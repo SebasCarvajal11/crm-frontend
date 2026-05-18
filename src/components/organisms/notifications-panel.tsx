@@ -5,6 +5,7 @@ import {
   markMentionNotificationSeenRequest,
 } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
+import { notifyTransientNotice } from '@/shared/lib/transient-notice'
 import { Button } from '@/components/ui/button'
 
 type Props = {
@@ -23,6 +24,7 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
   const notificationsQ = useQuery({
     queryKey: collabKeys.mentionNotifications(),
     queryFn: () => listUnreadMentionNotificationsRequest(accessToken),
+    enabled: Boolean(accessToken?.trim()),
     refetchInterval: 20_000,
   })
 
@@ -37,8 +39,12 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
   const rows = notificationsQ.data?.data ?? []
 
   const handleOpen = async (item: (typeof rows)[number]) => {
-    await markSeen.mutateAsync(item.id)
-    onOpenNotification({ projectId: item.project_id, channel: item.channel, messageId: item.message_id })
+    try {
+      await markSeen.mutateAsync(item.id)
+      onOpenNotification({ projectId: item.project_id, channel: item.channel, messageId: item.message_id })
+    } catch {
+      notifyTransientNotice('No se pudo abrir la notificación. Intenta de nuevo.')
+    }
   }
 
   return (

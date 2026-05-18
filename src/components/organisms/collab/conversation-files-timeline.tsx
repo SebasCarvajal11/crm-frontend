@@ -1,6 +1,7 @@
 ﻿import { CalendarClock, CheckCircle2, Download, Eye, File as FileIconBase, FileImage, FileText, FileVideo, GitPullRequestArrow, UserRound } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ProjectMember, ProjectTask, ProjectTimelineItem } from '@/features/collab/model'
+import { downloadGatewayFile, previewGatewayFile, triggerBlobDownload } from '@/features/collab/utils'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -53,12 +54,38 @@ export function ConversationFilesTimeline({ accessToken, timeline, tasks, member
   const [imageZoom, setImageZoom] = useState(1)
   const [searchText, setSearchText] = useState('')
   const [kindFilter, setKindFilter] = useState<'all' | ProjectTimelineItem['kind']>('all')
-  const [preview, setPreview] = useState<{ open: boolean; url: string | null; mime: string; fileName: string }>({
+  const [preview, setPreview] = useState<{
+    open: boolean
+    url: string | null
+    blob: Blob | null
+    mime: string
+    fileName: string
+  }>({
     open: false,
     url: null,
+    blob: null,
     mime: '',
     fileName: '',
   })
+  const detachedPreviewUrlsRef = useRef<Set<string>>(new Set())
+
+  useEffect(() => {
+    const url = preview.url
+    if (!url) return
+    return () => {
+      URL.revokeObjectURL(url)
+    }
+  }, [preview.url])
+
+  useEffect(() => {
+    const detached = detachedPreviewUrlsRef.current
+    return () => {
+      for (const url of detached) {
+        URL.revokeObjectURL(url)
+      }
+      detached.clear()
+    }
+  }, [])
 
   const emailBySub = useMemo(
     () => new Map(
@@ -88,18 +115,14 @@ export function ConversationFilesTimeline({ accessToken, timeline, tasks, member
     const key = `${fileId}:preview`
     try {
       setBusyKey(key)
-      const res = await fetch(`/api/files/${fileId}/download?preview=true`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      if (!res.ok) throw new Error(`No se pudo previsualizar (${res.status})`)
-      const blob = await res.blob()
-      const objectUrl = URL.createObjectURL(blob)
+      const next = await previewGatewayFile(accessToken, fileId, fileName)
       setImageZoom(1)
       setPreview({
         open: true,
-        url: objectUrl,
-        mime: blob.type || 'application/octet-stream',
-        fileName,
+        url: next.objectUrl,
+        blob: next.blob,
+        mime: next.mime,
+        fileName: next.fileName,
       })
     } catch (error) {
       onError(error instanceof Error ? error.message : 'No se pudo previsualizar el archivo')
@@ -111,41 +134,31 @@ export function ConversationFilesTimeline({ accessToken, timeline, tasks, member
   const closePreview = () => {
     if (preview.url) URL.revokeObjectURL(preview.url)
     setImageZoom(1)
-    setPreview({ open: false, url: null, mime: '', fileName: '' })
+    setPreview({ open: false, url: null, blob: null, mime: '', fileName: '' })
   }
 
   const openPreviewInNewTab = () => {
-    if (!preview.url) return
-    window.open(preview.url, '_blank', 'noopener,noreferrer')
+    if (!preview.blob) return
+    const tabUrl = URL.createObjectURL(preview.blob)
+    detachedPreviewUrlsRef.current.add(tabUrl)
+    const opened = window.open(tabUrl, '_blank', 'noopener,noreferrer')
+    if (!opened) {
+      URL.revokeObjectURL(tabUrl)
+      detachedPreviewUrlsRef.current.delete(tabUrl)
+      onError('No se pudo abrir la pestaña. Permite ventanas emergentes.')
+    }
   }
 
   const downloadPreviewFile = () => {
-    if (!preview.url) return
-    const link = document.createElement('a')
-    link.href = preview.url
-    link.download = preview.fileName
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    if (!preview.blob) return
+    triggerBlobDownload(preview.blob, preview.fileName)
   }
 
   const downloadFile = async (fileId: string, fileName: string) => {
     const key = `${fileId}:download`
     try {
       setBusyKey(key)
-      const res = await fetch(`/api/files/${fileId}/download`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      if (!res.ok) throw new Error(`No se pudo descargar (${res.status})`)
-      const blob = await res.blob()
-      const objectUrl = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = objectUrl
-      link.download = fileName
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(objectUrl)
+      await downloadGatewayFile(accessToken, fileId, fileName)
     } catch (error) {
       onError(error instanceof Error ? error.message : 'No se pudo descargar el archivo')
     } finally {

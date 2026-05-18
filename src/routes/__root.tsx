@@ -1,4 +1,5 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { TransientNoticeHost } from '@/app/providers/transient-notice-host'
 import { GridPattern } from '@/components/ui/grid-pattern'
 
 /**
@@ -18,6 +19,7 @@ export const Route = createRootRoute({
       />
       <div className="relative z-10">
         <Outlet />
+        <TransientNoticeHost />
       </div>
     </div>
   ),

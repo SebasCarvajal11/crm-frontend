@@ -1,11 +1,12 @@
 ﻿import { useEffect, useRef, useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Bell, MessageSquare, X } from 'lucide-react'
 import {
   listUnreadMentionNotificationsRequest,
   markMentionNotificationSeenRequest,
 } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
+import { notifyTransientNotice } from '@/shared/lib/transient-notice'
 
 type Props = {
   accessToken: string
@@ -25,7 +26,9 @@ export function MentionNotifications({ accessToken, onOpenNotification }: Props)
   const notificationsQ = useQuery({
     queryKey: collabKeys.mentionNotifications(),
     queryFn: () => listUnreadMentionNotificationsRequest(accessToken),
+    enabled: Boolean(accessToken?.trim()),
     refetchInterval: 20_000,
+    placeholderData: keepPreviousData,
   })
 
   const markSeen = useMutation({
@@ -38,11 +41,16 @@ export function MentionNotifications({ accessToken, onOpenNotification }: Props)
 
   const rows = notificationsQ.data?.data ?? []
   const unread = rows.length
+  const notificationsUnavailable = notificationsQ.isError && unread === 0
 
   const handleOpen = async (item: (typeof rows)[number]) => {
-    await markSeen.mutateAsync(item.id)
-    onOpenNotification({ projectId: item.project_id, channel: item.channel, messageId: item.message_id })
-    setOpen(false)
+    try {
+      await markSeen.mutateAsync(item.id)
+      onOpenNotification({ projectId: item.project_id, channel: item.channel, messageId: item.message_id })
+      setOpen(false)
+    } catch {
+      notifyTransientNotice('No se pudo abrir la notificación. Intenta de nuevo.')
+    }
   }
 
   useEffect(() => {
@@ -56,11 +64,11 @@ export function MentionNotifications({ accessToken, onOpenNotification }: Props)
       if (event.key === 'Escape') setOpen(false)
     }
 
-    document.addEventListener('mousedown', onClickOutside)
+    document.addEventListener('click', onClickOutside)
     document.addEventListener('keydown', onEsc)
 
     return () => {
-      document.removeEventListener('mousedown', onClickOutside)
+      document.removeEventListener('click', onClickOutside)
       document.removeEventListener('keydown', onEsc)
     }
   }, [open])
@@ -74,11 +82,17 @@ export function MentionNotifications({ accessToken, onOpenNotification }: Props)
         aria-label="Notificaciones de menciones"
       >
         <Bell className="size-4" />
-        {unread > 0 && (
+        {notificationsUnavailable ? (
+          <span
+            className="absolute -right-1 -top-1 inline-flex size-2.5 rounded-full bg-amber-500"
+            title="No se pudieron cargar las notificaciones"
+            aria-label="Error al cargar notificaciones"
+          />
+        ) : unread > 0 ? (
           <span className="absolute -right-1 -top-1 inline-flex min-w-[1.1rem] justify-center rounded-full bg-red-600 px-1 text-[10px] text-white">
             {unread > 99 ? '99+' : unread}
           </span>
-        )}
+        ) : null}
       </button>
 
       {open && (
@@ -91,8 +105,15 @@ export function MentionNotifications({ accessToken, onOpenNotification }: Props)
           </div>
 
           <div className="max-h-96 overflow-y-auto p-2">
-            {notificationsQ.isLoading && <p className="px-2 py-3 text-sm text-muted-foreground">Cargando...</p>}
-            {!notificationsQ.isLoading && rows.length === 0 && (
+            {notificationsQ.isLoading && !notificationsQ.data && (
+              <p className="px-2 py-3 text-sm text-muted-foreground">Cargando...</p>
+            )}
+            {notificationsQ.isError && (
+              <p className="px-2 py-3 text-sm text-amber-700 dark:text-amber-400">
+                No se pudieron cargar las notificaciones. Se reintentará automáticamente.
+              </p>
+            )}
+            {!notificationsQ.isLoading && !notificationsQ.isError && rows.length === 0 && (
               <p className="px-2 py-3 text-sm text-muted-foreground">No tienes menciones sin leer.</p>
             )}
             {rows.map((n) => (

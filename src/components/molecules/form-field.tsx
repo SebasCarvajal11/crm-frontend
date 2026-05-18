@@ -2,36 +2,58 @@
 import { Label } from '@/components/ui/label'
 import { cn } from '@/shared/lib/utils'
 
+export type FormFieldControlProps = {
+  id: string
+  'aria-invalid'?: boolean
+  'aria-describedby'?: string
+}
+
 type FormFieldProps = {
   id: string
   label: string
   error?: string
   hint?: string
-  /** Debe incluir el mismo `id` que el control (Input/Textarea). */
-  children: React.ReactNode
+  /**
+   * Control del campo: elemento React (p. ej. `<Input />`) o función que recibe props a11y
+   * para aplicarlas al nodo DOM real (recomendado con Select, Controller, etc.).
+   */
+  children: React.ReactNode | ((control: FormFieldControlProps) => React.ReactNode)
   className?: string
 }
 
-/** MolÃ©cula: etiqueta + control + error (el control repite `id` para accesibilidad). */
+function mergeControlElement(
+  child: React.ReactElement<Record<string, unknown>>,
+  control: FormFieldControlProps,
+): React.ReactElement {
+  const prev = child.props as Partial<FormFieldControlProps>
+  return React.cloneElement(child, {
+    ...control,
+    id: control.id,
+    'aria-invalid': control['aria-invalid'],
+    'aria-describedby': control['aria-describedby'] ?? prev['aria-describedby'],
+  })
+}
+
+/** Molécula: etiqueta + control + error/hint con ids y ARIA enlazados. */
 export function FormField({ id, label, error, hint, children, className }: FormFieldProps) {
   const errorId = `${id}-error`
   const hintId = `${id}-hint`
   const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ')
 
-  const control = React.isValidElement(children)
-    ? React.cloneElement(
-        children as React.ReactElement<{
-          id?: string
-          'aria-invalid'?: boolean
-          'aria-describedby'?: string
-        }>,
-        {
-          id,
-          'aria-invalid': Boolean(error),
-          'aria-describedby': describedBy || undefined,
-        }
-      )
-    : children
+  const controlProps: FormFieldControlProps = {
+    id,
+    'aria-invalid': Boolean(error),
+    'aria-describedby': describedBy || undefined,
+  }
+
+  let control: React.ReactNode
+  if (typeof children === 'function') {
+    control = children(controlProps)
+  } else if (React.isValidElement(children)) {
+    control = mergeControlElement(children as React.ReactElement<Record<string, unknown>>, controlProps)
+  } else {
+    control = children
+  }
 
   return (
     <div className={cn('space-y-2', className)}>
@@ -50,4 +72,3 @@ export function FormField({ id, label, error, hint, children, className }: FormF
     </div>
   )
 }
-

@@ -1,5 +1,6 @@
 import { api } from '@/lib/api'
-import { bearer } from './collab-api.projects'
+import { putFileToPresignedUrl } from '@/features/media/api/presigned-upload'
+import { abortProjectFileUploadRequest, bearer } from './collab-api.projects'
 import type {
   DataResponse,
   ProjectFile,
@@ -15,7 +16,7 @@ export async function createTaskRequest(
     title: string
     description?: string
     priority?: ProjectTask['priority']
-    assignees?: { user_sub: string; user_email: string }[]
+    assignees?: { user_sub: string; user_email?: string }[]
     due_date?: string
     client_visible?: boolean
     checklist_progress?: number
@@ -36,7 +37,7 @@ export async function patchTaskRequest(
     title?: string
     description?: string | null
     priority?: ProjectTask['priority']
-    assignees?: { user_sub: string; user_email: string }[]
+    assignees?: { user_sub: string; user_email?: string }[]
     due_date?: string | null
     checklist_progress?: number
     client_visible?: boolean
@@ -80,6 +81,70 @@ export async function listTaskFilesRequest(
     .json<DataResponse<ProjectFile[]>>()
 }
 
+type PresignedUploadUrlResponse = {
+  data: {
+    uploadUrl: string
+    objectKey: string
+    expiresInSeconds: number
+  }
+}
+
+export async function uploadTaskFilePresignedRequest(
+  accessToken: string,
+  projectId: string,
+  taskId: string,
+  file: File,
+): Promise<{ objectKey: string }> {
+  const mimeType = file.type || 'application/octet-stream'
+
+  const step = await api
+    .post(`projects/${projectId}/tasks/${taskId}/files/upload-url`, {
+      headers: bearer(accessToken),
+      json: {
+        file_name: file.name,
+        mime_type: mimeType,
+        size_bytes: file.size,
+      },
+    })
+    .json<PresignedUploadUrlResponse>()
+
+  await putFileToPresignedUrl(step.data.uploadUrl, file, mimeType)
+  return { objectKey: step.data.objectKey }
+}
+
+export async function uploadTaskFileWithMetadataRequest(
+  accessToken: string,
+  projectId: string,
+  taskId: string,
+  file: File,
+  title: string,
+  description: string,
+  body: {
+    fileName: string
+    mimeType: string
+    sizeBytes: number
+    isClientVisible: boolean
+  },
+): Promise<DataResponse<ProjectFile>> {
+  const upload = await uploadTaskFilePresignedRequest(accessToken, projectId, taskId, file)
+  try {
+    return await uploadTaskFileRequest(accessToken, projectId, taskId, title, description, {
+      fileName: body.fileName,
+      storagePath: upload.objectKey,
+      mimeType: body.mimeType,
+      sizeBytes: body.sizeBytes,
+      isClientVisible: body.isClientVisible,
+    })
+  } catch (error) {
+    try {
+      await abortProjectFileUploadRequest(accessToken, projectId, upload.objectKey)
+    } catch {
+      // best-effort
+    }
+    throw error
+  }
+}
+
 export async function uploadTaskFileRequest(
   accessToken: string,
   projectId: string,
@@ -110,12 +175,4 @@ export async function uploadTaskFileRequest(
     .json<DataResponse<ProjectFile>>()
 }
 
-export async function getFileAccessRequest(
-  accessToken: string,
-  fileId: string,
-  preview = false
-): Promise<DataResponse<{ url: string; expiresInSeconds: number }>> {
-  const searchParams = preview ? { preview: 'true' } : undefined
-  return api.get(`files/${fileId}/access`, { headers: bearer(accessToken), searchParams }).json()
-}
-
+export { getProjectFileAccessRequest as getFileAccessRequest } from './collab-api.projects'

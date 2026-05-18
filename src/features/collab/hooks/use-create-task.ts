@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { parseApiError } from '@/shared/lib'
 import { createTaskRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
+import { getProjectMemberLabel, projectWorkers } from '@/features/collab/lib/member-display'
 import type { ProjectMember, ProjectTask, ProjectTaskColumn } from '@/features/collab/model'
 
 type Subtask = { id: string; title: string; is_completed: boolean; assignee_sub: string | null }
@@ -42,7 +43,7 @@ export function useCreateTask({
   handleClose,
 }: Params) {
   const queryClient = useQueryClient()
-  const workerMembers = members.filter((m) => m.role === 'worker' && Boolean(m.email))
+  const workerMembers = projectWorkers(members)
   const selectedWorkers = workerMembers.filter((m) => selectedWorkerSubs.includes(m.userSub))
   const columnId = column?.id ?? ''
 
@@ -53,7 +54,10 @@ export function useCreateTask({
         title: title.trim(),
         description: description.trim() || undefined,
         priority,
-        assignees: selectedWorkers.map((w) => ({ user_sub: w.userSub, user_email: w.email! })),
+        assignees: selectedWorkers.map((w) => ({
+          user_sub: w.userSub,
+          ...(w.email ? { user_email: w.email } : {}),
+        })),
         due_date: deadline || undefined,
         client_visible: clientVis,
         checklist_progress: 0,
@@ -72,7 +76,7 @@ export function useCreateTask({
     },
   })
 
-  return { createTask, workerMembers, selectedWorkers, columnId }
+  return { createTask, workerMembers, selectedWorkers, columnId, getProjectMemberLabel }
 }
 
 

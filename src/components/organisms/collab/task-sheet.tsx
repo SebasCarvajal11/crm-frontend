@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { AlertCircle, Calendar, FileText, Lock, Paperclip, Pencil, MessageSquare, User, X, CheckSquare, Trash2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,9 +14,17 @@ import { useTaskSheetSave } from '@/features/collab/hooks'
 import { TaskComments } from './task-comments'
 import { TaskFilesTab } from './task-files-tab'
 import type { ClientSearchResult } from '@/shared/types'
+import { getProjectMemberLabel, projectWorkers } from '@/features/collab/lib/member-display'
 import type { ProjectMember, ProjectTask, ProjectTaskColumn } from '@/features/collab/model'
 
 type Tab = 'info' | 'comments' | 'files'
+
+function workersFromTask(task: ProjectTask, members: ProjectMember[]): ClientSearchResult[] {
+  if (!task.assigneeSub) return []
+  const member = members.find((m) => m.userSub === task.assigneeSub)
+  if (!member) return []
+  return [{ subject: member.userSub, email: member.email ?? getProjectMemberLabel(member), role: 'worker' }]
+}
 
 type Props = {
   task: ProjectTask
@@ -40,12 +48,23 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
   const [editVisible,  setEditVisible]  = useState(task.isClientVisible)
   const [editDeadline, setEditDeadline] = useState(task.deadline?.slice(0, 10) ?? '')
   const [editColumnId, setEditColumnId] = useState(task.columnId)
-  const [editWorkers,  setEditWorkers]  = useState<ClientSearchResult[]>([])
+  const [editWorkers,  setEditWorkers]  = useState<ClientSearchResult[]>(() => workersFromTask(task, members))
 
   const [newSubtask,         setNewSubtask]         = useState('')
   const [newSubtaskAssignee, setNewSubtaskAssignee] = useState<string>('none')
 
-  const assignableMembers = members.filter((m) => m.role === 'worker' && Boolean(m.email))
+  const assignableMembers = projectWorkers(members)
+
+  const startEditing = useCallback(() => {
+    setEditTitle(task.title)
+    setEditDesc(task.description ?? '')
+    setEditPriority(task.priority)
+    setEditVisible(task.isClientVisible)
+    setEditDeadline(task.deadline?.slice(0, 10) ?? '')
+    setEditColumnId(task.columnId)
+    setEditWorkers(workersFromTask(task, members))
+    setEditing(true)
+  }, [task, members])
 
   const { save } = useTaskSheetSave({
     accessToken,
@@ -57,6 +76,20 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
     },
     onError,
   })
+
+  /** Campos de tarea desde el prop actual (no desde estado de edición, que puede estar stale). */
+  const persistedTaskFields = useCallback(
+    () => ({
+      editTitle: task.title,
+      editDesc: task.description ?? '',
+      editPriority: task.priority,
+      editVisible: task.isClientVisible,
+      editDeadline: task.deadline?.slice(0, 10) ?? '',
+      editColumnId: task.columnId,
+      editWorkers: workersFromTask(task, members),
+    }),
+    [task, members],
+  )
 
   // â”€â”€ Subtask handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -75,13 +108,7 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
       assignee_sub: newSubtaskAssignee,
     }]
     save.mutate({
-      editTitle,
-      editDesc,
-      editPriority,
-      editVisible,
-      editDeadline,
-      editColumnId,
-      editWorkers,
+      ...persistedTaskFields(),
       subtasks: updated,
     })
     setNewSubtask('')
@@ -97,13 +124,7 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
       assignee_sub: s.assigneeSub ?? null,
     }))
     save.mutate({
-      editTitle,
-      editDesc,
-      editPriority,
-      editVisible,
-      editDeadline,
-      editColumnId,
-      editWorkers,
+      ...persistedTaskFields(),
       subtasks: updated,
     })
   }
@@ -114,13 +135,7 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
       .filter(s => s.id !== id)
       .map(s => ({ id: s.id, title: s.title, is_completed: s.isCompleted, assignee_sub: s.assigneeSub ?? null }))
     save.mutate({
-      editTitle,
-      editDesc,
-      editPriority,
-      editVisible,
-      editDeadline,
-      editColumnId,
-      editWorkers,
+      ...persistedTaskFields(),
       subtasks: updated,
     })
   }
@@ -155,7 +170,7 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
           </div>
           <div className="flex items-center gap-1 shrink-0">
             {canEdit && !editing && (
-              <Button variant="ghost" size="icon" className="size-8" onClick={() => setEditing(true)} aria-label="Editar tarea">
+              <Button variant="ghost" size="icon" className="size-8" onClick={startEditing} aria-label="Editar tarea">
                 <Pencil className="size-3.5" />
               </Button>
             )}
@@ -305,7 +320,7 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
                             <SelectItem value="none" disabled>â€” Seleccionar trabajador â€”</SelectItem>
                             {assignableMembers.map((m) => (
                               <SelectItem key={m.userSub} value={m.userSub}>
-                                {m.email ? m.email.split('@')[0] : m.userSub.slice(0, 8)}
+                                {getProjectMemberLabel(m)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -349,7 +364,7 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
               {canEdit && (
                 <>
                   <Separator />
-                  <Button className="w-full" variant="outline" onClick={() => setEditing(true)}>
+                  <Button className="w-full" variant="outline" onClick={startEditing}>
                     <Pencil className="size-4 mr-2" />Editar tarea
                   </Button>
                 </>
@@ -424,10 +439,10 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
                   <Select value="none" onValueChange={(value) => {
                     if (value === 'none') return
                     const worker = assignableMembers.find((m) => m.userSub === value)
-                    if (!worker?.email) return
+                    if (!worker) return
                     setEditWorkers((prev) => prev.some((existing) => existing.subject === worker.userSub)
                       ? prev
-                      : [...prev, { subject: worker.userSub, email: worker.email!, role: 'worker' }])
+                      : [...prev, { subject: worker.userSub, email: worker.email ?? getProjectMemberLabel(worker), role: 'worker' }])
                   }}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecciona trabajador del proyecto…" />
@@ -438,7 +453,7 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
                         .filter((m) => !editWorkers.some((w) => w.subject === m.userSub))
                         .map((m) => (
                           <SelectItem key={m.userSub} value={m.userSub}>
-                            {m.email}
+                            {getProjectMemberLabel(m)}
                           </SelectItem>
                         ))}
                     </SelectContent>

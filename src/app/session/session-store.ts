@@ -18,9 +18,10 @@ type SessionState = StoredSession & {
 
 let bootstrapInFlight: Promise<void> | null = null
 let storageSyncBound = false
+let storageSyncCleanup: (() => void) | null = null
 
 function canUseStorage(): boolean {
-  return typeof window !== 'undefined' && typeof localStorage !== 'undefined'
+  return typeof window !== 'undefined' && typeof sessionStorage !== 'undefined'
 }
 
 function readStored(): StoredSession {
@@ -29,8 +30,8 @@ function readStored(): StoredSession {
   }
 
   return {
-    token: localStorage.getItem(TOKEN_KEY),
-    email: localStorage.getItem(EMAIL_KEY),
+    token: sessionStorage.getItem(TOKEN_KEY),
+    email: sessionStorage.getItem(EMAIL_KEY),
   }
 }
 
@@ -38,15 +39,15 @@ function writeStored(token: string | null, email: string | null) {
   if (!canUseStorage()) return
 
   if (token) {
-    localStorage.setItem(TOKEN_KEY, token)
+    sessionStorage.setItem(TOKEN_KEY, token)
   } else {
-    localStorage.removeItem(TOKEN_KEY)
+    sessionStorage.removeItem(TOKEN_KEY)
   }
 
   if (email) {
-    localStorage.setItem(EMAIL_KEY, email)
+    sessionStorage.setItem(EMAIL_KEY, email)
   } else {
-    localStorage.removeItem(EMAIL_KEY)
+    sessionStorage.removeItem(EMAIL_KEY)
   }
 }
 
@@ -74,15 +75,13 @@ export async function bootstrapSession(): Promise<void> {
   if (bootstrapInFlight) return bootstrapInFlight
 
   bootstrapInFlight = (async () => {
-    const store = useSessionStore.getState()
-    store.syncFromStorage()
-
-    if (useSessionStore.getState().token) {
-      useSessionStore.getState().setBootstrapped(true)
-      return
-    }
-
     try {
+      useSessionStore.getState().syncFromStorage()
+
+      if (useSessionStore.getState().token) {
+        return
+      }
+
       const refreshResponse = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
         method: 'POST',
         credentials: 'include',
@@ -106,20 +105,28 @@ export async function bootstrapSession(): Promise<void> {
       useSessionStore.getState().setSession(token, useSessionStore.getState().email)
     } finally {
       useSessionStore.getState().setBootstrapped(true)
-      bootstrapInFlight = null
     }
   })()
 
   return bootstrapInFlight
 }
 
-export function bindSessionStorageSync() {
-  if (!canUseStorage() || storageSyncBound) return
+/** Sincroniza sesión entre pestañas. Devuelve cleanup para `useEffect`. */
+export function bindSessionStorageSync(): () => void {
+  if (!canUseStorage()) return () => {}
+  if (storageSyncBound) return storageSyncCleanup ?? (() => {})
 
-  window.addEventListener('storage', (event) => {
+  const onStorage = (event: StorageEvent) => {
     if (event.key !== TOKEN_KEY && event.key !== EMAIL_KEY && event.key !== null) return
     useSessionStore.getState().syncFromStorage()
-  })
+  }
 
+  window.addEventListener('storage', onStorage)
   storageSyncBound = true
+  storageSyncCleanup = () => {
+    window.removeEventListener('storage', onStorage)
+    storageSyncBound = false
+    storageSyncCleanup = null
+  }
+  return storageSyncCleanup
 }

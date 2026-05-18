@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { KanbanSquare } from 'lucide-react'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { TaskColumn } from './task-column'
@@ -30,6 +30,13 @@ export function TaskBoard({
 }: Props) {
   const [selectedTaskId,  setSelectedTaskId]  = useState<string | null>(focusedTaskId ?? null)
   const [createColumnId, setCreateColumnId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (focusedTaskId) {
+      const timer = window.requestAnimationFrame(() => setSelectedTaskId(focusedTaskId))
+      return () => window.cancelAnimationFrame(timer)
+    }
+  }, [focusedTaskId])
 
   const selectedTask = Object.values(tasksByColumn).flat().find(t => t.id === selectedTaskId) ?? null
   const createColumn = columns.find((column) => column.id === createColumnId) ?? null

@@ -62,18 +62,20 @@ export function AdminInviteForms({ accessToken }: Props) {
               </FormField>
             </div>
             <FormField id="invite-kind" label="Tipo de cliente" error={inviteForm.formState.errors.client_kind?.message}>
-              <Select
-                value={inviteKind}
-                onValueChange={(value) => inviteForm.setValue('client_kind', value as 'natural' | 'juridical', { shouldValidate: true })}
-              >
-                <SelectTrigger id="invite-kind" className="h-10 w-full">
-                  <SelectValue placeholder="Selecciona tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="natural">Persona natural</SelectItem>
-                  <SelectItem value="juridical">Persona juridica</SelectItem>
-                </SelectContent>
-              </Select>
+              {(control) => (
+                <Select
+                  value={inviteKind}
+                  onValueChange={(value) => inviteForm.setValue('client_kind', value as 'natural' | 'juridical', { shouldValidate: true })}
+                >
+                  <SelectTrigger {...control} className="h-10 w-full">
+                    <SelectValue placeholder="Selecciona tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="natural">Persona natural</SelectItem>
+                    <SelectItem value="juridical">Persona juridica</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
             </FormField>
             {inviteKind === 'juridical' && (
               <FormField id="invite-company" label="Empresa" error={inviteForm.formState.errors.company_name?.message}>

@@ -70,7 +70,7 @@ export function CreateTaskModal({
     onClose()
   }
 
-  const { createTask, workerMembers, selectedWorkers, columnId } = useCreateTask({
+  const { createTask, workerMembers, selectedWorkers, columnId, getProjectMemberLabel } = useCreateTask({
     accessToken,
     projectId,
     column,
@@ -107,8 +107,8 @@ export function CreateTaskModal({
 
   const getWorkerLabel = (sub: string | null) => {
     if (!sub) return null
-    const worker = selectedWorkers.find((w) => w.userSub === sub)
-    return worker ? worker.email : sub
+    const worker = workerMembers.find((w) => w.userSub === sub)
+    return worker ? getProjectMemberLabel(worker) : sub
   }
 
   return (
@@ -161,7 +161,7 @@ export function CreateTaskModal({
                   {selectedWorkers.map((worker) => (
                     <UserChip
                       key={worker.userSub}
-                      email={worker.email!}
+                      email={getProjectMemberLabel(worker)}
                       onRemove={() => {
                         setSelectedWorkerSubs((prev) => prev.filter((sub) => sub !== worker.userSub))
                         setSubtasks((prev) => prev.map((subtask) => subtask.assignee_sub === worker.userSub ? { ...subtask, assignee_sub: null } : subtask))
@@ -189,7 +189,7 @@ export function CreateTaskModal({
                     {workerMembers
                       .filter((worker) => !selectedWorkerSubs.includes(worker.userSub))
                       .map((worker) => (
-                        <SelectItem key={worker.userSub} value={worker.userSub}>{worker.email}</SelectItem>
+                        <SelectItem key={worker.userSub} value={worker.userSub}>{getProjectMemberLabel(worker)}</SelectItem>
                       ))}
                   </SelectContent>
                 </Select>

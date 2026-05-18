@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { parseApiError } from '@/shared/lib'
-import { listTaskFilesRequest, uploadTaskFileRequest } from '@/features/collab/api'
+import { listTaskFilesRequest, uploadTaskFileWithMetadataRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
-import { uploadDocumentRequest } from '@/features/media/api'
 import type { ProjectFile } from '@/features/collab/model'
 
 type Params = {
@@ -33,14 +32,19 @@ export function useTaskFiles({ accessToken, projectId, taskId, onError, setFileE
   const upload = useMutation({
     mutationFn: (input: UploadInput) => {
       if (!input.selectedFile) throw new Error('No hay archivo seleccionado')
-      return uploadDocumentRequest(accessToken, input.selectedFile).then((mediaRes) =>
-        uploadTaskFileRequest(accessToken, projectId, taskId, input.fileTitle.trim(), input.fileDesc.trim(), {
+      return uploadTaskFileWithMetadataRequest(
+        accessToken,
+        projectId,
+        taskId,
+        input.selectedFile!,
+        input.fileTitle.trim(),
+        input.fileDesc.trim(),
+        {
           fileName: input.selectedFile!.name,
-          storagePath: mediaRes.data.objectKey,
           mimeType: input.selectedFile!.type || 'application/octet-stream',
           sizeBytes: input.selectedFile!.size,
           isClientVisible: false,
-        }),
+        },
       )
     },
     onSuccess: () => {

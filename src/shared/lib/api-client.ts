@@ -1,5 +1,11 @@
 import ky from 'ky'
 import { getApiBaseUrl, useSessionStore } from '@/app/session/session-store'
+import {
+  RefreshTokenError,
+  classifyRefreshHttpStatus,
+  getRefreshFailureReason,
+} from '@/shared/lib/refresh-token-error'
+import { notifyNetworkRetry } from '@/shared/lib/transient-notice'
 
 type RefreshPayload = {
   data?: {
@@ -13,7 +19,27 @@ type Subscriber = {
 }
 
 let isRefreshing = false
+let isRedirecting = false
 let refreshSubscribers: Array<Subscriber> = []
+
+function isLoginPath(): boolean {
+  const path = window.location.pathname.replace(/\/$/, '') || '/'
+  return path === '/login'
+}
+
+/** Una sola redirección o limpieza cuando el refresh falla (varios 401 en paralelo). */
+function handleAuthFailure() {
+  if (typeof window === 'undefined') return
+  if (isRedirecting) return
+
+  if (isLoginPath()) {
+    isRefreshing = false
+    return
+  }
+
+  isRedirecting = true
+  window.location.assign('/login')
+}
 
 function onRefreshed(token: string) {
   refreshSubscribers.forEach(({ resolve }) => resolve(token))
@@ -30,6 +56,7 @@ function hasRetriedAuth(request: Request): boolean {
 }
 
 function shouldAttemptRefresh(request: Request, response: Response): boolean {
+  if (isRedirecting) return false
   if (response.status !== 401) return false
   if (request.url.includes('/auth/refresh')) return false
   if (hasRetriedAuth(request)) return false
@@ -37,6 +64,9 @@ function shouldAttemptRefresh(request: Request, response: Response): boolean {
 }
 
 async function refreshAccessToken(): Promise<string> {
+  if (isRedirecting) {
+    throw new Error('Sesion expirada')
+  }
   if (isRefreshing) {
     return new Promise((resolve, reject) => {
       refreshSubscribers.push({ resolve, reject })
@@ -52,24 +82,32 @@ async function refreshAccessToken(): Promise<string> {
     })
 
     if (!refreshResponse.ok) {
-      throw new Error('No se pudo renovar la sesion')
+      throw new RefreshTokenError(
+        'No se pudo renovar la sesion',
+        classifyRefreshHttpStatus(refreshResponse.status),
+      )
     }
 
     const payload = (await refreshResponse.json()) as RefreshPayload
     const token = payload.data?.access_token
     if (!token) {
-      throw new Error('La respuesta de refresh no trae access_token')
+      throw new RefreshTokenError('La respuesta de refresh no trae access_token', 'auth')
     }
 
     useSessionStore.getState().setSession(token, useSessionStore.getState().email)
     onRefreshed(token)
     return token
   } catch (error) {
-    useSessionStore.getState().clearSession()
-    onRefreshFailed(error as Error)
+    const reason = getRefreshFailureReason(error)
+    if (reason === 'auth') {
+      useSessionStore.getState().clearSession()
+    }
+    onRefreshFailed(error instanceof Error ? error : new Error('Refresh fallido'))
     throw error
   } finally {
-    isRefreshing = false
+    if (!isRedirecting) {
+      isRefreshing = false
+    }
   }
 }
 
@@ -115,9 +153,11 @@ export const api = ky.create({
         try {
           const token = await refreshAccessToken()
           return retryWithRefreshedToken(request, token)
-        } catch {
-          if (typeof window !== 'undefined') {
-            window.location.assign('/login')
+        } catch (error) {
+          if (getRefreshFailureReason(error) === 'auth') {
+            handleAuthFailure()
+          } else {
+            notifyNetworkRetry()
           }
           return response
         }

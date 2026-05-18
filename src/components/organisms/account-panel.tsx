@@ -11,7 +11,7 @@ type Props = {
 /** Organismo raiz del panel de cuenta del usuario. */
 export function AccountPanel({ accessToken, identity }: Props) {
   return (
-    <div className="space-y-10">
+    <div className="w-full min-w-0 space-y-10">
       <ProfileSection accessToken={accessToken} identity={identity} />
       <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
         <SessionsSection accessToken={accessToken} />

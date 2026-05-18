@@ -235,8 +235,16 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
                 )}
               </div>
             </div>
+            {boardData?.board.tasksTruncated ? (
+              <Alert className="mb-3 border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
+                <AlertDescription>
+                  Este proyecto tiene {boardData.board.tasksTotal ?? 'más de'}{' '}
+                  {boardData.board.tasksLimit ?? 2000} tareas. Solo se muestran las primeras{' '}
+                  {boardData.board.tasksLimit ?? 2000}. Usa la búsqueda de tareas para localizar el resto.
+                </AlertDescription>
+              </Alert>
+            ) : null}
             <TaskBoard
-              key={focusedTaskId ?? 'board-default'}
               accessToken={accessToken}
               projectId={projectId}
               columns={boardColumns}

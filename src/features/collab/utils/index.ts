@@ -4,4 +4,4 @@ export {
   mentionHints,
   resolveMentionsFromBody,
 } from '@/components/organisms/collab/chat-mentions'
-export { downloadGatewayFile, formatFileSize } from './files'
+export { downloadGatewayFile, formatFileSize, previewGatewayFile, triggerBlobDownload } from './files'

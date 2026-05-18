@@ -84,10 +84,11 @@ function getRelativeActivityLabel(iso: string | null) {
   const days = Math.floor((startNow - startThen) / 86_400_000)
   if (days <= 0) return 'Hoy'
   if (days === 1) return 'Ayer'
-  if (days < 7) return `Hace ${days} dias`
+  if (days < 7) return `Hace ${days} días`
   if (days < 30) return `Hace ${Math.floor(days / 7)} semana${Math.floor(days / 7) === 1 ? '' : 's'}`
   if (days < 365) return `Hace ${Math.floor(days / 30)} mes${Math.floor(days / 30) === 1 ? '' : 'es'}`
-  return `Hace ${Math.floor(days / 365)} ano${Math.floor(days / 365) === 1 ? '' : 's'}`
+  const years = Math.floor(days / 365)
+  return `Hace ${years} año${years === 1 ? '' : 's'}`
 }
 
 export function ProjectMembers({ members, isLoading, accessToken, projectId, identity, canManageMembers, onError }: Props) {

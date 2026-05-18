@@ -1,4 +1,6 @@
+import { useSessionStore } from '@/app/session/session-store'
 import { api } from '@/lib/api'
+import { putFileToPresignedUrl } from '@/features/media/api/presigned-upload'
 import type {
   DataResponse,
   PaginatedData,
@@ -14,7 +16,12 @@ import type {
   ProjectWorkspaceResponse,
 } from '@/features/collab/model'
 
-export const bearer = (accessToken: string) => ({ Authorization: `Bearer ${accessToken}` })
+/** Usa el token del store (p. ej. tras refresh) para alinear con el hook 401 de `api`. */
+export const bearer = (accessToken?: string) => {
+  const token = useSessionStore.getState().token ?? accessToken
+  if (!token) throw new Error('No hay sesión activa')
+  return { Authorization: `Bearer ${token}` }
+}
 
 export async function listProjectsRequest(
   accessToken: string,
@@ -103,7 +110,9 @@ export async function listProjectFilesEnrichedRequest(
   const searchParams: Record<string, string> = {}
   if (params?.page != null) searchParams.page = String(params.page)
   if (params?.limit != null) searchParams.limit = String(params.limit)
-  return api.get(`projects/${projectId}/files`, { headers: bearer(accessToken), searchParams }).json()
+  return api
+    .get(`projects/${projectId}/files`, { headers: bearer(accessToken), searchParams })
+    .json<DataResponse<PaginatedData<ProjectFileEnriched>>>()
 }
 
 export async function upsertProjectMemberRequest(
@@ -139,7 +148,7 @@ export async function uploadProjectConversationFileRequest(
     description?: string
     isClientVisible: boolean
   }
-) {
+): Promise<DataResponse<ProjectFileEnriched>> {
   const form = new FormData()
   form.append('file', body.file)
   form.append('title', body.title)
@@ -147,7 +156,50 @@ export async function uploadProjectConversationFileRequest(
   form.append('is_client_visible', String(body.isClientVisible))
   // Backward compatibility: older backend contracts still expect channel.
   form.append('channel', body.isClientVisible ? 'external' : 'internal')
-  return api.post(`projects/${projectId}/files/upload`, { headers: bearer(accessToken), body: form }).json()
+  return api
+    .post(`projects/${projectId}/files/upload`, { headers: bearer(accessToken), body: form })
+    .json<DataResponse<ProjectFileEnriched>>()
+}
+
+type PresignedUploadUrlResponse = {
+  data: {
+    uploadUrl: string
+    objectKey: string
+    expiresInSeconds: number
+  }
+}
+
+export async function uploadProjectFilePresignedRequest(
+  accessToken: string,
+  projectId: string,
+  file: File,
+): Promise<{ objectKey: string }> {
+  const mimeType = file.type || 'application/octet-stream'
+
+  const step = await api
+    .post(`projects/${projectId}/files/upload-url`, {
+      headers: bearer(accessToken),
+      json: {
+        file_name: file.name,
+        mime_type: mimeType,
+        size_bytes: file.size,
+      },
+    })
+    .json<PresignedUploadUrlResponse>()
+
+  await putFileToPresignedUrl(step.data.uploadUrl, file, mimeType)
+  return { objectKey: step.data.objectKey }
+}
+
+export async function abortProjectFileUploadRequest(
+  accessToken: string,
+  projectId: string,
+  objectKey: string,
+): Promise<void> {
+  await api.delete(`projects/${projectId}/files/uploaded-object`, {
+    headers: bearer(accessToken),
+    searchParams: { objectKey },
+  })
 }
 
 export async function createProjectFileMetadataRequest(
@@ -163,7 +215,7 @@ export async function createProjectFileMetadataRequest(
     isClientVisible: boolean
     origin: 'internal_chat' | 'external_chat' | 'manual_upload'
   }
-) {
+): Promise<DataResponse<ProjectFileEnriched>> {
   return api.post(`projects/${projectId}/files`, {
     headers: bearer(accessToken),
     json: {
@@ -177,15 +229,61 @@ export async function createProjectFileMetadataRequest(
       is_client_visible: body.isClientVisible,
       origin: body.origin,
     },
-  }).json()
+  }).json<DataResponse<ProjectFileEnriched>>()
 }
 
-export async function deleteProjectFileRequest(accessToken: string, fileId: string) {
-  return api.delete(`files/${fileId}`, { headers: bearer(accessToken) }).json()
+export type ProjectFileMetadataInput = {
+  fileName: string
+  title: string
+  description?: string | null
+  mimeType: string
+  sizeBytes: number
+  isClientVisible: boolean
+  origin: 'internal_chat' | 'external_chat' | 'manual_upload'
 }
 
-export function getProjectFileDownloadUrl(fileId: string, preview = false): string {
-  return preview ? `/api/files/${fileId}/download?preview=true` : `/api/files/${fileId}/download`
+/** Upload prefirmado + metadata; si falla el registro, intenta borrar el objeto en OCI. */
+export async function uploadProjectFileWithMetadataRequest(
+  accessToken: string,
+  projectId: string,
+  file: File,
+  metadata: ProjectFileMetadataInput,
+): Promise<DataResponse<ProjectFileEnriched>> {
+  const upload = await uploadProjectFilePresignedRequest(accessToken, projectId, file)
+  try {
+    return await createProjectFileMetadataRequest(accessToken, projectId, {
+      ...metadata,
+      storagePath: upload.objectKey,
+    })
+  } catch (error) {
+    try {
+      await abortProjectFileUploadRequest(accessToken, projectId, upload.objectKey)
+    } catch {
+      // compensación best-effort; el worker orphan-oci puede limpiar más tarde
+    }
+    throw error
+  }
+}
+
+export async function deleteProjectFileRequest(
+  accessToken: string,
+  fileId: string
+): Promise<DataResponse<{ id: string }>> {
+  return api.delete(`files/${fileId}`, { headers: bearer(accessToken) }).json<DataResponse<{ id: string }>>()
+}
+
+/** Descarga vía cliente `api` (ky): reintenta tras 401 con refresh. No usar `fetch()` directo. */
+export async function downloadProjectFileBlobRequest(
+  accessToken: string,
+  fileId: string,
+  preview = false
+): Promise<Blob> {
+  return api
+    .get(`files/${fileId}/download`, {
+      headers: bearer(accessToken),
+      searchParams: preview ? { preview: 'true' } : undefined,
+    })
+    .blob()
 }
 
 export async function getProjectFileAccessRequest(
@@ -194,15 +292,19 @@ export async function getProjectFileAccessRequest(
   preview = false
 ): Promise<DataResponse<{ url: string; expiresInSeconds: number }>> {
   const searchParams = preview ? { preview: 'true' } : undefined
-  return api.get(`files/${fileId}/access`, { headers: bearer(accessToken), searchParams }).json()
+  return api
+    .get(`files/${fileId}/access`, { headers: bearer(accessToken), searchParams })
+    .json<DataResponse<{ url: string; expiresInSeconds: number }>>()
 }
 
 export async function updateProjectFileRequest(
   accessToken: string,
   fileId: string,
   body: { title?: string; description?: string | null; task_id?: string | null; is_client_visible?: boolean }
-) {
-  return api.patch(`files/${fileId}`, { headers: bearer(accessToken), json: body }).json()
+): Promise<DataResponse<ProjectFileEnriched>> {
+  return api
+    .patch(`files/${fileId}`, { headers: bearer(accessToken), json: body })
+    .json<DataResponse<ProjectFileEnriched>>()
 }
 
 export async function createMinorChangeRequestRequest(
@@ -244,6 +346,8 @@ export async function listFormalChangeLogRequest(
   const searchParams: Record<string, string> = {}
   if (params?.page != null) searchParams.page = String(params.page)
   if (params?.limit != null) searchParams.limit = String(params.limit)
-  return api.get(`projects/${projectId}/change-log/formal`, { headers: bearer(accessToken), searchParams }).json()
+  return api
+    .get(`projects/${projectId}/change-log/formal`, { headers: bearer(accessToken), searchParams })
+    .json<DataResponse<PaginatedData<{ id: string; description: string; createdAt: string }>>>()
 }
 

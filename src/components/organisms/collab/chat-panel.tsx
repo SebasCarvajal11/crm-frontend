@@ -72,6 +72,7 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
   const [activeIdx, setActiveIdx] = useState(0)
   const [highlightMessageId, setHighlightMessageId] = useState<string | null>(initialMessageId ?? null)
   const [cursorPos, setCursorPos] = useState(0)
+  const [mentionPickerSuppressed, setMentionPickerSuppressed] = useState(false)
   const logRef = useRef<HTMLDivElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -89,7 +90,10 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
     lastMarkedRef,
   })
 
-  const mentionQuery = useMemo(() => extractActiveMentionQuery(body, cursorPos || body.length), [body, cursorPos])
+  const mentionQuery = useMemo(() => {
+    if (mentionPickerSuppressed) return null
+    return extractActiveMentionQuery(body, cursorPos || body.length)
+  }, [body, cursorPos, mentionPickerSuppressed])
   const mentionSuggestions = useMemo(() => mentionQuery ? buildMentionSuggestions(mentionQuery.query, identity.role, members) : [], [mentionQuery, identity.role, members])
 
   useLayoutEffect(() => {
@@ -168,6 +172,7 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
     const next = `${before}@${value} ${after}`
     setBody(next)
     setActiveIdx(0)
+    setMentionPickerSuppressed(false)
     requestAnimationFrame(() => {
       const pos = before.length + value.length + 2
       textareaRef.current?.focus()
@@ -310,6 +315,7 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
               onChange={(e) => {
                 setBody(e.target.value)
                 setActiveIdx(0)
+                setMentionPickerSuppressed(false)
                 setCursorPos(e.target.selectionStart ?? e.target.value.length)
               }}
               onKeyDown={(e) => {
@@ -322,7 +328,7 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
                     applyMention(mentionSuggestions[idx]?.value ?? mentionSuggestions[0].value)
                     return
                   }
-                  if (e.key === 'Escape') { e.preventDefault(); setBody((v) => `${v} `); setActiveIdx(0); return }
+                  if (e.key === 'Escape') { e.preventDefault(); setMentionPickerSuppressed(true); setActiveIdx(0); return }
                 }
                 if (e.key === 'Enter' && !e.shiftKey && body.trim()) {
                   e.preventDefault()
@@ -336,7 +342,10 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
               className="min-h-[44px] max-h-28 resize-none text-sm"
               rows={1}
               aria-label="Escribir mensaje"
-              onSelect={(e) => setCursorPos((e.target as HTMLTextAreaElement).selectionStart ?? body.length)}
+              onSelect={(e) => {
+                setMentionPickerSuppressed(false)
+                setCursorPos((e.target as HTMLTextAreaElement).selectionStart ?? body.length)
+              }}
             />
           </div>
           <Button

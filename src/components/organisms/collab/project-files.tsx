@@ -3,6 +3,7 @@ import { Download, FolderOpen } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useProjectFiles } from '@/features/collab/hooks'
 import { downloadGatewayFile, formatFileSize } from '@/features/collab/utils'
+import { notifyTransientNotice } from '@/shared/lib/transient-notice'
 
 type Props = {
   accessToken: string
@@ -37,7 +38,9 @@ export function ProjectFiles({ accessToken, projectId }: Props) {
       setBusyId(fileId)
       await downloadGatewayFile(accessToken, fileId, fileName)
     } catch (error) {
-      console.error(error)
+      const message =
+        error instanceof Error ? error.message : 'No se pudo descargar el archivo. Intenta de nuevo.'
+      notifyTransientNotice(message)
     } finally {
       setBusyId(null)
     }

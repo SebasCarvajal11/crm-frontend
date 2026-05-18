@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input'
 import { SectionIntro } from '@/components/molecules/section-intro'
 import { useAccountProfileSection } from '@/features/auth/hooks'
+import { cn } from '@/shared/lib/utils'
 import type { MeResponse } from '@/features/auth/model'
 
 type Props = {
@@ -49,16 +50,16 @@ export function ProfileSection({ accessToken, identity }: Props) {
   } = useAccountProfileSection(accessToken)
 
   return (
-    <section className="space-y-4">
+    <section className="w-full min-w-0 space-y-4">
       <SectionIntro title="Mi Cuenta" description="Gestiona tu perfil, foto y estado de verificacion." />
-      <Card className="overflow-hidden border-border/80 shadow-sm">
+      <Card className="w-full min-w-0 overflow-hidden border-border/80 shadow-sm">
         <CardHeader className="border-b bg-muted/20">
           <CardTitle className="text-base">Perfil e identidad</CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-6 pt-5 text-sm">
-          <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-center">
-            <div className="flex flex-col items-center gap-3 lg:w-[22rem] lg:shrink-0">
+          <div className="flex w-full min-w-0 flex-col items-stretch gap-6 lg:flex-row lg:items-center">
+            <div className="flex w-full flex-col items-center gap-3 lg:w-[22rem] lg:shrink-0">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
@@ -67,15 +68,19 @@ export function ProfileSection({ accessToken, identity }: Props) {
                     aria-label="Opciones de foto de perfil"
                   >
                     {avatarUrl ? (
-                      <img src={avatarUrl} alt="Avatar del usuario" className="size-64 rounded-full border object-cover shadow-sm" />
+                      <img
+                        src={avatarUrl}
+                        alt="Avatar del usuario"
+                        className="size-36 rounded-full border object-cover shadow-sm sm:size-48 lg:size-64"
+                      />
                     ) : (
-                      <div className="flex size-64 items-center justify-center rounded-full border bg-muted">
-                        <UserCircle2 className="size-24 text-muted-foreground" />
+                      <div className="flex size-36 items-center justify-center rounded-full border bg-muted sm:size-48 lg:size-64">
+                        <UserCircle2 className="size-14 text-muted-foreground sm:size-20 lg:size-24" />
                       </div>
                     )}
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-52">
+                <DropdownMenuContent align="center" className="min-w-52 w-auto">
                   <DropdownMenuItem onClick={() => setPhotoViewerOpen(true)} disabled={!avatarUrl}>Ver foto</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => avatarInputRef.current?.click()} disabled={uploadAvatarMutation.isPending}>Cambiar foto de perfil</DropdownMenuItem>
                 </DropdownMenuContent>
@@ -96,8 +101,8 @@ export function ProfileSection({ accessToken, identity }: Props) {
               )}
             </div>
 
-            <div className="flex-1 space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+            <div className="w-full min-w-0 flex-1 space-y-4">
+              <div className="grid w-full min-w-0 gap-4 sm:grid-cols-2">
                 <div className="rounded-md border p-3">
                   <p className="text-muted-foreground">Nombres</p>
                   <p className="mt-1 font-medium">{displayOrFallback(identity.first_name)}</p>
@@ -208,7 +213,7 @@ export function ProfileSection({ accessToken, identity }: Props) {
       </Card>
 
       <Dialog open={photoViewerOpen} onOpenChange={setPhotoViewerOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="w-[calc(100vw-1rem)] max-w-xl sm:w-full">
           <DialogHeader>
             <DialogTitle>Foto de perfil</DialogTitle>
             <DialogDescription>Vista previa de tu avatar actual.</DialogDescription>
@@ -226,16 +231,22 @@ export function ProfileSection({ accessToken, identity }: Props) {
       </Dialog>
 
       <Dialog open={Boolean(selectedImageSrc)} onOpenChange={(open) => !open && setSelectedImageSrc(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
+        <DialogContent
+          className={cn(
+            'flex w-[calc(100vw-1rem)] max-w-2xl flex-col gap-0 overflow-hidden p-0 sm:w-full',
+            'top-[max(0.75rem,env(safe-area-inset-top))] max-h-[calc(100dvh-1.5rem)] translate-y-0',
+            'sm:top-1/2 sm:max-h-[min(90dvh,100%)] sm:-translate-y-1/2',
+          )}
+        >
+          <DialogHeader className="shrink-0 border-b pb-4">
             <DialogTitle>Editar foto de perfil</DialogTitle>
             <DialogDescription>
               Ajusta la posicion y el zoom para encuadrar tu avatar. Luego presiona Guardar.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 px-6 pb-2">
-            <div className="relative h-[360px] w-full overflow-hidden rounded-lg border bg-black/80">
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-6">
+            <div className="relative mx-auto aspect-square w-full max-h-[min(52dvh,20rem)] overflow-hidden rounded-lg border bg-black/80 sm:max-h-[22.5rem]">
               {selectedImageSrc ? (
                 <Cropper
                   image={selectedImageSrc}
@@ -266,7 +277,7 @@ export function ProfileSection({ accessToken, identity }: Props) {
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="shrink-0 border-t bg-background">
             <Button variant="outline" onClick={() => setSelectedImageSrc(null)} disabled={uploadAvatarMutation.isPending}>
               Cancelar
             </Button>

@@ -1,7 +1,7 @@
 ﻿import React from "react"
 import { cn } from "@/shared/lib/utils"
 
-interface GridPatternProps {
+export type GridPatternProps = {
   width?: number
   height?: number
   x?: number
@@ -9,7 +9,6 @@ interface GridPatternProps {
   squares?: [number, number][]
   strokeDasharray?: string
   className?: string
-  [key: string]: unknown
 }
 
 export function GridPattern({
@@ -20,7 +19,6 @@ export function GridPattern({
   strokeDasharray = "0",
   squares,
   className,
-  ...props
 }: GridPatternProps) {
   const id = React.useId()
 
@@ -31,7 +29,6 @@ export function GridPattern({
         "pointer-events-none absolute inset-0 h-full w-full fill-gray-400/30 stroke-gray-400/30",
         className,
       )}
-      {...(props as React.SVGProps<SVGSVGElement>)}
     >
       <defs>
         <pattern height={height} id={id} patternUnits="userSpaceOnUse" width={width} x={x} y={y}>
@@ -40,7 +37,7 @@ export function GridPattern({
       </defs>
       <rect fill={`url(#${id})`} height="100%" strokeWidth={0} width="100%" />
       {squares && (
-        <svg aria-label="Grid squares" className="overflow-visible" role="img" x={x} y={y}>
+        <svg className="overflow-visible" x={x} y={y}>
           {squares.map(([squareX, squareY]) => (
             <rect
               height={height - 1}
@@ -57,7 +54,4 @@ export function GridPattern({
   )
 }
 
-export type { GridPatternProps }
-
 export default GridPattern
-

@@ -32,14 +32,20 @@ function AppBootstrap() {
   const bootstrapped = useSessionStore((s) => s.bootstrapped)
 
   useEffect(() => {
-    bindSessionStorageSync()
+    const unbindStorageSync = bindSessionStorageSync()
     void bootstrapSession()
+    return unbindStorageSync
   }, [])
 
   if (!bootstrapped) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4">
-        <div className="text-sm text-muted-foreground">Restaurando sesion...</div>
+      <div
+        className="flex min-h-screen items-center justify-center px-4"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <div className="text-sm text-muted-foreground">Restaurando sesión…</div>
       </div>
     )
   }

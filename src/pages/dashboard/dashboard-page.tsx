@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { isHTTPError } from 'ky'
 import { BarChart3, KanbanSquare, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,7 +15,7 @@ import { fetchDashboardBff } from '@/features/bff/api'
 import { bffKeys } from '@/features/bff/model'
 import { DashboardOverview } from '@/features/bff/ui'
 import { CollabPanel, NotificationsPanel } from '@/features/collab/ui'
-import { getCurrentAvatarRequest } from '@/features/media/api'
+import { getCurrentAvatarRequestOptional } from '@/features/media/api'
 import { pickAvatarUrl } from '@/features/media/utils'
 import type { DashboardTab } from '@/routes/-dashboard.search'
 
@@ -36,14 +36,14 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   const queryClient = useQueryClient()
 
   const dashboardQuery = useQuery({
-    queryKey: [...bffKeys.dashboard(), token],
+    queryKey: bffKeys.dashboard(token),
     queryFn: () => fetchDashboardBff(token!),
     enabled: bootstrapped && Boolean(token),
     retry: false,
   })
   const avatarQuery = useQuery({
     queryKey: ['media', 'avatar', 'current', token],
-    queryFn: () => getCurrentAvatarRequest(token!),
+    queryFn: () => getCurrentAvatarRequestOptional(token!),
     enabled: bootstrapped && Boolean(token),
     retry: false,
   })
@@ -88,40 +88,71 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     },
   })
 
-  const goTo = (next: 'overview' | 'collab' | 'account' | 'notifications' | 'admin') =>
-    navigate({
-      to: '/dashboard',
-      search: (prev) => ({
-        ...prev,
-        tab: next,
-        ...(next === 'collab'
-          ? {}
-          : {
-              project_id: undefined,
-              workspace_tab: undefined,
-              chat_channel: undefined,
-              chat_message_id: undefined,
-            }),
-      }),
-      replace: true,
-    })
+  const goTo = useCallback(
+    (next: 'overview' | 'collab' | 'account' | 'notifications' | 'admin') => {
+      navigate({
+        to: '/dashboard',
+        search: (prev) => ({
+          ...prev,
+          tab: next,
+          ...(next === 'collab'
+            ? {}
+            : {
+                project_id: undefined,
+                workspace_tab: undefined,
+                chat_channel: undefined,
+                chat_message_id: undefined,
+              }),
+        }),
+        replace: true,
+      })
+    },
+    [navigate],
+  )
 
-  const goToMention = (payload: { projectId: string; channel: 'internal' | 'external' | 'system'; messageId: string }) => {
-    navigate({
-      to: '/dashboard',
-      search: (prev) => ({
-        ...prev,
-        tab: 'collab',
-        project_id: payload.projectId,
-        workspace_tab: 'chat',
-        chat_channel: payload.channel === 'internal' ? 'internal' : 'external',
-        chat_message_id: payload.messageId,
-      }),
-      replace: true,
-    })
+  const goToMention = useCallback(
+    (payload: { projectId: string; channel: 'internal' | 'external' | 'system'; messageId: string }) => {
+      navigate({
+        to: '/dashboard',
+        search: (prev) => ({
+          ...prev,
+          tab: 'collab',
+          project_id: payload.projectId,
+          workspace_tab: 'chat',
+          chat_channel: payload.channel === 'internal' ? 'internal' : 'external',
+          chat_message_id: payload.messageId,
+        }),
+        replace: true,
+      })
+    },
+    [navigate],
+  )
+
+  const identity = dashboardQuery.data?.identity
+  const projects = dashboardQuery.data?.projects
+  const isAdmin = identity?.role === 'admin'
+  const activeTab: DashboardTab = useMemo(() => {
+    const currentTab = tab ?? 'overview'
+    if (currentTab === 'admin' && !isAdmin) return 'overview'
+    return currentTab
+  }, [tab, isAdmin])
+
+  const sidebarItems = useMemo(
+    () => [
+      { key: 'overview', label: 'Resumen', icon: <BarChart3 className="size-4" />, onClick: () => goTo('overview'), isActive: activeTab === 'overview' },
+      { key: 'collab', label: 'Colaboración', icon: <KanbanSquare className="size-4" />, onClick: () => goTo('collab'), isActive: activeTab === 'collab' },
+      { key: 'admin', label: 'Administración', icon: <ShieldCheck className="size-4" />, onClick: () => goTo('admin'), isActive: activeTab === 'admin', hidden: !isAdmin },
+    ],
+    [activeTab, goTo, isAdmin],
+  )
+
+  if (isUnauthorized) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-4" role="status" aria-live="polite">
+        <p className="text-sm text-muted-foreground">Redirigiendo al inicio de sesión…</p>
+      </div>
+    )
   }
-
-  if (isUnauthorized) return <div className="flex items-center justify-center min-h-screen px-4"><p className="text-sm text-muted-foreground">Redirigiendo al inicio de sesion...</p></div>
 
   if (!bootstrapped || dashboardQuery.isPending || !token) {
     return (
@@ -130,7 +161,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
           <Skeleton className="h-6 w-40" />
           <Skeleton className="h-24 w-full" />
           <Skeleton className="h-24 w-full" />
-          <p className="text-sm text-muted-foreground text-center">Comprobando sesion...</p>
+          <p className="text-sm text-muted-foreground text-center">Comprobando sesión…</p>
         </div>
       </div>
     )
@@ -140,40 +171,33 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     return (
       <div className="flex items-center justify-center min-h-screen px-4">
         <div className="w-full max-w-sm space-y-4">
-          <Alert variant="destructive"><AlertTitle>No se pudo cargar tu perfil</AlertTitle><AlertDescription>Ocurrio un error inesperado al validar tu sesion.</AlertDescription></Alert>
-          <Button variant="outline" className="w-full" onClick={() => dashboardQuery.refetch()}>Reintentar</Button>
+          <Alert variant="destructive">
+            <AlertTitle>No se pudo cargar tu perfil</AlertTitle>
+            <AlertDescription>
+              {dashboardQuery.error instanceof Error
+                ? dashboardQuery.error.message
+                : 'Ocurrió un error inesperado al validar tu sesión.'}
+            </AlertDescription>
+          </Alert>
+          <Button variant="outline" className="w-full" onClick={() => dashboardQuery.refetch()}>
+            Reintentar
+          </Button>
         </div>
       </div>
     )
   }
 
-  const identity = dashboardQuery.data?.identity
-  const projects = dashboardQuery.data?.projects
-
   if (!identity) {
     return (
       <div className="flex items-center justify-center min-h-screen px-4">
         <div className="w-full max-w-sm space-y-4">
-          <Alert variant="destructive"><AlertTitle>No se pudo cargar tu identidad</AlertTitle><AlertDescription>La sesion no trajo informacion de usuario. Reintenta o vuelve a iniciar sesion.</AlertDescription></Alert>
+          <Alert variant="destructive"><AlertTitle>No se pudo cargar tu identidad</AlertTitle><AlertDescription>La sesión no trajo información de usuario. Reintenta o vuelve a iniciar sesión.</AlertDescription></Alert>
           <Button variant="outline" className="w-full" onClick={() => dashboardQuery.refetch()}>Reintentar</Button>
           <Button className="w-full" onClick={() => { clearSession(); queryClient.clear(); navigate({ to: '/login', replace: true }) }}>Ir al login</Button>
         </div>
       </div>
     )
   }
-
-  const isAdmin = identity.role === 'admin'
-  const activeTab: DashboardTab = (() => {
-    const currentTab = tab ?? 'overview'
-    if (currentTab === 'admin' && !isAdmin) return 'overview'
-    return currentTab
-  })()
-
-  const sidebarItems = [
-    { key: 'overview', label: 'Resumen', icon: <BarChart3 className="size-4" />, onClick: () => goTo('overview'), isActive: activeTab === 'overview' },
-    { key: 'collab', label: 'Colaboracion', icon: <KanbanSquare className="size-4" />, onClick: () => goTo('collab'), isActive: activeTab === 'collab' },
-    { key: 'admin', label: 'Administracion', icon: <ShieldCheck className="size-4" />, onClick: () => goTo('admin'), isActive: activeTab === 'admin', hidden: !isAdmin },
-  ]
 
   return (
     <AppShell

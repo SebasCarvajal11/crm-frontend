@@ -57,7 +57,7 @@ export function CollabPanel({ accessToken, identity, initialProjects, initialOpe
   }, [projectSearchText])
 
   const projectSearchQ = useQuery({
-    queryKey: [...collabKeys.projects(), 'search', identity.role, projectSearchDebounced],
+    queryKey: [...collabKeys.projects(), 'search', projectSearchDebounced],
     queryFn: () => searchProjectsRequest(accessToken, { q: projectSearchDebounced, limit: 8 }),
     enabled: projectSearchDebounced.length >= 2,
     staleTime: 20_000,

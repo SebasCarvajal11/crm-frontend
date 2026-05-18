@@ -8,9 +8,9 @@ import {
   requestEmailVerificationRequest,
   revokeSessionRequest,
 } from '@/features/auth/api'
-import { authKeys, strongPasswordSchema } from '@/features/auth/model'
+import { authKeys, strongPasswordSchema, type SessionsResponse } from '@/features/auth/model'
 import { parseApiError } from '@/features/auth/utils'
-import { getCurrentAvatarRequest, uploadAvatarRequest } from '@/features/media/api'
+import { getCurrentAvatarRequestOptional, uploadAvatarRequest } from '@/features/media/api'
 import { useSessionStore } from '@/app/session/session-store'
 
 const PAGE_SIZE = 2
@@ -65,10 +65,14 @@ export function useSessionsSection(accessToken: string) {
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: authKeys.sessions() }),
   })
 
+  const sessionsQueryKey = [...authKeys.sessions(), accessToken] as const
+
   const revokeAllMutation = useMutation({
     mutationFn: async () => {
       try {
-        const allFamilies = sessions.map((session) => session.family)
+        const cached = queryClient.getQueryData<SessionsResponse>(sessionsQueryKey)
+        const freshSessions = cached?.data.sessions ?? []
+        const allFamilies = freshSessions.map((session) => session.family)
         await Promise.all(allFamilies.map((familyId) => revokeSessionRequest(accessToken, familyId)))
       } catch (error) {
         throw new Error(await parseApiError(error), { cause: error })
@@ -175,9 +179,17 @@ export function useAccountProfileSection(accessToken: string) {
   const [zoom, setZoom] = useState(1)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
 
+  useEffect(() => {
+    const src = selectedImageSrc
+    if (!src) return
+    return () => {
+      URL.revokeObjectURL(src)
+    }
+  }, [selectedImageSrc])
+
   const avatarQ = useQuery({
     queryKey: avatarQueryKey(accessToken),
-    queryFn: () => getCurrentAvatarRequest(accessToken),
+    queryFn: () => getCurrentAvatarRequestOptional(accessToken),
     retry: false,
   })
 

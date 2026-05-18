@@ -12,7 +12,6 @@ export function ProjectTypeBadge({ type, className = '' }: Props) {
   return (
     <span
       className={`inline-flex text-[10px] font-medium px-2 py-0.5 rounded-full border ${cfg.bg} ${cfg.text} ${cfg.border} ${className}`}
-      aria-label={`Tipo: ${cfg.label}`}
     >
       {cfg.label}
     </span>

@@ -6,9 +6,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { createProjectFileMetadataRequest } from '@/features/collab/api'
+import { uploadProjectFileWithMetadataRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
-import { uploadDocumentRequest } from '@/features/media/api'
 import { isBlockedByExtension, SAFE_FILE_ACCEPT } from '@/features/media/utils'
 
 type Props = {
@@ -31,18 +30,15 @@ export function ConversationUploadForm({ accessToken, projectId, onError }: Prop
       if (!selectedFile) throw new Error('Debes seleccionar un archivo')
       if (isBlockedByExtension(selectedFile.name)) throw new Error('Tipo de archivo bloqueado por seguridad')
       if (selectedFile.size > MAX_FILE_BYTES) throw new Error('El archivo supera el limite de 25 MB')
-      return uploadDocumentRequest(accessToken, selectedFile).then((mediaRes) =>
-        createProjectFileMetadataRequest(accessToken, projectId, {
-          fileName: selectedFile.name,
-          title: title.trim(),
-          description: description.trim() || null,
-          storagePath: mediaRes.data.objectKey,
-          mimeType: selectedFile.type || 'application/octet-stream',
-          sizeBytes: selectedFile.size,
-          isClientVisible: clientVisible,
-          origin: clientVisible ? 'external_chat' : 'internal_chat',
-        }).then(() => ({ ok: true }))
-      )
+      return uploadProjectFileWithMetadataRequest(accessToken, projectId, selectedFile, {
+        fileName: selectedFile.name,
+        title: title.trim(),
+        description: description.trim() || null,
+        mimeType: selectedFile.type || 'application/octet-stream',
+        sizeBytes: selectedFile.size,
+        isClientVisible: clientVisible,
+        origin: clientVisible ? 'external_chat' : 'internal_chat',
+      }).then(() => ({ ok: true }))
     },
     onSuccess: () => {
       setTitle('')

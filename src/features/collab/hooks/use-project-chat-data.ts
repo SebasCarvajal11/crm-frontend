@@ -9,9 +9,14 @@ import {
 } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
 import { getUserAvatarsRequest } from '@/features/media/api'
-import type { ProjectMember } from '@/features/collab/model'
+import type { ProjectChatMessage, ProjectMember } from '@/features/collab/model'
 
 type Channel = 'external' | 'internal'
+const EMPTY_MESSAGES: ProjectChatMessage[] = []
+
+/** IDs persistidos en mod-collab (UUID). Los optimistas usan `temp-…` y no deben ir a mark-read. */
+const PERSISTED_CHAT_MESSAGE_ID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 type Params = {
   accessToken: string
@@ -45,8 +50,19 @@ export function useProjectChatData({
     staleTime: 15_000,
   })
 
-  const messages = channel === 'external' ? (externalQ.data?.data.items ?? []) : (internalQ.data?.data.items ?? [])
-  const lastMessageId = messages[messages.length - 1]?.id ?? null
+  const externalMessages = externalQ.data?.data.items ?? EMPTY_MESSAGES
+  const internalMessages = internalQ.data?.data.items ?? EMPTY_MESSAGES
+  const messages = useMemo(
+    () => (channel === 'external' ? externalMessages : internalMessages),
+    [channel, externalMessages, internalMessages]
+  )
+  // El API devuelve mensajes en orden descendente (más reciente primero).
+  const readUpToMessageId = useMemo(() => {
+    for (const message of messages) {
+      if (PERSISTED_CHAT_MESSAGE_ID.test(message.id)) return message.id
+    }
+    return null
+  }, [messages])
   const memberBySub = useMemo(() => new Map(members.map((member) => [member.userSub, member] as const)), [members])
   const avatarSubjects = useMemo(() => Array.from(new Set(members.map((m) => m.userSub))), [members])
 
@@ -60,19 +76,19 @@ export function useProjectChatData({
   const avatarBySub = avatarsQ.data?.data.items ?? {}
 
   useEffect(() => {
-    if (!lastMessageId) return
-    if (lastMarkedRef.current[channel] === lastMessageId) return
+    if (!readUpToMessageId) return
+    if (lastMarkedRef.current[channel] === readUpToMessageId) return
 
-    lastMarkedRef.current[channel] = lastMessageId
     const req = channel === 'external' ? markExternalChatReadRequest : markInternalChatReadRequest
 
-    void req(accessToken, projectId, { up_to_message_id: lastMessageId })
+    void req(accessToken, projectId, { up_to_message_id: readUpToMessageId })
       .then(() => {
+        lastMarkedRef.current[channel] = readUpToMessageId
         void queryClient.invalidateQueries({ queryKey: collabKeys.mentionNotifications() })
         void queryClient.invalidateQueries({ queryKey: collabKeys.mentionNotificationsCount() })
       })
       .catch(() => undefined)
-  }, [accessToken, projectId, channel, lastMessageId, queryClient, lastMarkedRef])
+  }, [accessToken, projectId, channel, readUpToMessageId, queryClient, lastMarkedRef])
 
   return {
     externalQ,

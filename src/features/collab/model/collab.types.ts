@@ -25,6 +25,10 @@ export type ProjectListItem = {
   status: ParentProjectStatus
   progressPercent: number
   unreadNotifications: number
+  estimatedDueDate?: string | null
+  createdAt?: string
+  updatedAt?: string
+  isArchived?: boolean
 }
 
 export type ProjectSearchResult = {
@@ -123,10 +127,7 @@ export type ProjectChatMessage = {
 export type ProjectWorkspaceResponse = {
   project: Project
   members: ProjectMember[]
-  board: {
-    columns: ProjectTaskColumn[]
-    tasks: ProjectTask[]
-  }
+  board: ProjectBoardPayload
   brief: {
     projectId: string
     content: string
@@ -141,13 +142,18 @@ export type ProjectWorkspaceResponse = {
   }>
 }
 
+export type ProjectBoardPayload = {
+  columns: ProjectTaskColumn[]
+  tasks: ProjectTask[]
+  tasksTotal?: number
+  tasksLimit?: number
+  tasksTruncated?: boolean
+}
+
 export type ProjectBoardResponse = {
   project: Project
   members: ProjectMember[]
-  board: {
-    columns: ProjectTaskColumn[]
-    tasks: ProjectTask[]
-  }
+  board: ProjectBoardPayload
 }
 
 export type ProjectBrief = {

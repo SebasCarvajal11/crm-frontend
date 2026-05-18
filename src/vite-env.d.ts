@@ -1,7 +1,8 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_API_BASE_URL: string
+  /** Definir en `.env`; si falta, el cliente usa `/api` (ver `session-store`). */
+  readonly VITE_API_BASE_URL?: string
 }
 
 interface ImportMeta {

@@ -8,8 +8,16 @@
     "build": "vite build && tsc -b",
     "lint": "eslint .",
     "preview": "vite preview",
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "pnpm dlx only-allow pnpm"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SebasCarvajal11/crm-frontend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SebasCarvajal11/crm-frontend/issues"
+  },
+  "homepage": "https://github.com/SebasCarvajal11/crm-frontend#readme",
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.8",
     "@hookform/resolvers": "^5.2.2",

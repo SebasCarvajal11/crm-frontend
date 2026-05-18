@@ -8,7 +8,6 @@ import {
   resetPasswordRequest,
   verifyEmailRequest,
 } from '@/features/auth/api'
-import { authKeys } from '@/features/auth/model'
 import { parseApiError } from '@/features/auth/utils'
 import { useSessionStore } from '@/app/session/session-store'
 
@@ -28,7 +27,6 @@ export function useLoginFlow() {
     onSuccess: (data, variables) => {
       queryClient.clear()
       setSession(data.data.access_token, variables.email)
-      void queryClient.invalidateQueries({ queryKey: authKeys.all })
       navigate({ to: '/dashboard' })
     },
   })
@@ -97,8 +95,12 @@ export function useAcceptInviteFlow(token: string) {
       }
     },
     onSuccess: (data) => {
-      setSession(data.data.access_token)
-      void queryClient.invalidateQueries()
+      const email = previewQuery.data?.data.email ?? null
+      setSession(data.data.access_token, email)
+      queryClient.removeQueries({ queryKey: ['invite-preview', token] })
+      void queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] !== 'invite-preview',
+      })
       navigate({ to: '/dashboard' })
     },
   })

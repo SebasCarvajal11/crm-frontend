@@ -14,10 +14,7 @@ export function PriorityBadge({ priority, size = 'xs' }: Props) {
     : 'text-xs px-2 py-0.5'
 
   return (
-    <span
-      className={`inline-flex items-center font-semibold rounded-full ${cls} ${p.bg} ${p.text}`}
-      aria-label={`Prioridad: ${p.label}`}
-    >
+    <span className={`inline-flex items-center font-semibold rounded-full ${cls} ${p.bg} ${p.text}`}>
       {p.label}
     </span>
   )
