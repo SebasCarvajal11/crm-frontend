@@ -1,5 +1,5 @@
 import ky from 'ky'
-import { getApiBaseUrl, useSessionStore } from '@/app/session/session-store'
+import { canUseSecureRefreshFlow, getApiBaseUrl, useSessionStore } from '@/app/session/session-store'
 import {
   RefreshTokenError,
   classifyRefreshHttpStatus,
@@ -66,6 +66,9 @@ function shouldAttemptRefresh(request: Request, response: Response): boolean {
 async function refreshAccessToken(): Promise<string> {
   if (isRedirecting) {
     throw new Error('Sesion expirada')
+  }
+  if (!canUseSecureRefreshFlow()) {
+    throw new RefreshTokenError('El origen actual no soporta refresh seguro sin HTTPS', 'auth')
   }
   if (isRefreshing) {
     return new Promise((resolve, reject) => {

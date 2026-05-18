@@ -4,7 +4,7 @@ import { listProjectMembersRequest, upsertProjectMemberRequest } from '@/feature
 import { collabKeys } from '@/features/collab/model'
 import type { ClientSearchResult } from '@/shared/types'
 import type { ProjectMember } from '@/features/collab/model'
-import { getCurrentAvatarRequest, getUserAvatarsRequest } from '@/features/media/api'
+import { getCurrentAvatarRequestOptional, getUserAvatarsRequest } from '@/features/media/api'
 import { pickAvatarUrl } from '@/features/media/utils'
 
 type Params = {
@@ -49,7 +49,7 @@ export function useProjectMembers({
 
   const currentAvatarQ = useQuery({
     queryKey: ['media', 'avatar', 'current', accessToken],
-    queryFn: () => getCurrentAvatarRequest(accessToken),
+    queryFn: () => getCurrentAvatarRequestOptional(accessToken),
     enabled: Boolean(accessToken),
     retry: false,
     staleTime: 60_000,

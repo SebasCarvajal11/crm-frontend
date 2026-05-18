@@ -71,6 +71,15 @@ export function getApiBaseUrl(): string {
   return base.replace(/\/$/, '')
 }
 
+export function canUseSecureRefreshFlow(): boolean {
+  if (typeof window === 'undefined') return true
+
+  const { protocol, hostname } = window.location
+  if (protocol === 'https:') return true
+
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1'
+}
+
 export async function bootstrapSession(): Promise<void> {
   if (bootstrapInFlight) return bootstrapInFlight
 
@@ -79,6 +88,11 @@ export async function bootstrapSession(): Promise<void> {
       useSessionStore.getState().syncFromStorage()
 
       if (useSessionStore.getState().token) {
+        return
+      }
+
+      if (!canUseSecureRefreshFlow()) {
+        useSessionStore.getState().clearSession()
         return
       }
 
