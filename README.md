@@ -1,42 +1,41 @@
-# crm-frontend
+# CRM Frontend
 
-Frontend del CRM CIMA, separado del monorepo para operar como repositorio independiente.
+`crm-frontend` is the CIMA CRM web client.
 
-## Requisitos
+## Scope
 
-- Node.js 22+
-- `pnpm`
-- `crm-infra` corriendo con KrakenD disponible en `http://localhost:18080`
+- browser UI for authentication, account management, collaboration, admin flows, and media interactions
+- client-side routing and session bootstrap
+- integration with the platform only through the gateway contract
+- production SPA delivery through Nginx
 
-## Desarrollo local
-
-1. Instalar dependencias:
+## Local Development
 
 ```bash
 pnpm install
-```
-
-2. Crear `.env` a partir de `.env.example` si necesitas overrides.
-
-3. Iniciar el entorno de desarrollo:
-
-```bash
 pnpm dev
 ```
 
-Por defecto el frontend consume `VITE_API_BASE_URL=/api` y Vite redirige `/api` a KrakenD. Si `crm-infra` está aislado en su puerto de migración, usa:
+Useful commands:
 
-```env
-VITE_API_PROXY_TARGET=http://localhost:18080
-```
+- `pnpm lint`
+- `pnpm build`
+- `pnpm preview`
 
-## Build
+By default the frontend uses `VITE_API_BASE_URL=/api` and proxies `/api` to the gateway. For local multi-repo development, point `VITE_API_PROXY_TARGET` to the active `crm-infra` gateway, typically `http://localhost:18080`.
 
-```bash
-pnpm build
-```
+## Environment
 
-## Despliegue
+Start from [.env.example](D:\BACKUP CELULAR OLIMPO\crm-frontend\.env.example).
 
-- `nginx.conf` sirve la SPA y reenvía `/api` a `api-gateway:8080`.
-- Para integración local multi-repo, el frontend solo debe conocer el gateway; no debe acoplarse directo a `auth`, `collab` o `media`.
+The frontend should only know the gateway contract:
+
+- `VITE_API_BASE_URL`
+- `VITE_API_PROXY_TARGET`
+
+It should not be coupled directly to `crm-auth`, `crm-collab`, or `crm-media`.
+
+## Runtime Notes
+
+- Dev proxy behavior is defined in [vite.config.ts](D:\BACKUP CELULAR OLIMPO\crm-frontend\vite.config.ts)
+- Container/runtime proxy behavior is defined in [nginx.conf](D:\BACKUP CELULAR OLIMPO\crm-frontend\nginx.conf)

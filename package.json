@@ -3,6 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "pnpm@11.1.1",
+  "description": "Web client for the CIMA CRM multi-repo platform.",
   "scripts": {
     "dev": "vite",
     "build": "vite build && tsc -b",
