@@ -26,7 +26,7 @@ By default the frontend uses `VITE_API_BASE_URL=/api` and proxies `/api` to the 
 
 ## Environment
 
-Start from [.env.example](D:\BACKUP CELULAR OLIMPO\crm-frontend\.env.example).
+Start from [`./.env.example`](./.env.example).
 
 The frontend should only know the gateway contract:
 
@@ -37,5 +37,5 @@ It should not be coupled directly to `crm-auth`, `crm-collab`, or `crm-media`.
 
 ## Runtime Notes
 
-- Dev proxy behavior is defined in [vite.config.ts](D:\BACKUP CELULAR OLIMPO\crm-frontend\vite.config.ts)
-- Container/runtime proxy behavior is defined in [nginx.conf](D:\BACKUP CELULAR OLIMPO\crm-frontend\nginx.conf)
+- Development proxy behavior is defined in [`./vite.config.ts`](./vite.config.ts)
+- Container/runtime proxy behavior is defined in [`./nginx.conf`](./nginx.conf)
