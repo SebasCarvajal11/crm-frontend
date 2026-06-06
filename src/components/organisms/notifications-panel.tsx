@@ -1,4 +1,4 @@
-﻿import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { MessageSquare, RefreshCw } from 'lucide-react'
 import {
   listUnreadMentionNotificationsRequest,
@@ -26,6 +26,7 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
     queryFn: () => listUnreadMentionNotificationsRequest(accessToken),
     enabled: Boolean(accessToken?.trim()),
     refetchInterval: 20_000,
+    select: (d) => d.data,
   })
 
   const markSeen = useMutation({
@@ -36,7 +37,7 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
     },
   })
 
-  const rows = notificationsQ.data?.data ?? []
+  const rows = notificationsQ.data ?? []
 
   const handleOpen = async (item: (typeof rows)[number]) => {
     try {

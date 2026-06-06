@@ -44,6 +44,7 @@ export function useCreateTask({
 }: Params) {
   const queryClient = useQueryClient()
   const workerMembers = projectWorkers(members)
+  console.log("useCreateTask members:", JSON.stringify(members), "workerMembers:", JSON.stringify(workerMembers))
   const selectedWorkers = workerMembers.filter((m) => selectedWorkerSubs.includes(m.userSub))
   const columnId = column?.id ?? ''
 
@@ -64,10 +65,12 @@ export function useCreateTask({
         position: (tasksByColumn[columnId] ?? []).length,
         subtasks,
       }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: collabKeys.projectBoard(projectId) })
-      void queryClient.invalidateQueries({ queryKey: collabKeys.projects() })
-      void queryClient.invalidateQueries({ queryKey: collabKeys.timeline(projectId) })
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: collabKeys.projectBoard(projectId) }),
+        queryClient.invalidateQueries({ queryKey: collabKeys.projects() }),
+        queryClient.invalidateQueries({ queryKey: collabKeys.timeline(projectId) }),
+      ])
       handleClose()
       onCreated()
     },

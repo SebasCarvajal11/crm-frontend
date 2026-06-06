@@ -15,7 +15,7 @@ export const Route = createRootRoute({
         x={-1}
         y={-1}
         strokeDasharray={"4 2"}
-        className="[mask-image:radial-gradient(1000px_circle_at_center,white,transparent)] opacity-40"
+        className="[-webkit-mask-image:radial-gradient(1000px_circle_at_center,white,transparent)] [mask-image:radial-gradient(1000px_circle_at_center,white,transparent)] opacity-40"
       />
       <div className="relative z-10">
         <Outlet />

@@ -15,8 +15,8 @@ import { fetchDashboardBff } from '@/features/bff/api'
 import { bffKeys } from '@/features/bff/model'
 import { DashboardOverview } from '@/features/bff/ui'
 import { CollabPanel, NotificationsPanel } from '@/features/collab/ui'
-import { getCurrentAvatarRequestOptional } from '@/features/media/api'
-import { pickAvatarUrl } from '@/features/media/utils'
+import { getCurrentAvatarRequestOptional } from '@/shared/api'
+import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 import type { DashboardTab } from '@/routes/-dashboard.search'
 
 type Props = {
@@ -128,6 +128,45 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     [navigate],
   )
 
+  const openProject = useCallback(
+    (projectId: string) => {
+      navigate({
+        to: '/dashboard',
+        search: (prev) => ({ ...prev, tab: 'collab', project_id: projectId, workspace_tab: 'board' }),
+        replace: true,
+      })
+    },
+    [navigate],
+  )
+
+  const closeProject = useCallback(() => {
+    navigate({
+      to: '/dashboard',
+      search: (prev) => ({ ...prev, project_id: undefined, workspace_tab: undefined, chat_channel: undefined, chat_message_id: undefined }),
+      replace: true,
+    })
+  }, [navigate])
+
+  const changeWorkspaceTab = useCallback(
+    (workspaceTab: 'board' | 'chat' | 'brief' | 'members') => {
+      navigate({
+        to: '/dashboard',
+        search: (prev) => ({ ...prev, workspace_tab: workspaceTab }),
+        replace: true,
+      })
+    },
+    [navigate],
+  )
+
+  const handleOpenProfile = useCallback(() => goTo('account'), [goTo])
+  const handleOpenNotifications = useCallback(() => goTo('notifications'), [goTo])
+  const handleLogout = useCallback(() => { logoutMutation.mutate() }, [logoutMutation])
+  const handleGoToLogin = useCallback(() => {
+    clearSession()
+    queryClient.clear()
+    navigate({ to: '/login', replace: true })
+  }, [clearSession, queryClient, navigate])
+
   const identity = dashboardQuery.data?.identity
   const projects = dashboardQuery.data?.projects
   const isAdmin = identity?.role === 'admin'
@@ -193,7 +232,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
         <div className="w-full max-w-sm space-y-4">
           <Alert variant="destructive"><AlertTitle>No se pudo cargar tu identidad</AlertTitle><AlertDescription>La sesión no trajo información de usuario. Reintenta o vuelve a iniciar sesión.</AlertDescription></Alert>
           <Button variant="outline" className="w-full" onClick={() => dashboardQuery.refetch()}>Reintentar</Button>
-          <Button className="w-full" onClick={() => { clearSession(); queryClient.clear(); navigate({ to: '/login', replace: true }) }}>Ir al login</Button>
+          <Button className="w-full" onClick={handleGoToLogin}>Ir al login</Button>
         </div>
       </div>
     )
@@ -206,13 +245,13 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
       userEmail={identity.email ?? emailStored ?? ''}
       userRole={identity.role}
       userAvatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}
-      onOpenProfile={() => goTo('account')}
-      onOpenNotifications={() => goTo('notifications')}
-      onLogout={() => logoutMutation.mutate()}
+      onOpenProfile={handleOpenProfile}
+      onOpenNotifications={handleOpenNotifications}
+      onLogout={handleLogout}
       isLoggingOut={logoutMutation.isPending}
     >
       {activeTab === 'overview' && <DashboardOverview identity={identity} />}
-      {activeTab === 'collab' && <CollabPanel accessToken={token} identity={identity} initialProjects={projects?.data} initialOpenProjectId={project_id} initialWorkspaceTab={workspace_tab} initialOpenChannel={chat_channel} initialOpenMessageId={chat_message_id} />}
+      {activeTab === 'collab' && <CollabPanel accessToken={token} identity={identity} initialProjects={projects?.data} openProjectId={project_id} workspaceTab={workspace_tab} chatChannel={chat_channel} chatMessageId={chat_message_id} onOpenProject={openProject} onCloseProject={closeProject} onTabChange={changeWorkspaceTab} />}
       {activeTab === 'account' && <AccountPanel accessToken={token} identity={identity} />}
       {activeTab === 'notifications' && <NotificationsPanel accessToken={token} onOpenNotification={goToMention} />}
       {activeTab === 'admin' && isAdmin && <AdminConsole accessToken={token} />}

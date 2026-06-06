@@ -1,4 +1,6 @@
 import { api } from '@/shared/lib'
+import { bearer } from '@/shared/lib/bearer'
+import { ADMIN_ROUTES } from '@/shared/lib/gateway-routes'
 import type {
   AdminUsersListResponse,
   InviteAdminResponse,
@@ -7,16 +9,12 @@ import type {
   UserRole,
 } from '@/shared/types'
 
-function bearer(accessToken: string) {
-  return { Authorization: `Bearer ${accessToken}` }
-}
-
 export async function registerWorkerRequest(
   accessToken: string,
   body: { email: string; first_name: string; last_name: string; profession: string }
 ): Promise<RegisterWorkerResponse> {
   return api
-    .post('admin/workers', {
+    .post(ADMIN_ROUTES.workers, {
       headers: bearer(accessToken),
       json: body,
     })
@@ -34,7 +32,7 @@ export async function inviteClientRequest(
   }
 ): Promise<InviteClientResponse> {
   return api
-    .post('admin/clients/invite', {
+    .post(ADMIN_ROUTES.clientsInvite, {
       headers: bearer(accessToken),
       json: body,
     })
@@ -51,7 +49,7 @@ export async function inviteAdminRequest(
   }
 ): Promise<InviteAdminResponse> {
   return api
-    .post('admin/admins/invite', {
+    .post(ADMIN_ROUTES.adminsInvite, {
       headers: bearer(accessToken),
       json: body,
     })
@@ -78,7 +76,7 @@ export async function adminListUsersRequest(
   if (params.q?.trim()) searchParams.q = params.q.trim()
 
   return api
-    .get('admin/users', {
+    .get(ADMIN_ROUTES.users, {
       headers: bearer(accessToken),
       searchParams,
     })
@@ -91,7 +89,7 @@ export async function adminPatchUserStatusRequest(
   body: { is_active: boolean }
 ): Promise<{ message: string }> {
   return api
-    .patch(`admin/users/${subject}/status`, {
+    .patch(ADMIN_ROUTES.userStatus(subject), {
       headers: bearer(accessToken),
       json: body,
     })
@@ -104,7 +102,7 @@ export async function adminPatchUserFlagsRequest(
   body: { force_password_change: boolean }
 ): Promise<{ message: string }> {
   return api
-    .patch(`admin/users/${subject}/flags`, {
+    .patch(ADMIN_ROUTES.userFlags(subject), {
       headers: bearer(accessToken),
       json: body,
     })
@@ -116,7 +114,7 @@ export async function adminRestoreUserRequest(
   subject: string
 ): Promise<{ message: string }> {
   return api
-    .post(`admin/users/${subject}/restore`, {
+    .post(ADMIN_ROUTES.userRestore(subject), {
       headers: bearer(accessToken),
     })
     .json<{ message: string }>()
@@ -127,7 +125,7 @@ export async function adminSoftDeleteUserRequest(
   subject: string
 ): Promise<{ message: string }> {
   return api
-    .delete(`admin/users/${subject}`, {
+    .delete(ADMIN_ROUTES.user(subject), {
       headers: bearer(accessToken),
     })
     .json<{ message: string }>()

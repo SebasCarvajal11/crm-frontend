@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { uploadProjectFileWithMetadataRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
-import { isBlockedByExtension, SAFE_FILE_ACCEPT } from '@/features/media/utils'
+import type { DataResponse, ProjectFileEnriched, ProjectTimelineItem } from '@/features/collab/model'
+import { isBlockedByExtension, SAFE_FILE_ACCEPT } from '@/shared/lib'
 
 type Props = {
   accessToken: string
@@ -20,10 +21,18 @@ const MAX_FILE_BYTES = 25 * 1024 * 1024
 
 export function ConversationUploadForm({ accessToken, projectId, onError }: Props) {
   const queryClient = useQueryClient()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [clientVisible, setClientVisible] = useState(true)
+
+  const resetSelectedFile = () => {
+    setSelectedFile(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
 
   const upload = useMutation({
     mutationFn: () => {
@@ -37,13 +46,34 @@ export function ConversationUploadForm({ accessToken, projectId, onError }: Prop
         mimeType: selectedFile.type || 'application/octet-stream',
         sizeBytes: selectedFile.size,
         isClientVisible: clientVisible,
-        origin: clientVisible ? 'external_chat' : 'internal_chat',
-      }).then(() => ({ ok: true }))
+        origin: 'manual_upload',
+      })
     },
-    onSuccess: () => {
+    onSuccess: (response: DataResponse<ProjectFileEnriched>) => {
+      const file = response.data
+      queryClient.setQueryData<DataResponse<ProjectTimelineItem[]>>(collabKeys.timeline(projectId), (current) => {
+        const nextItem: ProjectTimelineItem = {
+          id: file.id,
+          kind: 'file',
+          label: 'Archivo',
+          title: file.title ?? file.fileName,
+          occurredAt: file.createdAt,
+          fileId: file.id,
+          fileName: file.fileName,
+          mimeType: file.mimeType,
+          taskId: file.taskId,
+          changeRequestId: null,
+          createdBySub: file.createdBySub,
+          createdByEmail: file.createdByEmail,
+          isClientVisible: file.isClientVisible,
+        }
+        const items = current?.data ?? []
+        const deduped = [nextItem, ...items.filter((item) => item.id !== nextItem.id || item.kind !== nextItem.kind)]
+        return { data: deduped }
+      })
       setTitle('')
       setDescription('')
-      setSelectedFile(null)
+      resetSelectedFile()
       void queryClient.invalidateQueries({ queryKey: collabKeys.timeline(projectId) })
       void queryClient.invalidateQueries({ queryKey: collabKeys.files(projectId) })
     },
@@ -59,14 +89,14 @@ export function ConversationUploadForm({ accessToken, projectId, onError }: Prop
       <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descripcion opcional del archivo" />
       <div className="space-y-1">
         <Input
+          ref={fileInputRef}
           type="file"
           accept={SAFE_FILE_ACCEPT}
           onChange={(e) => {
             const file = e.target.files?.[0] ?? null
             if (file && isBlockedByExtension(file.name)) {
               onError('Tipo de archivo bloqueado por seguridad')
-              setSelectedFile(null)
-              e.currentTarget.value = ''
+              resetSelectedFile()
               return
             }
             setSelectedFile(file)

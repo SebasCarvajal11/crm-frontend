@@ -34,7 +34,7 @@ export function useProjectChatSend({ accessToken, projectId, channel, identity, 
     },
     onMutate: async ({ trimmedBody, mentions }) => {
       await queryClient.cancelQueries({ queryKey })
-      const previous = queryClient.getQueryData<{ data: PaginatedData<ProjectChatMessage> }>(queryKey)
+      const previousQueries = queryClient.getQueriesData<{ data: PaginatedData<ProjectChatMessage> }>({ queryKey })
       const optimisticId = `temp-${channel}-${Date.now()}`
       const optimisticMessage: ProjectChatMessage = {
         id: optimisticId,
@@ -58,29 +58,43 @@ export function useProjectChatSend({ accessToken, projectId, channel, identity, 
         },
       }
 
-      queryClient.setQueryData(queryKey, (current: { data: PaginatedData<ProjectChatMessage> } | undefined) => ({
-        data: current?.data
-          ? { ...current.data, items: [...current.data.items, optimisticMessage] }
-          : { items: [optimisticMessage], page: 1, limit: 100, total: 1, total_pages: 1 },
-      }))
+      queryClient.setQueriesData<{ data: PaginatedData<ProjectChatMessage> }>(
+        { queryKey },
+        (current) => {
+          if (!current) return current
+          return {
+            data: current.data
+              ? { ...current.data, items: [...current.data.items, optimisticMessage] }
+              : { items: [optimisticMessage], page: 1, limit: 100, total: 1, total_pages: 1 },
+          }
+        }
+      )
       setBody('')
 
       return {
-        previous,
+        previousQueries,
         optimisticId,
         trimmedBody,
       }
     },
     onSuccess: (res, _variables, context) => {
-      queryClient.setQueryData(queryKey, (current: { data: PaginatedData<ProjectChatMessage> } | undefined) => ({
-        data: current?.data
-          ? { ...current.data, items: current.data.items.map((message) => (message.id === context?.optimisticId ? res.data : message)) }
-          : current?.data,
-      }))
+      queryClient.setQueriesData<{ data: PaginatedData<ProjectChatMessage> }>(
+        { queryKey },
+        (current) => {
+          if (!current) return current
+          return {
+            data: current.data
+              ? { ...current.data, items: current.data.items.map((message) => (message.id === context?.optimisticId ? res.data : message)) }
+              : current.data,
+          }
+        }
+      )
     },
     onError: async (error, _variables, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(queryKey, context.previous)
+      if (context?.previousQueries) {
+        for (const [key, previousData] of context.previousQueries) {
+          queryClient.setQueryData(key, previousData)
+        }
       }
       if (context?.trimmedBody) {
         setBody(context.trimmedBody)

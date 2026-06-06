@@ -1,9 +1,9 @@
-﻿import { CalendarClock, CheckCircle2, Download, Eye, File as FileIconBase, FileImage, FileText, FileVideo, GitPullRequestArrow, UserRound } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { CalendarClock, CheckCircle2, Download, Eye, File as FileIconBase, FileImage, FileText, FileVideo, GitPullRequestArrow, UserRound } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ProjectMember, ProjectTask, ProjectTimelineItem } from '@/features/collab/model'
 import { downloadGatewayFile, previewGatewayFile, triggerBlobDownload } from '@/features/collab/utils'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
@@ -35,13 +35,21 @@ const itemIcon = (item: ProjectTimelineItem) => {
 const supportsPreview = (mimeType: string) =>
   mimeType.startsWith('image/') || mimeType.startsWith('video/') || mimeType === 'application/pdf' || mimeType.startsWith('text/')
 
-const formatBogotaDate = (iso: string) =>
-  new Date(iso).toLocaleString('es-CO', {
-    timeZone: 'America/Bogota',
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    hour12: false,
-  })
+const formatBogotaDate = (iso: string | null | undefined): string => {
+  if (!iso) return '—'
+  const ts = Date.parse(iso)
+  if (!Number.isFinite(ts)) return '—'
+  try {
+    return new Date(ts).toLocaleString('es-CO', {
+      timeZone: 'America/Bogota',
+      dateStyle: 'medium',
+      timeStyle: 'short',
+      hour12: false,
+    })
+  } catch {
+    return '—'
+  }
+}
 
 const badgeClassByKind: Record<ProjectTimelineItem['kind'], string> = {
   file: 'bg-sky-100 text-sky-800 border-sky-200',
@@ -67,8 +75,6 @@ export function ConversationFilesTimeline({ accessToken, timeline, tasks, member
     mime: '',
     fileName: '',
   })
-  const detachedPreviewUrlsRef = useRef<Set<string>>(new Set())
-
   useEffect(() => {
     const url = preview.url
     if (!url) return
@@ -76,16 +82,6 @@ export function ConversationFilesTimeline({ accessToken, timeline, tasks, member
       URL.revokeObjectURL(url)
     }
   }, [preview.url])
-
-  useEffect(() => {
-    const detached = detachedPreviewUrlsRef.current
-    return () => {
-      for (const url of detached) {
-        URL.revokeObjectURL(url)
-      }
-      detached.clear()
-    }
-  }, [])
 
   const emailBySub = useMemo(
     () => new Map(
@@ -140,11 +136,11 @@ export function ConversationFilesTimeline({ accessToken, timeline, tasks, member
   const openPreviewInNewTab = () => {
     if (!preview.blob) return
     const tabUrl = URL.createObjectURL(preview.blob)
-    detachedPreviewUrlsRef.current.add(tabUrl)
+    // La URL se abre en una pestaña externa: NO la revocamos aquí.
+    // El navegador la libera automáticamente cuando esa pestaña se cierra.
     const opened = window.open(tabUrl, '_blank', 'noopener,noreferrer')
     if (!opened) {
       URL.revokeObjectURL(tabUrl)
-      detachedPreviewUrlsRef.current.delete(tabUrl)
       onError('No se pudo abrir la pestaña. Permite ventanas emergentes.')
     }
   }
@@ -271,6 +267,7 @@ export function ConversationFilesTimeline({ accessToken, timeline, tasks, member
         <DialogContent className="max-w-5xl">
           <DialogHeader>
             <DialogTitle className="truncate pr-8">{preview.fileName}</DialogTitle>
+            <DialogDescription className="sr-only">Previsualización del archivo seleccionado</DialogDescription>
           </DialogHeader>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">

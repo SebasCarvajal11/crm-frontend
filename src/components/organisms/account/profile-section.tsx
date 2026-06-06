@@ -33,6 +33,7 @@ export function ProfileSection({ accessToken, identity }: Props) {
   const {
     avatarInputRef,
     avatarUrl,
+    clearSelectedImage,
     crop,
     croppedAreaPixels,
     onAvatarFileSelect,
@@ -42,7 +43,6 @@ export function ProfileSection({ accessToken, identity }: Props) {
     selectedImageSrc,
     setCrop,
     setPhotoViewerOpen,
-    setSelectedImageSrc,
     setZoom,
     uploadAvatarMutation,
     verifyMutation,
@@ -230,7 +230,7 @@ export function ProfileSection({ accessToken, identity }: Props) {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={Boolean(selectedImageSrc)} onOpenChange={(open) => !open && setSelectedImageSrc(null)}>
+      <Dialog open={Boolean(selectedImageSrc)} onOpenChange={(open) => !open && clearSelectedImage()}>
         <DialogContent
           className={cn(
             'flex w-[calc(100vw-1rem)] max-w-2xl flex-col gap-0 overflow-hidden p-0 sm:w-full',
@@ -278,7 +278,7 @@ export function ProfileSection({ accessToken, identity }: Props) {
           </div>
 
           <DialogFooter className="shrink-0 border-t bg-background">
-            <Button variant="outline" onClick={() => setSelectedImageSrc(null)} disabled={uploadAvatarMutation.isPending}>
+            <Button variant="outline" onClick={clearSelectedImage} disabled={uploadAvatarMutation.isPending}>
               Cancelar
             </Button>
             <Button onClick={() => void onSaveCroppedAvatar()} disabled={!croppedAreaPixels || uploadAvatarMutation.isPending}>

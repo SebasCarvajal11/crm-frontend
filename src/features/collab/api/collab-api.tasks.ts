@@ -1,6 +1,8 @@
-import { api } from '@/lib/api'
-import { putFileToPresignedUrl } from '@/features/media/api/presigned-upload'
+import { api } from '@/shared/lib'
+import { putFileToPresignedUrl } from '@/shared/lib/presigned-upload'
+import { PROJECT_ROUTES, TASK_ROUTES } from '@/shared/lib/gateway-routes'
 import { abortProjectFileUploadRequest, bearer } from './collab-api.projects'
+import { isRetryableUploadRegistrationError, withUploadRegistrationRetries } from './upload-registration'
 import type {
   DataResponse,
   ProjectFile,
@@ -25,8 +27,22 @@ export async function createTaskRequest(
   }
 ): Promise<DataResponse<ProjectTask>> {
   return api
-    .post(`projects/${projectId}/tasks`, { headers: bearer(accessToken), json: body })
+    .post(PROJECT_ROUTES.tasks(projectId), { headers: bearer(accessToken), json: body })
     .json<DataResponse<ProjectTask>>()
+}
+
+export async function searchTasksRequest(
+  accessToken: string,
+  projectId: string,
+  q: string,
+  limit = 8
+): Promise<DataResponse<ProjectTask[]>> {
+  return api
+    .get(`${PROJECT_ROUTES.tasks(projectId)}/search`, {
+      headers: bearer(accessToken),
+      searchParams: { q, limit: String(limit) },
+    })
+    .json<DataResponse<ProjectTask[]>>()
 }
 
 export async function patchTaskRequest(
@@ -46,7 +62,7 @@ export async function patchTaskRequest(
   }
 ): Promise<DataResponse<ProjectTask>> {
   return api
-    .patch(`tasks/${taskId}`, { headers: bearer(accessToken), json: body })
+    .patch(TASK_ROUTES.update(taskId), { headers: bearer(accessToken), json: body })
     .json<DataResponse<ProjectTask>>()
 }
 
@@ -56,7 +72,7 @@ export async function listTaskCommentsRequest(
   taskId: string
 ): Promise<DataResponse<ProjectTaskComment[]>> {
   return api
-    .get(`projects/${projectId}/tasks/${taskId}/comments`, { headers: bearer(accessToken) })
+    .get(PROJECT_ROUTES.taskComments(projectId, taskId), { headers: bearer(accessToken) })
     .json<DataResponse<ProjectTaskComment[]>>()
 }
 
@@ -67,7 +83,7 @@ export async function createTaskCommentRequest(
   content: string
 ): Promise<DataResponse<ProjectTaskComment>> {
   return api
-    .post(`projects/${projectId}/tasks/${taskId}/comments`, { headers: bearer(accessToken), json: { content } })
+    .post(PROJECT_ROUTES.taskComments(projectId, taskId), { headers: bearer(accessToken), json: { content } })
     .json<DataResponse<ProjectTaskComment>>()
 }
 
@@ -77,7 +93,7 @@ export async function listTaskFilesRequest(
   taskId: string
 ): Promise<DataResponse<ProjectFile[]>> {
   return api
-    .get(`projects/${projectId}/tasks/${taskId}/files`, { headers: bearer(accessToken) })
+    .get(PROJECT_ROUTES.taskFiles(projectId, taskId), { headers: bearer(accessToken) })
     .json<DataResponse<ProjectFile[]>>()
 }
 
@@ -98,7 +114,7 @@ export async function uploadTaskFilePresignedRequest(
   const mimeType = file.type || 'application/octet-stream'
 
   const step = await api
-    .post(`projects/${projectId}/tasks/${taskId}/files/upload-url`, {
+    .post(PROJECT_ROUTES.taskFilesUploadUrl(projectId, taskId), {
       headers: bearer(accessToken),
       json: {
         file_name: file.name,
@@ -128,14 +144,19 @@ export async function uploadTaskFileWithMetadataRequest(
 ): Promise<DataResponse<ProjectFile>> {
   const upload = await uploadTaskFilePresignedRequest(accessToken, projectId, taskId, file)
   try {
-    return await uploadTaskFileRequest(accessToken, projectId, taskId, title, description, {
-      fileName: body.fileName,
-      storagePath: upload.objectKey,
-      mimeType: body.mimeType,
-      sizeBytes: body.sizeBytes,
-      isClientVisible: body.isClientVisible,
-    })
+    return await withUploadRegistrationRetries(() =>
+      uploadTaskFileRequest(accessToken, projectId, taskId, title, description, {
+        fileName: body.fileName,
+        storagePath: upload.objectKey,
+        mimeType: body.mimeType,
+        sizeBytes: body.sizeBytes,
+        isClientVisible: body.isClientVisible,
+      })
+    )
   } catch (error) {
+    if (isRetryableUploadRegistrationError(error)) {
+      throw error
+    }
     try {
       await abortProjectFileUploadRequest(accessToken, projectId, upload.objectKey)
     } catch {
@@ -160,7 +181,7 @@ export async function uploadTaskFileRequest(
   }
 ): Promise<DataResponse<ProjectFile>> {
   return api
-    .post(`projects/${projectId}/tasks/${taskId}/files/metadata`, {
+    .post(PROJECT_ROUTES.taskFilesMetadata(projectId, taskId), {
       headers: bearer(accessToken),
       json: {
         title,

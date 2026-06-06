@@ -11,6 +11,7 @@ type Props = {
   accessToken: string
   role: UserRole
   selected: ClientSearchResult[]
+  excludedSubjects?: string[]
   onSelect: (user: ClientSearchResult) => void
   placeholder?: string
   queryKeyPrefix?: string
@@ -20,7 +21,7 @@ type Props = {
  * Molecula: campo de busqueda con debounce para usuarios por email.
  * Emite la seleccion via onSelect sin gestionar el estado de seleccionados.
  */
-export function UserSearch({ accessToken, role, selected, onSelect, placeholder, queryKeyPrefix = 'user-search' }: Props) {
+export function UserSearch({ accessToken, role, selected, excludedSubjects = [], onSelect, placeholder, queryKeyPrefix = 'user-search' }: Props) {
   const [query, setQuery] = useState('')
   const [show, setShow] = useState(false)
   const [debounced, setDebounced] = useState('')
@@ -44,17 +45,24 @@ export function UserSearch({ accessToken, role, selected, onSelect, placeholder,
     staleTime: 30_000,
   })
 
+  const excludedSubjectSet = new Set([
+    ...selected.map((user) => user.subject),
+    ...excludedSubjects,
+  ])
+
   const suggestions = (searchQ.data?.data ?? []).filter(
-    (u) => !selected.some((s) => s.subject === u.subject),
+    (user) => !excludedSubjectSet.has(user.subject),
   )
 
   const listOpen = show && query.length >= 2
   const resolvedActiveIndex =
     suggestions.length === 0 ? -1 : Math.min(activeIndex, suggestions.length - 1)
 
+  // Usa 'click' (no 'mousedown') para que el onClick del botón de sugerencia
+  // se ejecute antes de que este listener cierre la lista y destruya el nodo.
   useEffect(() => {
     if (!listOpen) return
-    const onPointerDown = (event: MouseEvent) => {
+    const onClickOutside = (event: MouseEvent) => {
       const target = event.target
       if (!(target instanceof Node)) return
       if (!rootRef.current?.contains(target)) {
@@ -62,8 +70,8 @@ export function UserSearch({ accessToken, role, selected, onSelect, placeholder,
         setActiveIndex(-1)
       }
     }
-    document.addEventListener('mousedown', onPointerDown)
-    return () => document.removeEventListener('mousedown', onPointerDown)
+    document.addEventListener('click', onClickOutside)
+    return () => document.removeEventListener('click', onClickOutside)
   }, [listOpen])
 
   const selectUser = (user: ClientSearchResult) => {
@@ -180,4 +188,3 @@ export function UserSearch({ accessToken, role, selected, onSelect, placeholder,
     </div>
   )
 }
-

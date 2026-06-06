@@ -9,8 +9,14 @@
     "dev": "vite",
     "build": "vite build && tsc -b",
     "lint": "eslint .",
+    "audit:gateway-routes": "node scripts/audit-gateway-routes.mjs",
     "preview": "vite preview",
-    "preinstall": "pnpm dlx only-allow pnpm"
+    "test:unit": "vitest run",
+    "preinstall": "pnpm dlx only-allow pnpm",
+    "codegen:auth": "openapi-typescript http://localhost:8080/docs/auth/openapi.yaml -o src/shared/api-types/auth.gen.ts",
+    "codegen:collab": "openapi-typescript http://localhost:8080/docs/collab/openapi.yaml -o src/shared/api-types/collab.gen.ts",
+    "codegen:media": "openapi-typescript http://localhost:8080/docs/media/openapi.yaml -o src/shared/api-types/media.gen.ts",
+    "codegen:all": "pnpm codegen:auth && pnpm codegen:collab && pnpm codegen:media"
   },
   "repository": {
     "type": "git",
@@ -25,6 +31,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@tanstack/react-query": "^5.100.9",
     "@tanstack/react-router": "^1.169.2",
+    "@tanstack/react-virtual": "^3.13.25",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "ky": "^2.0.2",
@@ -52,9 +59,11 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
+    "openapi-typescript": "^7.13.0",
     "tailwindcss": "^4.3.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vitest": "^4.1.8"
   }
 }

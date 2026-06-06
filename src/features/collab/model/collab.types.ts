@@ -1,5 +1,9 @@
-export type ProjectType = 'campaign_service' | 'product_order'
-export type ParentProjectStatus = 'todo' | 'in_progress' | 'in_review' | 'completed'
+import type { ProjectType as _ProjectType, ParentProjectStatus as _ParentProjectStatus, ProjectListItem as _ProjectListItem } from '@/shared/types'
+
+export type ProjectType = _ProjectType
+export type ParentProjectStatus = _ParentProjectStatus
+export type ProjectListItem = _ProjectListItem
+
 export type ProjectMemberRole = 'admin' | 'worker' | 'client'
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
 export type TaskColumnKey =
@@ -15,21 +19,6 @@ export type TaskColumnKey =
   | 'shipped'
   | 'completed'
   | 'waiting_material'
-
-/** Campos devueltos por GET /projects (filtrado por gateway allow list). */
-export type ProjectListItem = {
-  id: string
-  name: string
-  clientName: string
-  type: ProjectType
-  status: ParentProjectStatus
-  progressPercent: number
-  unreadNotifications: number
-  estimatedDueDate?: string | null
-  createdAt?: string
-  updatedAt?: string
-  isArchived?: boolean
-}
 
 export type ProjectSearchResult = {
   id: string

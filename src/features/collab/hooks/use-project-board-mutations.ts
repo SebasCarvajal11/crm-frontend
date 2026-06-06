@@ -18,11 +18,12 @@ type Params = {
 export function useProjectBoardMutations({ accessToken, projectId, onError }: Params) {
   const queryClient = useQueryClient()
 
-  const invalidateBoardScope = () => {
-    void queryClient.invalidateQueries({ queryKey: collabKeys.projectBoard(projectId) })
-    void queryClient.invalidateQueries({ queryKey: collabKeys.projects() })
-    void queryClient.invalidateQueries({ queryKey: collabKeys.timeline(projectId) })
-  }
+  const invalidateBoardScope = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: collabKeys.projectBoard(projectId) }),
+      queryClient.invalidateQueries({ queryKey: collabKeys.projects() }),
+      queryClient.invalidateQueries({ queryKey: collabKeys.timeline(projectId) }),
+    ])
 
   const moveTask = useMutation({
     mutationFn: ({ taskId, targetColumnId, position }: MoveTaskInput) =>

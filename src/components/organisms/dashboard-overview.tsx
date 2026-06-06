@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { SectionIntro } from '@/components/molecules/section-intro'
-import { gatewayContractPaths } from '@/features/auth/utils'
+import { DOCS_ROUTES } from '@/shared/lib/gateway-routes'
 import { getApiBaseUrl } from '@/app/session/session-store'
 import type { MeResponse } from '@/features/auth/model'
 
@@ -65,7 +65,7 @@ export function DashboardOverview({ identity }: DashboardOverviewProps) {
           <CardContent className="flex flex-col gap-3">
             <Button variant="outline" size="sm" className="justify-between" asChild>
               <a
-                href={`${docsBase}${gatewayContractPaths.swaggerUi}`}
+                href={`${docsBase}${DOCS_ROUTES.swaggerUi}`}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Abrir Swagger UI en una nueva pestaña"
@@ -77,7 +77,7 @@ export function DashboardOverview({ identity }: DashboardOverviewProps) {
             </Button>
             <Button variant="outline" size="sm" className="justify-between" asChild>
               <a
-                href={`${docsBase}${gatewayContractPaths.openApiYaml}`}
+                href={`${docsBase}${DOCS_ROUTES.openApiYaml}`}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Abrir archivo openapi.yaml en una nueva pestaña"

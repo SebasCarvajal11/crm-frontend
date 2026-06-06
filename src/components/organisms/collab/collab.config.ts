@@ -1,6 +1,8 @@
 ﻿import { CheckCircle2, Clock, Layers, Zap } from 'lucide-react'
-import type { ParentProjectStatus, ProjectTask } from '@/features/collab/model'
+import type { ParentProjectStatus } from '@/features/collab/model'
 import React from 'react'
+
+export { PRIORITY_WEIGHT } from '@/features/collab/model/constants'
 
 /** Columnas del tablero kanban padre (por estado de proyecto). */
 export const PARENT_COLUMNS: {
@@ -51,10 +53,5 @@ export const STATUS_DOT: Record<ParentProjectStatus, string> = {
   in_progress: 'bg-blue-500',
   in_review:   'bg-amber-500',
   completed:   'bg-emerald-500',
-}
-
-/** Peso numerico de prioridad para ordenar tareas (mayor = mas urgente). */
-export const PRIORITY_WEIGHT: Record<ProjectTask['priority'], number> = {
-  urgent: 4, high: 3, medium: 2, low: 1,
 }
 

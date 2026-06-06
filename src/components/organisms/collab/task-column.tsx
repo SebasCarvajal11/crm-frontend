@@ -1,13 +1,14 @@
-﻿import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Plus, Users } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { TaskCard } from './task-card'
 import type { ProjectTask, ProjectTaskColumn } from '@/features/collab/model'
 
 /**
  * Alto fijo del area de tareas (en px).
- * Todas las columnas comparten este valor â†’ aspecto uniforme independiente del contenido.
+ * Todas las columnas comparten este valor -> aspecto uniforme independiente del contenido.
  * Cambiar solo aqui para ajustar globalmente.
  */
 const COLUMN_BODY_HEIGHT = 520
@@ -24,8 +25,25 @@ type Props = {
 }
 
 /** Organismo: columna kanban de tareas con alto fijo y soporte drag-and-drop. */
-export function TaskColumn({ column, tasks, selectedTaskId, canDrag, canCreateTask, onSelectTask, onDropTask, onCreateTask }: Props) {
+export function TaskColumn({
+  column,
+  tasks,
+  selectedTaskId,
+  canDrag,
+  canCreateTask,
+  onSelectTask,
+  onDropTask,
+  onCreateTask,
+}: Props) {
   const [isDragOver, setIsDragOver] = useState(false)
+  const parentRef = useRef<HTMLDivElement>(null)
+
+  const virtualizer = useVirtualizer({
+    count: tasks.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 120, // Estimated height of TaskCard (including spacing)
+    overscan: 3,
+  })
 
   return (
     <section
@@ -33,7 +51,12 @@ export function TaskColumn({ column, tasks, selectedTaskId, canDrag, canCreateTa
       className={`flex flex-col rounded-xl border transition-colors duration-150 ${
         isDragOver ? 'border-primary bg-primary/5 shadow-md' : 'bg-muted/30 border-border'
       }`}
-      onDragOver={(e) => { if (canDrag) { e.preventDefault(); setIsDragOver(true) } }}
+      onDragOver={(e) => {
+        if (canDrag) {
+          e.preventDefault()
+          setIsDragOver(true)
+        }
+      }}
       onDragLeave={() => setIsDragOver(false)}
       onDrop={(e) => {
         if (!canDrag) return
@@ -45,7 +68,9 @@ export function TaskColumn({ column, tasks, selectedTaskId, canDrag, canCreateTa
     >
       {/* Cabecera fija de la columna */}
       <div className="flex items-center justify-between gap-2 border-b bg-background/70 px-3 py-2.5 rounded-t-xl shrink-0">
-        <h3 className="min-w-0 flex-1 truncate text-[13px] font-semibold leading-tight" title={column.title}>{column.title}</h3>
+        <h3 className="min-w-0 flex-1 truncate text-[13px] font-semibold leading-tight" title={column.title}>
+          {column.title}
+        </h3>
         <div className="flex shrink-0 items-center gap-1">
           {column.isClientVisible && (
             <span title="Columna visible para el cliente">
@@ -72,12 +97,13 @@ export function TaskColumn({ column, tasks, selectedTaskId, canDrag, canCreateTa
       </div>
 
       {/*
-        Cuerpo con alto fijo: todas las columnas ocupan el mismo espacio.
+        Cuerpo virtualizado con alto fijo: todas las columnas ocupan el mismo espacio.
         Si hay muchas tareas, se activa scroll solo dentro de esta area.
       */}
       <div
-        className="overflow-y-auto p-2 flex flex-col gap-2"
-        style={{ height: `${COLUMN_BODY_HEIGHT}px` }}
+        ref={parentRef}
+        className="overflow-y-auto p-2"
+        style={{ height: `${COLUMN_BODY_HEIGHT}px`, position: 'relative' }}
         aria-label={`Tareas de la columna ${column.title}`}
       >
         {tasks.length === 0 ? (
@@ -87,15 +113,42 @@ export function TaskColumn({ column, tasks, selectedTaskId, canDrag, canCreateTa
             </p>
           </div>
         ) : (
-          tasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              isSelected={task.id === selectedTaskId}
-              canDrag={canDrag}
-              onClick={() => onSelectTask(task)}
-            />
-          ))
+          <div
+            style={{
+              height: `${virtualizer.getTotalSize()}px`,
+              width: '100%',
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualizer.getVirtualItems()[0]?.start ?? 0}px)`,
+              }}
+            >
+              {virtualizer.getVirtualItems().map((virtualRow) => {
+                const task = tasks[virtualRow.index]
+                return (
+                  <div
+                    key={virtualRow.key}
+                    data-index={virtualRow.index}
+                    ref={virtualizer.measureElement}
+                    className="pb-2 w-full shrink-0"
+                  >
+                    <TaskCard
+                      task={task}
+                      isSelected={task.id === selectedTaskId}
+                      canDrag={canDrag}
+                      onClick={() => onSelectTask(task)}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         )}
       </div>
     </section>

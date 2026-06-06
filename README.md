@@ -22,7 +22,9 @@ Useful commands:
 - `pnpm build`
 - `pnpm preview`
 
-By default the frontend uses `VITE_API_BASE_URL=/api` and proxies `/api` to the gateway. For local multi-repo development, point `VITE_API_PROXY_TARGET` to the active `crm-infra` gateway, typically `http://localhost:18080`.
+By default the frontend uses same-origin API calls with `VITE_API_BASE_URL=`. Public gateway routes are absolute and centralized in `src/shared/lib/gateway-routes.ts`, for example `/api/v1/auth/login`.
+
+For local multi-repo development, Vite proxies `/api/*` to the active `crm-infra` gateway without rewriting the path. Point `VITE_API_PROXY_TARGET` to the gateway, typically `http://localhost:28080` for the local Docker stack.
 
 ## Environment
 

@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getBriefRequest,
@@ -52,15 +52,15 @@ export function useProjectWorkspaceData({ accessToken, projectId, activeTab, isC
 
   useEffect(() => {
     void queryClient.prefetchQuery({
-      queryKey: collabKeys.chatExternal(projectId),
-      queryFn: () => listExternalChatRequest(accessToken, projectId),
+      queryKey: [...collabKeys.chatExternal(projectId), 20],
+      queryFn: () => listExternalChatRequest(accessToken, projectId, { limit: 20, page: 1 }),
       staleTime: 15_000,
     })
 
     if (!isClient) {
       void queryClient.prefetchQuery({
-        queryKey: collabKeys.chatInternal(projectId),
-        queryFn: () => listInternalChatRequest(accessToken, projectId),
+        queryKey: [...collabKeys.chatInternal(projectId), 20],
+        queryFn: () => listInternalChatRequest(accessToken, projectId, { limit: 20, page: 1 }),
         staleTime: 15_000,
       })
     }

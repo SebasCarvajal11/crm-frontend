@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CheckSquare, Lock, Plus, Trash2, User } from 'lucide-react'
+import { Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -17,8 +17,8 @@ import { UserChip } from '@/components/molecules/user-chip'
 import { useCreateTask } from '@/features/collab/hooks'
 import type { ProjectMember, ProjectTask, ProjectTaskColumn } from '@/features/collab/model'
 import type { MeResponse } from '@/shared/types'
-
-type Subtask = { id: string; title: string; is_completed: boolean; assignee_sub: string | null }
+import { CreateTaskSubtasksEditor } from './create-task-subtasks-editor'
+import type { TaskSubtaskDraft } from './task-subtask-utils'
 
 type Props = {
   accessToken: string
@@ -51,7 +51,7 @@ export function CreateTaskModal({
   const [deadline, setDeadline] = useState('')
   const [clientVis, setClientVis] = useState(false)
   const [selectedWorkerSubs, setSelectedWorkerSubs] = useState<string[]>([])
-  const [subtasks, setSubtasks] = useState<Subtask[]>([])
+  const [subtasks, setSubtasks] = useState<TaskSubtaskDraft[]>([])
   const [newSubtask, setNewSubtask] = useState('')
   const [newSubtaskAssignee, setNewSubtaskAssignee] = useState<string>('none')
 
@@ -103,12 +103,6 @@ export function CreateTaskModal({
     ])
     setNewSubtask('')
     setNewSubtaskAssignee('none')
-  }
-
-  const getWorkerLabel = (sub: string | null) => {
-    if (!sub) return null
-    const worker = workerMembers.find((w) => w.userSub === sub)
-    return worker ? getProjectMemberLabel(worker) : sub
   }
 
   return (
@@ -208,79 +202,18 @@ export function CreateTaskModal({
             </label>
           </div>
 
-          <div className="space-y-2 pt-2 border-t">
-            <div className="flex items-center justify-between">
-              <Label className="flex items-center gap-2">
-                <CheckSquare className="size-3.5 text-muted-foreground" />
-                Subtareas (Checklist)
-              </Label>
-              {!canAssign && <span className="text-[10px] text-muted-foreground">Solo admin/worker</span>}
-            </div>
-
-            {canAssign && selectedWorkers.length === 0 && (
-              <div className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-2.5 text-xs text-muted-foreground">
-                <Lock className="size-3.5 shrink-0" />
-                <span>Asigna al menos un trabajador arriba para poder agregar subtareas.</span>
-              </div>
-            )}
-
-            {canAssign && selectedWorkers.length > 0 && (
-              <>
-                {subtasks.length > 0 && (
-                  <div className="space-y-2 mb-1">
-                    {subtasks.map((subtask) => (
-                      <div key={subtask.id} className="flex items-center gap-2 group text-sm rounded-lg border px-3 py-2 bg-muted/30">
-                        <CheckSquare className="size-3.5 text-muted-foreground shrink-0" />
-                        <span className="flex-1 break-words">{subtask.title}</span>
-                        {subtask.assignee_sub && (
-                          <span className="flex items-center gap-1 text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded-full shrink-0">
-                            <User className="size-2.5" />
-                            {getWorkerLabel(subtask.assignee_sub)?.split('@')[0]}
-                          </span>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-6 shrink-0 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100"
-                          onClick={() => setSubtasks((prev) => prev.filter((entry) => entry.id !== subtask.id))}
-                          title="Eliminar subtarea"
-                        >
-                          <Trash2 className="size-3.5" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex items-center gap-2">
-                  <Input
-                    placeholder="Descripcion de la subtarea..."
-                    value={newSubtask}
-                    onChange={(e) => setNewSubtask(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddSubtask() } }}
-                    className="h-8 text-sm"
-                  />
-                  <Select value={newSubtaskAssignee} onValueChange={setNewSubtaskAssignee}>
-                    <SelectTrigger className="h-8 w-36 text-xs shrink-0">
-                      <User className="size-3 mr-1 shrink-0" />
-                      <SelectValue placeholder="Asignar a..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Sin asignar</SelectItem>
-                      {selectedWorkers.map((worker) => (
-                        <SelectItem key={worker.userSub} value={worker.userSub}>
-                          {worker.email?.split('@')[0] ?? worker.userSub.slice(0, 8)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button type="button" variant="secondary" size="icon" className="size-8 shrink-0" disabled={!newSubtask.trim()} onClick={handleAddSubtask}>
-                    <Plus className="size-4" />
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
+          <CreateTaskSubtasksEditor
+            canAssign={canAssign}
+            workerMembers={workerMembers}
+            selectedWorkers={selectedWorkers}
+            subtasks={subtasks}
+            newSubtask={newSubtask}
+            newSubtaskAssignee={newSubtaskAssignee}
+            onNewSubtaskChange={setNewSubtask}
+            onNewSubtaskAssigneeChange={setNewSubtaskAssignee}
+            onAddSubtask={handleAddSubtask}
+            onRemoveSubtask={(subtaskId) => setSubtasks((prev) => prev.filter((entry) => entry.id !== subtaskId))}
+          />
         </div>
 
         <DialogFooter>

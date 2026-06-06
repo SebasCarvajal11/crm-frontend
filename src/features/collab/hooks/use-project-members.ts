@@ -4,8 +4,8 @@ import { listProjectMembersRequest, upsertProjectMemberRequest } from '@/feature
 import { collabKeys } from '@/features/collab/model'
 import type { ClientSearchResult } from '@/shared/types'
 import type { ProjectMember } from '@/features/collab/model'
-import { getCurrentAvatarRequestOptional, getUserAvatarsRequest } from '@/features/media/api'
-import { pickAvatarUrl } from '@/features/media/utils'
+import { getCurrentAvatarRequestOptional, getUserAvatarsRequest } from '@/shared/api'
+import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 
 type Params = {
   accessToken: string
@@ -39,7 +39,7 @@ export function useProjectMembers({
   const avatarSubjects = Array.from(new Set(resolvedMembers.map((m) => m.userSub)))
 
   const avatarsQ = useQuery({
-    queryKey: ['media', 'avatars', 'users', projectId, avatarSubjects.join(',')],
+    queryKey: ['media', 'avatars', 'users', projectId],
     queryFn: () => getUserAvatarsRequest(accessToken, avatarSubjects),
     enabled: avatarSubjects.length > 0,
     staleTime: 60_000,
@@ -67,11 +67,13 @@ export function useProjectMembers({
         })
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       setSelectedWorkers(() => [])
-      void queryClient.invalidateQueries({ queryKey: collabKeys.projectMembers(projectId) })
-      void queryClient.invalidateQueries({ queryKey: collabKeys.projectBoard(projectId) })
-      void queryClient.invalidateQueries({ queryKey: collabKeys.projects() })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: collabKeys.projectMembers(projectId) }),
+        queryClient.invalidateQueries({ queryKey: collabKeys.projectBoard(projectId) }),
+        queryClient.invalidateQueries({ queryKey: collabKeys.projects() }),
+      ])
     },
     onError: (error) => {
       void parseApiError(error).then((m) => onError(m || 'No se pudo agregar trabajador al proyecto'))
@@ -79,7 +81,8 @@ export function useProjectMembers({
   })
 
   const memberAvatarUrl = (memberSub: string, memberEmail?: string | null) =>
-    pickAvatarUrl(avatarBySub[memberSub]?.urls, '64') ?? (memberEmail === identityEmail ? currentUserAvatarUrl : null)
+    pickAvatarUrl(avatarBySub[memberSub]?.urls, '64') ??
+    (memberEmail === identityEmail ? currentUserAvatarUrl : null)
 
   return {
     membersQ,
@@ -88,7 +91,3 @@ export function useProjectMembers({
     memberAvatarUrl,
   }
 }
-
-
-
-

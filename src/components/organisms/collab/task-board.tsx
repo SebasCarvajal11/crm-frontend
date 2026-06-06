@@ -12,6 +12,7 @@ type Props = {
   projectId: string
   columns: ProjectTaskColumn[]
   tasksByColumn: Record<string, ProjectTask[]>
+  taskIndexMap: Map<string, ProjectTask>
   identity: MeResponse['data']
   members: ProjectMember[]
   canOperate: boolean
@@ -24,7 +25,7 @@ type Props = {
 
 /** Organismo: tablero kanban de tareas del proyecto (tablero hijo). */
 export function TaskBoard({
-  accessToken, projectId, columns, tasksByColumn, identity, members,
+  accessToken, projectId, columns, tasksByColumn, taskIndexMap, identity, members,
   canOperate, isLoading, onMoveTask, onTaskSaved, onError,
   focusedTaskId,
 }: Props) {
@@ -38,7 +39,7 @@ export function TaskBoard({
     }
   }, [focusedTaskId])
 
-  const selectedTask = Object.values(tasksByColumn).flat().find(t => t.id === selectedTaskId) ?? null
+  const selectedTask = selectedTaskId ? (taskIndexMap.get(selectedTaskId) ?? null) : null
   const createColumn = columns.find((column) => column.id === createColumnId) ?? null
 
   if (isLoading) {
@@ -78,8 +79,8 @@ export function TaskBoard({
           <div
             className="grid gap-3"
             style={{
-              gridTemplateColumns: `repeat(${columns.length}, minmax(195px, 1fr))`,
-              minWidth: `calc(${columns.length} * (195px + 12px))`,
+              gridTemplateColumns: `repeat(${columns.length}, minmax(272px, 1fr))`,
+              minWidth: `calc(${columns.length} * (272px + 12px))`,
             }}
           >
             {columns.map((col) => (

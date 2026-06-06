@@ -1,8 +1,7 @@
-import type { UserRole } from '@/shared/types'
-import type { ProjectListItem } from '@/features/collab/model'
+import type { UserRole, ProjectListItem } from '@/shared/types'
 import { z } from 'zod'
 
-/** Respuesta del BFF /bff/dashboard — identidad + proyectos en un solo fetch. */
+/** Respuesta del BFF dashboard: identidad + proyectos en un solo fetch. */
 export type DashboardBffResponse = {
   identity: {
     email: string

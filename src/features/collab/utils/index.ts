@@ -3,5 +3,5 @@ export {
   extractActiveMentionQuery,
   mentionHints,
   resolveMentionsFromBody,
-} from '@/components/organisms/collab/chat-mentions'
+} from './chat-mentions'
 export { downloadGatewayFile, formatFileSize, previewGatewayFile, triggerBlobDownload } from './files'

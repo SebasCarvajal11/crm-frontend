@@ -15,7 +15,7 @@ type Props = {
 /** Organismo: panel de comentarios de una tarea con feed y formulario de envio. */
 export function TaskComments({ accessToken, projectId, taskId, onError }: Props) {
   const [content, setContent] = useState('')
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const { commentsQ, comments, send } = useTaskComments({
     accessToken,
@@ -27,12 +27,13 @@ export function TaskComments({ accessToken, projectId, taskId, onError }: Props)
   })
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const el = containerRef.current
+    if (el) el.scrollTop = el.scrollHeight
   }, [comments.length])
 
   return (
     <div className="flex flex-col gap-3 h-full">
-      <div className="flex-1 overflow-y-auto space-y-3 max-h-[350px]" role="log" aria-live="polite">
+      <div ref={containerRef} className="flex-1 overflow-y-auto space-y-3 max-h-[350px]" role="log" aria-live="polite">
         {commentsQ.isLoading ? (
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-6 w-6 border-2 border-muted border-t-primary" />
@@ -57,7 +58,6 @@ export function TaskComments({ accessToken, projectId, taskId, onError }: Props)
             </div>
           ))
         )}
-        <div ref={bottomRef} />
       </div>
 
       <Separator />

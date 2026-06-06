@@ -29,6 +29,20 @@ function messageFromZodValidatorBody(data: unknown): string | null {
   return null
 }
 
+function messageFromStructuredIssues(data: unknown): string | null {
+  if (!data || typeof data !== 'object') return null
+  const o = data as Record<string, unknown>
+  const candidates = [o.issues, o.errors]
+  for (const candidate of candidates) {
+    if (!Array.isArray(candidate) || candidate.length === 0) continue
+    const first = candidate[0] as { message?: string }
+    if (typeof first?.message === 'string' && first.message.length > 0) {
+      return first.message
+    }
+  }
+  return null
+}
+
 function messageFromApiShape(data: unknown): string | null {
   if (!data || typeof data !== 'object') return null
   const o = data as Record<string, unknown>
@@ -67,6 +81,8 @@ export async function parseApiError(error: unknown): Promise<string> {
       const raw = await readJsonPayload(error.response.clone())
       const fromZod = messageFromZodValidatorBody(raw)
       if (fromZod) return fromZod
+      const fromIssues = messageFromStructuredIssues(raw)
+      if (fromIssues) return fromIssues
       const fromApi = messageFromApiShape(raw)
       if (fromApi) return fromApi
     } catch {

@@ -4,6 +4,8 @@
  * Los endpoints autenticados usan /identity/, /account/, /admin/.
  */
 import { api } from '@/shared/lib'
+import { bearer } from '@/shared/lib/bearer'
+import { AUTH_ROUTES, IDENTITY_ROUTES, ACCOUNT_ROUTES, ADMIN_ROUTES } from '@/shared/lib/gateway-routes'
 import type {
   AcceptInviteResponse,
   AdminUsersListResponse,
@@ -21,10 +23,6 @@ import type {
 } from '@/features/auth/model'
 import type { ClientSearchResult } from '@/shared/types'
 
-function bearer(accessToken: string) {
-  return { Authorization: `Bearer ${accessToken}` }
-}
-
 // ── Auth publico (sin cambios — URLs genericas) ──────────────────────────────
 
 export async function loginRequest(
@@ -32,7 +30,7 @@ export async function loginRequest(
   password: string
 ): Promise<LoginResponse> {
   return api
-    .post('auth/login', {
+    .post(AUTH_ROUTES.login, {
       json: { email, password },
       timeout: 15_000,
     })
@@ -40,54 +38,53 @@ export async function loginRequest(
 }
 
 export async function refreshSessionRequest(): Promise<RefreshResponse> {
-  return api.post('auth/refresh').json<RefreshResponse>()
+  return api.post(AUTH_ROUTES.refresh).json<RefreshResponse>()
 }
 
 export async function forgotPasswordRequest(body: {
   email: string
 }): Promise<ForgotPasswordResponse> {
-  return api.post('auth/forgot-password', { json: body }).json<ForgotPasswordResponse>()
+  return api.post(AUTH_ROUTES.forgotPassword, { json: body }).json<ForgotPasswordResponse>()
 }
 
 export async function resetPasswordRequest(body: {
   token: string
   password: string
 }): Promise<MessageResponse> {
-  return api.post('auth/reset-password', { json: body }).json<MessageResponse>()
+  return api.post(AUTH_ROUTES.resetPassword, { json: body }).json<MessageResponse>()
 }
 
 export async function getInvitationPreviewRequest(
   token: string
 ): Promise<InvitePreviewResponse> {
-  const safe = encodeURIComponent(token)
-  return api.get(`auth/accept-invite/${safe}`).json<InvitePreviewResponse>()
+  return api.get(AUTH_ROUTES.acceptInviteToken(token)).json<InvitePreviewResponse>()
 }
 
 export async function acceptInviteRequest(body: {
   token: string
   password: string
 }): Promise<AcceptInviteResponse> {
-  return api.post('auth/accept-invite', { json: body }).json<AcceptInviteResponse>()
+  return api.post(AUTH_ROUTES.acceptInvite, { json: body }).json<AcceptInviteResponse>()
 }
 
 export async function verifyEmailRequest(body: {
   token: string
 }): Promise<MessageResponse> {
-  return api.post('auth/verify-email', { json: body }).json<MessageResponse>()
+  return api.post(AUTH_ROUTES.verifyEmail, { json: body }).json<MessageResponse>()
 }
 
 // ── Identidad (/identity/) ───────────────────────────────────────────────────
 
 export async function fetchMe(accessToken: string): Promise<MeResponse> {
   return api
-    .get('identity/me', {
+    .get(IDENTITY_ROUTES.me, {
       headers: bearer(accessToken),
     })
     .json<MeResponse>()
 }
 
 export async function logoutRequest(accessToken: string): Promise<void> {
-  await api.post('identity/logout', {
+  await api.post(IDENTITY_ROUTES.logout, {
     headers: bearer(accessToken),
   })
 }
@@ -98,7 +95,7 @@ export async function searchClientsRequest(
   role: UserRole = 'client'
 ): Promise<{ data: ClientSearchResult[] }> {
   return api
-    .get('identity/search', {
+    .get(IDENTITY_ROUTES.search, {
       headers: bearer(accessToken),
       searchParams: { q, role },
     })
@@ -112,7 +109,7 @@ export async function changePasswordRequest(
   body: { old_password: string; new_password: string }
 ): Promise<MessageResponse> {
   return api
-    .post('account/password', {
+    .post(ACCOUNT_ROUTES.password, {
       headers: bearer(accessToken),
       json: body,
     })
@@ -123,7 +120,7 @@ export async function listSessionsRequest(
   accessToken: string
 ): Promise<SessionsResponse> {
   return api
-    .get('account/sessions', {
+    .get(ACCOUNT_ROUTES.sessions, {
       headers: bearer(accessToken),
     })
     .json<SessionsResponse>()
@@ -134,7 +131,7 @@ export async function revokeSessionRequest(
   familyId: string
 ): Promise<MessageResponse> {
   return api
-    .delete(`account/sessions/${familyId}`, {
+    .delete(ACCOUNT_ROUTES.session(familyId), {
       headers: bearer(accessToken),
     })
     .json<MessageResponse>()
@@ -144,7 +141,7 @@ export async function requestEmailVerificationRequest(
   accessToken: string
 ): Promise<MessageResponse> {
   return api
-    .post('account/verify-email/request', {
+    .post(ACCOUNT_ROUTES.verifyEmailRequest, {
       headers: bearer(accessToken),
     })
     .json<MessageResponse>()
@@ -157,7 +154,7 @@ export async function registerWorkerRequest(
   body: { email: string; first_name: string; last_name: string; profession: string }
 ): Promise<RegisterWorkerResponse> {
   return api
-    .post('admin/workers', {
+    .post(ADMIN_ROUTES.workers, {
       headers: bearer(accessToken),
       json: body,
     })
@@ -175,7 +172,7 @@ export async function inviteClientRequest(
   }
 ): Promise<InviteClientResponse> {
   return api
-    .post('admin/clients/invite', {
+    .post(ADMIN_ROUTES.clientsInvite, {
       headers: bearer(accessToken),
       json: body,
     })
@@ -192,7 +189,7 @@ export async function inviteAdminRequest(
   }
 ): Promise<InviteAdminResponse> {
   return api
-    .post('admin/admins/invite', {
+    .post(ADMIN_ROUTES.adminsInvite, {
       headers: bearer(accessToken),
       json: body,
     })
@@ -219,7 +216,7 @@ export async function adminListUsersRequest(
   if (params.q?.trim()) searchParams.q = params.q.trim()
 
   return api
-    .get('admin/users', {
+    .get(ADMIN_ROUTES.users, {
       headers: bearer(accessToken),
       searchParams,
     })
@@ -232,7 +229,7 @@ export async function adminPatchUserStatusRequest(
   body: { is_active: boolean }
 ): Promise<MessageResponse> {
   return api
-    .patch(`admin/users/${subject}/status`, {
+    .patch(ADMIN_ROUTES.userStatus(subject), {
       headers: bearer(accessToken),
       json: body,
     })
@@ -245,7 +242,7 @@ export async function adminPatchUserFlagsRequest(
   body: { force_password_change: boolean }
 ): Promise<MessageResponse> {
   return api
-    .patch(`admin/users/${subject}/flags`, {
+    .patch(ADMIN_ROUTES.userFlags(subject), {
       headers: bearer(accessToken),
       json: body,
     })
@@ -257,7 +254,7 @@ export async function adminRestoreUserRequest(
   subject: string
 ): Promise<MessageResponse> {
   return api
-    .post(`admin/users/${subject}/restore`, {
+    .post(ADMIN_ROUTES.userRestore(subject), {
       headers: bearer(accessToken),
     })
     .json<MessageResponse>()
@@ -268,7 +265,7 @@ export async function adminSoftDeleteUserRequest(
   subject: string
 ): Promise<MessageResponse> {
   return api
-    .delete(`admin/users/${subject}`, {
+    .delete(ADMIN_ROUTES.user(subject), {
       headers: bearer(accessToken),
     })
     .json<MessageResponse>()
@@ -277,4 +274,3 @@ export async function adminSoftDeleteUserRequest(
 
 
 export type { ClientSearchResult } from '@/shared/types'
-

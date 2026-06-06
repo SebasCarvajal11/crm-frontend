@@ -26,6 +26,15 @@ export default defineConfig([
     },
   },
   {
+    files: [
+      'src/components/organisms/admin/user-table.tsx',
+      'src/components/organisms/collab/task-column.tsx',
+    ],
+    rules: {
+      'react-hooks/incompatible-library': 'off',
+    },
+  },
+  {
     files: ['src/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [
@@ -65,8 +74,8 @@ export default defineConfig([
         {
           patterns: [
             {
-              group: ['@/features/auth/*'],
-              message: 'En features/admin evita dependencia directa con auth; usa shared o capas de admin.',
+              group: ['@/features/auth/*', '@/features/collab/*', '@/features/bff/*'],
+              message: 'En features/admin evita dependencias directas con otras features; usa shared o capas de admin.',
             },
           ],
         },
@@ -81,24 +90,8 @@ export default defineConfig([
         {
           patterns: [
             {
-              group: ['@/features/auth/*'],
-              message: 'En features/bff evita dependencia directa con auth; usa shared o capas propias de bff.',
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    files: ['src/features/media/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@/features/auth/*', '@/features/admin/*', '@/features/collab/*', '@/features/bff/*'],
-              message: 'En features/media evita acoplamiento con otras features; usa shared o capas propias de media.',
+              group: ['@/features/auth/*', '@/features/admin/*', '@/features/collab/*'],
+              message: 'En features/bff evita dependencias directas con otras features; usa shared o capas propias de bff.',
             },
           ],
         },
@@ -113,8 +106,8 @@ export default defineConfig([
         {
           patterns: [
             {
-              group: ['@/features/auth/*', '@/features/admin/*'],
-              message: 'En features/collab evita acoplamiento directo con auth/admin; usa shared o capas de collab.',
+              group: ['@/features/auth/*', '@/features/admin/*', '@/features/bff/*'],
+              message: 'En features/collab evita dependencias directas con otras features; usa shared o capas de collab.',
             },
           ],
         },

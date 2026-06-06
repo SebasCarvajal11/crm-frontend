@@ -1,5 +1,6 @@
-import { bearer } from '@/features/collab/api/collab-api.projects'
+import { bearer } from '@/shared/lib/bearer'
 import { api } from '@/shared/lib'
+import { BFF_ROUTES } from '@/shared/lib/gateway-routes'
 import type { DashboardBffResponse } from '@/features/bff/model'
 import { dashboardBffResponseSchema } from '@/features/bff/model'
 
@@ -36,7 +37,7 @@ export async function fetchDashboardBff(
   accessToken?: string
 ): Promise<DashboardBffResponse> {
   const payload = await api
-    .get('bff/dashboard', { headers: bearer(accessToken) })
+    .get(BFF_ROUTES.dashboard, { headers: bearer(accessToken) })
     .json<unknown>()
 
   const parsed = dashboardBffResponseSchema.safeParse(normalizeDashboardBffPayload(payload))
@@ -44,7 +45,7 @@ export async function fetchDashboardBff(
     const detail = parsed.error.issues
       .map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`)
       .join('; ')
-    throw new Error(`Respuesta invalida de /bff/dashboard: ${detail}`)
+    throw new Error(`Respuesta invalida de ${BFF_ROUTES.dashboard}: ${detail}`)
   }
 
   const identity = parsed.data.identity
@@ -66,5 +67,3 @@ export async function fetchDashboardBff(
     },
   }
 }
-
-

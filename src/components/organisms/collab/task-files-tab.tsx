@@ -1,12 +1,13 @@
 ﻿import { useRef, useState } from 'react'
 import { Download, Paperclip } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useTaskFiles } from '@/features/collab/hooks'
 import { downloadGatewayFile, formatFileSize } from '@/features/collab/utils'
-import { isBlockedByExtension, SAFE_FILE_ACCEPT } from '@/features/media/utils'
+import { isBlockedByExtension, SAFE_FILE_ACCEPT } from '@/shared/lib'
 
 const MAX_FILE_BYTES = 25 * 1024 * 1024
 
@@ -26,6 +27,7 @@ export function TaskFilesTab({ accessToken, projectId, taskId, canUpload, onErro
   const [fileDesc, setFileDesc] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<string | null>(null)
+  const [clientVisible, setClientVisible] = useState(true)
   const [busyDownloadId, setBusyDownloadId] = useState<string | null>(null)
 
   const { filesQ, files, upload } = useTaskFiles({
@@ -40,6 +42,7 @@ export function TaskFilesTab({ accessToken, projectId, taskId, canUpload, onErro
       setFileDesc('')
       setSelectedFile(null)
       setFileError(null)
+      setClientVisible(true)
     },
   })
 
@@ -112,10 +115,14 @@ export function TaskFilesTab({ accessToken, projectId, taskId, canUpload, onErro
             </Button>
             {selectedFile && <p className="text-xs text-muted-foreground">{formatFileSize(selectedFile.size)}</p>}
           </div>
+          <label className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Checkbox checked={clientVisible} onCheckedChange={(v) => setClientVisible(v === true)} />
+            Visible para cliente
+          </label>
           {fileError && <p className="text-xs text-destructive" role="alert">{fileError}</p>}
           <Button size="sm" className="w-full"
             disabled={!fileTitle.trim() || !fileDesc.trim() || !selectedFile || upload.isPending}
-            onClick={() => upload.mutate({ selectedFile, fileTitle, fileDesc })}>
+            onClick={() => upload.mutate({ selectedFile, fileTitle, fileDesc, isClientVisible: clientVisible })}>
             {upload.isPending ? 'Subiendo...' : 'Subir archivo'}
           </Button>
         </div>

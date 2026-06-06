@@ -1,4 +1,6 @@
+import { useRef } from 'react'
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -33,7 +35,6 @@ export function AdminUserTable({ accessToken }: Props) {
   const {
     actionsError,
     actionsMessage,
-    filteredItems,
     includeDeleted,
     items,
     pageSafe,
@@ -49,9 +50,24 @@ export function AdminUserTable({ accessToken }: Props) {
     setRoleFilter,
     setSearch,
     softDelete,
+    totalItems,
     totalPages,
     usersQ,
   } = useAdminUsersTable(accessToken)
+
+  const parentRef = useRef<HTMLDivElement>(null)
+
+  const virtualizer = useVirtualizer({
+    count: items.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 70,
+    overscan: 5,
+  })
+
+  const virtualRows = virtualizer.getVirtualItems()
+  const totalSize = virtualizer.getTotalSize()
+  const paddingTop = virtualRows.length > 0 ? virtualRows[0].start : 0
+  const paddingBottom = virtualRows.length > 0 ? totalSize - virtualRows[virtualRows.length - 1].end : 0
 
   return (
     <section className="space-y-4">
@@ -126,6 +142,12 @@ export function AdminUserTable({ accessToken }: Props) {
               <Skeleton className="h-10 w-full" />
               <p className="text-sm text-muted-foreground">Cargando usuarios...</p>
             </div>
+          ) : usersQ.isFetching && items.length > 0 ? (
+            <div className="space-y-3" role="status" aria-live="polite" aria-busy="true">
+              <Skeleton className="h-10 w-full opacity-60" />
+              <Skeleton className="h-10 w-full opacity-60" />
+              <Skeleton className="h-10 w-full opacity-60" />
+            </div>
           ) : usersQ.isError ? (
             <Alert variant="destructive">
               <AlertTitle>Error al cargar usuarios</AlertTitle>
@@ -138,11 +160,14 @@ export function AdminUserTable({ accessToken }: Props) {
             </Alert>
           ) : (
             <>
-              <div className="overflow-x-auto rounded-lg border border-border/80">
+              <div
+                ref={parentRef}
+                className="overflow-auto max-h-[500px] rounded-lg border border-border/80"
+              >
                 <Table>
                   <caption className="sr-only">Listado de usuarios administrables.</caption>
-                  <TableHeader>
-                    <TableRow>
+                  <TableHeader className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                    <TableRow className="border-b-0">
                       <TableHead className="w-[260px]">Usuario</TableHead>
                       <TableHead>Correo</TableHead>
                       <TableHead className="w-[130px] text-center">Rol</TableHead>
@@ -151,46 +176,64 @@ export function AdminUserTable({ accessToken }: Props) {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {items.map((row: AdminUserRow) => (
-                      <TableRow key={row.id} className="align-middle">
-                        <TableCell className="min-w-[220px]">
-                          <div className="flex flex-col">
-                            <span className="font-semibold leading-tight">{userDisplayName(row)}</span>
-                            {userSecondaryName(row) && (
-                              <span className="mt-0.5 text-xs text-muted-foreground">{userSecondaryName(row)}</span>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-mono text-xs sm:text-sm break-all">{row.email}</TableCell>
-                        <TableCell className="text-center">{roleBadge(row.role)}</TableCell>
-                        <TableCell className="text-center">
-                          {row.deleted_at ? (
-                            <Badge variant="destructive" className="inline-flex min-w-[108px] justify-center rounded-full">Archivado</Badge>
-                          ) : row.is_active ? (
-                            <Badge className="inline-flex min-w-[108px] justify-center rounded-full bg-emerald-100 text-emerald-800 border-emerald-200">Activo</Badge>
-                          ) : (
-                            <Badge variant="outline" className="inline-flex min-w-[108px] justify-center rounded-full">Inactivo</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right align-middle">
-                          <AdminUserActions
-                            row={row}
-                            patchStatus={patchStatus}
-                            patchFlags={patchFlags}
-                            softDelete={softDelete}
-                            restore={restore}
-                            clearActionMessage={() => setActionsMessage(null)}
-                          />
-                        </TableCell>
+                    {paddingTop > 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} style={{ height: `${paddingTop}px` }} />
                       </TableRow>
-                    ))}
+                    )}
+                    {virtualRows.map((virtualRow) => {
+                      const row: AdminUserRow = items[virtualRow.index]
+                      return (
+                        <TableRow
+                          key={row.id}
+                          data-index={virtualRow.index}
+                          ref={virtualizer.measureElement}
+                          className="align-middle"
+                        >
+                          <TableCell className="min-w-[220px]">
+                            <div className="flex flex-col">
+                              <span className="font-semibold leading-tight">{userDisplayName(row)}</span>
+                              {userSecondaryName(row) && (
+                                <span className="mt-0.5 text-xs text-muted-foreground">{userSecondaryName(row)}</span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-mono text-xs sm:text-sm break-all">{row.email}</TableCell>
+                          <TableCell className="text-center">{roleBadge(row.role)}</TableCell>
+                          <TableCell className="text-center">
+                            {row.deleted_at ? (
+                              <Badge variant="destructive" className="inline-flex min-w-[108px] justify-center rounded-full">Archivado</Badge>
+                            ) : row.is_active ? (
+                              <Badge className="inline-flex min-w-[108px] justify-center rounded-full bg-emerald-100 text-emerald-800 border-emerald-200">Activo</Badge>
+                            ) : (
+                              <Badge variant="outline" className="inline-flex min-w-[108px] justify-center rounded-full">Inactivo</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right align-middle">
+                            <AdminUserActions
+                              row={row}
+                              patchStatus={patchStatus}
+                              patchFlags={patchFlags}
+                              softDelete={softDelete}
+                              restore={restore}
+                              clearActionMessage={() => setActionsMessage(null)}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                    {paddingBottom > 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} style={{ height: `${paddingBottom}px` }} />
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border bg-muted/10 px-3 py-2">
                 <p className="text-sm text-muted-foreground whitespace-nowrap">
-                  Pagina {pageSafe} de {Math.max(totalPages, 1)} - {filteredItems.length} registros
+                  Pagina {pageSafe} de {Math.max(totalPages, 1)} — {totalItems} registros
                 </p>
                 <div className="flex items-center gap-1.5">
                   <Button

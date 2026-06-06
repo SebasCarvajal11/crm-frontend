@@ -1,6 +1,8 @@
-import { useSessionStore } from '@/app/session/session-store'
-import { api } from '@/lib/api'
-import { putFileToPresignedUrl } from '@/features/media/api/presigned-upload'
+import { api } from '@/shared/lib'
+import { bearer } from '@/shared/lib/bearer'
+import { putFileToPresignedUrl } from '@/shared/lib/presigned-upload'
+import { PROJECT_ROUTES, FILE_ROUTES } from '@/shared/lib/gateway-routes'
+import { isRetryableUploadRegistrationError, withUploadRegistrationRetries } from './upload-registration'
 import type {
   DataResponse,
   PaginatedData,
@@ -16,12 +18,7 @@ import type {
   ProjectWorkspaceResponse,
 } from '@/features/collab/model'
 
-/** Usa el token del store (p. ej. tras refresh) para alinear con el hook 401 de `api`. */
-export const bearer = (accessToken?: string) => {
-  const token = useSessionStore.getState().token ?? accessToken
-  if (!token) throw new Error('No hay sesión activa')
-  return { Authorization: `Bearer ${token}` }
-}
+export { bearer }
 
 export async function listProjectsRequest(
   accessToken: string,
@@ -32,7 +29,7 @@ export async function listProjectsRequest(
   if (params?.limit != null) searchParams.limit = String(params.limit)
   if (params?.type) searchParams.type = params.type
   if (params?.status) searchParams.status = params.status
-  return api.get('projects', { headers: bearer(accessToken), searchParams }).json<DataResponse<PaginatedData<ProjectListItem>>>()
+  return api.get(PROJECT_ROUTES.list, { headers: bearer(accessToken), searchParams }).json<DataResponse<PaginatedData<ProjectListItem>>>()
 }
 
 export async function updateProjectRequest(
@@ -46,7 +43,7 @@ export async function updateProjectRequest(
     progress_percent?: number
   }
 ): Promise<DataResponse<Project>> {
-  return api.patch(`projects/${projectId}`, { headers: bearer(accessToken), json: body }).json<DataResponse<Project>>()
+  return api.patch(PROJECT_ROUTES.update(projectId), { headers: bearer(accessToken), json: body }).json<DataResponse<Project>>()
 }
 
 export async function createProjectRequest(
@@ -61,21 +58,21 @@ export async function createProjectRequest(
     brief?: string
   }
 ): Promise<DataResponse<Project>> {
-  return api.post('projects', { headers: bearer(accessToken), json: body }).json<DataResponse<Project>>()
+  return api.post(PROJECT_ROUTES.create, { headers: bearer(accessToken), json: body }).json<DataResponse<Project>>()
 }
 
 export async function getProjectWorkspaceRequest(
   accessToken: string,
   projectId: string
 ): Promise<DataResponse<ProjectWorkspaceResponse>> {
-  return api.get(`projects/${projectId}/workspace`, { headers: bearer(accessToken) }).json<DataResponse<ProjectWorkspaceResponse>>()
+  return api.get(PROJECT_ROUTES.workspace(projectId), { headers: bearer(accessToken) }).json<DataResponse<ProjectWorkspaceResponse>>()
 }
 
 export async function getProjectBoardRequest(
   accessToken: string,
   projectId: string
 ): Promise<DataResponse<ProjectBoardResponse>> {
-  return api.get(`projects/${projectId}/board`, { headers: bearer(accessToken) }).json<DataResponse<ProjectBoardResponse>>()
+  return api.get(PROJECT_ROUTES.board(projectId), { headers: bearer(accessToken) }).json<DataResponse<ProjectBoardResponse>>()
 }
 
 export async function searchProjectsRequest(
@@ -84,14 +81,14 @@ export async function searchProjectsRequest(
 ): Promise<DataResponse<ProjectSearchResult[]>> {
   const searchParams: Record<string, string> = { q: params.q }
   if (params.limit != null) searchParams.limit = String(params.limit)
-  return api.get('projects/search', { headers: bearer(accessToken), searchParams }).json<DataResponse<ProjectSearchResult[]>>()
+  return api.get(PROJECT_ROUTES.search, { headers: bearer(accessToken), searchParams }).json<DataResponse<ProjectSearchResult[]>>()
 }
 
 export async function getBriefRequest(
   accessToken: string,
   projectId: string
 ): Promise<DataResponse<ProjectBrief>> {
-  return api.get(`projects/${projectId}/brief`, { headers: bearer(accessToken) }).json<DataResponse<ProjectBrief>>()
+  return api.get(PROJECT_ROUTES.brief(projectId), { headers: bearer(accessToken) }).json<DataResponse<ProjectBrief>>()
 }
 
 export async function updateBriefRequest(
@@ -99,7 +96,7 @@ export async function updateBriefRequest(
   projectId: string,
   body: { body: string }
 ): Promise<DataResponse<ProjectBrief>> {
-  return api.patch(`projects/${projectId}/brief`, { headers: bearer(accessToken), json: body }).json<DataResponse<ProjectBrief>>()
+  return api.patch(PROJECT_ROUTES.brief(projectId), { headers: bearer(accessToken), json: body }).json<DataResponse<ProjectBrief>>()
 }
 
 export async function listProjectFilesEnrichedRequest(
@@ -111,7 +108,7 @@ export async function listProjectFilesEnrichedRequest(
   if (params?.page != null) searchParams.page = String(params.page)
   if (params?.limit != null) searchParams.limit = String(params.limit)
   return api
-    .get(`projects/${projectId}/files`, { headers: bearer(accessToken), searchParams })
+    .get(PROJECT_ROUTES.files(projectId), { headers: bearer(accessToken), searchParams })
     .json<DataResponse<PaginatedData<ProjectFileEnriched>>>()
 }
 
@@ -120,21 +117,21 @@ export async function upsertProjectMemberRequest(
   projectId: string,
   body: { user_sub: string; role: 'admin' | 'worker' | 'client'; user_email?: string }
 ): Promise<DataResponse<ProjectMember>> {
-  return api.put(`projects/${projectId}/members`, { headers: bearer(accessToken), json: body }).json<DataResponse<ProjectMember>>()
+  return api.put(PROJECT_ROUTES.members(projectId), { headers: bearer(accessToken), json: body }).json<DataResponse<ProjectMember>>()
 }
 
 export async function listProjectMembersRequest(
   accessToken: string,
   projectId: string
 ): Promise<DataResponse<ProjectMember[]>> {
-  return api.get(`projects/${projectId}/members`, { headers: bearer(accessToken) }).json<DataResponse<ProjectMember[]>>()
+  return api.get(PROJECT_ROUTES.members(projectId), { headers: bearer(accessToken) }).json<DataResponse<ProjectMember[]>>()
 }
 
 export async function listProjectTimelineRequest(
   accessToken: string,
   projectId: string
 ): Promise<DataResponse<ProjectTimelineItem[]>> {
-  return api.get(`projects/${projectId}/timeline`, { headers: bearer(accessToken) }).json<DataResponse<ProjectTimelineItem[]>>()
+  return api.get(PROJECT_ROUTES.timeline(projectId), { headers: bearer(accessToken) }).json<DataResponse<ProjectTimelineItem[]>>()
 }
 
 export const listProjectFilesTimelineRequest = listProjectTimelineRequest
@@ -157,7 +154,7 @@ export async function uploadProjectConversationFileRequest(
   // Backward compatibility: older backend contracts still expect channel.
   form.append('channel', body.isClientVisible ? 'external' : 'internal')
   return api
-    .post(`projects/${projectId}/files/upload`, { headers: bearer(accessToken), body: form })
+    .post(PROJECT_ROUTES.filesUpload(projectId), { headers: bearer(accessToken), body: form })
     .json<DataResponse<ProjectFileEnriched>>()
 }
 
@@ -177,7 +174,7 @@ export async function uploadProjectFilePresignedRequest(
   const mimeType = file.type || 'application/octet-stream'
 
   const step = await api
-    .post(`projects/${projectId}/files/upload-url`, {
+    .post(PROJECT_ROUTES.filesUploadUrl(projectId), {
       headers: bearer(accessToken),
       json: {
         file_name: file.name,
@@ -196,7 +193,7 @@ export async function abortProjectFileUploadRequest(
   projectId: string,
   objectKey: string,
 ): Promise<void> {
-  await api.delete(`projects/${projectId}/files/uploaded-object`, {
+  await api.delete(PROJECT_ROUTES.filesUploadedObject(projectId), {
     headers: bearer(accessToken),
     searchParams: { objectKey },
   })
@@ -216,7 +213,7 @@ export async function createProjectFileMetadataRequest(
     origin: 'internal_chat' | 'external_chat' | 'manual_upload'
   }
 ): Promise<DataResponse<ProjectFileEnriched>> {
-  return api.post(`projects/${projectId}/files`, {
+  return api.post(PROJECT_ROUTES.files(projectId), {
     headers: bearer(accessToken),
     json: {
       file_name: body.fileName,
@@ -242,7 +239,7 @@ export type ProjectFileMetadataInput = {
   origin: 'internal_chat' | 'external_chat' | 'manual_upload'
 }
 
-/** Upload prefirmado + metadata; si falla el registro, intenta borrar el objeto en OCI. */
+/** Upload prefirmado + metadata; solo compensa en OCI cuando el fallo no es transitorio. */
 export async function uploadProjectFileWithMetadataRequest(
   accessToken: string,
   projectId: string,
@@ -251,15 +248,20 @@ export async function uploadProjectFileWithMetadataRequest(
 ): Promise<DataResponse<ProjectFileEnriched>> {
   const upload = await uploadProjectFilePresignedRequest(accessToken, projectId, file)
   try {
-    return await createProjectFileMetadataRequest(accessToken, projectId, {
-      ...metadata,
-      storagePath: upload.objectKey,
-    })
+    return await withUploadRegistrationRetries(() =>
+      createProjectFileMetadataRequest(accessToken, projectId, {
+        ...metadata,
+        storagePath: upload.objectKey,
+      })
+    )
   } catch (error) {
+    if (isRetryableUploadRegistrationError(error)) {
+      throw error
+    }
     try {
       await abortProjectFileUploadRequest(accessToken, projectId, upload.objectKey)
     } catch {
-      // compensación best-effort; el worker orphan-oci puede limpiar más tarde
+      // Compensacion best-effort: media owns cleanup for unregistered uploads.
     }
     throw error
   }
@@ -269,7 +271,7 @@ export async function deleteProjectFileRequest(
   accessToken: string,
   fileId: string
 ): Promise<DataResponse<{ id: string }>> {
-  return api.delete(`files/${fileId}`, { headers: bearer(accessToken) }).json<DataResponse<{ id: string }>>()
+  return api.delete(FILE_ROUTES.delete(fileId), { headers: bearer(accessToken) }).json<DataResponse<{ id: string }>>()
 }
 
 /** Descarga vía cliente `api` (ky): reintenta tras 401 con refresh. No usar `fetch()` directo. */
@@ -279,7 +281,7 @@ export async function downloadProjectFileBlobRequest(
   preview = false
 ): Promise<Blob> {
   return api
-    .get(`files/${fileId}/download`, {
+    .get(FILE_ROUTES.download(fileId), {
       headers: bearer(accessToken),
       searchParams: preview ? { preview: 'true' } : undefined,
     })
@@ -293,7 +295,7 @@ export async function getProjectFileAccessRequest(
 ): Promise<DataResponse<{ url: string; expiresInSeconds: number }>> {
   const searchParams = preview ? { preview: 'true' } : undefined
   return api
-    .get(`files/${fileId}/access`, { headers: bearer(accessToken), searchParams })
+    .get(FILE_ROUTES.access(fileId), { headers: bearer(accessToken), searchParams })
     .json<DataResponse<{ url: string; expiresInSeconds: number }>>()
 }
 
@@ -303,7 +305,7 @@ export async function updateProjectFileRequest(
   body: { title?: string; description?: string | null; task_id?: string | null; is_client_visible?: boolean }
 ): Promise<DataResponse<ProjectFileEnriched>> {
   return api
-    .patch(`files/${fileId}`, { headers: bearer(accessToken), json: body })
+    .patch(FILE_ROUTES.update(fileId), { headers: bearer(accessToken), json: body })
     .json<DataResponse<ProjectFileEnriched>>()
 }
 
@@ -313,7 +315,7 @@ export async function createMinorChangeRequestRequest(
   body: { task_id: string; title: string; description: string }
 ): Promise<DataResponse<ProjectChangeRequest>> {
   return api
-    .post(`projects/${projectId}/change-requests/minor`, { headers: bearer(accessToken), json: body })
+    .post(PROJECT_ROUTES.changeRequestMinor(projectId), { headers: bearer(accessToken), json: body })
     .json<DataResponse<ProjectChangeRequest>>()
 }
 
@@ -323,7 +325,7 @@ export async function createFormalChangeRequestRequest(
   body: { task_id?: string; title: string; description: string; justification: string }
 ): Promise<DataResponse<ProjectChangeRequest>> {
   return api
-    .post(`projects/${projectId}/change-requests/formal`, { headers: bearer(accessToken), json: body })
+    .post(PROJECT_ROUTES.changeRequestFormal(projectId), { headers: bearer(accessToken), json: body })
     .json<DataResponse<ProjectChangeRequest>>()
 }
 
@@ -334,7 +336,7 @@ export async function resolveChangeRequestRequest(
   body: { status: 'accepted' | 'rejected' | 'escalated' | 'approved' }
 ): Promise<DataResponse<ProjectChangeRequest>> {
   return api
-    .patch(`projects/${projectId}/change-requests/${changeRequestId}`, { headers: bearer(accessToken), json: body })
+    .patch(PROJECT_ROUTES.changeRequest(projectId, changeRequestId), { headers: bearer(accessToken), json: body })
     .json<DataResponse<ProjectChangeRequest>>()
 }
 
@@ -347,7 +349,6 @@ export async function listFormalChangeLogRequest(
   if (params?.page != null) searchParams.page = String(params.page)
   if (params?.limit != null) searchParams.limit = String(params.limit)
   return api
-    .get(`projects/${projectId}/change-log/formal`, { headers: bearer(accessToken), searchParams })
+    .get(PROJECT_ROUTES.changeLogFormal(projectId), { headers: bearer(accessToken), searchParams })
     .json<DataResponse<PaginatedData<{ id: string; description: string; createdAt: string }>>>()
 }
-

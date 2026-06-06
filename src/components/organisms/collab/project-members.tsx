@@ -7,6 +7,7 @@ import { useProjectMembers } from '@/features/collab/hooks'
 import type { ProjectMember, ProjectMemberRole } from '@/features/collab/model'
 import type { ClientSearchResult } from '@/shared/types'
 import type { MeResponse } from '@/shared/types'
+import { getAvatarColor } from './avatar-color'
 
 type Props = {
   members: ProjectMember[]
@@ -39,13 +40,6 @@ const ROLE_CONFIG: Record<ProjectMemberRole, { label: string; icon: React.ReactN
   },
 }
 
-const AVATAR_COLORS = ['bg-violet-500', 'bg-sky-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500', 'bg-indigo-500', 'bg-teal-500', 'bg-orange-500']
-
-function getAvatarColor(sub: string) {
-  let hash = 0
-  for (let i = 0; i < sub.length; i++) hash = (sub.charCodeAt(i) + ((hash << 5) - hash)) | 0
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
-}
 
 function getDisplayName(member: ProjectMember) {
   const full = `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim()
@@ -112,6 +106,12 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
 
   const memberSubs = new Set(resolvedMembers.map((m) => m.userSub))
   const filteredSelection = selectedWorkers.filter((w) => !memberSubs.has(w.subject))
+  const excludedWorkerSubjects = Array.from(new Set([
+    ...resolvedMembers
+      .filter((member) => member.role === 'worker')
+      .map((member) => member.userSub),
+    ...filteredSelection.map((worker) => worker.subject),
+  ]))
   const byRole = resolvedMembers.reduce<Record<ProjectMemberRole, ProjectMember[]>>((acc, member) => {
     acc[member.role] = [...acc[member.role], member]
     return acc
@@ -141,6 +141,7 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
             accessToken={accessToken}
             role="worker"
             selected={filteredSelection}
+            excludedSubjects={excludedWorkerSubjects}
             onSelect={(worker) => {
               if (memberSubs.has(worker.subject)) return
               setSelectedWorkers((prev) => prev.some((w) => w.subject === worker.subject) ? prev : [...prev, worker])

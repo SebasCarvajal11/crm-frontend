@@ -11,8 +11,7 @@ import { adminUsersKeys, type AdminUserRow, type UserRole } from '@/features/adm
 import { parseApiError } from '@/features/admin/utils'
 
 const PAGE_BLOCK_SIZE = 5
-const DEFAULT_LIMIT = 2
-const FETCH_LIMIT = 100
+const SERVER_PAGE_LIMIT = 20
 
 type ActionPayload =
   | { subject: string; is_active: boolean }
@@ -32,16 +31,23 @@ export function useAdminUsersTable(accessToken: string) {
     const timeout = window.setTimeout(() => {
       setDebouncedSearch(search.trim())
       setPage(1)
-    }, 220)
+    }, 300)
     return () => window.clearTimeout(timeout)
   }, [search])
 
-  const listParams = { page: 1, limit: FETCH_LIMIT, include_deleted: true }
+  const listParams = {
+    page,
+    limit: SERVER_PAGE_LIMIT,
+    include_deleted: includeDeleted,
+    ...(roleFilter !== 'all' && { role: roleFilter as UserRole }),
+    ...(debouncedSearch && { q: debouncedSearch }),
+  }
 
   const usersQ = useQuery({
     queryKey: adminUsersKeys.list(listParams),
     queryFn: () => adminListUsersRequest(accessToken, listParams),
     enabled: Boolean(accessToken),
+    placeholderData: (prev) => prev,
   })
 
   const mutationOptions = <T extends ActionPayload>(fn: (arg: T) => Promise<{ message: string }>) => ({
@@ -66,28 +72,11 @@ export function useAdminUsersTable(accessToken: string) {
   const softDelete = useMutation(mutationOptions((subject: string) => adminSoftDeleteUserRequest(accessToken, subject)))
   const restore = useMutation(mutationOptions((subject: string) => adminRestoreUserRequest(accessToken, subject)))
 
-  const filteredItems = useMemo(() => {
-    const needle = debouncedSearch.trim().toLowerCase()
-    const sourceItems = usersQ.data?.data.items ?? []
-    return sourceItems.filter((row) => {
-      if (!includeDeleted && row.deleted_at) return false
-      if (roleFilter !== 'all' && row.role !== roleFilter) return false
-      if (!needle) return true
-      const fullName = `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim()
-      return (
-        row.email.toLowerCase().includes(needle) ||
-        fullName.toLowerCase().includes(needle) ||
-        (row.company_name ?? '').toLowerCase().includes(needle) ||
-        (row.first_name ?? '').toLowerCase().includes(needle) ||
-        (row.last_name ?? '').toLowerCase().includes(needle)
-      )
-    })
-  }, [usersQ.data?.data.items, includeDeleted, roleFilter, debouncedSearch])
+  const items: AdminUserRow[] = usersQ.data?.data.items ?? []
+  const totalItems = usersQ.data?.data.total ?? 0
+  const totalPages = usersQ.data?.data.total_pages ?? 0
 
-  const totalPages = Math.ceil(filteredItems.length / DEFAULT_LIMIT)
-  const pageSafe = Math.min(Math.max(1, page), Math.max(1, totalPages))
-  const pageStart = (pageSafe - 1) * DEFAULT_LIMIT
-  const items = filteredItems.slice(pageStart, pageStart + DEFAULT_LIMIT)
+  const pageSafe = useMemo(() => Math.min(Math.max(1, page), Math.max(1, totalPages)), [page, totalPages])
 
   const pageWindow = useMemo(() => {
     if (totalPages <= 0) return []
@@ -97,14 +86,13 @@ export function useAdminUsersTable(accessToken: string) {
     const pages: number[] = []
     for (let p = start; p <= end; p += 1) pages.push(p)
     return pages
-  }, [pageSafe, totalPages])
+  }, [totalPages, pageSafe])
 
-  const actionsError = patchStatus.error ?? patchFlags.error ?? softDelete.error ?? restore.error
+  const actionsError = useMemo(() => patchStatus.error ?? patchFlags.error ?? softDelete.error ?? restore.error, [patchStatus.error, patchFlags.error, softDelete.error, restore.error])
 
   return {
     actionsError,
     actionsMessage,
-    filteredItems,
     includeDeleted,
     items,
     pageSafe,
@@ -120,6 +108,7 @@ export function useAdminUsersTable(accessToken: string) {
     setRoleFilter,
     setSearch,
     softDelete,
+    totalItems,
     totalPages,
     usersQ,
   }

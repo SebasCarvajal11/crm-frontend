@@ -1,7 +1,8 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Bell, MessageSquare, X } from 'lucide-react'
 import {
+  countUnreadMentionNotificationsRequest,
   listUnreadMentionNotificationsRequest,
   markMentionNotificationSeenRequest,
 } from '@/features/collab/api'
@@ -23,12 +24,20 @@ export function MentionNotifications({ accessToken, onOpenNotification }: Props)
   const rootRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
 
-  const notificationsQ = useQuery({
-    queryKey: collabKeys.mentionNotifications(),
-    queryFn: () => listUnreadMentionNotificationsRequest(accessToken),
+  const countQ = useQuery({
+    queryKey: collabKeys.mentionNotificationsCount(),
+    queryFn: () => countUnreadMentionNotificationsRequest(accessToken),
     enabled: Boolean(accessToken?.trim()),
     refetchInterval: 20_000,
     placeholderData: keepPreviousData,
+    select: (d) => d.data.unread_count,
+  })
+
+  const notificationsQ = useQuery({
+    queryKey: collabKeys.mentionNotifications(),
+    queryFn: () => listUnreadMentionNotificationsRequest(accessToken),
+    enabled: Boolean(accessToken?.trim()) && open,
+    select: (d) => d.data,
   })
 
   const markSeen = useMutation({
@@ -39,9 +48,9 @@ export function MentionNotifications({ accessToken, onOpenNotification }: Props)
     },
   })
 
-  const rows = notificationsQ.data?.data ?? []
-  const unread = rows.length
-  const notificationsUnavailable = notificationsQ.isError && unread === 0
+  const unread = countQ.data ?? 0
+  const rows = notificationsQ.data ?? []
+  const notificationsUnavailable = countQ.isError && unread === 0
 
   const handleOpen = async (item: (typeof rows)[number]) => {
     try {

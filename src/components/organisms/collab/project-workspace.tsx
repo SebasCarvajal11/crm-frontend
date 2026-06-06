@@ -1,17 +1,15 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { AlertCircle, ArrowLeft, FileText, KanbanSquare, MessageSquare, User, Users } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
+import { AlertCircle, ArrowLeft, FileText, KanbanSquare, MessageSquare, Users } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { ProjectTypeBadge } from '@/components/molecules/project-type-badge'
-import { useProjectBoardMutations, useProjectWorkspaceData } from '@/features/collab/hooks'
-import { PARENT_COLUMNS, PRIORITY_WEIGHT, STATUS_DOT } from './collab.config'
+import { useProjectBoardMutations, useProjectWorkspaceData, useTaskSearch, useBoardData } from '@/features/collab/hooks'
+import { ProjectHeader } from './project-header'
+import { TaskSearchBar } from './task-search-bar'
 import { TaskBoard } from './task-board'
 import { ConversationPanel } from './conversation-panel'
 import { BriefPanel } from './brief-panel'
 import { ProjectMembers } from './project-members'
-import type { Project, ProjectListItem, ProjectTask } from '@/features/collab/model'
+import type { ProjectListItem } from '@/features/collab/model'
 import type { MeResponse } from '@/shared/types'
 
 type WorkspaceTab = 'board' | 'chat' | 'brief' | 'members'
@@ -20,11 +18,12 @@ type Props = {
   accessToken: string
   identity: MeResponse['data']
   projectId: string
-  projectMeta: Project | ProjectListItem | null
-  initialWorkspaceTab?: WorkspaceTab
-  initialChatChannel?: 'internal' | 'external'
-  initialChatMessageId?: string
+  projectMeta: ProjectListItem | null
+  activeTab?: WorkspaceTab
+  chatChannel?: 'internal' | 'external'
+  chatMessageId?: string
   onBack: () => void
+  onTabChange: (tab: WorkspaceTab) => void
 }
 
 const TABS: { value: WorkspaceTab; label: string; icon: React.ReactNode }[] = [
@@ -36,87 +35,42 @@ const TABS: { value: WorkspaceTab; label: string; icon: React.ReactNode }[] = [
 
 const FINALIZATION_COLUMN_KEYS = new Set(['done', 'completed'])
 
-/** Organismo: workspace de un proyecto (tablero hijo + tabs de conversacion, archivos y brief). */
-export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta, initialWorkspaceTab, initialChatChannel, initialChatMessageId, onBack }: Props) {
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>(initialWorkspaceTab ?? (initialChatChannel ? 'chat' : 'board'))
-  const [errorMsg,  setErrorMsg]  = useState<string | null>(null)
-  const [taskSearchText, setTaskSearchText] = useState('')
+export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta, activeTab = 'board', chatChannel, chatMessageId, onBack, onTabChange }: Props) {
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [taskSearchDebounced, setTaskSearchDebounced] = useState('')
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null)
-  const navigate = useNavigate({ from: '/dashboard' })
 
-  const isClient   = identity.role === 'client'
+  const isClient = identity.role === 'client'
   const canOperate = identity.role === 'admin' || identity.role === 'worker'
 
-  const { boardQ, briefQ } = useProjectWorkspaceData({
-    accessToken,
-    projectId,
-    activeTab,
-    isClient,
-  })
-  const { moveTask, invalidateBoardScope } = useProjectBoardMutations({
-    accessToken,
-    projectId,
-    onError: (message) => setErrorMsg(message),
-  })
+  const { boardQ, briefQ } = useProjectWorkspaceData({ accessToken, projectId, activeTab, isClient })
+  const { moveTask, invalidateBoardScope } = useProjectBoardMutations({ accessToken, projectId, onError: (message) => setErrorMsg(message) })
 
   const boardData = boardQ.data?.data
   const project = boardData?.project ?? projectMeta
-
-  const boardColumns = useMemo(() => {
-    const cols = boardData?.board.columns ?? []
-    return cols.toSorted((a, b) => a.position - b.position)
-  }, [boardData])
-
-  const boardTasks = useMemo(() => {
-    return boardData?.board.tasks ?? []
-  }, [boardData])
-
   const members = boardData?.members ?? []
+  const isTruncated = boardData?.board.tasksTruncated ?? false
 
-  const searchableTasks = useMemo(() => {
-    const normalized = taskSearchText.trim().toLowerCase()
+  const { boardColumns, boardTasks, tasksByColumn, taskIndexMap } = useBoardData(boardData?.board)
+
+  const handleTaskSearchDebounced = useCallback((value: string) => {
+    setTaskSearchDebounced(value)
+  }, [])
+
+  const localSearchResults = useMemo(() => {
+    if (isTruncated) return []
+    const normalized = taskSearchDebounced.trim().toLowerCase()
     if (normalized.length < 2) return []
     return boardTasks
       .filter((task) => {
         const columnTitle = boardColumns.find((c) => c.id === task.columnId)?.title ?? ''
-        return [
-          task.title,
-          task.description ?? '',
-          task.priority,
-          columnTitle,
-        ].join(' ').toLowerCase().includes(normalized)
+        return [task.title, task.description ?? '', task.priority, columnTitle].join(' ').toLowerCase().includes(normalized)
       })
       .slice(0, 8)
-  }, [boardColumns, boardTasks, taskSearchText])
+  }, [boardColumns, boardTasks, taskSearchDebounced, isTruncated])
 
-  useEffect(() => {
-    navigate({
-      to: '/dashboard',
-      search: (prev) => ({
-        ...prev,
-        tab: 'collab',
-        project_id: projectId,
-        workspace_tab: activeTab,
-      }),
-      replace: true,
-    })
-  }, [navigate, projectId, activeTab])
-
-  const tasksByColumn = useMemo(() => {
-    const map: Record<string, ProjectTask[]> = {}
-    for (const col of boardColumns) map[col.id] = []
-    for (const task of boardTasks) {
-      if (!map[task.columnId]) map[task.columnId] = []
-      map[task.columnId].push(task)
-    }
-    for (const id of Object.keys(map)) {
-      map[id].sort((a, b) => (PRIORITY_WEIGHT[b.priority] ?? 0) - (PRIORITY_WEIGHT[a.priority] ?? 0))
-    }
-    return map
-  }, [boardColumns, boardTasks])
-
-  const status = project?.status ? PARENT_COLUMNS.find((c) => c.key === project.status) : null
-  const pct    = project?.progressPercent ?? 0
+  const { results: remoteSearchResults, isSearching } = useTaskSearch({ accessToken, projectId, rawQuery: taskSearchDebounced, enabled: isTruncated })
+  const searchableTasks = isTruncated ? remoteSearchResults : localSearchResults
 
   return (
     <div className="flex min-h-0 flex-col gap-5">
@@ -128,43 +82,7 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
             Proyectos
           </Button>
         </div>
-
-        <div className="rounded-2xl border bg-card px-4 py-3 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
-                <h1 className="text-base font-semibold truncate leading-tight">{project?.name ?? '…'}</h1>
-                {project?.type && (
-                  <ProjectTypeBadge type={project.type} className="hidden sm:inline-flex" />
-                )}
-              </div>
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                {status && project && (
-                  <span className="flex items-center gap-1">
-                    <span className={`size-1.5 rounded-full ${STATUS_DOT[project.status]}`} aria-hidden="true" />
-                    {status.label}
-                  </span>
-                )}
-                <span className="flex items-center gap-1">
-                  <User className="size-3" aria-hidden="true" />
-                  <span className="truncate max-w-[140px]">{project?.clientName ?? '…'}</span>
-                </span>
-              </div>
-            </div>
-            {project && (
-              <div className="flex items-center gap-2 shrink-0" role="progressbar"
-                aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={`Progreso: ${pct}%`}>
-                <div className="flex flex-col items-end gap-1">
-                  <span className="text-sm font-semibold leading-none">{pct}%</span>
-                  <div className="w-20 sm:w-28 h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary rounded-full transition-all duration-500"
-                      style={{ width: `${Math.max(pct > 0 ? 4 : 0, pct)}%` }} />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <ProjectHeader project={project} />
       </div>
 
       {errorMsg && (
@@ -175,19 +93,13 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
         </Alert>
       )}
 
-      <div
-        className="flex items-center gap-1 overflow-x-auto rounded-2xl border bg-card p-1 shadow-sm"
-        role="tablist"
-        aria-label="Secciones del proyecto"
-      >
+      <div className="flex items-center gap-1 overflow-x-auto rounded-2xl border bg-card p-1 shadow-sm scrollbar-thin" role="tablist" aria-label="Secciones del proyecto">
         {TABS.map((tab) => (
           <button key={tab.value} type="button" role="tab" aria-selected={activeTab === tab.value}
-            aria-controls={`tabpanel-${tab.value}`} onClick={() => setActiveTab(tab.value)}
+            aria-controls={`tabpanel-${tab.value}`} onClick={() => onTabChange(tab.value)}
             className={[
               'flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-              activeTab === tab.value
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+              activeTab === tab.value ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
             ].join(' ')}>
             <span aria-hidden="true">{tab.icon}</span>
             <span>{tab.label}</span>
@@ -196,123 +108,84 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
       </div>
 
       <div className="min-h-0">
-        {activeTab === 'board' && (
-          <div id="tabpanel-board" role="tabpanel" aria-label="Tablero de tareas">
-            <div className="mb-4 rounded-2xl border bg-card p-3 shadow-sm">
-              <div className="mb-2">
-                <h3 className="text-sm font-semibold">Buscar tareas</h3>
-                <p className="text-xs text-muted-foreground">Filtra por nombre, descripcion o columna del tablero.</p>
-              </div>
-              <div className="relative max-w-md">
-                <Input
-                  value={taskSearchText}
-                  onChange={(e) => setTaskSearchText(e.target.value)}
-                  placeholder="Buscar tareas por nombre, descripcion o columna"
-                  aria-label="Buscar tareas del proyecto"
-                />
-                {taskSearchText.trim().length >= 2 && (
-                  <div className="absolute z-30 mt-1 w-full rounded-md border bg-popover shadow-md">
-                    {searchableTasks.length === 0 && (
-                      <p className="px-3 py-2 text-xs text-muted-foreground">Sin tareas coincidentes</p>
-                    )}
-                    {searchableTasks.map((task) => (
-                      <button
-                        key={task.id}
-                        type="button"
-                        className="w-full px-3 py-2 text-left transition-colors hover:bg-accent"
-                        onClick={() => {
-                          setTaskSearchText('')
-                          setFocusedTaskId(task.id)
-                        }}
-                      >
-                        <p className="truncate text-sm font-medium">{task.title}</p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {boardColumns.find((c) => c.id === task.columnId)?.title ?? 'Sin columna'}
-                        </p>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-            {boardData?.board.tasksTruncated ? (
-              <Alert className="mb-3 border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
-                <AlertDescription>
-                  Este proyecto tiene {boardData.board.tasksTotal ?? 'más de'}{' '}
-                  {boardData.board.tasksLimit ?? 2000} tareas. Solo se muestran las primeras{' '}
-                  {boardData.board.tasksLimit ?? 2000}. Usa la búsqueda de tareas para localizar el resto.
-                </AlertDescription>
-              </Alert>
-            ) : null}
-            <TaskBoard
-              accessToken={accessToken}
-              projectId={projectId}
-              columns={boardColumns}
-              tasksByColumn={tasksByColumn}
-              identity={identity}
-              members={members}
-              canOperate={canOperate}
-              isLoading={boardQ.isLoading}
-              onMoveTask={(taskId, targetColumnId) => {
-                setErrorMsg(null)
-                const task = boardTasks.find((item) => item.id === taskId)
-                const targetColumn = boardColumns.find((column) => column.id === targetColumnId)
-                const hasSubtasks = (task?.subtasks?.length ?? 0) > 0
-                if (task && targetColumn && FINALIZATION_COLUMN_KEYS.has(targetColumn.key) && hasSubtasks && task.checklistProgress < 100) {
-                  setErrorMsg('No puedes mover la tarea a la columna final sin completar todas las subtareas')
-                  return
-                }
-                moveTask.mutate({ taskId, targetColumnId, position: (tasksByColumn[targetColumnId] ?? []).length })
-              }}
-              onTaskSaved={() => {
-                invalidateBoardScope()
-              }}
-              onError={setErrorMsg}
-              focusedTaskId={focusedTaskId}
-            />
-          </div>
-        )}
-        {activeTab === 'chat' && (
-          <div id="tabpanel-chat" role="tabpanel">
-            <ConversationPanel
-              accessToken={accessToken}
-              projectId={projectId}
-              identity={identity}
-              isClient={isClient}
-              initialChannel={initialChatChannel}
-              initialMessageId={initialChatMessageId}
-              members={members}
-              tasks={boardTasks}
-              onError={setErrorMsg}
-            />
-          </div>
-        )}
-        {activeTab === 'brief' && (
-          <div id="tabpanel-brief" role="tabpanel">
-            <BriefPanel
-              brief={briefQ.data?.brief ?? null}
-              formalChanges={briefQ.data?.formalChanges ?? []}
-              isLoading={briefQ.isLoading}
-            />
-          </div>
-        )}
-        {activeTab === 'members' && (
-          <div id="tabpanel-members" role="tabpanel">
-            <ProjectMembers
-              members={members}
-              isLoading={boardQ.isLoading}
-              accessToken={accessToken}
-              projectId={projectId}
-              identity={identity}
-              canManageMembers={identity.role === 'admin'}
-              onError={setErrorMsg}
-            />
-          </div>
-        )}
+        <div id="tabpanel-board" role="tabpanel" aria-label="Tablero de tareas" style={{ display: activeTab === 'board' ? 'block' : 'none' }}>
+          <TaskSearchBar
+            searchableTasks={searchableTasks}
+            isSearching={isSearching}
+            boardColumns={boardColumns}
+            onDebouncedChange={handleTaskSearchDebounced}
+            onSelectTask={setFocusedTaskId}
+          />
+          {boardData?.board.tasksTruncated ? (
+            <Alert className="mb-3 border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
+              <AlertDescription>
+                Este proyecto tiene {boardData.board.tasksTotal ?? 'más de'}{' '}
+                {boardData.board.tasksLimit ?? 2000} tareas. Solo se muestran las primeras{' '}
+                {boardData.board.tasksLimit ?? 2000}. Usa la búsqueda de tareas para localizar el resto.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          <TaskBoard
+            accessToken={accessToken}
+            projectId={projectId}
+            columns={boardColumns}
+            tasksByColumn={tasksByColumn}
+            taskIndexMap={taskIndexMap}
+            identity={identity}
+            members={members}
+            canOperate={canOperate}
+            isLoading={boardQ.isLoading}
+            onMoveTask={(taskId, targetColumnId) => {
+              setErrorMsg(null)
+              const task = taskIndexMap.get(taskId)
+              const targetColumn = boardColumns.find((column) => column.id === targetColumnId)
+              const hasSubtasks = (task?.subtasks?.length ?? 0) > 0
+              if (task && targetColumn && FINALIZATION_COLUMN_KEYS.has(targetColumn.key) && hasSubtasks && task.checklistProgress < 100) {
+                setErrorMsg('No puedes mover la tarea a la columna final sin completar todas las subtareas')
+                return
+              }
+              moveTask.mutate({ taskId, targetColumnId, position: (tasksByColumn[targetColumnId] ?? []).length })
+            }}
+            onTaskSaved={invalidateBoardScope}
+            onError={setErrorMsg}
+            focusedTaskId={focusedTaskId}
+          />
+        </div>
+
+        <div id="tabpanel-chat" role="tabpanel" style={{ display: activeTab === 'chat' ? 'block' : 'none' }}>
+          <ConversationPanel
+            accessToken={accessToken}
+            projectId={projectId}
+            identity={identity}
+            isClient={isClient}
+            initialChannel={chatChannel}
+            initialMessageId={chatMessageId}
+            members={members}
+            tasks={boardTasks}
+            onError={setErrorMsg}
+          />
+        </div>
+
+        <div id="tabpanel-brief" role="tabpanel" style={{ display: activeTab === 'brief' ? 'block' : 'none' }}>
+          <BriefPanel
+            brief={briefQ.data?.brief ?? null}
+            formalChanges={briefQ.data?.formalChanges ?? []}
+            isLoading={briefQ.isLoading}
+          />
+        </div>
+
+        <div id="tabpanel-members" role="tabpanel" style={{ display: activeTab === 'members' ? 'block' : 'none' }}>
+          <ProjectMembers
+            members={members}
+            isLoading={boardQ.isLoading}
+            accessToken={accessToken}
+            projectId={projectId}
+            identity={identity}
+            canManageMembers={identity.role === 'admin'}
+            onError={setErrorMsg}
+          />
+        </div>
       </div>
     </div>
   )
 }
-
-
-

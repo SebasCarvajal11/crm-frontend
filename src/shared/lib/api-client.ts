@@ -6,6 +6,7 @@ import {
   getRefreshFailureReason,
 } from '@/shared/lib/refresh-token-error'
 import { notifyNetworkRetry } from '@/shared/lib/transient-notice'
+import { AUTH_ROUTES } from '@/shared/lib/gateway-routes'
 
 type RefreshPayload = {
   data?: {
@@ -16,6 +17,13 @@ type RefreshPayload = {
 type Subscriber = {
   resolve: (token: string) => void
   reject: (error: Error) => void
+}
+
+function createRequestId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID()
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
 }
 
 let isRefreshing = false
@@ -58,14 +66,14 @@ function hasRetriedAuth(request: Request): boolean {
 function shouldAttemptRefresh(request: Request, response: Response): boolean {
   if (isRedirecting) return false
   if (response.status !== 401) return false
-  if (request.url.includes('/auth/refresh')) return false
+  if (request.url.includes(AUTH_ROUTES.refresh)) return false
   if (hasRetriedAuth(request)) return false
   return request.headers.has('authorization')
 }
 
 async function refreshAccessToken(): Promise<string> {
   if (isRedirecting) {
-    throw new Error('Sesion expirada')
+    throw new RefreshTokenError('Sesion expirada', 'auth')
   }
   if (!canUseSecureRefreshFlow()) {
     throw new RefreshTokenError('El origen actual no soporta refresh seguro sin HTTPS', 'auth')
@@ -78,11 +86,16 @@ async function refreshAccessToken(): Promise<string> {
 
   isRefreshing = true
 
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 10000)
+
   try {
-    const refreshResponse = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
+    const refreshResponse = await fetch(`${getApiBaseUrl()}${AUTH_ROUTES.refresh}`, {
       method: 'POST',
       credentials: 'include',
+      signal: controller.signal,
     })
+    clearTimeout(timeoutId)
 
     if (!refreshResponse.ok) {
       throw new RefreshTokenError(
@@ -101,6 +114,7 @@ async function refreshAccessToken(): Promise<string> {
     onRefreshed(token)
     return token
   } catch (error) {
+    clearTimeout(timeoutId)
     const reason = getRefreshFailureReason(error)
     if (reason === 'auth') {
       useSessionStore.getState().clearSession()
@@ -139,13 +153,18 @@ export const api = ky.create({
   hooks: {
     beforeRequest: [
       ({ request }) => {
+        if (!request.headers.has('x-request-id')) {
+          request.headers.set('x-request-id', createRequestId())
+        }
+
         const authHeader = request.headers.get('authorization')
         const requestToken = extractBearerToken(authHeader)
         if (!requestToken) return
 
-        const currentToken = useSessionStore.getState().token
-        if (!currentToken || currentToken !== requestToken) {
-          throw new Error('Sesion invalida o token obsoleto para la solicitud actual')
+        // Solo verifica que exista sesión activa. Permite solicitudes autenticadas
+        // si la app está en proceso de bootstrap (ej. recuperando email).
+        if (!useSessionStore.getState().token && useSessionStore.getState().bootstrapped) {
+          throw new Error('Sesion invalida: no hay token activo')
         }
       },
     ],
@@ -159,14 +178,14 @@ export const api = ky.create({
         } catch (error) {
           if (getRefreshFailureReason(error) === 'auth') {
             handleAuthFailure()
-          } else {
-            notifyNetworkRetry()
+            return response
           }
-          return response
+          // Fallo de red: propagar el error para que TanStack Query lo trate
+          // como reintentable, sin invalidar la sesión local.
+          notifyNetworkRetry()
+          throw error
         }
       },
     ],
   },
 })
-
-

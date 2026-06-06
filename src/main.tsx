@@ -6,7 +6,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import './index.css'
 
 import { routeTree } from './routeTree.gen'
-import { bindSessionStorageSync, bootstrapSession, useSessionStore } from './app/session/session-store'
+import { bootstrapSession, useSessionStore } from './app/session/session-store'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,9 +32,7 @@ function AppBootstrap() {
   const bootstrapped = useSessionStore((s) => s.bootstrapped)
 
   useEffect(() => {
-    const unbindStorageSync = bindSessionStorageSync()
     void bootstrapSession()
-    return unbindStorageSync
   }, [])
 
   if (!bootstrapped) {
