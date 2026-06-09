@@ -68,32 +68,3 @@ export async function getUserAvatarsRequest(accessToken: string, userIds: string
     })
     .json<UserAvatarsResponse>()
 }
-
-export async function uploadDocumentRequest(accessToken: string, file: File): Promise<DocumentUploadResponse> {
-  const mimeType = file.type || 'application/octet-stream'
-
-  const urlStep = await api
-    .post(MEDIA_ROUTES.documentsUploadUrl, {
-      headers: bearer(accessToken),
-      json: {
-        fileName: file.name,
-        mimeType,
-        sizeBytes: file.size,
-      },
-    })
-    .json<DocumentUploadUrlResponse>()
-
-  await putFileToPresignedUrl(urlStep.data.uploadUrl, file, mimeType)
-
-  return api
-    .post(MEDIA_ROUTES.documentsConfirm, {
-      headers: bearer(accessToken),
-      json: {
-        objectKey: urlStep.data.objectKey,
-        fileName: file.name,
-        mimeType,
-        sizeBytes: file.size,
-      },
-    })
-    .json<DocumentUploadResponse>()
-}

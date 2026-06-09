@@ -37,10 +37,6 @@ export async function loginRequest(
     .json<LoginResponse>()
 }
 
-export async function refreshSessionRequest(): Promise<RefreshResponse> {
-  return api.post(AUTH_ROUTES.refresh).json<RefreshResponse>()
-}
-
 export async function forgotPasswordRequest(body: {
   email: string
 }): Promise<ForgotPasswordResponse> {
