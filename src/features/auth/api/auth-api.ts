@@ -16,7 +16,6 @@ import type {
   LoginResponse,
   MeResponse,
   MessageResponse,
-  RefreshResponse,
   RegisterWorkerResponse,
   SessionsResponse,
   UserRole,

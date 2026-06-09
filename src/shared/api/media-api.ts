@@ -1,26 +1,15 @@
 import { api } from '@/shared/lib/api-client'
 import { bearer } from '@/shared/lib/bearer'
 import { MEDIA_ROUTES } from '@/shared/lib/gateway-routes'
-import { putFileToPresignedUrl } from '@/shared/lib/presigned-upload'
 import type {
   AvatarUploadResponse,
   CurrentAvatarResponse,
-  DocumentUploadResponse,
   UserAvatarsResponse,
 } from '@/shared/types'
-
-type DocumentUploadUrlResponse = {
-  data: {
-    uploadUrl: string
-    objectKey: string
-    expiresInSeconds: number
-  }
-}
 
 export type {
   AvatarUploadResponse,
   CurrentAvatarResponse,
-  DocumentUploadResponse,
   UserAvatarsResponse,
 }
 
