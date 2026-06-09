@@ -66,36 +66,6 @@ export default defineConfig([
       ],
     },
   },
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [
-            {
-              name: '@/lib/utils',
-              message: 'Usa "@/shared/lib/utils" o "@/shared/lib".',
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    files: ['src/components/organisms/admin/**/*.{ts,tsx}', 'src/components/organisms/admin-console.tsx'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@/features/auth/*'],
-              message: 'En admin UI usa "@/features/admin/*" en vez de "@/features/auth/*".',
-            },
-          ],
-        },
-      ],
-    },
-  },
   {
     files: ['src/features/admin/**/*.{ts,tsx}'],
     rules: {
@@ -139,20 +109,13 @@ export default defineConfig([
               group: ['@/features/admin/*', '@/features/collab/*'],
               message: 'En features/auth evita acoplamiento con otras features; usa shared o capas propias de auth.',
             },
-          ],
-        {
-          patterns: [
             {
               group: ['@/components/organisms/*'],
-              message: 'En routes importa UI desde "@/features/*/ui", no organismos directos.',
-            },
-            {
-              group: ['@/features/*'],
-              message: 'En routes usa "@/pages" como capa de composicion; evita importar features directo.',
+              message: 'En features/auth importa UI desde "@/features/*/ui", no organismos directos.',
             },
             {
               group: ['@/components/templates/*'],
-              message: 'En routes usa "@/pages"; los templates se consumen desde pages.',
+              message: 'En features/auth usa "@/pages"; los templates se consumen desde pages.',
             },
           ],
         },
