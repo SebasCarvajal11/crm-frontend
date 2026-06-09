@@ -34,7 +34,7 @@ Comandos útiles:
 pnpm lint           # ESLint + TypeScript check
 pnpm build          # build de producción (dist/)
 pnpm preview        # preview del build de producción
-pnpm audit:routes   # validar que gateway-routes.ts cubre todos los manifests
+pnpm audit:gateway-routes   # validar que gateway-routes.ts cubre todos los manifests
 ```
 
 Para desarrollo con el stack completo (infraestructura Docker + servicios en host):
@@ -64,11 +64,11 @@ El proxy de producción está definido en [`nginx.conf`](./nginx.conf). Ver [crm
 ```bash
 pnpm lint            # linting
 pnpm build           # verifica que el build compile sin errores
-pnpm audit:routes    # valida que las rutas del frontend coinciden con los manifests del gateway
+pnpm audit:gateway-routes    # valida que las rutas del frontend coinciden con los manifests del gateway
 ```
 
 Los tests E2E cross-stack están orquestados desde `crm-infra` (Playwright).
 
 ## Contrato con el gateway
 
-Las rutas públicas se definen en [`src/shared/lib/gateway-routes.ts`](./src/shared/lib/gateway-routes.ts). Este archivo es la **única fuente de verdad** para las URLs de API que usa el frontend. Usar `pnpm audit:routes` para verificar que cada ruta tenga su endpoint en el gateway manifest correspondiente.
+Las rutas públicas se definen en [`src/shared/lib/gateway-routes.ts`](./src/shared/lib/gateway-routes.ts). Este archivo es la **única fuente de verdad** para las URLs de API que usa el frontend. Usar `pnpm audit:gateway-routes` para verificar que cada ruta tenga su endpoint en el gateway manifest correspondiente.
