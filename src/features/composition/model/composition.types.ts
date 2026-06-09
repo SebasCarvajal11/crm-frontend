@@ -1,8 +1,8 @@
 import type { UserRole, ProjectListItem } from '@/shared/types'
 import { z } from 'zod'
 
-/** Respuesta del BFF dashboard: identidad + proyectos en un solo fetch. */
-export type DashboardBffResponse = {
+/** Respuesta de la composición del dashboard: identidad + proyectos en un solo fetch. */
+export type DashboardCompositionResponse = {
   identity: {
     email: string
     role: UserRole
@@ -43,12 +43,9 @@ const projectListItemSchema = z.object({
   unreadNotifications: z.number().int(),
 })
 
-export const dashboardBffResponseSchema = z.object({
+export const dashboardCompositionResponseSchema = z.object({
   identity: dashboardIdentitySchema,
   projects: z.object({
     data: z.array(projectListItemSchema).optional(),
   }),
 })
-
-
-

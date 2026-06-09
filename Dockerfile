@@ -2,7 +2,9 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@11.1.1 --activate
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY cima-contracts ./cima-contracts
 RUN pnpm install --frozen-lockfile
+RUN pnpm --prefix cima-contracts build
 COPY . .
 # Same-origin contract. Route constants already include /api/v1.
 ENV VITE_API_BASE_URL=

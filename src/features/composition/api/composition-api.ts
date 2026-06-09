@@ -1,10 +1,9 @@
-import { bearer } from '@/shared/lib/bearer'
-import { api } from '@/shared/lib'
-import { BFF_ROUTES } from '@/shared/lib/gateway-routes'
-import type { DashboardBffResponse } from '@/features/bff/model'
-import { dashboardBffResponseSchema } from '@/features/bff/model'
+import { fetchMe } from '@/features/auth/api'
+import { listProjectsRequest } from '@/features/collab/api'
+import type { DashboardCompositionResponse } from '@/features/composition/model'
+import { dashboardCompositionResponseSchema } from '@/features/composition/model'
 
-/** Normaliza la agrupación BFF de KrakenD (`identity` + `projects`). */
+/** Normaliza la agrupación de composición (`identity` + `projects`). */
 function extractProjectListItems(projects: unknown): unknown[] {
   if (projects == null) return []
   if (Array.isArray(projects)) return projects
@@ -23,7 +22,7 @@ function extractProjectListItems(projects: unknown): unknown[] {
   return []
 }
 
-function normalizeDashboardBffPayload(raw: unknown): unknown {
+function normalizeDashboardCompositionPayload(raw: unknown): unknown {
   if (!raw || typeof raw !== 'object') return raw
   const root = raw as Record<string, unknown>
   return {
@@ -32,20 +31,30 @@ function normalizeDashboardBffPayload(raw: unknown): unknown {
   }
 }
 
-/** Obtiene identidad + proyectos en una sola llamada al gateway. */
-export async function fetchDashboardBff(
+/** Obtiene identidad + proyectos realizando llamadas en paralelo a través del API Gateway. */
+export async function fetchDashboardComposition(
   accessToken?: string
-): Promise<DashboardBffResponse> {
-  const payload = await api
-    .get(BFF_ROUTES.dashboard, { headers: bearer(accessToken) })
-    .json<unknown>()
+): Promise<DashboardCompositionResponse> {
+  if (!accessToken) {
+    throw new Error('Access token is required')
+  }
 
-  const parsed = dashboardBffResponseSchema.safeParse(normalizeDashboardBffPayload(payload))
+  const [meRes, projectsRes] = await Promise.all([
+    fetchMe(accessToken),
+    listProjectsRequest(accessToken, { page: 1, limit: 100 }),
+  ])
+
+  const payload = {
+    identity: meRes.data,
+    projects: projectsRes.data,
+  }
+
+  const parsed = dashboardCompositionResponseSchema.safeParse(normalizeDashboardCompositionPayload(payload))
   if (!parsed.success) {
     const detail = parsed.error.issues
       .map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`)
       .join('; ')
-    throw new Error(`Respuesta invalida de ${BFF_ROUTES.dashboard}: ${detail}`)
+    throw new Error(`Respuesta compuesta invalida: ${detail}`)
   }
 
   const identity = parsed.data.identity

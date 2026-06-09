@@ -66,6 +66,36 @@ export default defineConfig([
       ],
     },
   },
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@/lib/utils',
+              message: 'Usa "@/shared/lib/utils" o "@/shared/lib".',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/components/organisms/admin/**/*.{ts,tsx}', 'src/components/organisms/admin-console.tsx'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/features/auth/*'],
+              message: 'En admin UI usa "@/features/admin/*" en vez de "@/features/auth/*".',
+            },
+          ],
+        },
+      ],
+    },
+  },
   {
     files: ['src/features/admin/**/*.{ts,tsx}'],
     rules: {
@@ -74,24 +104,8 @@ export default defineConfig([
         {
           patterns: [
             {
-              group: ['@/features/auth/*', '@/features/collab/*', '@/features/bff/*'],
+              group: ['@/features/auth/*', '@/features/collab/*'],
               message: 'En features/admin evita dependencias directas con otras features; usa shared o capas de admin.',
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    files: ['src/features/bff/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@/features/auth/*', '@/features/admin/*', '@/features/collab/*'],
-              message: 'En features/bff evita dependencias directas con otras features; usa shared o capas propias de bff.',
             },
           ],
         },
@@ -106,7 +120,7 @@ export default defineConfig([
         {
           patterns: [
             {
-              group: ['@/features/auth/*', '@/features/admin/*', '@/features/bff/*'],
+              group: ['@/features/auth/*', '@/features/admin/*'],
               message: 'En features/collab evita dependencias directas con otras features; usa shared o capas de collab.',
             },
           ],
@@ -122,19 +136,10 @@ export default defineConfig([
         {
           patterns: [
             {
-              group: ['@/features/admin/*', '@/features/collab/*', '@/features/bff/*'],
+              group: ['@/features/admin/*', '@/features/collab/*'],
               message: 'En features/auth evita acoplamiento con otras features; usa shared o capas propias de auth.',
             },
           ],
-        },
-      ],
-    },
-  },
-  {
-    files: ['src/routes/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
         {
           patterns: [
             {

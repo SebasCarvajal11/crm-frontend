@@ -9,135 +9,133 @@
  */
 
 // ── API Version Prefix ──────────────────────────────────────────────────────
-const API = "/api/v1";
+const AUTH_VERSION = import.meta.env.VITE_AUTH_API_VERSION || 'v1';
+const COLLAB_VERSION = import.meta.env.VITE_COLLAB_API_VERSION || 'v1';
+const MEDIA_VERSION = import.meta.env.VITE_MEDIA_API_VERSION || 'v1';
+
+const AUTH_API = `/api/${AUTH_VERSION}`;
+const COLLAB_API = `/api/${COLLAB_VERSION}`;
+const MEDIA_API = `/api/${MEDIA_VERSION}`;
 
 // ── Auth (público, sin JWT) ─────────────────────────────────────────────────
 export const AUTH_ROUTES = {
-  login: `${API}/auth/login`,
-  refresh: `${API}/auth/refresh`,
-  forgotPassword: `${API}/auth/forgot-password`,
-  resetPassword: `${API}/auth/reset-password`,
-  acceptInviteToken: (token: string) => `${API}/auth/accept-invite/${encodeURIComponent(token)}`,
-  acceptInvite: `${API}/auth/accept-invite`,
-  verifyEmail: `${API}/auth/verify-email`,
+  login: `${AUTH_API}/auth/login`,
+  refresh: `${AUTH_API}/auth/refresh`,
+  forgotPassword: `${AUTH_API}/auth/forgot-password`,
+  resetPassword: `${AUTH_API}/auth/reset-password`,
+  acceptInviteToken: (token: string) => `${AUTH_API}/auth/accept-invite/${encodeURIComponent(token)}`,
+  acceptInvite: `${AUTH_API}/auth/accept-invite`,
+  verifyEmail: `${AUTH_API}/auth/verify-email`,
 } as const
 
 // ── Identity (autenticado) — contrato de gateway, no topologia interna ──────
 export const IDENTITY_ROUTES = {
-  me: `${API}/identity/me`,
-  logout: `${API}/identity/logout`,
-  search: `${API}/identity/search`,
+  me: `${AUTH_API}/identity/me`,
+  logout: `${AUTH_API}/identity/logout`,
+  search: `${AUTH_API}/identity/search`,
 } as const
 
 // ── Account (autenticado) — contrato de gateway, no topologia interna ───────
 export const ACCOUNT_ROUTES = {
-  password: `${API}/account/password`,
-  sessions: `${API}/account/sessions`,
-  session: (familyId: string) => `${API}/account/sessions/${familyId}`,
-  verifyEmailRequest: `${API}/account/verify-email/request`,
+  password: `${AUTH_API}/account/password`,
+  sessions: `${AUTH_API}/account/sessions`,
+  session: (familyId: string) => `${AUTH_API}/account/sessions/${familyId}`,
+  verifyEmailRequest: `${AUTH_API}/account/verify-email/request`,
 } as const
 
 // ── Admin (autenticado) — contrato de gateway, no topologia interna ─────────
 export const ADMIN_ROUTES = {
-  workers: `${API}/admin/workers`,
-  clientsInvite: `${API}/admin/clients/invite`,
-  adminsInvite: `${API}/admin/admins/invite`,
-  users: `${API}/admin/users`,
-  userStatus: (subject: string) => `${API}/admin/users/${subject}/status`,
-  userFlags: (subject: string) => `${API}/admin/users/${subject}/flags`,
-  userRestore: (subject: string) => `${API}/admin/users/${subject}/restore`,
-  user: (subject: string) => `${API}/admin/users/${subject}`,
+  workers: `${AUTH_API}/admin/workers`,
+  clientsInvite: `${AUTH_API}/admin/clients/invite`,
+  adminsInvite: `${AUTH_API}/admin/admins/invite`,
+  users: `${AUTH_API}/admin/users`,
+  userStatus: (subject: string) => `${AUTH_API}/admin/users/${subject}/status`,
+  userFlags: (subject: string) => `${AUTH_API}/admin/users/${subject}/flags`,
+  userRestore: (subject: string) => `${AUTH_API}/admin/users/${subject}/restore`,
+  user: (subject: string) => `${AUTH_API}/admin/users/${subject}`,
 } as const
 
 // ── Projects (autenticado) ──────────────────────────────────────────────────
 export const PROJECT_ROUTES = {
-  list: `${API}/collab/projects`,
-  search: `${API}/collab/projects/search`,
-  create: `${API}/collab/projects`,
-  update: (projectId: string) => `${API}/collab/projects/${projectId}`,
-  board: (projectId: string) => `${API}/collab/projects/${projectId}/board`,
-  workspace: (projectId: string) => `${API}/collab/projects/${projectId}/workspace`,
-  members: (projectId: string) => `${API}/collab/projects/${projectId}/members`,
-  brief: (projectId: string) => `${API}/collab/projects/${projectId}/brief`,
-  timeline: (projectId: string) => `${API}/collab/projects/${projectId}/timeline`,
-  columns: (projectId: string) => `${API}/collab/projects/${projectId}/columns`,
+  list: `${COLLAB_API}/collab/projects`,
+  search: `${COLLAB_API}/collab/projects/search`,
+  create: `${COLLAB_API}/collab/projects`,
+  update: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}`,
+  board: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/board`,
+  workspace: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/workspace`,
+  members: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/members`,
+  brief: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/brief`,
+  timeline: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/timeline`,
+  columns: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/columns`,
   // Files
-  files: (projectId: string) => `${API}/collab/projects/${projectId}/files`,
-  filesTimeline: (projectId: string) => `${API}/collab/projects/${projectId}/files/timeline`,
-  filesUpload: (projectId: string) => `${API}/collab/projects/${projectId}/files/upload`,
-  filesUploadUrl: (projectId: string) => `${API}/collab/projects/${projectId}/files/upload-url`,
-  filesUploadedObject: (projectId: string) => `${API}/collab/projects/${projectId}/files/uploaded-object`,
+  files: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/files`,
+  filesTimeline: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/files/timeline`,
+  filesUpload: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/files/upload`,
+  filesUploadUrl: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/files/upload-url`,
+  filesUploadedObject: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/files/uploaded-object`,
   // Tasks
-  tasks: (projectId: string) => `${API}/collab/projects/${projectId}/tasks`,
+  tasks: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/tasks`,
   taskComments: (projectId: string, taskId: string) =>
-    `${API}/collab/projects/${projectId}/tasks/${taskId}/comments`,
+    `${COLLAB_API}/collab/projects/${projectId}/tasks/${taskId}/comments`,
   taskFiles: (projectId: string, taskId: string) =>
-    `${API}/collab/projects/${projectId}/tasks/${taskId}/files`,
+    `${COLLAB_API}/collab/projects/${projectId}/tasks/${taskId}/files`,
   taskFilesUploadUrl: (projectId: string, taskId: string) =>
-    `${API}/collab/projects/${projectId}/tasks/${taskId}/files/upload-url`,
+    `${COLLAB_API}/collab/projects/${projectId}/tasks/${taskId}/files/upload-url`,
   taskFilesMetadata: (projectId: string, taskId: string) =>
-    `${API}/collab/projects/${projectId}/tasks/${taskId}/files/metadata`,
+    `${COLLAB_API}/collab/projects/${projectId}/tasks/${taskId}/files/metadata`,
   // Chat
-  chatExternal: (projectId: string) => `${API}/collab/projects/${projectId}/chat/external`,
-  chatExternalRead: (projectId: string) => `${API}/collab/projects/${projectId}/chat/external/read`,
-  chatInternal: (projectId: string) => `${API}/collab/projects/${projectId}/chat/internal`,
-  chatInternalRead: (projectId: string) => `${API}/collab/projects/${projectId}/chat/internal/read`,
+  chatExternal: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/external`,
+  chatExternalRead: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/external/read`,
+  chatInternal: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/internal`,
+  chatInternalRead: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/internal/read`,
   // Change Requests
-  changeRequestMinor: (projectId: string) => `${API}/collab/projects/${projectId}/change-requests/minor`,
-  changeRequestFormal: (projectId: string) => `${API}/collab/projects/${projectId}/change-requests/formal`,
+  changeRequestMinor: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/change-requests/minor`,
+  changeRequestFormal: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/change-requests/formal`,
   changeRequest: (projectId: string, changeRequestId: string) =>
-    `${API}/collab/projects/${projectId}/change-requests/${changeRequestId}`,
-  changeLogFormal: (projectId: string) => `${API}/collab/projects/${projectId}/change-log/formal`,
+    `${COLLAB_API}/collab/projects/${projectId}/change-requests/${changeRequestId}`,
+  changeLogFormal: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/change-log/formal`,
 } as const
 
 // ── Columns (autenticado) ───────────────────────────────────────────────────
 export const COLUMN_ROUTES = {
-  update: (columnId: string) => `${API}/collab/columns/${columnId}`,
+  update: (columnId: string) => `${COLLAB_API}/collab/columns/${columnId}`,
 } as const
 
 // ── Tasks (autenticado) ─────────────────────────────────────────────────────
 export const TASK_ROUTES = {
-  update: (taskId: string) => `${API}/collab/tasks/${taskId}`,
+  update: (taskId: string) => `${COLLAB_API}/collab/tasks/${taskId}`,
 } as const
 
 // ── Files (autenticado) ─────────────────────────────────────────────────────
 export const FILE_ROUTES = {
-  delete: (fileId: string) => `${API}/collab/files/${fileId}`,
-  update: (fileId: string) => `${API}/collab/files/${fileId}`,
-  download: (fileId: string) => `${API}/collab/files/${fileId}/download`,
-  access: (fileId: string) => `${API}/collab/files/${fileId}/access`,
-  approve: (fileId: string) => `${API}/collab/files/${fileId}/approve`,
+  delete: (fileId: string) => `${COLLAB_API}/collab/files/${fileId}`,
+  update: (fileId: string) => `${COLLAB_API}/collab/files/${fileId}`,
+  download: (fileId: string) => `${COLLAB_API}/collab/files/${fileId}/download`,
+  access: (fileId: string) => `${COLLAB_API}/collab/files/${fileId}/access`,
+  approve: (fileId: string) => `${COLLAB_API}/collab/files/${fileId}/approve`,
 } as const
 
 // ── Notifications (autenticado) ─────────────────────────────────────────────
 export const NOTIFICATION_ROUTES = {
-  chatMentionsUnread: `${API}/collab/notifications/chat-mentions/unread`,
-  chatMentionsUnreadCount: `${API}/collab/notifications/chat-mentions/unread/count`,
+  chatMentionsUnread: `${COLLAB_API}/collab/notifications/chat-mentions/unread`,
+  chatMentionsUnreadCount: `${COLLAB_API}/collab/notifications/chat-mentions/unread/count`,
   chatMentionRead: (notificationId: string) =>
-    `${API}/collab/notifications/chat-mentions/${notificationId}/read`,
+    `${COLLAB_API}/collab/notifications/chat-mentions/${notificationId}/read`,
 } as const
 
 // ── Media (autenticado) ─────────────────────────────────────────────────────
 export const MEDIA_ROUTES = {
-  avatars: `${API}/media/avatars`,
-  avatarsCurrent: `${API}/media/avatars/current`,
-  avatarsUsers: `${API}/media/avatars/users`,
-  documentsUploadUrl: `${API}/media/documents/upload-url`,
-  documentsConfirm: `${API}/media/documents/confirm`,
+  avatars: `${MEDIA_API}/media/avatars`,
+  avatarsCurrent: `${MEDIA_API}/media/avatars/current`,
+  avatarsUsers: `${MEDIA_API}/media/avatars/users`,
+  documentsUploadUrl: `${MEDIA_API}/media/documents/upload-url`,
+  documentsConfirm: `${MEDIA_API}/media/documents/confirm`,
 } as const
-
-// ── BFF (autenticado, multi-backend) ────────────────────────────────────────
-export const BFF_ROUTES = {
-  dashboard: '/bff/dashboard',
-  adminOverview: '/bff/admin-overview',
-  workspace: (projectId: string) => `/bff/workspace/${projectId}`,
-} as const
-
 // ── Docs (público) ──────────────────────────────────────────────────────────
 export const DOCS_ROUTES = {
   openApiYaml: '/openapi.yaml',
   swaggerUi: '/docs',
-  authOpenApi: '/docs/auth/openapi.yaml',
-  collabOpenApi: '/docs/collab/openapi.yaml',
-  mediaOpenApi: '/docs/media/openapi.yaml',
+  authOpenApi: `/docs/auth/${AUTH_VERSION}/openapi.yaml`,
+  collabOpenApi: `/docs/collab/${COLLAB_VERSION}/openapi.yaml`,
+  mediaOpenApi: `/docs/media/${MEDIA_VERSION}/openapi.yaml`,
 } as const

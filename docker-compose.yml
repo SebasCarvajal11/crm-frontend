@@ -1,0 +1,17 @@
+services:
+  crm-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_HOST_PORT:-5173}:80"
+    depends_on:
+      api-gateway:
+        condition: service_started
+    networks:
+      - shared_backplane
+
+networks:
+  shared_backplane:
+    name: cima-crm-local-backplane

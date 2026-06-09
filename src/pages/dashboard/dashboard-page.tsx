@@ -11,9 +11,8 @@ import { useSessionStore } from '@/app/session/session-store'
 import { logoutRequest } from '@/features/auth/api'
 import { AccountPanel } from '@/features/auth/ui'
 import { AdminConsole } from '@/features/admin/ui'
-import { fetchDashboardBff } from '@/features/bff/api'
-import { bffKeys } from '@/features/bff/model'
-import { DashboardOverview } from '@/features/bff/ui'
+import { useDashboardComposition } from '@/features/composition'
+import { DashboardOverview } from '@/features/composition/ui'
 import { CollabPanel, NotificationsPanel } from '@/features/collab/ui'
 import { getCurrentAvatarRequestOptional } from '@/shared/api'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
@@ -35,12 +34,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   const navigate = useNavigate({ from: '/dashboard' })
   const queryClient = useQueryClient()
 
-  const dashboardQuery = useQuery({
-    queryKey: bffKeys.dashboard(token),
-    queryFn: () => fetchDashboardBff(token!),
-    enabled: bootstrapped && Boolean(token),
-    retry: false,
-  })
+  const dashboardQuery = useDashboardComposition(token, bootstrapped)
   const avatarQuery = useQuery({
     queryKey: ['media', 'avatar', 'current', token],
     queryFn: () => getCurrentAvatarRequestOptional(token!),

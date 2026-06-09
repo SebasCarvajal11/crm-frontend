@@ -1,4 +1,6 @@
 import type { ProjectType as _ProjectType, ParentProjectStatus as _ParentProjectStatus, ProjectListItem as _ProjectListItem } from '@/shared/types'
+export type { DataResponse, PaginatedData } from '@sebascarvajal11/cima-contracts'
+
 
 export type ProjectType = _ProjectType
 export type ParentProjectStatus = _ParentProjectStatus
@@ -233,17 +235,7 @@ export type ProjectChangeRequest = {
   resolvedAt: string | null
 }
 
-export type DataResponse<T> = {
-  data: T
-}
 
-export type PaginatedData<T> = {
-  items: T[]
-  page: number
-  limit: number
-  total: number
-  total_pages: number
-}
 
 
 export type ChatMentionNotification = {
