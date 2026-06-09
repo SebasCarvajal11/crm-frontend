@@ -1,3 +1,2 @@
 allowBuilds:
   '@sebascarvajal11/cima-contracts': true
-  msw: true
