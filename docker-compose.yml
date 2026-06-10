@@ -15,7 +15,3 @@ services:
         condition: service_started
     networks:
       - shared_backplane
-
-networks:
-  shared_backplane:
-    name: cima-crm-local-backplane
