@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'cima-contracts']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -110,8 +110,8 @@ export default defineConfig([
               message: 'En features/auth evita acoplamiento con otras features; usa shared o capas propias de auth.',
             },
             {
-              group: ['@/components/organisms/*'],
-              message: 'En features/auth importa UI desde "@/features/*/ui", no organismos directos.',
+              group: ['@/components/organisms/admin/*', '@/components/organisms/collab/*'],
+              message: 'En features/auth evita importar organismos de admin o collab; usa shared o capas propias de auth.',
             },
             {
               group: ['@/components/templates/*'],
@@ -168,6 +168,15 @@ export default defineConfig([
           ],
         },
       ],
+    },
+  },
+  {
+    files: ['tests/playwright/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'prefer-const': 'off',
+      'react-hooks/rules-of-hooks': 'off',
     },
   },
 ])
