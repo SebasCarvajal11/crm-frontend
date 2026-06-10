@@ -7,7 +7,11 @@ import { useEmailVerificationRequest } from './use-email-verification'
 
 const avatarQueryKey = (token: string) => ['media', 'avatar', 'current', token] as const
 
-function getCroppedFileViaWorker(imageSrc: string, pixelCrop: Area): Promise<File> {
+function getCroppedFileViaWorker(
+  buffer: ArrayBuffer,
+  mimeType: string,
+  pixelCrop: Area,
+): Promise<File> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(
       new URL('../workers/image-crop.worker.ts', import.meta.url),
@@ -28,7 +32,8 @@ function getCroppedFileViaWorker(imageSrc: string, pixelCrop: Area): Promise<Fil
       reject(new Error(err.message ?? 'Error en worker de recorte'))
     }
 
-    worker.postMessage({ imageSrc, pixelCrop })
+    // Transferible: el buffer se mueve al worker sin copiar en memoria
+    worker.postMessage({ buffer, mimeType, pixelCrop }, [buffer])
   })
 }
 
@@ -38,6 +43,8 @@ export function useAccountProfileSection(accessToken: string) {
   // Tracks the previous blob URL so it can be revoked before a new one is assigned,
   // preventing accumulative memory leaks when the user selects multiple files.
   const prevBlobUrlRef = useRef<string | null>(null)
+  // Keeps the original File to read its ArrayBuffer without fetch() (CSP-safe).
+  const selectedFileRef = useRef<File | null>(null)
   const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null)
   const [photoViewerOpen, setPhotoViewerOpen] = useState(false)
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
@@ -98,6 +105,7 @@ export function useAccountProfileSection(accessToken: string) {
 
     const src = URL.createObjectURL(file)
     prevBlobUrlRef.current = src
+    selectedFileRef.current = file
     setSelectedImageSrc(src)
     setCrop({ x: 0, y: 0 })
     setZoom(1)
@@ -110,12 +118,16 @@ export function useAccountProfileSection(accessToken: string) {
       URL.revokeObjectURL(prevBlobUrlRef.current)
       prevBlobUrlRef.current = null
     }
+    selectedFileRef.current = null
     setSelectedImageSrc(null)
   }
 
   const onSaveCroppedAvatar = async () => {
-    if (!selectedImageSrc || !croppedAreaPixels) return
-    const file = await getCroppedFileViaWorker(selectedImageSrc, croppedAreaPixels)
+    if (!croppedAreaPixels || !selectedFileRef.current) return
+    // Lee el ArrayBuffer del File original — no usa fetch(), no viola CSP.
+    const buffer = await selectedFileRef.current.arrayBuffer()
+    const mimeType = selectedFileRef.current.type || 'image/jpeg'
+    const file = await getCroppedFileViaWorker(buffer, mimeType, croppedAreaPixels)
     uploadAvatarMutation.mutate(file)
   }
 

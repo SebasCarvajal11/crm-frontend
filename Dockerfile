@@ -1,6 +1,11 @@
-FROM node:22-alpine AS builder
+ARG NODE_IMAGE=node:22-alpine
+ARG NGINX_IMAGE=nginx:1.27-alpine
+ARG PNPM_VERSION=11.1.1
+
+FROM ${NODE_IMAGE} AS builder
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@11.1.1 --activate
+ENV CI=true
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY cima-contracts ./cima-contracts
 RUN pnpm install --frozen-lockfile
@@ -8,9 +13,9 @@ RUN pnpm --prefix cima-contracts build
 COPY . .
 # Same-origin contract. Route constants already include /api/v1.
 ENV VITE_API_BASE_URL=
-RUN pnpm run build
+RUN pnpm build
 
-FROM nginx:alpine
+FROM ${NGINX_IMAGE}
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY snippets/ /etc/nginx/snippets/

@@ -3,6 +3,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NODE_IMAGE: ${NODE_IMAGE:-node:22-alpine}
+        NGINX_IMAGE: ${NGINX_IMAGE:-nginx:1.27-alpine}
+        PNPM_VERSION: ${PNPM_VERSION:-11.1.1}
     restart: unless-stopped
     ports:
       - "${FRONTEND_HOST_PORT:-5173}:80"

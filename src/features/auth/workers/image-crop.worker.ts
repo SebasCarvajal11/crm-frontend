@@ -1,12 +1,17 @@
 /**
  * Web Worker para procesamiento de imagen (recorte) fuera del hilo principal.
  * Evita que el navegador se congele al procesar imagenes de alta resolucion.
+ *
+ * Recibe el ArrayBuffer de la imagen directamente (transferable) para evitar
+ * que el worker tenga que hacer fetch() de una blob URL, lo cual es bloqueado
+ * por la CSP (connect-src no incluye blob:).
  */
 
 type CropArea = { x: number; y: number; width: number; height: number }
 
 type WorkerInput = {
-  imageSrc: string
+  buffer: ArrayBuffer
+  mimeType: string
   pixelCrop: CropArea
 }
 
@@ -15,11 +20,10 @@ type WorkerOutput =
   | { ok: false; error: string }
 
 self.onmessage = async (e: MessageEvent<WorkerInput>) => {
-  const { imageSrc, pixelCrop } = e.data
+  const { buffer, mimeType, pixelCrop } = e.data
 
   try {
-    const response = await fetch(imageSrc)
-    const imageBlob = await response.blob()
+    const imageBlob = new Blob([buffer], { type: mimeType })
     const bitmap = await createImageBitmap(imageBlob)
 
     const offscreen = new OffscreenCanvas(pixelCrop.width, pixelCrop.height)

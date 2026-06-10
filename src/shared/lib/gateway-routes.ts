@@ -16,6 +16,7 @@ const MEDIA_VERSION = import.meta.env.VITE_MEDIA_API_VERSION || 'v1';
 const AUTH_API = `/api/${AUTH_VERSION}`;
 const COLLAB_API = `/api/${COLLAB_VERSION}`;
 const MEDIA_API = `/api/${MEDIA_VERSION}`;
+const API_PREFIX = '/api/v1';
 
 // ── Auth (público, sin JWT) ─────────────────────────────────────────────────
 export const AUTH_ROUTES = {
@@ -133,9 +134,9 @@ export const MEDIA_ROUTES = {
 } as const
 // ── Docs (público) ──────────────────────────────────────────────────────────
 export const DOCS_ROUTES = {
-  openApiYaml: '/openapi.yaml',
-  swaggerUi: '/docs',
-  authOpenApi: `/docs/auth/${AUTH_VERSION}/openapi.yaml`,
-  collabOpenApi: `/docs/collab/${COLLAB_VERSION}/openapi.yaml`,
-  mediaOpenApi: `/docs/media/${MEDIA_VERSION}/openapi.yaml`,
+  openApiYaml: `${API_PREFIX}/openapi.yaml`,
+  swaggerUi: `${API_PREFIX}/docs`,
+  authOpenApi: `${API_PREFIX}/docs/auth/${AUTH_VERSION}/openapi.yaml`,
+  collabOpenApi: `${API_PREFIX}/docs/collab/${COLLAB_VERSION}/openapi.yaml`,
+  mediaOpenApi: `${API_PREFIX}/docs/media/${MEDIA_VERSION}/openapi.yaml`,
 } as const

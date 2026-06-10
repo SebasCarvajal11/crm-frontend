@@ -99,7 +99,7 @@ const routesSource = readFileSync(gatewayRoutesFile, 'utf8')
 const routeDefRegex = /\b([a-zA-Z0-9_]+)\s*:\s*(?:\([^)]*\)\s*=>\s*)?(?:`([^`]+)`|'([^']+)'|"([^"]+)")/g
 
 const routeViolations = []
-const whitelist = new Set(['/openapi.yaml', '/docs'])
+const whitelist = new Set(['/api/v1/openapi.yaml', '/api/v1/docs'])
 
 for (const match of routesSource.matchAll(routeDefRegex)) {
   const name = match[1]
@@ -112,6 +112,7 @@ for (const match of routesSource.matchAll(routeDefRegex)) {
 
   // Normalizar el path
   let route = rawValue
+  route = route.replaceAll('${API_PREFIX}', '/api/v1')
   route = route.replaceAll('${AUTH_API}', '/api/v1')
   route = route.replaceAll('${COLLAB_API}', '/api/v1')
   route = route.replaceAll('${MEDIA_API}', '/api/v1')

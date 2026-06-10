@@ -57,6 +57,9 @@ Desktop.ini
 # Testing
 coverage/
 .nyc_output
+test-results/
+tests/playwright/reports/
+tests/playwright/test-results/
 
 # Generated API types (regenerate with pnpm codegen:all)
 src/shared/api-types/*.gen.ts
