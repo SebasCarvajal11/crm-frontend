@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useCallback, useEffect, useMemo } from 'react'
 import { isHTTPError } from 'ky'
-import { BarChart3, KanbanSquare, ShieldCheck } from 'lucide-react'
+import { BarChart3, KanbanSquare, Megaphone, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -14,6 +14,7 @@ import { AdminConsole } from '@/features/admin/ui'
 import { useDashboardComposition } from '@/features/composition'
 import { DashboardOverview } from '@/features/composition/ui'
 import { CollabPanel, NotificationsPanel } from '@/features/collab/ui'
+import { MarketingPanel } from '@/features/marketing'
 import { getCurrentAvatarRequestOptional } from '@/shared/api'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 import type { DashboardTab } from '@/routes/-dashboard.search'
@@ -83,7 +84,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   })
 
   const goTo = useCallback(
-    (next: 'overview' | 'collab' | 'account' | 'notifications' | 'admin') => {
+    (next: DashboardTab) => {
       navigate({
         to: '/dashboard',
         search: (prev) => ({
@@ -174,6 +175,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     () => [
       { key: 'overview', label: 'Resumen', icon: <BarChart3 className="size-4" />, onClick: () => goTo('overview'), isActive: activeTab === 'overview' },
       { key: 'collab', label: 'Colaboración', icon: <KanbanSquare className="size-4" />, onClick: () => goTo('collab'), isActive: activeTab === 'collab' },
+      { key: 'marketing', label: 'Marketing', icon: <Megaphone className="size-4" />, onClick: () => goTo('marketing'), isActive: activeTab === 'marketing' },
       { key: 'admin', label: 'Administración', icon: <ShieldCheck className="size-4" />, onClick: () => goTo('admin'), isActive: activeTab === 'admin', hidden: !isAdmin },
     ],
     [activeTab, goTo, isAdmin],
@@ -246,6 +248,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     >
       {activeTab === 'overview' && <DashboardOverview identity={identity} />}
       {activeTab === 'collab' && <CollabPanel accessToken={token} identity={identity} initialProjects={projects?.data} openProjectId={project_id} workspaceTab={workspace_tab} chatChannel={chat_channel} chatMessageId={chat_message_id} onOpenProject={openProject} onCloseProject={closeProject} onTabChange={changeWorkspaceTab} />}
+      {activeTab === 'marketing' && <MarketingPanel accessToken={token} />}
       {activeTab === 'account' && <AccountPanel accessToken={token} identity={identity} />}
       {activeTab === 'notifications' && <NotificationsPanel accessToken={token} onOpenNotification={goToMention} />}
       {activeTab === 'admin' && isAdmin && <AdminConsole accessToken={token} />}

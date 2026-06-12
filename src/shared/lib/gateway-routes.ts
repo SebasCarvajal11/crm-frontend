@@ -140,3 +140,29 @@ export const DOCS_ROUTES = {
   collabOpenApi: `${API_PREFIX}/docs/collab/${COLLAB_VERSION}/openapi.yaml`,
   mediaOpenApi: `${API_PREFIX}/docs/media/${MEDIA_VERSION}/openapi.yaml`,
 } as const
+
+// ── Marketing (autenticado) ──────────────────────────────────────────────────
+export const MARKETING_ROUTES = {
+  campaigns: `${API_PREFIX}/marketing/campaigns`,
+  campaign: (id: string | number) => `${API_PREFIX}/marketing/campaigns/${id}`,
+  campaignsByClient: (clientId: string | number) => `${API_PREFIX}/marketing/campaigns/client/${clientId}`,
+  workflows: `${API_PREFIX}/marketing/workflows`,
+  workflow: (id: string | number) => `${API_PREFIX}/marketing/workflows/${id}`,
+  workflowsByCampaign: (campaignId: string | number) => `${API_PREFIX}/marketing/workflows/campaign/${campaignId}`,
+  workflowsActive: `${API_PREFIX}/marketing/workflows/active`,
+  workflowToggle: (id: string | number) => `${API_PREFIX}/marketing/workflows/${id}/toggle`,
+  executionsRun: (workflowId: string | number) => `${API_PREFIX}/marketing/executions/run/${workflowId}`,
+  executionsRunForClient: (workflowId: string | number, clientId: string | number) => `${API_PREFIX}/marketing/executions/run/${workflowId}/client/${clientId}`,
+  executionsByWorkflow: (workflowId: string | number) => `${API_PREFIX}/marketing/executions/workflow/${workflowId}`,
+  executionsByClient: (clientId: string | number) => `${API_PREFIX}/marketing/executions/client/${clientId}`,
+} as const
+
+// ── Analytics (autenticado) ──────────────────────────────────────────────────
+export const ANALYTICS_ROUTES = {
+  summary: `${API_PREFIX}/analytics/summary`,
+  planDistribution: `${API_PREFIX}/analytics/customers/plan-distribution`,
+  activity: `${API_PREFIX}/analytics/customers/activity`,
+  campaignsStatus: `${API_PREFIX}/analytics/campaigns/status`,
+  lowStock: `${API_PREFIX}/analytics/inventory/low-stock`,
+  kpis: `${API_PREFIX}/analytics/kpis`,
+} as const

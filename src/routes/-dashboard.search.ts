@@ -1,4 +1,4 @@
-export type DashboardTab = 'overview' | 'collab' | 'account' | 'notifications' | 'admin'
+export type DashboardTab = 'overview' | 'collab' | 'marketing' | 'account' | 'notifications' | 'admin'
 
 export type DashboardSearch = {
   tab?: DashboardTab
@@ -12,7 +12,12 @@ export const parseDashboardSearch = (search: Record<string, unknown>): Dashboard
   const tab = search.tab
   return {
     tab:
-      tab === 'overview' || tab === 'collab' || tab === 'account' || tab === 'notifications' || tab === 'admin'
+      tab === 'overview' ||
+      tab === 'collab' ||
+      tab === 'marketing' ||
+      tab === 'account' ||
+      tab === 'notifications' ||
+      tab === 'admin'
         ? tab
         : undefined,
     project_id: typeof search.project_id === 'string' ? search.project_id : undefined,
