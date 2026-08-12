@@ -72,3 +72,9 @@ Los tests E2E cross-stack están orquestados desde `crm-infra` (Playwright).
 ## Contrato con el gateway
 
 Las rutas públicas se definen en [`src/shared/lib/gateway-routes.ts`](./src/shared/lib/gateway-routes.ts). Este archivo es la **única fuente de verdad** para las URLs de API que usa el frontend. Usar `pnpm audit:gateway-routes` para verificar que cada ruta tenga su endpoint en el gateway manifest correspondiente.
+
+## Integración sostenible
+
+El frontend se integra por contrato, no por conocimiento de la topología interna. Cuando cambie una capacidad backend, actualizar primero OpenAPI y el manifest del servicio, luego `gateway-routes.ts`, los clientes tipados y las pruebas de interfaz. `pnpm audit:gateway-routes` debe pasar antes de desplegar.
+
+Los errores `401`, `403` y `503/504` son estados de borde que la interfaz debe comunicar sin intentar reproducir reglas de autorización o reintentos de operaciones no idempotentes en el navegador.

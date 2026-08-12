@@ -60,3 +60,9 @@ This section enforces the restrictions on frontend capabilities to maintain a cl
 - **No Direct WebSockets/SSE**: For real-time updates, the frontend must consume events through dedicated, gateway-routed Server-Sent Events (SSE) or WebSockets endpoints (e.g., exposed by the BFF or a gateway aggregator). Direct WebSockets or SSE connections to individual microservice ports are strictly prohibited.
 - **Authorization Enforcement**: The frontend must not make primary authorization decisions. While it can hide/show UI elements based on the roles/claims received in the JWT token or auth state, the backend is the sole authority for security. The frontend must gracefully handle `401 Unauthorized` and `403 Forbidden` responses.
 - **State Separation**: Do not replicate or sync complex business state across different feature modules in the browser. Each feature module must manage its own API state using localized query caches (e.g., TanStack Query) without sharing mutable global data stores.
+
+## Integration Change Gate
+
+- Treat `gateway-routes.ts` as a versioned boundary: changes require the matching service manifest and `pnpm audit:gateway-routes`.
+- Do not retry non-idempotent commands automatically after a `503` or `504`; show a recoverable state and refresh from the authoritative API.
+- Keep environment-specific proxying in Vite/Nginx configuration, never inside feature modules.
