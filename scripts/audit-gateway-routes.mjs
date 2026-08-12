@@ -63,6 +63,7 @@ const manifests = [
   '../crm-auth/gateway/gateway.manifest.json',
   '../crm-collab/gateway/gateway.manifest.json',
   '../crm-media/gateway/gateway.manifest.json',
+  '../crm-marketing/gateway/gateway.manifest.json',
 ]
 
 const manifestEndpoints = new Set()
