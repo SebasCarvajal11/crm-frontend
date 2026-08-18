@@ -1,77 +1,104 @@
-import { useQuery } from '@tanstack/react-query'
-import { Megaphone, BarChart3 } from 'lucide-react'
-import { getAnalyticsSummaryRequest, listCampaignsRequest } from '../api'
+import { useState } from 'react'
+import { BarChart3, Megaphone, Zap } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { MarketingOverview } from './MarketingOverview'
+import { CampaignsManager } from './CampaignsManager'
+import { WorkflowsManager } from './WorkflowsManager'
 
 interface Props {
   accessToken: string
 }
 
-export function MarketingPanel({ accessToken }: Props) {
-  const analyticsQuery = useQuery({
-    queryKey: ['marketing', 'analytics', 'summary'],
-    queryFn: () => getAnalyticsSummaryRequest(accessToken),
-  })
+type MarketingTab = 'overview' | 'campaigns' | 'workflows'
 
-  const campaignsQuery = useQuery({
-    queryKey: ['marketing', 'campaigns'],
-    queryFn: () => listCampaignsRequest(accessToken),
-  })
+export function MarketingPanel({ accessToken }: Props) {
+  const [activeTab, setActiveTab] = useState<MarketingTab>('overview')
+  const [preselectedCampaignId, setPreselectedCampaignId] = useState<number | null>(null)
+
+  const handleSelectCampaignForWorkflows = (campaignId: number) => {
+    setPreselectedCampaignId(campaignId)
+    setActiveTab('workflows')
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Marketing & Analítica</h2>
-        <p className="text-muted-foreground">Campañas, inventario y actividad comercial.</p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
-          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium tracking-tight">Total Campañas</h3>
-            <Megaphone className="size-4 text-muted-foreground" />
-          </div>
-          <div className="text-2xl font-bold">
-            {campaignsQuery.data?.length ?? 0}
-          </div>
-          <p className="text-xs text-muted-foreground">Campañas registradas</p>
+      {/* ── Header de Módulo ─────────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-4 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-black uppercase tracking-tight text-foreground flex items-center gap-2.5">
+            <Megaphone className="size-6 text-primary" />
+            Marketing & Analítica CIMA
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Gestión integral de campañas, flujos de reactivación y métricas de desempeño
+          </p>
         </div>
 
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
-          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium tracking-tight">Alerta Stock Bajo</h3>
-            <BarChart3 className="size-4 text-muted-foreground" />
-          </div>
-          <div className="text-2xl font-bold">
-            {analyticsQuery.data?.lowStockItemsCount ?? 0}
-          </div>
-          <p className="text-xs text-muted-foreground">Productos que requieren atención</p>
+        {/* Sub-navegación por Pestañas */}
+        <div className="flex items-center gap-1 rounded-lg bg-muted p-1 text-xs font-semibold">
+          <Button
+            type="button"
+            variant={activeTab === 'overview' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveTab('overview')}
+            className={`gap-1.5 text-xs font-bold ${
+              activeTab === 'overview' ? 'shadow-sm' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <BarChart3 className="size-3.5" />
+            Dashboard & KPIs
+          </Button>
+
+          <Button
+            type="button"
+            variant={activeTab === 'campaigns' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveTab('campaigns')}
+            className={`gap-1.5 text-xs font-bold ${
+              activeTab === 'campaigns' ? 'shadow-sm' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Megaphone className="size-3.5" />
+            Campañas
+          </Button>
+
+          <Button
+            type="button"
+            variant={activeTab === 'workflows' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveTab('workflows')}
+            className={`gap-1.5 text-xs font-bold ${
+              activeTab === 'workflows' ? 'shadow-sm' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Zap className="size-3.5" />
+            Automatizaciones
+          </Button>
         </div>
       </div>
 
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <h3 className="font-semibold text-lg pb-4">Campañas Recientes</h3>
-        {campaignsQuery.isLoading ? (
-          <p className="text-sm text-muted-foreground">Cargando campañas...</p>
-        ) : campaignsQuery.isError ? (
-          <p className="text-sm text-destructive">Error al cargar campañas.</p>
-        ) : campaignsQuery.data?.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No hay campañas activas en este momento.</p>
-        ) : (
-          <div className="space-y-4">
-            {campaignsQuery.data?.map((campaign) => (
-              <div key={campaign.campaignId} className="flex justify-between items-center border-b pb-2">
-                <div>
-                  <p className="font-medium text-sm">{campaign.campaignName}</p>
-                  <p className="text-xs text-muted-foreground">Tipo: {campaign.campaignType} | Estado: {campaign.status}</p>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Inicia: {campaign.startDate}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* ── Contenido de la Pestaña Activa ──────────────────────────────────── */}
+      {activeTab === 'overview' && (
+        <MarketingOverview
+          accessToken={accessToken}
+          onNavigateToCampaigns={() => setActiveTab('campaigns')}
+          onNavigateToWorkflows={() => setActiveTab('workflows')}
+        />
+      )}
+
+      {activeTab === 'campaigns' && (
+        <CampaignsManager
+          accessToken={accessToken}
+          onSelectCampaignForWorkflows={handleSelectCampaignForWorkflows}
+        />
+      )}
+
+      {activeTab === 'workflows' && (
+        <WorkflowsManager
+          accessToken={accessToken}
+          preselectedCampaignId={preselectedCampaignId}
+        />
+      )}
     </div>
   )
 }
