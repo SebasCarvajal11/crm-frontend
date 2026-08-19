@@ -165,4 +165,8 @@ export const ANALYTICS_ROUTES = {
   campaignsStatus: `${API_PREFIX}/analytics/campaigns/status`,
   lowStock: `${API_PREFIX}/analytics/inventory/low-stock`,
   kpis: `${API_PREFIX}/analytics/kpis`,
+  // Exportación de reportes (Excel/PDF vía ?format=xlsx|pdf)
+  exportKpis: `${API_PREFIX}/analytics/export/kpis`,
+  exportCampaigns: `${API_PREFIX}/analytics/export/campaigns`,
+  exportLowStock: `${API_PREFIX}/analytics/export/low-stock`,
 } as const
