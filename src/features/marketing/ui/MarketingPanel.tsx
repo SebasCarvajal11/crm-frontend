@@ -1,18 +1,37 @@
 import { useState } from 'react'
-import { BarChart3, Megaphone, Zap } from 'lucide-react'
+import { BarChart3, Megaphone, Zap, FileText, Users, MessageSquare, Target } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MarketingOverview } from './MarketingOverview'
 import { CampaignsManager } from './CampaignsManager'
 import { WorkflowsManager } from './WorkflowsManager'
+import { ProposalsManager } from './ProposalsManager'
+import { ClientPlansManager } from './ClientPlansManager'
+import { InteractionsManager } from './InteractionsManager'
+import { SegmentsManager } from './SegmentsManager'
 
 interface Props {
   accessToken: string
 }
 
-type MarketingTab = 'overview' | 'campaigns' | 'workflows'
+type MarketingTab =
+  | 'clients'
+  | 'campaigns'
+  | 'proposals'
+  | 'workflows'
+  | 'segments'
+  | 'interactions'
+
+const TABS: { id: MarketingTab; label: string; icon: typeof BarChart3 }[] = [
+  { id: 'clients', label: 'Clientes', icon: Users },
+  { id: 'campaigns', label: 'Campañas', icon: Megaphone },
+  { id: 'proposals', label: 'Propuestas', icon: FileText },
+  { id: 'workflows', label: 'Automatizaciones', icon: Zap },
+  { id: 'segments', label: 'Segmentos', icon: Target },
+  { id: 'interactions', label: 'Interacciones', icon: MessageSquare },
+]
 
 export function MarketingPanel({ accessToken }: Props) {
-  const [activeTab, setActiveTab] = useState<MarketingTab>('overview')
+  const [activeTab, setActiveTab] = useState<MarketingTab>('clients')
   const [preselectedCampaignId, setPreselectedCampaignId] = useState<number | null>(null)
 
   const handleSelectCampaignForWorkflows = (campaignId: number) => {
@@ -22,10 +41,10 @@ export function MarketingPanel({ accessToken }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* ── Header de Módulo ─────────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-4 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* Header de Módulo */}
+      <div className="flex flex-col gap-4 border-b pb-4 xl:flex-row xl:items-center xl:justify-between">
         <div>
-          <h1 className="text-2xl font-black uppercase tracking-tight text-foreground flex items-center gap-2.5">
+          <h1 className="flex items-center gap-2.5 text-2xl font-black uppercase tracking-tight text-foreground">
             <Megaphone className="size-6 text-primary" />
             Marketing & Analítica CIMA
           </h1>
@@ -34,57 +53,30 @@ export function MarketingPanel({ accessToken }: Props) {
           </p>
         </div>
 
-        {/* Sub-navegación por Pestañas */}
-        <div className="flex items-center gap-1 rounded-lg bg-muted p-1 text-xs font-semibold">
-          <Button
-            type="button"
-            variant={activeTab === 'overview' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('overview')}
-            className={`gap-1.5 text-xs font-bold ${
-              activeTab === 'overview' ? 'shadow-sm' : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <BarChart3 className="size-3.5" />
-            Dashboard & KPIs
-          </Button>
-
-          <Button
-            type="button"
-            variant={activeTab === 'campaigns' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('campaigns')}
-            className={`gap-1.5 text-xs font-bold ${
-              activeTab === 'campaigns' ? 'shadow-sm' : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Megaphone className="size-3.5" />
-            Campañas
-          </Button>
-
-          <Button
-            type="button"
-            variant={activeTab === 'workflows' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('workflows')}
-            className={`gap-1.5 text-xs font-bold ${
-              activeTab === 'workflows' ? 'shadow-sm' : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Zap className="size-3.5" />
-            Automatizaciones
-          </Button>
+        <div className="flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1 text-xs font-semibold">
+          {TABS.map((tab) => {
+            const Icon = tab.icon
+            const isActive = activeTab === tab.id
+            return (
+              <Button
+                key={tab.id}
+                type="button"
+                variant={isActive ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab(tab.id)}
+                className={`gap-1.5 text-xs font-bold ${
+                  isActive ? 'shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Icon className="size-3.5" />
+                {tab.label}
+              </Button>
+            )
+          })}
         </div>
       </div>
 
-      {/* ── Contenido de la Pestaña Activa ──────────────────────────────────── */}
-      {activeTab === 'overview' && (
-        <MarketingOverview
-          accessToken={accessToken}
-          onNavigateToCampaigns={() => setActiveTab('campaigns')}
-          onNavigateToWorkflows={() => setActiveTab('workflows')}
-        />
-      )}
+      {activeTab === 'clients' && <ClientPlansManager accessToken={accessToken} />}
 
       {activeTab === 'campaigns' && (
         <CampaignsManager
@@ -93,12 +85,18 @@ export function MarketingPanel({ accessToken }: Props) {
         />
       )}
 
+      {activeTab === 'proposals' && <ProposalsManager accessToken={accessToken} />}
+
       {activeTab === 'workflows' && (
         <WorkflowsManager
           accessToken={accessToken}
           preselectedCampaignId={preselectedCampaignId}
         />
       )}
+
+      {activeTab === 'segments' && <SegmentsManager accessToken={accessToken} />}
+
+      {activeTab === 'interactions' && <InteractionsManager accessToken={accessToken} />}
     </div>
   )
 }

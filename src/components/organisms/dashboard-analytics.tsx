@@ -24,6 +24,7 @@ import {
 } from '@/features/analytics/api'
 import { CampaignStatusChart } from '@/features/analytics/ui/charts'
 import type { InventoryAlertDto } from '@/features/analytics/model'
+import { KpiDashboard } from '@/features/analytics/ui/KpiDashboard'
 
 interface Props {
   accessToken: string
@@ -210,6 +211,8 @@ export function DashboardAnalytics({ accessToken }: Props) {
           Actualizar
         </button>
       </div>
+
+      <KpiDashboard accessToken={accessToken} />
 
       {summaryQuery.isError && (
         <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">

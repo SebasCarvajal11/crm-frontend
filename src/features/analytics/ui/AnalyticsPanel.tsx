@@ -1,3 +1,4 @@
+import { KpiDashboard } from './KpiDashboard'
 import { useQuery } from '@tanstack/react-query'
 import { Megaphone, BarChart3 } from 'lucide-react'
 import { getAnalyticsSummaryRequest, listCampaignsRequest } from '../api'
@@ -6,7 +7,7 @@ interface Props {
   accessToken: string
 }
 
-export function MarketingPanel({ accessToken }: Props) {
+export function AnalyticsPanel({ accessToken }: Props) {
   const analyticsQuery = useQuery({
     queryKey: ['marketing', 'analytics', 'summary'],
     queryFn: () => getAnalyticsSummaryRequest(accessToken),
@@ -23,6 +24,8 @@ export function MarketingPanel({ accessToken }: Props) {
         <h2 className="text-3xl font-bold tracking-tight">Marketing & Analítica</h2>
         <p className="text-muted-foreground">Campañas, inventario y actividad comercial.</p>
       </div>
+
+      <KpiDashboard accessToken={accessToken} />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border bg-card p-6 shadow-sm">
