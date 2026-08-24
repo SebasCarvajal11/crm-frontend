@@ -14,6 +14,7 @@ import {
   Plus,
   Trash2,
   Zap,
+  type LucideIcon,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -58,7 +59,7 @@ const TRIGGER_TYPES: { value: TriggerType; label: string; description: string }[
   { value: 'manual', label: 'Disparo Manual', description: 'Activado por demanda por el equipo' },
 ]
 
-const ACTION_TYPES: { value: ActionType; label: string; icon: any }[] = [
+const ACTION_TYPES: { value: ActionType; label: string; icon: LucideIcon }[] = [
   { value: 'send_whatsapp', label: 'Mensaje WhatsApp', icon: MessageSquare },
   { value: 'send_email', label: 'Correo Electrónico', icon: Mail },
   { value: 'log_followup', label: 'Registrar Seguimiento', icon: Activity },
