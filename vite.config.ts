@@ -25,8 +25,7 @@ export default defineConfig(({ mode }) => {
         // blob: es requerido para workers de módulo que Vite sirve como blob: URLs.
         'Content-Security-Policy': [
           "default-src 'self'",
-          // "script-src 'self' blob:",
-          mode === 'development' ? "script-src 'self' 'unsafe-inline' blob:" : "script-src 'self' blob:",
+          "script-src 'self' blob:",
           "style-src 'self' 'unsafe-inline'",
           "img-src 'self' data: blob: https:",
           "font-src 'self' data:",

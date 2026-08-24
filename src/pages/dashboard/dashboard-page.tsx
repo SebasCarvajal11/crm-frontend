@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useCallback, useEffect, useMemo } from 'react'
 import { isHTTPError } from 'ky'
-import { BarChart3, KanbanSquare, ChartAreaIcon, Megaphone, ShieldCheck } from 'lucide-react'
+import { BarChart3, KanbanSquare, Megaphone, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -18,7 +18,6 @@ import { MarketingPanel } from '@/features/marketing'
 import { getCurrentAvatarRequestOptional } from '@/shared/api'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 import type { DashboardTab } from '@/routes/-dashboard.search'
-import { DashboardAnalytics} from '@/components/organisms/dashboard-analytics'
 
 type Props = {
   tab?: DashboardTab
@@ -178,7 +177,6 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
       { key: 'collab', label: 'Colaboración', icon: <KanbanSquare className="size-4" />, onClick: () => goTo('collab'), isActive: activeTab === 'collab' },
       { key: 'marketing', label: 'Marketing', icon: <Megaphone className="size-4" />, onClick: () => goTo('marketing'), isActive: activeTab === 'marketing' },
       { key: 'admin', label: 'Administración', icon: <ShieldCheck className="size-4" />, onClick: () => goTo('admin'), isActive: activeTab === 'admin', hidden: !isAdmin },
-      { key: 'analytics', label: 'Analítica', icon: <ChartAreaIcon className="size-4" />, onClick: () => goTo('analytics'), isActive: activeTab === 'analytics' },
     ],
     [activeTab, goTo, isAdmin],
   )
@@ -254,7 +252,6 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
       {activeTab === 'account' && <AccountPanel accessToken={token} identity={identity} />}
       {activeTab === 'notifications' && <NotificationsPanel accessToken={token} onOpenNotification={goToMention} />}
       {activeTab === 'admin' && isAdmin && <AdminConsole accessToken={token} />}
-      {activeTab === 'analytics' && <DashboardAnalytics accessToken={token} />}
     </AppShell>
   )
 }
