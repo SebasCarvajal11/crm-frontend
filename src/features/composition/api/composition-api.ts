@@ -39,14 +39,21 @@ export async function fetchDashboardComposition(
     throw new Error('Access token is required')
   }
 
-  const [meRes, projectsRes] = await Promise.all([
+  const [meSettled, projectsSettled] = await Promise.allSettled([
     fetchMe(accessToken),
     listProjectsRequest(accessToken, { page: 1, limit: 100 }),
   ])
 
+  if (meSettled.status === 'rejected') {
+    throw meSettled.reason
+  }
+
+  const projectsData =
+    projectsSettled.status === 'fulfilled' ? projectsSettled.value.data : { data: [] }
+
   const payload = {
-    identity: meRes.data,
-    projects: projectsRes.data,
+    identity: meSettled.value.data,
+    projects: projectsData,
   }
 
   const parsed = dashboardCompositionResponseSchema.safeParse(normalizeDashboardCompositionPayload(payload))
