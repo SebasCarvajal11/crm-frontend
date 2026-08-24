@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { BarChart3, Megaphone, Zap, FileText, Users, MessageSquare, Target } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { MarketingOverview } from './MarketingOverview'
 import { CampaignsManager } from './CampaignsManager'
 import { WorkflowsManager } from './WorkflowsManager'
 import { ProposalsManager } from './ProposalsManager'
