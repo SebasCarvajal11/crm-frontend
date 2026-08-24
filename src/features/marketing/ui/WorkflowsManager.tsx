@@ -132,7 +132,7 @@ export function WorkflowsManager({ accessToken, preselectedCampaignId }: Workflo
       })
       setTimeout(() => setExecutionResultMsg(null), 6000)
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       setExecutionResultMsg({
         success: false,
         text: `Error al ejecutar: ${err.message || 'El workflow no pudo ser procesado'}`,
