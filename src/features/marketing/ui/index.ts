@@ -1,1 +1,5 @@
 export * from './MarketingPanel'
+export { ProposalsManager } from './ProposalsManager'
+export { ClientPlansManager } from './ClientPlansManager'
+export { InteractionsManager } from './InteractionsManager'
+export { SegmentsManager } from './SegmentsManager'
