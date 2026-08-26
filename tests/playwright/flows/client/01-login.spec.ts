@@ -21,8 +21,8 @@ test.describe('Client - Login y Navegacion', () => {
     await logger.persist(false)
   })
 
-  test('sidebar NO muestra tab Admin para client', async ({ clientPage }) => {
-    const logger = new ConsoleLogger('client-01-no-admin-tab')
+  test('sidebar no expone capacidades internas para client', async ({ clientPage }) => {
+    const logger = new ConsoleLogger('client-01-no-internal-tabs')
     logger.attachToPage(clientPage)
 
     const dashboard = new DashboardPage(clientPage)
@@ -30,6 +30,11 @@ test.describe('Client - Login y Navegacion', () => {
 
     const adminVisible = await dashboard.isTabVisible('Administracion')
     expect(adminVisible).toBe(false)
+
+    const marketingVisible = await dashboard.isTabVisible('Marketing')
+    const analyticsVisible = await dashboard.isTabVisible('Analitica')
+    expect(marketingVisible).toBe(false)
+    expect(analyticsVisible).toBe(false)
 
     await logger.persist(false)
   })

@@ -42,6 +42,7 @@ import {
   type CampaignStatus,
   type CreateCampaignInput,
 } from '../api/marketing-api'
+import { listClientsRequest, type MarketingClient } from '../api/clients-api'
 
 interface CampaignsManagerProps {
   accessToken: string
@@ -64,6 +65,10 @@ const CAMPAIGN_STATUSES: { value: CampaignStatus; label: string; badge: 'default
   { value: 'Cancelled', label: 'Cancelada', badge: 'destructive' },
 ]
 
+function clientLabel(client: MarketingClient) {
+  return client.contactInfo || client.additionalInfo || client.clientId
+}
+
 export function CampaignsManager({ accessToken, onSelectCampaignForWorkflows }: CampaignsManagerProps) {
   const queryClient = useQueryClient()
   const [searchTerm, setSearchTerm] = useState('')
@@ -77,7 +82,7 @@ export function CampaignsManager({ accessToken, onSelectCampaignForWorkflows }: 
   const [formData, setFormData] = useState<CreateCampaignInput>({
     campaignName: '',
     campaignType: 'Direct_sales',
-    clientId: '01a001c0-620b-73b8-8a23-9c9714c7d850',
+    clientId: '',
     startDate: new Date().toISOString().split('T')[0],
     endDate: '',
     status: 'Active',
@@ -88,6 +93,11 @@ export function CampaignsManager({ accessToken, onSelectCampaignForWorkflows }: 
   const campaignsQuery = useQuery({
     queryKey: ['marketing', 'campaigns', accessToken],
     queryFn: () => listCampaignsRequest(accessToken),
+  })
+
+  const clientsQuery = useQuery({
+    queryKey: ['marketing', 'clients', accessToken],
+    queryFn: () => listClientsRequest(accessToken),
   })
 
   const createMutation = useMutation({
@@ -120,7 +130,7 @@ export function CampaignsManager({ accessToken, onSelectCampaignForWorkflows }: 
     setFormData({
       campaignName: '',
       campaignType: 'Direct_sales',
-      clientId: '01a001c0-620b-73b8-8a23-9c9714c7d850',
+      clientId: '',
       startDate: new Date().toISOString().split('T')[0],
       endDate: '',
       status: 'Active',
@@ -156,6 +166,7 @@ export function CampaignsManager({ accessToken, onSelectCampaignForWorkflows }: 
   }
 
   const campaigns = campaignsQuery.data || []
+  const clients = clientsQuery.data || []
 
   const filteredCampaigns = campaigns.filter((c) => {
     const matchesSearch =
@@ -400,6 +411,33 @@ export function CampaignsManager({ accessToken, onSelectCampaignForWorkflows }: 
 
             <div className="space-y-3 text-xs">
               <div>
+                <Label htmlFor="campaignClient" className="text-xs font-semibold">
+                  Cliente *
+                </Label>
+                <select
+                  id="campaignClient"
+                  required
+                  value={formData.clientId}
+                  disabled={clientsQuery.isLoading || clients.length === 0}
+                  onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
+                  className="mt-1 w-full rounded-md border border-input bg-background p-2 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="">
+                    {clientsQuery.isLoading
+                      ? 'Cargando clientes…'
+                      : clients.length === 0
+                        ? 'No hay clientes sincronizados'
+                        : 'Selecciona un cliente'}
+                  </option>
+                  {clients.map((client) => (
+                    <option key={client.clientId} value={client.clientId}>
+                      {clientLabel(client)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
                 <Label htmlFor="campaignName" className="text-xs font-semibold">
                   Nombre de la Campaña *
                 </Label>
@@ -522,7 +560,7 @@ export function CampaignsManager({ accessToken, onSelectCampaignForWorkflows }: 
               <Button
                 type="submit"
                 size="sm"
-                disabled={createMutation.isPending || updateMutation.isPending}
+                disabled={createMutation.isPending || updateMutation.isPending || (!editingCampaign && !formData.clientId)}
                 className="font-semibold"
               >
                 {createMutation.isPending || updateMutation.isPending

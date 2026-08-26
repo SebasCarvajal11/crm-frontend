@@ -166,21 +166,23 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   const identity = dashboardQuery.data?.identity
   const projects = dashboardQuery.data?.projects
   const isAdmin = identity?.role === 'admin'
+  const canUseMarketing = identity?.role === 'admin' || identity?.role === 'worker'
   const activeTab: DashboardTab = useMemo(() => {
     const currentTab = tab ?? 'overview'
     if (currentTab === 'admin' && !isAdmin) return 'overview'
+    if ((currentTab === 'marketing' || currentTab === 'analytics') && !canUseMarketing) return 'overview'
     return currentTab
-  }, [tab, isAdmin])
+  }, [tab, isAdmin, canUseMarketing])
 
   const sidebarItems = useMemo(
     () => [
       { key: 'overview', label: 'Resumen', icon: <BarChart3 className="size-4" />, onClick: () => goTo('overview'), isActive: activeTab === 'overview' },
       { key: 'collab', label: 'Colaboración', icon: <KanbanSquare className="size-4" />, onClick: () => goTo('collab'), isActive: activeTab === 'collab' },
-      { key: 'marketing', label: 'Marketing', icon: <Megaphone className="size-4" />, onClick: () => goTo('marketing'), isActive: activeTab === 'marketing' },
+      { key: 'marketing', label: 'Marketing', icon: <Megaphone className="size-4" />, onClick: () => goTo('marketing'), isActive: activeTab === 'marketing', hidden: !canUseMarketing },
       { key: 'admin', label: 'Administración', icon: <ShieldCheck className="size-4" />, onClick: () => goTo('admin'), isActive: activeTab === 'admin', hidden: !isAdmin },
-      { key: 'analytics', label: 'Analítica', icon: <ChartAreaIcon className="size-4" />, onClick: () => goTo('analytics'), isActive: activeTab === 'analytics' },
+      { key: 'analytics', label: 'Analítica', icon: <ChartAreaIcon className="size-4" />, onClick: () => goTo('analytics'), isActive: activeTab === 'analytics', hidden: !canUseMarketing },
     ],
-    [activeTab, goTo, isAdmin],
+    [activeTab, goTo, isAdmin, canUseMarketing],
   )
 
   if (isUnauthorized) {
@@ -250,11 +252,11 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     >
       {activeTab === 'overview' && <DashboardOverview identity={identity} />}
       {activeTab === 'collab' && <CollabPanel accessToken={token} identity={identity} initialProjects={projects?.data} openProjectId={project_id} workspaceTab={workspace_tab} chatChannel={chat_channel} chatMessageId={chat_message_id} onOpenProject={openProject} onCloseProject={closeProject} onTabChange={changeWorkspaceTab} />}
-      {activeTab === 'marketing' && <MarketingPanel accessToken={token} />}
+      {activeTab === 'marketing' && canUseMarketing && <MarketingPanel accessToken={token} />}
       {activeTab === 'account' && <AccountPanel accessToken={token} identity={identity} />}
       {activeTab === 'notifications' && <NotificationsPanel accessToken={token} onOpenNotification={goToMention} />}
       {activeTab === 'admin' && isAdmin && <AdminConsole accessToken={token} />}
-      {activeTab === 'analytics' && <DashboardAnalytics accessToken={token} />}
+      {activeTab === 'analytics' && canUseMarketing && <DashboardAnalytics accessToken={token} />}
     </AppShell>
   )
 }
