@@ -17,6 +17,7 @@ import { CollabPanel, NotificationsPanel } from '@/features/collab/ui'
 import { MarketingPanel } from '@/features/marketing'
 import { getCurrentAvatarRequestOptional } from '@/shared/api'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
+import { getAccessTokenRole } from '@/shared/lib/access-token-role'
 import type { DashboardTab } from '@/routes/-dashboard.search'
 import { DashboardAnalytics} from '@/components/organisms/dashboard-analytics'
 
@@ -107,16 +108,16 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   )
 
   const goToMention = useCallback(
-    (payload: { projectId: string; channel: 'internal' | 'external' | 'system'; messageId: string }) => {
+    (payload: { projectId: string; channel: 'internal' | 'external' | 'system'; messageId?: string | null }) => {
       navigate({
         to: '/dashboard',
         search: (prev) => ({
           ...prev,
           tab: 'collab',
           project_id: payload.projectId,
-          workspace_tab: 'chat',
-          chat_channel: payload.channel === 'internal' ? 'internal' : 'external',
-          chat_message_id: payload.messageId,
+          workspace_tab: payload.messageId ? 'chat' : 'board',
+          chat_channel: payload.messageId ? (payload.channel === 'internal' ? 'internal' : 'external') : undefined,
+          chat_message_id: payload.messageId ?? undefined,
         }),
         replace: true,
       })
@@ -165,8 +166,10 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
 
   const identity = dashboardQuery.data?.identity
   const projects = dashboardQuery.data?.projects
+  const accessTokenRole = getAccessTokenRole(token)
+  const hasRoleMismatch = Boolean(identity && accessTokenRole && identity.role !== accessTokenRole)
   const isAdmin = identity?.role === 'admin'
-  const canUseMarketing = identity?.role === 'admin' || identity?.role === 'worker'
+  const canUseMarketing = !hasRoleMismatch && (identity?.role === 'admin' || identity?.role === 'worker')
   const activeTab: DashboardTab = useMemo(() => {
     const currentTab = tab ?? 'overview'
     if (currentTab === 'admin' && !isAdmin) return 'overview'
@@ -250,6 +253,17 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
       onLogout={handleLogout}
       isLoggingOut={logoutMutation.isPending}
     >
+      {hasRoleMismatch && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertTitle>Tu sesión necesita actualizarse</AlertTitle>
+          <AlertDescription className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <span>Tu rol cambió desde que iniciaste sesión. Vuelve a iniciar sesión para aplicar los permisos actuales.</span>
+            <Button variant="outline" size="sm" onClick={handleLogout} disabled={logoutMutation.isPending}>
+              Actualizar sesión
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
       {activeTab === 'overview' && <DashboardOverview identity={identity} />}
       {activeTab === 'collab' && <CollabPanel accessToken={token} identity={identity} initialProjects={projects?.data} openProjectId={project_id} workspaceTab={workspace_tab} chatChannel={chat_channel} chatMessageId={chat_message_id} onOpenProject={openProject} onCloseProject={closeProject} onTabChange={changeWorkspaceTab} />}
       {activeTab === 'marketing' && canUseMarketing && <MarketingPanel accessToken={token} />}

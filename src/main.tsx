@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { isHTTPError } from 'ky'
 import './index.css'
 
 import { routeTree } from './routeTree.gen'
@@ -12,7 +13,14 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60 * 1000,
-      retry: 1,
+      // Los 4xx representan una petición inválida o una decisión de autorización;
+      // reintentarlos solo duplica tráfico y oculta la causa al usuario.
+      retry: (failureCount, error) => {
+        if (isHTTPError(error) && error.response.status >= 400 && error.response.status < 500) {
+          return false
+        }
+        return failureCount < 1
+      },
     },
     mutations: {
       retry: false,
