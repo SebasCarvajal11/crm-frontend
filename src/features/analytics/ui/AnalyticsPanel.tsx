@@ -45,7 +45,7 @@ export function AnalyticsPanel({ accessToken }: Props) {
             <BarChart3 className="size-4 text-muted-foreground" />
           </div>
           <div className="text-2xl font-bold">
-            {analyticsQuery.data?.lowStockItemsCount ?? 0}
+            {analyticsQuery.data?.lowStockAlerts ?? 0}
           </div>
           <p className="text-xs text-muted-foreground">Productos que requieren atención</p>
         </div>

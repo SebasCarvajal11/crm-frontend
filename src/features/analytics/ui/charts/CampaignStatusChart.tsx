@@ -32,7 +32,13 @@ export function CampaignStatusChart({ data, loading }: Props) {
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
         <XAxis dataKey="status" />
         <YAxis allowDecimals={false} />
-        <Tooltip formatter={(value: number) => [`${value} campaña${value === 1 ? '' : 's'}`, 'Cantidad']} />
+        <Tooltip
+          formatter={(value): [string, string] => {
+            const campaignCount = typeof value === 'number' ? value : 0
+
+            return [`${campaignCount} campaña${campaignCount === 1 ? '' : 's'}`, 'Cantidad']
+          }}
+        />
         <Legend />
         <Bar dataKey="campaignCount" name="Campañas" radius={[4, 4, 0, 0]}>
           {data.map((entry) => (
