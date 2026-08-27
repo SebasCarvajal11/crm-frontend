@@ -16,6 +16,7 @@ export function DesktopSidebar({
   userAvatarUrl,
   onOpenProfile,
   onOpenNotifications,
+  unreadNotificationsCount,
   onLogout,
   isLoggingOut,
   headerExtras,
@@ -27,6 +28,7 @@ export function DesktopSidebar({
   userAvatarUrl?: string | null
   onOpenProfile: () => void
   onOpenNotifications: () => void
+  unreadNotificationsCount: number
   onLogout: () => void
   isLoggingOut: boolean
   headerExtras?: React.ReactNode
@@ -63,6 +65,7 @@ export function DesktopSidebar({
         userAvatarUrl={userAvatarUrl}
         onOpenProfile={onOpenProfile}
         onOpenNotifications={onOpenNotifications}
+        unreadNotificationsCount={unreadNotificationsCount}
         onLogout={onLogout}
         isLoggingOut={isLoggingOut}
         compact={collapsed}

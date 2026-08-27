@@ -12,8 +12,8 @@ const roleAliases: Record<ProjectMember['role'], string[]> = {
 
 const allowedMentionRolesByActor = (role: UserRole): ProjectMember['role'][] => {
   if (role === 'admin') return ['admin', 'worker', 'client']
-  if (role === 'worker') return ['worker', 'client']
-  return ['worker']
+  if (role === 'worker') return ['admin', 'worker', 'client']
+  return ['admin', 'worker']
 }
 
 const memberAliases = (member: ProjectMember) => {
@@ -25,8 +25,8 @@ const memberAliases = (member: ProjectMember) => {
 
 export function mentionHints(actorRole: UserRole): string[] {
   if (actorRole === 'admin') return ['@trabajador', '@cliente', '@administrador', '@nombre']
-  if (actorRole === 'worker') return ['@trabajador', '@cliente', '@nombre']
-  return ['@trabajador', '@nombre']
+  if (actorRole === 'worker') return ['@administrador', '@trabajador', '@cliente', '@nombre']
+  return ['@administrador', '@trabajador', '@nombre']
 }
 
 export function resolveMentionsFromBody(body: string, actorRole: UserRole, members: ProjectMember[]): string[] {

@@ -15,6 +15,7 @@ type AppShellProps = {
   userAvatarUrl?: string | null
   onOpenProfile: () => void
   onOpenNotifications: () => void
+  unreadNotificationsCount?: number
   onLogout: () => void
   isLoggingOut?: boolean
   headerExtras?: React.ReactNode
@@ -32,6 +33,7 @@ export function AppShell({
   userAvatarUrl,
   onOpenProfile,
   onOpenNotifications,
+  unreadNotificationsCount = 0,
   onLogout,
   isLoggingOut = false,
   headerExtras,
@@ -50,6 +52,7 @@ export function AppShell({
         userAvatarUrl={userAvatarUrl}
         onOpenProfile={onOpenProfile}
         onOpenNotifications={onOpenNotifications}
+        unreadNotificationsCount={unreadNotificationsCount}
         onLogout={onLogout}
         isLoggingOut={isLoggingOut}
         headerExtras={headerExtras}
@@ -65,6 +68,7 @@ export function AppShell({
         userAvatarUrl={userAvatarUrl}
         onOpenProfile={onOpenProfile}
         onOpenNotifications={onOpenNotifications}
+        unreadNotificationsCount={unreadNotificationsCount}
         onLogout={onLogout}
         isLoggingOut={isLoggingOut}
         headerExtras={headerExtras}

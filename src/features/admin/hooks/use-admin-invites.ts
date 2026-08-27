@@ -31,7 +31,6 @@ export const inviteAdminSchema = z.object({
   email: z.string().email(),
   first_name: z.string().trim().min(1, 'Requerido').max(120),
   last_name: z.string().trim().min(1, 'Requerido').max(120),
-  secret_password: z.string().min(1, 'Requerido'),
 })
 
 export function useAdminInvites(accessToken: string) {

@@ -16,6 +16,7 @@ export function MobileSidebar({
   userAvatarUrl,
   onOpenProfile,
   onOpenNotifications,
+  unreadNotificationsCount,
   onLogout,
   isLoggingOut,
   headerExtras,
@@ -29,6 +30,7 @@ export function MobileSidebar({
   userAvatarUrl?: string | null
   onOpenProfile: () => void
   onOpenNotifications: () => void
+  unreadNotificationsCount: number
   onLogout: () => void
   isLoggingOut: boolean
   headerExtras?: React.ReactNode
@@ -73,6 +75,7 @@ export function MobileSidebar({
           userAvatarUrl={userAvatarUrl}
           onOpenProfile={onOpenProfile}
           onOpenNotifications={onOpenNotifications}
+          unreadNotificationsCount={unreadNotificationsCount}
           onLogout={onLogout}
           isLoggingOut={isLoggingOut}
           menuPlacement="inline"

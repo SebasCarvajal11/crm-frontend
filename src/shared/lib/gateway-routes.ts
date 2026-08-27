@@ -118,10 +118,9 @@ export const FILE_ROUTES = {
 
 // ── Notifications (autenticado) ─────────────────────────────────────────────
 export const NOTIFICATION_ROUTES = {
-  chatMentionsUnread: `${COLLAB_API}/collab/notifications/chat-mentions/unread`,
-  chatMentionsUnreadCount: `${COLLAB_API}/collab/notifications/chat-mentions/unread/count`,
-  chatMentionRead: (notificationId: string) =>
-    `${COLLAB_API}/collab/notifications/chat-mentions/${notificationId}/read`,
+  unread: `${COLLAB_API}/collab/notifications/unread`,
+  unreadCount: `${COLLAB_API}/collab/notifications/unread/count`,
+  read: (notificationId: string) => `${COLLAB_API}/collab/notifications/${notificationId}/read`,
 } as const
 
 // ── Media (autenticado) ─────────────────────────────────────────────────────

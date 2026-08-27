@@ -15,5 +15,7 @@ export const collabKeys = {
   taskAssignees: (taskId: string) => [...collabKeys.all, 'task-assignees', taskId] as const,
   mentionNotifications: () => [...collabKeys.all, 'mention-notifications'] as const,
   mentionNotificationsCount: () => [...collabKeys.all, 'mention-notifications-count'] as const,
+  notifications: () => [...collabKeys.all, 'notifications'] as const,
+  notificationsCount: () => [...collabKeys.all, 'notifications-count'] as const,
   taskSearch: (projectId: string, q: string) => [...collabKeys.all, 'task-search', projectId, q] as const,
 }

@@ -40,7 +40,6 @@ const projectListItemSchema = z.object({
   type: z.enum(['campaign_service', 'product_order']),
   status: z.enum(['todo', 'in_progress', 'in_review', 'completed']),
   progressPercent: z.number().int(),
-  unreadNotifications: z.number().int(),
 })
 
 export const dashboardCompositionResponseSchema = z.object({

@@ -14,6 +14,8 @@ import { AdminConsole } from '@/features/admin/ui'
 import { useDashboardComposition } from '@/features/composition'
 import { DashboardOverview } from '@/features/composition/ui'
 import { CollabPanel, NotificationsPanel } from '@/features/collab/ui'
+import { countUnreadNotificationsRequest } from '@/features/collab/api'
+import { collabKeys } from '@/features/collab/model'
 import { MarketingPanel } from '@/features/marketing'
 import { getCurrentAvatarRequestOptional } from '@/shared/api'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
@@ -43,6 +45,13 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     queryFn: () => getCurrentAvatarRequestOptional(token!),
     enabled: bootstrapped && Boolean(token),
     retry: false,
+  })
+  const unreadNotificationsQuery = useQuery({
+    queryKey: collabKeys.notificationsCount(),
+    queryFn: () => countUnreadNotificationsRequest(token!),
+    enabled: bootstrapped && Boolean(token),
+    refetchInterval: 20_000,
+    select: (response) => response.data.unread_count,
   })
 
   const isUnauthorized = dashboardQuery.isError && isHTTPError(dashboardQuery.error) && dashboardQuery.error.response.status === 401
@@ -250,6 +259,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
       userAvatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}
       onOpenProfile={handleOpenProfile}
       onOpenNotifications={handleOpenNotifications}
+      unreadNotificationsCount={unreadNotificationsQuery.data ?? 0}
       onLogout={handleLogout}
       isLoggingOut={logoutMutation.isPending}
     >

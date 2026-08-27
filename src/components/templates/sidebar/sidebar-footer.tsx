@@ -10,6 +10,7 @@ export function SidebarFooter({
   userAvatarUrl,
   onOpenProfile,
   onOpenNotifications,
+  unreadNotificationsCount,
   onLogout,
   isLoggingOut,
   compact = false,
@@ -21,6 +22,7 @@ export function SidebarFooter({
   userAvatarUrl?: string | null
   onOpenProfile: () => void
   onOpenNotifications: () => void
+  unreadNotificationsCount: number
   onLogout: () => void
   isLoggingOut: boolean
   compact?: boolean
@@ -105,6 +107,14 @@ export function SidebarFooter({
             >
               <Bell className="size-4" />
               <span>Notificaciones</span>
+              {unreadNotificationsCount > 0 && (
+                <span
+                  className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-primary-foreground px-1.5 py-0.5 text-[10px] font-bold text-primary"
+                  aria-label={`${unreadNotificationsCount} notificaciones sin leer`}
+                >
+                  {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
+                </span>
+              )}
             </Button>
             <Button
               type="button"

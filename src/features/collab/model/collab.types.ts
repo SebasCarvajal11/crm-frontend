@@ -234,19 +234,18 @@ export type ProjectChangeRequest = {
   createdAt: string
   resolvedAt: string | null
 }
-
-
-
-
-export type ChatMentionNotification = {
+export type ProjectNotification = {
   id: string
+  source: 'mention' | 'activity'
   project_id: string
   project_name: string
-  message_id: string
   channel: 'internal' | 'external' | 'system'
   created_at: string
-  message_preview: string
+  title: string
+  body: string
+  resource_type: string
+  resource_id: string | null
+  message_id: string | null
   author_sub: string | null
   author_email: string | null
-  author_name: string
 }

@@ -36,7 +36,7 @@ export function AdminInviteForms({ accessToken }: Props) {
 
   const adminForm = useForm<import('zod').infer<typeof inviteAdminSchema>>({
     resolver: zodResolver(inviteAdminSchema),
-    defaultValues: { email: '', first_name: '', last_name: '', secret_password: '' },
+    defaultValues: { email: '', first_name: '', last_name: '' },
   })
 
   const { adminMutation, inviteMutation, workerMutation } = useAdminInvites(accessToken)
@@ -104,7 +104,7 @@ export function AdminInviteForms({ accessToken }: Props) {
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
           <CardTitle className="text-base tracking-tight">Registrar trabajador</CardTitle>
-          <CardDescription>Crea la cuenta y envia por correo la contrasena temporal.</CardDescription>
+          <CardDescription>Envía una invitación para que el trabajador active su cuenta.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={workerForm.handleSubmit((values) => workerMutation.mutate(values, { onSuccess: () => workerForm.reset() }))}>
@@ -130,9 +130,9 @@ export function AdminInviteForms({ accessToken }: Props) {
             )}
             {workerMutation.isSuccess && (
               <Alert>
-                <AlertTitle>Trabajador registrado</AlertTitle>
+                <AlertTitle>Invitación de trabajador creada</AlertTitle>
                 <AlertDescription>
-                  Se creo el usuario {workerMutation.data.data.user.email} y se envio el acceso temporal por correo.
+                  Se envió la invitación a {workerMutation.data.data.user.email} para activar su cuenta.
                 </AlertDescription>
               </Alert>
             )}
@@ -146,7 +146,7 @@ export function AdminInviteForms({ accessToken }: Props) {
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
           <CardTitle className="text-base tracking-tight">Invitar administrador</CardTitle>
-          <CardDescription>Requiere la contrasena secreta del gerente para autorizar esta accion.</CardDescription>
+          <CardDescription>Envía una invitación segura para que el administrador active su cuenta.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={adminForm.handleSubmit((values) => adminMutation.mutate(values, { onSuccess: () => adminForm.reset() }))}>
@@ -161,9 +161,6 @@ export function AdminInviteForms({ accessToken }: Props) {
                 <Input className={inputClass} {...adminForm.register('last_name')} />
               </FormField>
             </div>
-            <FormField id="admin-secret" label="Contrasena secreta" error={adminForm.formState.errors.secret_password?.message}>
-              <Input type="password" autoComplete="current-password" className={inputClass} {...adminForm.register('secret_password')} />
-            </FormField>
             {adminMutation.isError && (
               <Alert variant="destructive">
                 <AlertTitle>No se pudo invitar al administrador</AlertTitle>
@@ -172,12 +169,12 @@ export function AdminInviteForms({ accessToken }: Props) {
             )}
             {adminMutation.isSuccess && (
               <Alert>
-                <AlertTitle>Administrador creado</AlertTitle>
+                <AlertTitle>Invitación de administrador creada</AlertTitle>
                 <AlertDescription>{adminMutation.data.message}</AlertDescription>
               </Alert>
             )}
             <Button className="h-10 w-full" type="submit" disabled={adminMutation.isPending}>
-              {adminMutation.isPending ? 'Creando...' : 'Invitar administrador'}
+              {adminMutation.isPending ? 'Creando...' : 'Enviar invitación'}
             </Button>
           </form>
         </CardContent>

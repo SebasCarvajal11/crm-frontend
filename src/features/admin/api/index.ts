@@ -45,7 +45,6 @@ export async function inviteAdminRequest(
     email: string
     first_name: string
     last_name: string
-    secret_password: string
   }
 ): Promise<InviteAdminResponse> {
   return api

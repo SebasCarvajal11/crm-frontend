@@ -1,4 +1,4 @@
-﻿import { Bell, User } from 'lucide-react'
+﻿import { User } from 'lucide-react'
 import { ProjectTypeBadge } from '@/components/molecules/project-type-badge'
 import type { ProjectListItem } from '@/features/collab/model'
 
@@ -27,15 +27,6 @@ export function ProjectCard({ project, onClick }: Props) {
         <span className="font-semibold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors">
           {project.name}
         </span>
-        {project.unreadNotifications > 0 && (
-          <span
-            className="shrink-0 inline-flex items-center gap-0.5 text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-full px-1.5 py-0.5"
-            aria-label={`${project.unreadNotifications} notificacion${project.unreadNotifications > 1 ? 'es' : ''} sin leer`}
-          >
-            <Bell className="size-2.5" aria-hidden="true" />
-            {project.unreadNotifications}
-          </span>
-        )}
       </div>
 
       <div
