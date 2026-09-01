@@ -47,7 +47,7 @@ export function BriefPanel({ brief, formalChanges, isLoading }: Props) {
         </div>
         <div className="p-5">
           {brief?.content ? (
-            <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+            <div className="break-words whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
               {brief.content}
             </div>
           ) : (

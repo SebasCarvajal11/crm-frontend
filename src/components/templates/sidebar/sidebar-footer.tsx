@@ -43,7 +43,7 @@ export function SidebarFooter({
   }, [open])
 
   return (
-    <div className="border-t border-primary-foreground/10 p-3" ref={rootRef}>
+    <div className="relative border-t border-primary-foreground/10 p-3" ref={rootRef}>
       <div className={cn('rounded-xl bg-primary-foreground/[0.07] p-3', compact && 'p-2')}>
         <button
           type="button"
@@ -71,12 +71,12 @@ export function SidebarFooter({
           )}
         </button>
 
-        {open && !compact && (
+        {open && (
           <div
             className={cn(
               'space-y-1 rounded-lg border border-primary-foreground/12 bg-primary text-primary-foreground p-1.5 shadow-xl animate-in fade-in-0 zoom-in-95 duration-150',
               menuPlacement === 'side'
-                ? 'absolute bottom-3 left-[calc(100%+0.5rem)] z-50 min-w-[220px]'
+                ? 'absolute bottom-0 left-[calc(100%+0.5rem)] z-50 min-w-[220px]'
                 : 'mt-2 bg-primary-foreground/[0.04]'
             )}
           >

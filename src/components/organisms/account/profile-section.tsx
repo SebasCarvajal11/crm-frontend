@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import { SectionIntro } from '@/components/molecules/section-intro'
 import { useAccountProfileSection } from '@/features/auth/hooks'
 import { cn } from '@/shared/lib/utils'
 import type { MeResponse } from '@/features/auth/model'
@@ -50,8 +49,7 @@ export function ProfileSection({ accessToken, identity }: Props) {
   } = useAccountProfileSection(accessToken)
 
   return (
-    <section className="w-full min-w-0 space-y-4">
-      <SectionIntro title="Mi Cuenta" description="Gestiona tu perfil, foto y estado de verificacion." />
+    <section className="w-full min-w-0">
       <Card className="w-full min-w-0 overflow-hidden border-border/80 shadow-sm">
         <CardHeader className="border-b bg-muted/20">
           <CardTitle className="text-base">Perfil e identidad</CardTitle>

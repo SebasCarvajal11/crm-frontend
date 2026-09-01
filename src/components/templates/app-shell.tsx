@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/shared/lib/utils'
@@ -24,6 +24,16 @@ type AppShellProps = {
 }
 
 const shellSidebarOffset = 'md:ml-64 lg:ml-72'
+const collapsedSidebarOffset = 'md:ml-20'
+const sidebarPreferenceKey = 'cima.sidebar.collapsed'
+
+function readSidebarPreference() {
+  try {
+    return window.localStorage.getItem(sidebarPreferenceKey) === 'true'
+  } catch {
+    return false
+  }
+}
 
 export function AppShell({
   title,
@@ -41,6 +51,16 @@ export function AppShell({
   className,
 }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [desktopCollapsed, setDesktopCollapsed] = useState(readSidebarPreference)
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(sidebarPreferenceKey, String(desktopCollapsed))
+    } catch {
+      // La preferencia es opcional; el layout funciona aunque el navegador
+      // no permita almacenamiento local.
+    }
+  }, [desktopCollapsed])
 
   return (
     <div className={cn('flex min-h-screen bg-background', className)}>
@@ -56,6 +76,8 @@ export function AppShell({
         onLogout={onLogout}
         isLoggingOut={isLoggingOut}
         headerExtras={headerExtras}
+        collapsed={desktopCollapsed}
+        onCollapsedChange={setDesktopCollapsed}
       />
 
       <MobileSidebar
@@ -74,7 +96,12 @@ export function AppShell({
         headerExtras={headerExtras}
       />
 
-      <div className={cn('flex min-w-0 flex-1 flex-col', shellSidebarOffset)}>
+      <div
+        className={cn(
+          'flex min-w-0 flex-1 flex-col transition-[margin] duration-200 ease-out',
+          desktopCollapsed ? collapsedSidebarOffset : shellSidebarOffset,
+        )}
+      >
         <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b bg-card/95 p-3 backdrop-blur md:hidden">
           <Button
             type="button"
@@ -93,7 +120,9 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+        <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+          {children}
+        </main>
       </div>
     </div>
   )

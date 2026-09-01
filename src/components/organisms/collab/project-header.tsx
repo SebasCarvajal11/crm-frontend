@@ -17,15 +17,17 @@ export function ProjectHeader({ project }: Props) {
 
   return (
     <div className="rounded-2xl border bg-card px-4 py-3 shadow-sm">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
-            <h1 className="text-base font-semibold truncate leading-tight">{project?.name ?? '…'}</h1>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="mb-0.5 flex flex-wrap items-center gap-1.5">
+            <h1 className="min-w-0 line-clamp-2 text-base font-semibold leading-tight sm:truncate" title={project?.name ?? undefined}>
+              {project?.name ?? '…'}
+            </h1>
             {project?.type && (
               <ProjectTypeBadge type={project.type} className="hidden sm:inline-flex" />
             )}
           </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
             {status && project && (
               <span className="flex items-center gap-1">
                 <span className={`size-1.5 rounded-full ${STATUS_DOT[project.status]}`} aria-hidden="true" />

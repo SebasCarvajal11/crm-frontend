@@ -6,13 +6,6 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import { TaskCard } from './task-card'
 import type { ProjectTask, ProjectTaskColumn } from '@/features/collab/model'
 
-/**
- * Alto fijo del area de tareas (en px).
- * Todas las columnas comparten este valor -> aspecto uniforme independiente del contenido.
- * Cambiar solo aqui para ajustar globalmente.
- */
-const COLUMN_BODY_HEIGHT = 520
-
 type Props = {
   column: ProjectTaskColumn
   tasks: ProjectTask[]
@@ -96,14 +89,11 @@ export function TaskColumn({
         </div>
       </div>
 
-      {/*
-        Cuerpo virtualizado con alto fijo: todas las columnas ocupan el mismo espacio.
-        Si hay muchas tareas, se activa scroll solo dentro de esta area.
-      */}
+      {/* El cuerpo se adapta al alto disponible en móvil y conserva una referencia uniforme en escritorio. */}
       <div
         ref={parentRef}
-        className="overflow-y-auto p-2"
-        style={{ height: `${COLUMN_BODY_HEIGHT}px`, position: 'relative' }}
+        className="h-[min(62dvh,520px)] overflow-y-auto p-2"
+        style={{ position: 'relative' }}
         aria-label={`Tareas de la columna ${column.title}`}
       >
         {tasks.length === 0 ? (

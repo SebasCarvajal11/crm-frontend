@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { IconButton } from '@/components/ui/icon-button'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   getCurrentKpisRequest,
@@ -221,9 +222,9 @@ export function KpiDashboard({ accessToken }: KpiDashboardProps) {
       {aviso && (
         <div className="flex items-start justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
           <span>{aviso}</span>
-          <button onClick={() => setAviso(null)} className="text-muted-foreground">
+          <IconButton label="Cerrar aviso" onClick={() => setAviso(null)}>
             <XCircle className="h-4 w-4" />
-          </button>
+          </IconButton>
         </div>
       )}
 

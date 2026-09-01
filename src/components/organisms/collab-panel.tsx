@@ -5,9 +5,10 @@
  */
 import { useCallback, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Plus } from 'lucide-react'
+import { KanbanSquare, Plus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { PageHeader } from '@/components/molecules/page-header'
 import { Separator } from '@/components/ui/separator'
 import { listProjectsRequest, searchProjectsRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
@@ -94,14 +95,12 @@ export function CollabPanel({ accessToken, identity, initialProjects, openProjec
 
   return (
     <div className="flex flex-col gap-6 min-h-0">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Tablero de Proyectos</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Vista Kanban por estado — haz clic en un proyecto para abrir su workspace
-          </p>
-        </div>
-        <div className="w-full sm:w-auto flex flex-col sm:items-end gap-2">
+      <PageHeader
+        title="Proyectos"
+        description="Vista Kanban por estado. Abre un proyecto para gestionar su espacio de trabajo."
+        icon={KanbanSquare}
+        actions={(
+          <div className="flex w-full flex-col gap-2 sm:items-end xl:w-auto">
           {canCreate && (
             <Button size="sm" className="shrink-0 self-start sm:self-auto" onClick={() => setShowModal(true)}>
               <Plus className="size-4 mr-1.5" />
@@ -115,8 +114,9 @@ export function CollabPanel({ accessToken, identity, initialProjects, openProjec
             onDebouncedChange={handleDebouncedChange}
             onSelectProject={onOpenProject}
           />
-        </div>
-      </div>
+          </div>
+        )}
+      />
 
       {canCreate && (
         <CreateProjectModal

@@ -113,9 +113,13 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
   }
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm" style={{ height: 'min(600px, 70vh)' }} role="region" aria-label={channel === 'external' ? 'Chat con el cliente' : 'Chat interno del equipo'}>
+    <div
+      className="flex h-[min(32.5rem,62dvh)] flex-col overflow-hidden rounded-xl border bg-card shadow-sm sm:h-[min(35rem,64dvh)] min-[1400px]:h-[min(600px,70vh)]"
+      role="region"
+      aria-label={channel === 'external' ? 'Chat con el cliente' : 'Chat interno del equipo'}
+    >
       <div className="shrink-0 border-b bg-muted/20 px-4 py-3">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold">{channel === 'external' ? 'Chat con el Cliente' : 'Chat del Equipo'}</p>
             <p className="text-xs text-muted-foreground">

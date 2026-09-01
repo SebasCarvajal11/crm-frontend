@@ -115,13 +115,20 @@ export function CreateTaskModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="px-6 space-y-4">
+        <form
+          id="create-task-form"
+          className="space-y-4 px-5 sm:px-6"
+          onSubmit={(event) => {
+            event.preventDefault()
+            createTask.mutate()
+          }}
+        >
           <div className="space-y-1.5">
             <Label htmlFor="ct-title">Titulo <span className="text-destructive">*</span></Label>
             <Input id="ct-title" placeholder="Describe brevemente la tarea" value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Columna</Label>
               <div className="rounded-lg border bg-muted/40 px-3 py-2 text-sm">
@@ -191,7 +198,7 @@ export function CreateTaskModal({
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3 items-end">
+          <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="ct-dead">Fecha limite</Label>
               <Input id="ct-dead" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
@@ -214,11 +221,11 @@ export function CreateTaskModal({
             onAddSubtask={handleAddSubtask}
             onRemoveSubtask={(subtaskId) => setSubtasks((prev) => prev.filter((entry) => entry.id !== subtaskId))}
           />
-        </div>
+        </form>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={createTask.isPending}>Cancelar</Button>
-          <Button disabled={!canSubmit || createTask.isPending} onClick={() => createTask.mutate()}>
+          <Button type="button" variant="outline" onClick={handleClose} disabled={createTask.isPending}>Cancelar</Button>
+          <Button type="submit" form="create-task-form" disabled={!canSubmit || createTask.isPending}>
             {createTask.isPending ? 'Creando...' : 'Crear tarea'}
           </Button>
         </DialogFooter>

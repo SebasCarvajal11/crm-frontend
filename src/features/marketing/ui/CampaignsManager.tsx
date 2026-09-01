@@ -15,6 +15,8 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { NativeSelect } from '@/components/ui/native-select'
+import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -414,13 +416,12 @@ export function CampaignsManager({ accessToken, onSelectCampaignForWorkflows }: 
                 <Label htmlFor="campaignClient" className="text-xs font-semibold">
                   Cliente *
                 </Label>
-                <select
+                <NativeSelect
                   id="campaignClient"
                   required
                   value={formData.clientId}
                   disabled={clientsQuery.isLoading || clients.length === 0}
                   onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
-                  className="mt-1 w-full rounded-md border border-input bg-background p-2 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="">
                     {clientsQuery.isLoading
@@ -434,7 +435,7 @@ export function CampaignsManager({ accessToken, onSelectCampaignForWorkflows }: 
                       {clientLabel(client)}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
               </div>
 
               <div>
@@ -451,41 +452,39 @@ export function CampaignsManager({ accessToken, onSelectCampaignForWorkflows }: 
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="campaignType" className="text-xs font-semibold">
                     Tipo de Campaña
                   </Label>
-                  <select
+                  <NativeSelect
                     id="campaignType"
                     value={formData.campaignType}
                     onChange={(e) => setFormData({ ...formData, campaignType: e.target.value as CampaignType })}
-                    className="mt-1 w-full rounded-md border border-input bg-background p-2 text-xs font-medium"
                   >
                     {CAMPAIGN_TYPES.map((t) => (
                       <option key={t.value} value={t.value}>
                         {t.label}
                       </option>
                     ))}
-                  </select>
+                  </NativeSelect>
                 </div>
 
                 <div>
                   <Label htmlFor="status" className="text-xs font-semibold">
                     Estado
                   </Label>
-                  <select
+                  <NativeSelect
                     id="status"
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as CampaignStatus })}
-                    className="mt-1 w-full rounded-md border border-input bg-background p-2 text-xs font-medium"
                   >
                     {CAMPAIGN_STATUSES.map((s) => (
                       <option key={s.value} value={s.value}>
                         {s.label}
                       </option>
                     ))}
-                  </select>
+                  </NativeSelect>
                 </div>
               </div>
 
@@ -502,7 +501,7 @@ export function CampaignsManager({ accessToken, onSelectCampaignForWorkflows }: 
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="startDate" className="text-xs font-semibold">
                     Fecha de Inicio *
@@ -534,13 +533,13 @@ export function CampaignsManager({ accessToken, onSelectCampaignForWorkflows }: 
                 <Label htmlFor="objective" className="text-xs font-semibold">
                   Objetivo Estratégico / KPI
                 </Label>
-                <textarea
+                <Textarea
                   id="objective"
                   rows={3}
                   placeholder="Detalla el objetivo comercial, meta de leads o incremento porcentual…"
                   value={formData.objective || ''}
                   onChange={(e) => setFormData({ ...formData, objective: e.target.value })}
-                  className="mt-1 w-full rounded-md border border-input bg-background p-2 text-xs focus:ring-1 focus:ring-primary"
+                  className="mt-1 min-h-24 resize-y text-xs"
                 />
               </div>
             </div>

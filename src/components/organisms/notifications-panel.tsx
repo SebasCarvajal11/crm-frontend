@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { MessageSquare, RefreshCw } from 'lucide-react'
+import { Bell, MessageSquare, RefreshCw } from 'lucide-react'
 import {
   listUnreadNotificationsRequest,
   markNotificationSeenRequest,
@@ -7,6 +7,7 @@ import {
 import { collabKeys } from '@/features/collab/model'
 import { notifyTransientNotice } from '@/shared/lib/transient-notice'
 import { Button } from '@/components/ui/button'
+import { PageHeader } from '@/components/molecules/page-header'
 
 type Props = {
   accessToken: string
@@ -49,17 +50,18 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
   }
 
   return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">Notificaciones</h2>
-          <p className="text-sm text-muted-foreground">Actividad y menciones sin leer de tus proyectos.</p>
-        </div>
-        <Button type="button" variant="outline" size="sm" onClick={() => notificationsQ.refetch()}>
+    <section className="space-y-6">
+      <PageHeader
+        title="Notificaciones"
+        description="Actividad, menciones y actualizaciones pendientes de tus proyectos."
+        icon={Bell}
+        actions={(
+          <Button type="button" variant="outline" size="sm" onClick={() => notificationsQ.refetch()}>
           <RefreshCw className="mr-2 size-4" />
           Actualizar
-        </Button>
-      </div>
+          </Button>
+        )}
+      />
 
       {notificationsQ.isLoading && <p className="text-sm text-muted-foreground">Cargando notificaciones...</p>}
       {!notificationsQ.isLoading && rows.length === 0 && (

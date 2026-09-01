@@ -121,9 +121,14 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
     <div className="space-y-6">
       {canManageMembers && (
         <div className="space-y-3 rounded-xl border bg-card p-4 shadow-sm">
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="text-sm font-semibold">Agregar trabajador</h3>
-            <Button size="sm" onClick={() => addWorker.mutate()} disabled={filteredSelection.length === 0 || addWorker.isPending}>
+            <Button
+              size="sm"
+              className="w-full sm:w-auto"
+              onClick={() => addWorker.mutate()}
+              disabled={filteredSelection.length === 0 || addWorker.isPending}
+            >
               <Plus className="mr-1 size-4" />
               {addWorker.isPending ? 'Agregando...' : 'Agregar trabajador'}
             </Button>
@@ -186,7 +191,7 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
               <div className="h-px flex-1 bg-border" />
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className={group.length === 1 ? 'grid max-w-xl gap-3' : 'grid gap-3 sm:grid-cols-2 lg:grid-cols-3'}>
               {group.map((member) => {
                 const displayName = getDisplayName(member)
                 const showEmailLine = Boolean(member.email && member.email !== displayName)

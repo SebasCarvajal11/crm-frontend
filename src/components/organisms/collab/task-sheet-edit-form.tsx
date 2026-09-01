@@ -67,7 +67,7 @@ export function TaskSheetEditForm({
         <Textarea id="et-desc" value={editDesc} onChange={(event) => onEditDescChange(event.target.value)} className="min-h-[100px] resize-none" />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="et-col" className="text-xs font-medium">Columna</Label>
           <Select value={editColumnId} onValueChange={onEditColumnIdChange}>

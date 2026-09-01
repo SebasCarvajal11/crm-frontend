@@ -11,6 +11,7 @@ export type FormFieldControlProps = {
 type FormFieldProps = {
   id: string
   label: string
+  required?: boolean
   error?: string
   hint?: string
   /**
@@ -35,7 +36,7 @@ function mergeControlElement(
 }
 
 /** Molécula: etiqueta + control + error/hint con ids y ARIA enlazados. */
-export function FormField({ id, label, error, hint, children, className }: FormFieldProps) {
+export function FormField({ id, label, required = false, error, hint, children, className }: FormFieldProps) {
   const errorId = `${id}-error`
   const hintId = `${id}-hint`
   const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ')
@@ -57,7 +58,10 @@ export function FormField({ id, label, error, hint, children, className }: FormF
 
   return (
     <div className={cn('space-y-2', className)}>
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id}>
+        {label}
+        {required ? <span className="ml-1 text-destructive" aria-hidden="true">*</span> : null}
+      </Label>
       {control}
       {hint ? (
         <p id={hintId} className="text-xs text-muted-foreground">

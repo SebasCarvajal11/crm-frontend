@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { PhoneCall } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { NativeSelect } from '@/components/ui/native-select'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
   DialogContent,
@@ -124,11 +126,10 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
           <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label htmlFor="rc-client">Cliente</Label>
-              <select
+              <NativeSelect
                 id="rc-client"
                 value={clientId}
                 onChange={(e) => setClientId(e.target.value)}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
               >
                 <option value="">Seleccione un cliente…</option>
                 {clients.map((c) => (
@@ -136,16 +137,15 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
                     {c.contactInfo || c.additionalInfo || c.clientId}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="rc-campaign">Campaña relacionada</Label>
-              <select
+              <NativeSelect
                 id="rc-campaign"
                 value={campaignId}
                 onChange={(e) => setCampaignId(e.target.value)}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
               >
                 <option value="">Seleccione una campaña…</option>
                 {campaigns.map((c) => (
@@ -153,7 +153,7 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
                     {c.campaignName}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
               <p className="text-xs text-muted-foreground">
                 Todo contacto pertenece a una campaña; es lo que permite medir su
                 efectividad.
@@ -163,34 +163,32 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="rc-channel">Canal</Label>
-                <select
+                <NativeSelect
                   id="rc-channel"
                   value={channel}
                   onChange={(e) => setChannel(e.target.value)}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                 >
                   {CANALES.map((c) => (
                     <option key={c.value} value={c.value}>
                       {c.label}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="rc-type">Resultado</Label>
-                <select
+                <NativeSelect
                   id="rc-type"
                   value={interactionType}
                   onChange={(e) => setInteractionType(e.target.value as InteractionType)}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                 >
                   {TIPOS.map((t) => (
                     <option key={t.value} value={t.value}>
                       {t.label}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
                 {tipoSeleccionado && (
                   <p className="text-xs text-muted-foreground">{tipoSeleccionado.ayuda}</p>
                 )}
@@ -199,13 +197,13 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
 
             <div className="space-y-2">
               <Label htmlFor="rc-response">Notas (opcional)</Label>
-              <textarea
+              <Textarea
                 id="rc-response"
                 rows={3}
                 value={response}
                 onChange={(e) => setResponse(e.target.value)}
                 placeholder="Llamada de seguimiento: solicitó ampliar la cotización a dos piezas…"
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="min-h-24 resize-y"
               />
             </div>
 

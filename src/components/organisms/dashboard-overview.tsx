@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, LayoutDashboard } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { SectionIntro } from '@/components/molecules/section-intro'
+import { PageHeader } from '@/components/molecules/page-header'
 import { DOCS_ROUTES } from '@/shared/lib/gateway-routes'
 import { getApiBaseUrl } from '@/app/session/session-store'
 import type { MeResponse } from '@/features/auth/model'
@@ -24,9 +24,10 @@ export function DashboardOverview({ identity }: DashboardOverviewProps) {
 
   return (
     <div className="space-y-6">
-      <SectionIntro
+      <PageHeader
         title="Resumen"
-        description="Datos de identidad proporcionados por mod-auth a través del API Gateway."
+        description="Consulta tu identidad y los recursos principales disponibles en CIMA."
+        icon={LayoutDashboard}
       />
       <div className="grid gap-4 md:grid-cols-2">
         <Card>

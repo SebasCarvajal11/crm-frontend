@@ -47,10 +47,11 @@ export function MobileSidebar({
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-primary text-primary-foreground shadow-xl transition-transform duration-300 md:hidden',
+          'fixed inset-y-0 left-0 z-50 flex w-[calc(100vw-2.5rem)] max-w-72 flex-col bg-primary text-primary-foreground shadow-xl transition-transform duration-300 md:hidden',
           open ? 'translate-x-0' : '-translate-x-full'
         )}
         aria-label="Menu de navegacion"
+        aria-hidden={!open}
         {...(!open ? { inert: true } : {})}
       >
         <div className="flex items-center justify-between border-b border-primary-foreground/10 px-4 py-4">

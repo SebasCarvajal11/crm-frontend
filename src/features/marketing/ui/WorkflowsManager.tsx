@@ -19,6 +19,8 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { NativeSelect } from '@/components/ui/native-select'
+import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -282,7 +284,7 @@ export function WorkflowsManager({ accessToken, preselectedCampaignId }: Workflo
                   )}
 
                   {/* Disparador y Acción en Bloque Visual */}
-                  <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted/40 p-2.5 text-xs">
+                  <div className="grid grid-cols-1 gap-2 rounded-lg bg-muted/40 p-2.5 text-xs sm:grid-cols-2">
                     <div className="space-y-0.5">
                       <span className="text-[10px] uppercase font-bold text-muted-foreground">Disparador</span>
                       <p className="font-semibold text-foreground flex items-center gap-1">
@@ -384,18 +386,17 @@ export function WorkflowsManager({ accessToken, preselectedCampaignId }: Workflo
                 <Label htmlFor="campaignSelect" className="text-xs font-semibold">
                   Campaña Vinculada *
                 </Label>
-                <select
+                <NativeSelect
                   id="campaignSelect"
                   value={formData.campaignId}
                   onChange={(e) => setFormData({ ...formData, campaignId: Number(e.target.value) })}
-                  className="mt-1 w-full rounded-md border border-input bg-background p-2 text-xs font-medium"
                 >
                   {campaigns.map((c) => (
                     <option key={c.campaignId} value={c.campaignId}>
                       {c.campaignName}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
@@ -403,36 +404,34 @@ export function WorkflowsManager({ accessToken, preselectedCampaignId }: Workflo
                   <Label htmlFor="triggerType" className="text-xs font-semibold">
                     Disparador
                   </Label>
-                  <select
+                  <NativeSelect
                     id="triggerType"
                     value={formData.triggerType}
                     onChange={(e) => setFormData({ ...formData, triggerType: e.target.value as TriggerType })}
-                    className="mt-1 w-full rounded-md border border-input bg-background p-2 text-xs font-medium"
                   >
                     {TRIGGER_TYPES.map((t) => (
                       <option key={t.value} value={t.value}>
                         {t.label}
                       </option>
                     ))}
-                  </select>
+                  </NativeSelect>
                 </div>
 
                 <div>
                   <Label htmlFor="actionType" className="text-xs font-semibold">
                     Acción a Ejecutar
                   </Label>
-                  <select
+                  <NativeSelect
                     id="actionType"
                     value={formData.actionType}
                     onChange={(e) => setFormData({ ...formData, actionType: e.target.value as ActionType })}
-                    className="mt-1 w-full rounded-md border border-input bg-background p-2 text-xs font-medium"
                   >
                     {ACTION_TYPES.map((a) => (
                       <option key={a.value} value={a.value}>
                         {a.label}
                       </option>
                     ))}
-                  </select>
+                  </NativeSelect>
                 </div>
               </div>
 
@@ -457,13 +456,13 @@ export function WorkflowsManager({ accessToken, preselectedCampaignId }: Workflo
                 <Label htmlFor="msgTemplate" className="text-xs font-semibold">
                   Plantilla de Mensaje
                 </Label>
-                <textarea
+                <Textarea
                   id="msgTemplate"
                   rows={3}
                   value={formData.messageTemplate || ''}
                   onChange={(e) => setFormData({ ...formData, messageTemplate: e.target.value })}
                   placeholder="Usa {nombre} y {workflow} para personalización automática…"
-                  className="mt-1 w-full rounded-md border border-input bg-background p-2 text-xs focus:ring-1 focus:ring-primary"
+                  className="mt-1 min-h-24 resize-y text-xs"
                 />
                 <p className="text-[10px] text-muted-foreground mt-1">
                   Variables disponibles: <code className="font-bold">{'{nombre}'}</code>, <code className="font-bold">{'{workflow}'}</code>

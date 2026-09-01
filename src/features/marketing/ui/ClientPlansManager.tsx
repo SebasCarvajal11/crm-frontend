@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { IconButton } from '@/components/ui/icon-button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -207,12 +208,9 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
       {feedback && (
         <div className="flex items-start justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
           <span>{feedback}</span>
-          <button
-            onClick={() => setFeedback(null)}
-            className="text-muted-foreground hover:text-foreground"
-          >
+          <IconButton label="Cerrar aviso" onClick={() => setFeedback(null)}>
             <XCircle className="h-4 w-4" />
-          </button>
+          </IconButton>
         </div>
       )}
 

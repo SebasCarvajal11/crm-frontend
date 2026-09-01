@@ -1,4 +1,5 @@
 import { User, X } from 'lucide-react'
+import { IconButton } from '@/components/ui/icon-button'
 
 type Props = {
   email: string
@@ -16,14 +17,13 @@ export function UserChip({ email, onRemove, role }: Props) {
         <span className="text-[9px] text-muted-foreground font-medium ml-0.5">({role})</span>
       )}
       {onRemove && (
-        <button
-          type="button"
-          aria-label={`Quitar ${email}`}
+        <IconButton
+          label={`Quitar ${email}`}
           onClick={onRemove}
-          className="text-muted-foreground hover:text-destructive ml-0.5 flex-shrink-0 transition-colors"
+          className="ml-0.5 size-5 shrink-0 text-muted-foreground hover:text-destructive"
         >
           <X className="size-3" />
-        </button>
+        </IconButton>
       )}
     </span>
   )

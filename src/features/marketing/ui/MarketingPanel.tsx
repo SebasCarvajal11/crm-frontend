@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { BarChart3, Megaphone, Zap, FileText, Users, MessageSquare, Target } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Megaphone, Zap, FileText, Users, MessageSquare, Target } from 'lucide-react'
+import { PageHeader } from '@/components/molecules/page-header'
+import { SectionTabs, type SectionTabItem } from '@/components/molecules/section-tabs'
 import { CampaignsManager } from './CampaignsManager'
 import { WorkflowsManager } from './WorkflowsManager'
 import { ProposalsManager } from './ProposalsManager'
@@ -20,13 +21,13 @@ type MarketingTab =
   | 'segments'
   | 'interactions'
 
-const TABS: { id: MarketingTab; label: string; icon: typeof BarChart3 }[] = [
-  { id: 'clients', label: 'Clientes', icon: Users },
-  { id: 'campaigns', label: 'Campañas', icon: Megaphone },
-  { id: 'proposals', label: 'Propuestas', icon: FileText },
-  { id: 'workflows', label: 'Automatizaciones', icon: Zap },
-  { id: 'segments', label: 'Segmentos', icon: Target },
-  { id: 'interactions', label: 'Interacciones', icon: MessageSquare },
+const TABS: SectionTabItem<MarketingTab>[] = [
+  { value: 'clients', label: 'Clientes', icon: <Users className="size-4" /> },
+  { value: 'campaigns', label: 'Campañas', icon: <Megaphone className="size-4" /> },
+  { value: 'proposals', label: 'Propuestas', icon: <FileText className="size-4" /> },
+  { value: 'workflows', label: 'Automatizaciones', icon: <Zap className="size-4" /> },
+  { value: 'segments', label: 'Segmentos', icon: <Target className="size-4" /> },
+  { value: 'interactions', label: 'Interacciones', icon: <MessageSquare className="size-4" /> },
 ]
 
 export function MarketingPanel({ accessToken }: Props) {
@@ -40,40 +41,17 @@ export function MarketingPanel({ accessToken }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Header de Módulo */}
-      <div className="flex flex-col gap-4 border-b pb-4 xl:flex-row xl:items-center xl:justify-between">
-        <div>
-          <h1 className="flex items-center gap-2.5 text-2xl font-black uppercase tracking-tight text-foreground">
-            <Megaphone className="size-6 text-primary" />
-            Marketing & Analítica CIMA
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            Gestión integral de campañas, flujos de reactivación y métricas de desempeño
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1 text-xs font-semibold">
-          {TABS.map((tab) => {
-            const Icon = tab.icon
-            const isActive = activeTab === tab.id
-            return (
-              <Button
-                key={tab.id}
-                type="button"
-                variant={isActive ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setActiveTab(tab.id)}
-                className={`gap-1.5 text-xs font-bold ${
-                  isActive ? 'shadow-sm' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Icon className="size-3.5" />
-                {tab.label}
-              </Button>
-            )
-          })}
-        </div>
-      </div>
+      <PageHeader
+        title="Marketing CIMA"
+        description="Gestión integral de campañas, flujos de reactivación y métricas de desempeño."
+        icon={Megaphone}
+      />
+      <SectionTabs
+        items={TABS}
+        value={activeTab}
+        onValueChange={setActiveTab}
+        ariaLabel="Secciones de marketing"
+      />
 
       {activeTab === 'clients' && <ClientPlansManager accessToken={accessToken} />}
 

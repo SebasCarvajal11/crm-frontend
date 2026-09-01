@@ -1,6 +1,7 @@
 ﻿import { useRef, useState } from 'react'
 import { Download, Paperclip } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { IconButton } from '@/components/ui/icon-button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -151,15 +152,14 @@ export function TaskFilesTab({ accessToken, projectId, taskId, canUpload, onErro
                   )}
                 </div>
               </div>
-              <button
-                type="button"
-                className="shrink-0 rounded-md p-1.5 transition-colors hover:bg-muted"
-                aria-label={`Descargar ${f.fileName}`}
+              <IconButton
+                label={`Descargar ${f.fileName}`}
+                className="size-7 shrink-0"
                 disabled={busyDownloadId !== null}
                 onClick={() => void openDownload(f.id, f.fileName)}
               >
                 <Download className="size-3.5 text-muted-foreground" aria-hidden="true" />
-              </button>
+              </IconButton>
             </div>
           ))}
         </div>

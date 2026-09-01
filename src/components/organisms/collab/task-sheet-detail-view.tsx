@@ -54,7 +54,7 @@ export function TaskSheetDetailView({
 
       <Separator />
 
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-4 text-sm">
+      <dl className="grid grid-cols-1 gap-x-4 gap-y-4 text-sm sm:grid-cols-2">
         <div>
           <dt className="mb-1 text-xs text-muted-foreground">Prioridad</dt>
           <dd><span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${priorityConfig.bg} ${priorityConfig.text}`}>{priorityConfig.label}</span></dd>
@@ -72,7 +72,7 @@ export function TaskSheetDetailView({
           <dd className="text-xs text-muted-foreground" suppressHydrationWarning>{updatedAtLabel}</dd>
         </div>
         {task.deadline && (
-          <div className="col-span-2">
+          <div className="sm:col-span-2">
             <dt className="mb-1 text-xs text-muted-foreground">Fecha limite</dt>
             <dd className="flex items-center gap-1.5" suppressHydrationWarning>
               <Calendar className="size-3.5 text-muted-foreground" aria-hidden="true" />

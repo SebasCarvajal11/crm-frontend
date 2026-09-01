@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { AlertCircle, ArrowLeft, FileText, KanbanSquare, MessageSquare, Users } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { SectionTabs, type SectionTabItem } from '@/components/molecules/section-tabs'
 import { useProjectBoardMutations, useProjectWorkspaceData, useTaskSearch, useBoardData } from '@/features/collab/hooks'
 import { ProjectHeader } from './project-header'
 import { TaskSearchBar } from './task-search-bar'
@@ -26,7 +27,7 @@ type Props = {
   onTabChange: (tab: WorkspaceTab) => void
 }
 
-const TABS: { value: WorkspaceTab; label: string; icon: React.ReactNode }[] = [
+const TABS: SectionTabItem<WorkspaceTab>[] = [
   { value: 'board',   label: 'Tablero',      icon: <KanbanSquare  className="size-4" /> },
   { value: 'chat',    label: 'Conversacion', icon: <MessageSquare className="size-4" /> },
   { value: 'brief',   label: 'Brief',        icon: <FileText      className="size-4" /> },
@@ -93,19 +94,13 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
         </Alert>
       )}
 
-      <div className="flex items-center gap-1 overflow-x-auto rounded-2xl border bg-card p-1 shadow-sm scrollbar-thin" role="tablist" aria-label="Secciones del proyecto">
-        {TABS.map((tab) => (
-          <button key={tab.value} type="button" role="tab" aria-selected={activeTab === tab.value}
-            aria-controls={`tabpanel-${tab.value}`} onClick={() => onTabChange(tab.value)}
-            className={[
-              'flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-              activeTab === tab.value ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-            ].join(' ')}>
-            <span aria-hidden="true">{tab.icon}</span>
-            <span>{tab.label}</span>
-          </button>
-        ))}
-      </div>
+      <SectionTabs
+        items={TABS}
+        value={activeTab}
+        onValueChange={onTabChange}
+        ariaLabel="Secciones del proyecto"
+        getPanelId={(tab) => `tabpanel-${tab}`}
+      />
 
       <div className="min-h-0">
         <div id="tabpanel-board" role="tabpanel" aria-label="Tablero de tareas" style={{ display: activeTab === 'board' ? 'block' : 'none' }}>

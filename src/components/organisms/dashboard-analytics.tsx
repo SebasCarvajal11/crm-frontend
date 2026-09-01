@@ -12,7 +12,10 @@ import {
   FileText,
   Loader2,
   CheckCircle2,
+  ChartAreaIcon,
 } from 'lucide-react'
+import { PageHeader } from '@/components/molecules/page-header'
+import { Button } from '@/components/ui/button'
 import {
   getAnalyticsSummaryRequest,
   getCampaignStatusReportRequest,
@@ -102,11 +105,13 @@ interface ExportButtonsProps {
 function ExportButtons({ label, onExport, isPending, pendingFormat }: ExportButtonsProps) {
   return (
     <div className="flex items-center gap-1.5" aria-label={`Exportar ${label}`}>
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         onClick={() => onExport('xlsx')}
         disabled={isPending}
-        className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+        className="gap-1.5"
       >
         {isPending && pendingFormat === 'xlsx' ? (
           <Loader2 className="size-3.5 animate-spin" />
@@ -114,12 +119,14 @@ function ExportButtons({ label, onExport, isPending, pendingFormat }: ExportButt
           <FileSpreadsheet className="size-3.5" />
         )}
         Excel
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         onClick={() => onExport('pdf')}
         disabled={isPending}
-        className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+        className="gap-1.5"
       >
         {isPending && pendingFormat === 'pdf' ? (
           <Loader2 className="size-3.5 animate-spin" />
@@ -127,7 +134,7 @@ function ExportButtons({ label, onExport, isPending, pendingFormat }: ExportButt
           <FileText className="size-3.5" />
         )}
         PDF
-      </button>
+      </Button>
     </div>
   )
 }
@@ -196,21 +203,17 @@ export function DashboardAnalytics({ accessToken }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Resumen de Analítica</h2>
-          <p className="text-muted-foreground">Vista general de métricas principales del sistema.</p>
-        </div>
-        <button
-          type="button"
-          onClick={refreshAll}
-          disabled={isRefreshing}
-          className="inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <RefreshCw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          Actualizar
-        </button>
-      </div>
+      <PageHeader
+        title="Analítica"
+        description="Vista general de las métricas operativas y comerciales de CIMA."
+        icon={ChartAreaIcon}
+        actions={(
+          <Button type="button" variant="outline" size="sm" onClick={refreshAll} disabled={isRefreshing}>
+            <RefreshCw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Actualizar
+          </Button>
+        )}
+      />
 
       <KpiDashboard accessToken={accessToken} />
 

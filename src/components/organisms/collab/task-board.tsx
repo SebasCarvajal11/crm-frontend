@@ -70,6 +70,11 @@ export function TaskBoard({
         aria-label={`Tablero de tareas con ${columns.length} columnas`}
         className="overflow-x-auto -mx-1 px-1 pb-2"
       >
+        {columns.length > 1 ? (
+          <p className="mb-2 text-xs text-muted-foreground md:hidden">
+            Desliza horizontalmente para ver todas las columnas.
+          </p>
+        ) : null}
         {columns.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 px-8 gap-3 rounded-xl border border-dashed text-muted-foreground">
             <KanbanSquare className="size-10 opacity-20" aria-hidden="true" />

@@ -4,6 +4,7 @@ import { AlertCircle, User, X } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { IconButton } from '@/components/ui/icon-button'
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog'
@@ -74,7 +75,14 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
           </DialogDescription>
         </DialogHeader>
 
-        <div className="px-6 space-y-4">
+        <form
+          id="create-project-form"
+          className="space-y-4 px-5 sm:px-6"
+          onSubmit={(event) => {
+            event.preventDefault()
+            createProject.mutate()
+          }}
+        >
           <div className="space-y-1.5">
             <Label htmlFor="cp-name">Nombre del proyecto <span className="text-destructive">*</span></Label>
             <Input id="cp-name" placeholder="Describe brevemente el proyecto" value={name}
@@ -101,10 +109,13 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
                   <span className="text-sm truncate">{selectedClient.email}</span>
                   <Badge variant="secondary" className="text-[10px] shrink-0">Cliente</Badge>
                 </div>
-                <button type="button" onClick={() => setSelectedClient(null)} aria-label="Quitar cliente"
-                  className="text-muted-foreground hover:text-foreground shrink-0">
+                <IconButton
+                  label="Quitar cliente"
+                  onClick={() => setSelectedClient(null)}
+                  className="size-6 shrink-0 text-muted-foreground hover:text-foreground"
+                >
                   <X className="size-3.5" />
-                </button>
+                </IconButton>
               </div>
             ) : (
               <UserSearch
@@ -162,11 +173,11 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
               <AlertDescription>{errorMsg}</AlertDescription>
             </Alert>
           )}
-        </div>
+        </form>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={createProject.isPending}>Cancelar</Button>
-          <Button disabled={!canSubmit || createProject.isPending} onClick={() => createProject.mutate()}>
+          <Button type="button" variant="outline" onClick={handleClose} disabled={createProject.isPending}>Cancelar</Button>
+          <Button type="submit" form="create-project-form" disabled={!canSubmit || createProject.isPending}>
             {createProject.isPending ? 'Creando…' : 'Crear proyecto'}
           </Button>
         </DialogFooter>
