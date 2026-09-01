@@ -4,6 +4,7 @@ import { createTaskRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
 import { getProjectMemberLabel, projectWorkers } from '@/features/collab/lib/member-display'
 import type { ProjectMember, ProjectTask, ProjectTaskColumn } from '@/features/collab/model'
+import { toCreateTaskSubtasks } from '@/components/organisms/collab/task-subtask-utils'
 
 type Subtask = { id: string; title: string; is_completed: boolean; assignee_sub: string | null }
 
@@ -44,7 +45,6 @@ export function useCreateTask({
 }: Params) {
   const queryClient = useQueryClient()
   const workerMembers = projectWorkers(members)
-  console.log("useCreateTask members:", JSON.stringify(members), "workerMembers:", JSON.stringify(workerMembers))
   const selectedWorkers = workerMembers.filter((m) => selectedWorkerSubs.includes(m.userSub))
   const columnId = column?.id ?? ''
 
@@ -63,7 +63,7 @@ export function useCreateTask({
         client_visible: clientVis,
         checklist_progress: 0,
         position: (tasksByColumn[columnId] ?? []).length,
-        subtasks,
+        subtasks: toCreateTaskSubtasks(subtasks),
       }),
     onSuccess: async () => {
       await Promise.all([

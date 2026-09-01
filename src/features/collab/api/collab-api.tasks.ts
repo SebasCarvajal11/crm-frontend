@@ -23,7 +23,7 @@ export async function createTaskRequest(
     client_visible?: boolean
     checklist_progress?: number
     position?: number
-    subtasks?: { id: string; title: string; is_completed: boolean; assignee_sub?: string | null }[]
+    subtasks?: { title: string; is_completed: boolean; assignee_sub?: string | null }[]
   }
 ): Promise<DataResponse<ProjectTask>> {
   return api
