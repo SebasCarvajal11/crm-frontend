@@ -5,6 +5,7 @@ import type { SidebarItem } from './types'
 import { SidebarBrand } from './sidebar-brand'
 import { SidebarNav } from './sidebar-nav'
 import { SidebarFooter } from './sidebar-footer'
+import sidebarTexture from '@/assets/backgrounds/sidebar-texture.jpg'
 
 export function MobileSidebar({
   open,
@@ -47,9 +48,10 @@ export function MobileSidebar({
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex w-[calc(100vw-2.5rem)] max-w-72 flex-col bg-primary text-primary-foreground shadow-xl transition-transform duration-300 md:hidden',
+          'fixed inset-y-0 left-0 z-50 flex w-[calc(100vw-2.5rem)] max-w-72 flex-col bg-primary bg-cover bg-center text-primary-foreground shadow-xl transition-transform duration-300 md:hidden',
           open ? 'translate-x-0' : '-translate-x-full'
         )}
+        style={{ backgroundImage: `url(${sidebarTexture})` }}
         aria-label="Menu de navegacion"
         aria-hidden={!open}
         {...(!open ? { inert: true } : {})}

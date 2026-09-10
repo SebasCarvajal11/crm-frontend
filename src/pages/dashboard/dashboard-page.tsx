@@ -274,7 +274,13 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
           </AlertDescription>
         </Alert>
       )}
-      {activeTab === 'overview' && <DashboardOverview identity={identity} />}
+      {activeTab === 'overview' && (
+        <DashboardOverview
+          identity={identity}
+          avatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}
+          onOpenProfile={handleOpenProfile}
+        />
+      )}
       {activeTab === 'collab' && <CollabPanel accessToken={token} identity={identity} initialProjects={projects?.data} openProjectId={project_id} workspaceTab={workspace_tab} chatChannel={chat_channel} chatMessageId={chat_message_id} onOpenProject={openProject} onCloseProject={closeProject} onTabChange={changeWorkspaceTab} />}
       {activeTab === 'marketing' && canUseMarketing && <MarketingPanel accessToken={token} />}
       {activeTab === 'account' && <AccountPanel accessToken={token} identity={identity} />}

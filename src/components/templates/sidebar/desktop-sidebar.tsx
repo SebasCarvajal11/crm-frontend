@@ -6,6 +6,7 @@ import { shellSidebarWidth } from './utils'
 import { SidebarBrand } from './sidebar-brand'
 import { SidebarNav } from './sidebar-nav'
 import { SidebarFooter } from './sidebar-footer'
+import sidebarTexture from '@/assets/backgrounds/sidebar-texture.jpg'
 
 export function DesktopSidebar({
   title,
@@ -39,9 +40,10 @@ export function DesktopSidebar({
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-30 hidden shrink-0 flex-col bg-primary text-primary-foreground transition-[width] duration-200 ease-out md:flex',
+        'fixed inset-y-0 left-0 z-30 hidden shrink-0 flex-col bg-primary bg-cover bg-center text-primary-foreground transition-[width] duration-200 ease-out md:flex',
         collapsed ? 'md:w-20' : shellSidebarWidth
       )}
+      style={{ backgroundImage: `url(${sidebarTexture})` }}
       aria-label="Barra de navegacion lateral"
     >
       <div className={cn('flex items-center gap-2 border-b border-primary-foreground/10 p-3', collapsed && 'justify-center')}>

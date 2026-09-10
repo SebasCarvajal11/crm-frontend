@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/shared/lib/utils'
 import type { SidebarItem } from './sidebar'
 import { DesktopSidebar, MobileSidebar } from './sidebar'
+import appTexture from '@/assets/backgrounds/app-texture.jpg'
 
 export type { SidebarItem }
 
@@ -63,7 +64,10 @@ export function AppShell({
   }, [desktopCollapsed])
 
   return (
-    <div className={cn('flex min-h-screen bg-background', className)}>
+    <div
+      className={cn('flex min-h-screen bg-background bg-cover bg-center bg-fixed', className)}
+      style={{ backgroundImage: `url(${appTexture})` }}
+    >
       <DesktopSidebar
         title={title}
         items={sidebarItems}
