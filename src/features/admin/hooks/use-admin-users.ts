@@ -11,7 +11,6 @@ import { adminUsersKeys, type AdminUserRow, type UserRole } from '@/features/adm
 import { parseApiError } from '@/features/admin/utils'
 
 const PAGE_BLOCK_SIZE = 5
-const SERVER_PAGE_LIMIT = 20
 
 type ActionPayload =
   | { subject: string; is_active: boolean }
@@ -21,6 +20,7 @@ type ActionPayload =
 export function useAdminUsersTable(accessToken: string) {
   const queryClient = useQueryClient()
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(8)
   const [roleFilter, setRoleFilter] = useState<'all' | UserRole>('all')
   const [includeDeleted, setIncludeDeleted] = useState(false)
   const [search, setSearch] = useState('')
@@ -37,7 +37,7 @@ export function useAdminUsersTable(accessToken: string) {
 
   const listParams = {
     page,
-    limit: SERVER_PAGE_LIMIT,
+    limit: pageSize,
     include_deleted: includeDeleted,
     ...(roleFilter !== 'all' && { role: roleFilter as UserRole }),
     ...(debouncedSearch && { q: debouncedSearch }),
@@ -91,6 +91,8 @@ export function useAdminUsersTable(accessToken: string) {
   const actionsError = useMemo(() => patchStatus.error ?? patchFlags.error ?? softDelete.error ?? restore.error, [patchStatus.error, patchFlags.error, softDelete.error, restore.error])
 
   return {
+    pageSize,
+    setPageSize,
     actionsError,
     actionsMessage,
     includeDeleted,
@@ -116,13 +118,28 @@ export function useAdminUsersTable(accessToken: string) {
 
 export function userDisplayName(row: AdminUserRow) {
   const fullName = `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim()
+  if (fullName) return fullName
   if (row.role === 'client' && row.company_name) return row.company_name
-  return fullName || 'Sin nombre registrado'
+  if (row.email) {
+    const local = row.email.split('@')[0] ?? ''
+    const formatted = local
+      .replace(/[._-]+/g, ' ')
+      .trim()
+      .split(' ')
+      .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+      .join(' ')
+    if (formatted) return formatted
+  }
+  return 'Usuario'
 }
 
 export function userSecondaryName(row: AdminUserRow) {
   const fullName = `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim()
-  if (row.role === 'client' && row.company_name && fullName) return fullName
+  if (row.role === 'client' && row.company_name && fullName) return row.company_name
   if (row.role === 'worker' && row.profession) return row.profession
+  if (!fullName && row.email) {
+    const domain = row.email.split('@')[1]
+    if (domain) return `@${domain}`
+  }
   return null
 }
