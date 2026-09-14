@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { MoreHorizontal, RotateCcw, ShieldAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -10,6 +12,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import type { AdminUserRow } from '@/features/admin/model'
 
 type MutationHandle<T> = {
@@ -27,33 +37,68 @@ type Props = {
 }
 
 /** Organismo: acciones de administracion para una fila de usuario (activar, archivar, restaurar). */
-export function AdminUserActions({ row, patchStatus, patchFlags, softDelete, restore, clearActionMessage }: Props) {
-  const busy = patchStatus.isPending || patchFlags.isPending || softDelete.isPending || restore.isPending
+export function AdminUserActions({
+  row,
+  patchStatus,
+  patchFlags,
+  softDelete,
+  restore,
+  clearActionMessage,
+}: Props) {
+  const busy =
+    patchStatus.isPending ||
+    patchFlags.isPending ||
+    softDelete.isPending ||
+    restore.isPending
+  const [archiveOpen, setArchiveOpen] = useState(false)
 
   if (row.deleted_at) {
     return (
       <div className="flex justify-end">
-      <Button type="button" variant="secondary" size="sm" className="h-8 w-[132px] justify-center px-3" disabled={busy}
-        onClick={() => { clearActionMessage(); restore.mutate(row.id) }}>
-        Restaurar
-      </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-8 gap-1.5 px-3 text-xs font-medium"
+          disabled={busy}
+          onClick={() => {
+            clearActionMessage()
+            restore.mutate(row.id)
+          }}
+        >
+          <RotateCcw className="size-3.5" /> Restaurar
+        </Button>
       </div>
     )
   }
 
   return (
-    <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-3 sm:justify-items-end">
-      <Button type="button" variant="outline" size="sm" className="h-8 w-[132px] justify-center whitespace-nowrap px-3" disabled={busy}
-        onClick={() => { clearActionMessage(); patchStatus.mutate({ subject: row.id, is_active: !row.is_active }) }}>
+    <div className="flex items-center justify-end gap-1.5">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="h-8 px-2.5 text-xs font-medium"
+        disabled={busy}
+        onClick={() => {
+          clearActionMessage()
+          patchStatus.mutate({ subject: row.id, is_active: !row.is_active })
+        }}
+      >
         {row.is_active ? 'Desactivar' : 'Activar'}
       </Button>
-      <Button type="button" variant="outline" size="sm" className="h-8 w-[132px] justify-center whitespace-nowrap px-3" disabled={busy}
-        onClick={() => { clearActionMessage(); patchFlags.mutate({ subject: row.id, force_password_change: !row.force_password_change }) }}>
-        {row.force_password_change ? 'Quitar fuerza pwd' : 'Forzar cambio pwd'}
-      </Button>
-      <AlertDialog>
+
+      <AlertDialog open={archiveOpen} onOpenChange={setArchiveOpen}>
         <AlertDialogTrigger asChild>
-          <Button type="button" variant="destructive" size="sm" className="h-8 w-[132px] justify-center whitespace-nowrap px-3" disabled={busy}>Archivar</Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2 text-xs font-medium text-destructive hover:bg-destructive/10 hover:text-destructive"
+            disabled={busy}
+          >
+            Archivar
+          </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -65,14 +110,51 @@ export function AdminUserActions({ row, patchStatus, patchFlags, softDelete, res
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { clearActionMessage(); softDelete.mutate(row.id) }}>
+            <AlertDialogAction
+              onClick={() => {
+                clearActionMessage()
+                softDelete.mutate(row.id)
+                setArchiveOpen(false)
+              }}
+            >
               Archivar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-8"
+            disabled={busy}
+            aria-label={`Acciones para ${row.email}`}
+          >
+            <MoreHorizontal className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>Seguridad de cuenta</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onSelect={() => {
+              clearActionMessage()
+              patchFlags.mutate({
+                subject: row.id,
+                force_password_change: !row.force_password_change,
+              })
+            }}
+          >
+            <ShieldAlert className="size-4" />
+            {row.force_password_change
+              ? 'Quitar cambio obligatorio'
+              : 'Forzar cambio de contraseña'}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }
-
-

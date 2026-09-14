@@ -26,7 +26,7 @@ import { DashboardAnalytics} from '@/components/organisms/dashboard-analytics'
 type Props = {
   tab?: DashboardTab
   project_id?: string
-  workspace_tab?: 'board' | 'chat' | 'brief' | 'members'
+  workspace_tab?: 'board' | 'chat' | 'brief' | 'contract' | 'members'
   chat_channel?: 'internal' | 'external'
   chat_message_id?: string
 }
@@ -72,10 +72,10 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   }, [dashboardQuery.error, clearSession, navigate, queryClient])
 
   useEffect(() => {
-    if (tab === 'admin' && dashboardQuery.data?.identity?.role !== 'admin') {
+    if (tab === 'admin' && dashboardQuery.isSuccess && dashboardQuery.data?.identity?.role !== 'admin') {
       navigate({ to: '/dashboard', search: (prev) => ({ ...prev, tab: 'overview' }), replace: true })
     }
-  }, [tab, dashboardQuery.data, navigate])
+  }, [tab, dashboardQuery.isSuccess, dashboardQuery.data, navigate])
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -154,7 +154,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   }, [navigate])
 
   const changeWorkspaceTab = useCallback(
-    (workspaceTab: 'board' | 'chat' | 'brief' | 'members') => {
+    (workspaceTab: 'board' | 'chat' | 'brief' | 'contract' | 'members') => {
       navigate({
         to: '/dashboard',
         search: (prev) => ({ ...prev, workspace_tab: workspaceTab }),
