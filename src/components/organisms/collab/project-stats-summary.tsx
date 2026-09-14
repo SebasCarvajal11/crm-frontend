@@ -20,7 +20,7 @@ export function ProjectStatsSummary({ total, active, reviewing, done }: Props) {
   const values = [total, active, reviewing, done]
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" role="region" aria-label="Resumen de proyectos">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" role="region" aria-label="Resumen de proyectos">
       {STATS.map((s, i) => (
         <div key={s.label} className="flex items-center gap-3 rounded-xl border bg-card px-4 py-3 shadow-sm">
           <span className={`size-2.5 rounded-full shrink-0 ${s.dot}`} aria-hidden="true" />

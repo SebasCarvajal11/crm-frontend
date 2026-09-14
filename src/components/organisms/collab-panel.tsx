@@ -9,7 +9,6 @@ import { KanbanSquare, Plus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/molecules/page-header'
-import { Separator } from '@/components/ui/separator'
 import { cn } from '@/shared/lib/utils'
 import { listProjectsRequest, searchProjectsRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
@@ -36,7 +35,18 @@ type Props = {
   onTabChange: (tab: 'board' | 'chat' | 'brief' | 'contract' | 'members') => void
 }
 
-export function CollabPanel({ accessToken, identity, initialProjects, openProjectId, workspaceTab, chatChannel, chatMessageId, onOpenProject, onCloseProject, onTabChange }: Props) {
+export function CollabPanel({
+  accessToken,
+  identity,
+  initialProjects,
+  openProjectId,
+  workspaceTab,
+  chatChannel,
+  chatMessageId,
+  onOpenProject,
+  onCloseProject,
+  onTabChange,
+}: Props) {
   const [showModal, setShowModal] = useState(false)
   const [projectSearchDebounced, setProjectSearchDebounced] = useState('')
 
@@ -46,7 +56,17 @@ export function CollabPanel({ accessToken, identity, initialProjects, openProjec
   const projectsQ = useQuery({
     queryKey: collabKeys.projects(),
     queryFn: () => listProjectsRequest(accessToken, { page: 1, limit: 100 }),
-    initialData: initialProjects ? { data: { items: initialProjects, page: 1, limit: initialProjects.length || 1, total: initialProjects.length, total_pages: 1 } } : undefined,
+    initialData: initialProjects
+      ? {
+          data: {
+            items: initialProjects,
+            page: 1,
+            limit: initialProjects.length || 1,
+            total: initialProjects.length,
+            total_pages: 1,
+          },
+        }
+      : undefined,
   })
   const projects = useMemo(() => projectsQ.data?.data.items ?? [], [projectsQ.data])
 
@@ -152,7 +172,12 @@ export function CollabPanel({ accessToken, identity, initialProjects, openProjec
       {!projectsQ.isLoading && (
         <div className="overflow-x-auto pb-4">
           <div
-            className="grid grid-cols-4 items-start gap-4 min-w-[900px]"
+            className="grid grid-cols-4 gap-4 min-w-[960px]"
+            style={{
+              height: total > 0
+                ? 'max(460px, calc(100dvh - 16.5rem))'
+                : 'max(500px, calc(100dvh - 11.5rem))',
+            }}
             role="main"
             aria-label="Tablero Kanban de proyectos"
           >
@@ -163,15 +188,23 @@ export function CollabPanel({ accessToken, identity, initialProjects, openProjec
                 <section
                   key={col.key}
                   className={cn(
-                    'flex flex-col rounded-xl border border-border border-t-4 bg-card shadow-sm overflow-hidden',
+                    'flex flex-col h-full rounded-2xl border border-border/70 bg-muted/30 shadow-xs overflow-hidden',
+                    'border-t-4',
                     col.accent,
                   )}
-                  aria-label={`${col.label}: ${colProjects.length} proyecto${colProjects.length !== 1 ? 's' : ''}`}
+                  aria-label={
+                    `${col.label}: ${colProjects.length} proyecto${colProjects.length !== 1 ? 's' : ''}`
+                  }
                 >
-                  <div className={`${col.headerBg} flex items-center justify-between gap-2 px-3 py-2.5`}>
+                  <div
+                    className={cn(
+                      'flex items-center justify-between gap-2 border-b border-border/60',
+                      'bg-background/85 px-3.5 py-3 shrink-0 backdrop-blur-xs',
+                    )}
+                  >
                     <div className="flex items-center gap-2">
                       <span className="text-muted-foreground" aria-hidden="true">{col.icon}</span>
-                      <h2 className="text-sm font-semibold">{col.label}</h2>
+                      <h2 className="text-sm font-semibold tracking-tight text-foreground">{col.label}</h2>
                     </div>
                     <Badge
                       variant="secondary"
@@ -181,26 +214,30 @@ export function CollabPanel({ accessToken, identity, initialProjects, openProjec
                       {colProjects.length}
                     </Badge>
                   </div>
-                  <Separator />
                   <div
-                    className={cn(
-                      'overflow-y-auto flex flex-col gap-2 p-2.5 scrollbar-thin',
-                      hasProjects
-                        ? total > 0
-                          ? 'max-h-[min(510px,calc(100dvh-23.5rem))]'
-                          : 'max-h-[min(590px,calc(100dvh-17.5rem))]'
-                        : 'min-h-[110px]',
-                    )}
+                    className="flex-1 min-h-0 overflow-y-auto p-2.5 flex flex-col gap-2.5 scrollbar-thin"
                     aria-label={`Proyectos en ${col.label}`}
                   >
                     {!hasProjects ? (
-                      <div
-                        className={cn(
-                          'flex flex-col items-center justify-center rounded-lg',
-                          'border border-dashed border-border/70 bg-muted/20 py-7 px-3 text-center my-0.5',
-                        )}
-                      >
-                        <p className="text-xs font-medium text-muted-foreground/70">{col.emptyText}</p>
+                      <div className="flex flex-1 h-full min-h-[220px] flex-col items-center justify-center">
+                        <div
+                          className={cn(
+                            'flex size-full flex-col items-center justify-center gap-3 rounded-xl',
+                            'border border-dashed border-border/80 bg-background/40 p-6 text-center',
+                          )}
+                        >
+                          <div className="flex size-11 items-center justify-center rounded-2xl bg-muted/80 text-muted-foreground shadow-2xs">
+                            {col.icon}
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-xs font-semibold text-foreground/85">
+                              {col.emptyText}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground/70">
+                              No hay proyectos en esta etapa
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     ) : (
                       colProjects.map((project) => (
