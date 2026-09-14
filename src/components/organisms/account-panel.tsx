@@ -1,4 +1,4 @@
-﻿import { UserCircle2 } from 'lucide-react'
+import { UserCircle2 } from 'lucide-react'
 import { PageHeader } from '@/components/molecules/page-header'
 import { ProfileSection } from './account/profile-section'
 import { SessionsSection } from './account/sessions-section'
@@ -10,21 +10,34 @@ type Props = {
   identity: MeResponse['data']
 }
 
-/** Organismo raiz del panel de cuenta del usuario. */
+/** Organismo raíz del panel de cuenta del usuario con diseño responsivo premium. */
 export function AccountPanel({ accessToken, identity }: Props) {
   return (
-    <div className="w-full min-w-0 space-y-10">
+    <div className="w-full min-w-0 space-y-6 sm:space-y-8">
       <PageHeader
-        title="Mi cuenta"
-        description="Administra tu perfil, las sesiones activas y la seguridad de acceso."
+        eyebrow={
+          <>
+            Perfil y <span className="font-black text-primary">Seguridad</span>
+          </>
+        }
+        title={
+          <>
+            Ajustes de{' '}
+            <span className="font-black tracking-tight text-foreground">
+              Mi cuenta
+            </span>
+          </>
+        }
+        description="Administra tu perfil personal, dispositivos conectados y la seguridad de acceso."
         icon={UserCircle2}
       />
+
       <ProfileSection accessToken={accessToken} identity={identity} />
-      <div className="grid gap-6 [&>section]:min-w-0 lg:grid-cols-2 lg:items-start">
+
+      <div className="grid gap-6 [&>section]:min-w-0 xl:grid-cols-2 xl:items-stretch">
         <SessionsSection accessToken={accessToken} />
         <ChangePasswordSection accessToken={accessToken} />
       </div>
     </div>
   )
 }
-

@@ -12,6 +12,7 @@ type SectionTabsProps<T extends string> = {
   onValueChange: (value: T) => void
   ariaLabel: string
   getPanelId?: (value: T) => string
+  itemRole?: 'tab' | 'button'
 }
 
 /**
@@ -24,11 +25,12 @@ export function SectionTabs<T extends string>({
   onValueChange,
   ariaLabel,
   getPanelId,
+  itemRole = 'tab',
 }: SectionTabsProps<T>) {
   return (
     <div
       className="flex items-center gap-1 overflow-x-auto rounded-2xl border bg-card p-1 shadow-sm scrollbar-thin"
-      role="tablist"
+      role={itemRole === 'button' ? 'toolbar' : 'tablist'}
       aria-label={ariaLabel}
     >
       {items.map((tab) => {
@@ -38,9 +40,10 @@ export function SectionTabs<T extends string>({
           <button
             key={tab.value}
             type="button"
-            role="tab"
-            aria-selected={isActive}
-            aria-controls={getPanelId?.(tab.value)}
+            role={itemRole === 'button' ? undefined : 'tab'}
+            aria-selected={itemRole === 'tab' ? isActive : undefined}
+            aria-pressed={itemRole === 'button' ? isActive : undefined}
+            aria-controls={itemRole === 'tab' ? getPanelId?.(tab.value) : undefined}
             onClick={() => onValueChange(tab.value)}
             className={[
               'flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',

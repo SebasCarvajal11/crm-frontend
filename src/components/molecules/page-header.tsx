@@ -3,34 +3,55 @@ import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/utils'
 
 type PageHeaderProps = {
-  title: string
-  description: string
-  icon: LucideIcon
+  title: ReactNode
+  description?: string
+  eyebrow?: ReactNode
+  icon?: LucideIcon
   actions?: ReactNode
   className?: string
 }
 
 /**
  * Encabezado consistente para los módulos principales del dashboard.
- * Mantiene la identidad visual de CIMA y deja las acciones propias de cada
- * módulo desacopladas del patrón de presentación.
+ * Replica la línea de diseño tipográfica premium de la pestaña Resumen:
+ * - Línea contextual superior con acento semántico en primary.
+ * - Título principal con peso font-black tracking-tight.
  */
-export function PageHeader({ title, description, icon: Icon, actions, className }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  description,
+  eyebrow,
+  actions,
+  className,
+}: PageHeaderProps) {
+  const renderedTitle =
+    typeof title === 'string' ? (
+      <span className="font-black tracking-tight text-foreground">{title}</span>
+    ) : (
+      title
+    )
+
   return (
     <header
       className={cn(
-        'flex flex-col gap-4 border-b border-border pb-5 xl:flex-row xl:items-center xl:justify-between',
+        'flex flex-col gap-4 border-b border-border/70 pb-5 xl:flex-row xl:items-center xl:justify-between',
         className,
       )}
     >
-      <div className="min-w-0">
-        <h1 className="flex items-center gap-2.5 text-2xl font-black uppercase tracking-tight text-foreground sm:text-3xl">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Icon className="size-5" aria-hidden="true" />
-          </span>
-          <span className="min-w-0">{title}</span>
+      <div className="min-w-0 space-y-1">
+        {eyebrow && (
+          <p className="text-2xl font-medium text-muted-foreground sm:text-3xl">
+            {eyebrow}
+          </p>
+        )}
+        <h1 className="text-2xl font-medium text-muted-foreground sm:text-3xl">
+          {renderedTitle}
         </h1>
-        <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">{description}</p>
+        {description && (
+          <p className="mt-1 max-w-2xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
+            {description}
+          </p>
+        )}
       </div>
 
       {actions ? (

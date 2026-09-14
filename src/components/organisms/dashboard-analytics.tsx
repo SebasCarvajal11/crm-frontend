@@ -204,7 +204,19 @@ export function DashboardAnalytics({ accessToken }: Props) {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Analítica"
+        eyebrow={
+          <>
+            Métricas y <span className="font-black text-primary">Rendimiento</span>
+          </>
+        }
+        title={
+          <>
+            Consola de{' '}
+            <span className="font-black tracking-tight text-foreground">
+              Analítica
+            </span>
+          </>
+        }
         description="Vista general de las métricas operativas y comerciales de CIMA."
         icon={ChartAreaIcon}
         actions={(

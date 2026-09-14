@@ -42,7 +42,19 @@ export function MarketingPanel({ accessToken }: Props) {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Marketing CIMA"
+        eyebrow={
+          <>
+            Estrategia y <span className="font-black text-primary">Crecimiento</span>
+          </>
+        }
+        title={
+          <>
+            Panel de{' '}
+            <span className="font-black tracking-tight text-foreground">
+              Marketing & Analítica CIMA
+            </span>
+          </>
+        }
         description="Gestión integral de campañas, flujos de reactivación y métricas de desempeño."
         icon={Megaphone}
       />
@@ -51,6 +63,7 @@ export function MarketingPanel({ accessToken }: Props) {
         value={activeTab}
         onValueChange={setActiveTab}
         ariaLabel="Secciones de marketing"
+        itemRole="button"
       />
 
       {activeTab === 'clients' && <ClientPlansManager accessToken={accessToken} />}

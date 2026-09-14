@@ -52,7 +52,19 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
   return (
     <section className="space-y-6">
       <PageHeader
-        title="Notificaciones"
+        eyebrow={
+          <>
+            Centro de <span className="font-black text-primary">Novedades</span>
+          </>
+        }
+        title={
+          <>
+            Bandeja de{' '}
+            <span className="font-black tracking-tight text-foreground">
+              Notificaciones
+            </span>
+          </>
+        }
         description="Actividad, menciones y actualizaciones pendientes de tus proyectos."
         icon={Bell}
         actions={(

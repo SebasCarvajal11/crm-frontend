@@ -28,12 +28,12 @@ type Props = {
   identity: MeResponse['data']
   initialProjects?: ProjectListItem[]
   openProjectId?: string
-  workspaceTab?: 'board' | 'chat' | 'brief' | 'members'
+  workspaceTab?: 'board' | 'chat' | 'brief' | 'contract' | 'members'
   chatChannel?: 'internal' | 'external'
   chatMessageId?: string
   onOpenProject: (projectId: string) => void
   onCloseProject: () => void
-  onTabChange: (tab: 'board' | 'chat' | 'brief' | 'members') => void
+  onTabChange: (tab: 'board' | 'chat' | 'brief' | 'contract' | 'members') => void
 }
 
 export function CollabPanel({ accessToken, identity, initialProjects, openProjectId, workspaceTab, chatChannel, chatMessageId, onOpenProject, onCloseProject, onTabChange }: Props) {
@@ -96,7 +96,19 @@ export function CollabPanel({ accessToken, identity, initialProjects, openProjec
   return (
     <div className="flex flex-col gap-6 min-h-0">
       <PageHeader
-        title="Proyectos"
+        eyebrow={
+          <>
+            Espacio de <span className="font-black text-primary">Colaboración</span>
+          </>
+        }
+        title={
+          <>
+            Gestión de{' '}
+            <span className="font-black tracking-tight text-foreground">
+              Proyectos
+            </span>
+          </>
+        }
         description="Vista Kanban por estado. Abre un proyecto para gestionar su espacio de trabajo."
         icon={KanbanSquare}
         actions={(

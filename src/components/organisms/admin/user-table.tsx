@@ -11,7 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { SectionIntro } from '@/components/molecules/section-intro'
 import { UserTableToolbar } from './user-table-toolbar'
 import { UserTableRow } from './user-table-row'
 import { UserTablePagination } from './user-table-pagination'
@@ -66,10 +65,6 @@ export function AdminUserTable({ accessToken }: Props) {
 
   return (
     <section className="space-y-4">
-      <SectionIntro
-        title="Directorio de Usuarios"
-        description="Gestiona accesos, roles corporativos y gobernanza desde un único panel centralizado."
-      />
       <Card className="overflow-hidden rounded-2xl border-border/70 bg-card shadow-sm">
         <UserTableToolbar
           totalItems={totalItems}
