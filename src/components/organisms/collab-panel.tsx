@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/molecules/page-header'
 import { Separator } from '@/components/ui/separator'
+import { cn } from '@/shared/lib/utils'
 import { listProjectsRequest, searchProjectsRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
 import { PARENT_COLUMNS } from './collab/collab.config'
@@ -21,7 +22,6 @@ import { CreateProjectModal } from './collab/create-project-modal'
 import type { ProjectListItem, ParentProjectStatus } from '@/features/collab/model'
 import type { MeResponse } from '@/shared/types'
 
-const PARENT_BOARD_COLUMN_BODY_HEIGHT_PX = 620
 
 type Props = {
   accessToken: string
@@ -150,18 +150,22 @@ export function CollabPanel({ accessToken, identity, initialProjects, openProjec
       )}
 
       {!projectsQ.isLoading && (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto pb-4">
           <div
-            className="grid grid-cols-4 gap-4 min-w-[900px]"
+            className="grid grid-cols-4 items-start gap-4 min-w-[900px]"
             role="main"
             aria-label="Tablero Kanban de proyectos"
           >
             {PARENT_COLUMNS.map((col) => {
               const colProjects = grouped[col.key] ?? []
+              const hasProjects = colProjects.length > 0
               return (
                 <section
                   key={col.key}
-                  className={`flex flex-col rounded-xl border border-border border-t-4 ${col.accent} bg-card shadow-sm overflow-hidden`}
+                  className={cn(
+                    'flex flex-col rounded-xl border border-border border-t-4 bg-card shadow-sm overflow-hidden',
+                    col.accent,
+                  )}
                   aria-label={`${col.label}: ${colProjects.length} proyecto${colProjects.length !== 1 ? 's' : ''}`}
                 >
                   <div className={`${col.headerBg} flex items-center justify-between gap-2 px-3 py-2.5`}>
@@ -169,20 +173,34 @@ export function CollabPanel({ accessToken, identity, initialProjects, openProjec
                       <span className="text-muted-foreground" aria-hidden="true">{col.icon}</span>
                       <h2 className="text-sm font-semibold">{col.label}</h2>
                     </div>
-                    <Badge variant="secondary" className="text-xs font-bold min-w-[1.5rem] justify-center"
-                      aria-label={`${colProjects.length} proyectos`}>
+                    <Badge
+                      variant="secondary"
+                      className="text-xs font-bold min-w-[1.5rem] justify-center"
+                      aria-label={`${colProjects.length} proyectos`}
+                    >
                       {colProjects.length}
                     </Badge>
                   </div>
                   <Separator />
                   <div
-                    className="overflow-y-auto flex flex-col gap-2 p-2.5"
-                    style={{ height: `${PARENT_BOARD_COLUMN_BODY_HEIGHT_PX}px` }}
+                    className={cn(
+                      'overflow-y-auto flex flex-col gap-2 p-2.5 scrollbar-thin',
+                      hasProjects
+                        ? total > 0
+                          ? 'max-h-[min(510px,calc(100dvh-23.5rem))]'
+                          : 'max-h-[min(590px,calc(100dvh-17.5rem))]'
+                        : 'min-h-[110px]',
+                    )}
                     aria-label={`Proyectos en ${col.label}`}
                   >
-                    {colProjects.length === 0 ? (
-                      <div className="flex items-center justify-center h-full">
-                        <p className="text-xs text-muted-foreground text-center opacity-50">{col.emptyText}</p>
+                    {!hasProjects ? (
+                      <div
+                        className={cn(
+                          'flex flex-col items-center justify-center rounded-lg',
+                          'border border-dashed border-border/70 bg-muted/20 py-7 px-3 text-center my-0.5',
+                        )}
+                      >
+                        <p className="text-xs font-medium text-muted-foreground/70">{col.emptyText}</p>
                       </div>
                     ) : (
                       colProjects.map((project) => (
