@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { CimaLogo } from '@/components/ui/cima-logo'
+import appTexture from '@/assets/backgrounds/app-texture.jpg'
 
 type AuthCardLayoutProps = {
   title: string
@@ -23,10 +24,13 @@ export function AuthCardLayout({
   footer,
 }: AuthCardLayoutProps) {
   return (
-    <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-muted/40 px-4 py-8 sm:px-6">
+    <div
+      className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-background bg-cover bg-center bg-fixed px-4 py-8 sm:px-6"
+      style={{ backgroundImage: `url(${appTexture})` }}
+    >
       <div className="w-full max-w-md">
         <CimaLogo className="mb-5 justify-center" size={34} textColor="text-foreground" subtitle />
-        <Card className="w-full border-border/80 shadow-md">
+        <Card className="w-full border-border/80 bg-card/95 backdrop-blur-xs shadow-lg">
         <CardHeader className="space-y-1.5">
           <CardTitle className="text-2xl font-bold tracking-tight">{title}</CardTitle>
           {description ? <CardDescription>{description}</CardDescription> : null}

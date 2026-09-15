@@ -4,6 +4,7 @@ interface CimaLogoProps {
   showText?: boolean
   textColor?: string
   subtitle?: boolean
+  inverted?: boolean
 }
 
 export function CimaEmblem({ size = 36, className = '' }: { size?: number; className?: string }) {
@@ -37,21 +38,28 @@ export function CimaLogo({
   className = '',
   size = 32,
   showText = true,
-  textColor = 'text-current',
+  textColor,
   subtitle = false,
+  inverted = false,
 }: CimaLogoProps) {
+  const resolvedTextColor = textColor ?? (inverted ? 'text-white' : 'text-current')
+  const badgeBg = inverted ? 'bg-white/15 backdrop-blur-xs' : 'bg-primary/10'
+  const emblemClass = inverted ? 'text-white' : 'text-primary'
+  const xisColor = inverted ? 'text-red-200' : 'text-primary'
+  const subtitleColor = inverted ? 'text-white/75' : 'text-muted-foreground'
+
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
-      <div className="relative flex shrink-0 items-center justify-center rounded-lg bg-primary/10 p-1">
-        <CimaEmblem size={size} className="text-primary" />
+      <div className={`relative flex shrink-0 items-center justify-center rounded-lg p-1 ${badgeBg}`}>
+        <CimaEmblem size={size} className={emblemClass} />
       </div>
       {showText && (
         <div className="flex flex-col">
-          <span className={`font-extrabold tracking-wider uppercase text-lg leading-tight ${textColor}`}>
-            CIMA<span className="text-primary font-black">XIS</span>
+          <span className={`font-extrabold tracking-wider uppercase text-lg leading-tight ${resolvedTextColor}`}>
+            CIMA<span className={`${xisColor} font-black`}>XIS</span>
           </span>
           {subtitle && (
-            <span className="text-[9px] uppercase tracking-widest text-muted-foreground font-medium">
+            <span className={`text-[9px] uppercase tracking-widest font-medium ${subtitleColor}`}>
               Centro de Innovación
             </span>
           )}

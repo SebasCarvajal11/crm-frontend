@@ -1,6 +1,6 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
-import { AuthCardLayout } from '@/components/templates/auth-card-layout'
+import { AuthSplitLayout } from '@/components/templates/auth-split-layout'
 import { LoginForm } from '@/features/auth/ui'
 import { useSessionStore } from '@/app/session/session-store'
 
@@ -17,13 +17,12 @@ export function LoginPage() {
   if (!bootstrapped || token) return null
 
   return (
-    <AuthCardLayout
-      title="Iniciar sesion"
-      description="Acceso via API Gateway (KrakenD) -> mod-auth."
-      footer={<Link to="/" className="underline underline-offset-4 hover:text-foreground">Volver al inicio</Link>}
+    <AuthSplitLayout
+      title="Iniciar sesión"
+      description="Ingresa tus credenciales para acceder a tu espacio de trabajo."
+      footer={<span>CIMA CRM • Acceso restringido a personal autorizado</span>}
     >
       <LoginForm />
-    </AuthCardLayout>
+    </AuthSplitLayout>
   )
 }
-
