@@ -46,7 +46,7 @@ export function BriefPanel({ brief, formalChanges, isLoading }: Props) {
             )}
           </div>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto p-5">
+        <div className="min-h-0 flex-1 overflow-y-auto scroll-smooth scrollbar-thin p-5">
           {brief?.content ? (
             <div className="break-words whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
               {brief.content}
@@ -60,12 +60,16 @@ export function BriefPanel({ brief, formalChanges, isLoading }: Props) {
         </div>
       </div>
 
-      <div className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`} role="region" aria-label="Historial de cambios formales">
+      <div
+        className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`}
+        role="region"
+        aria-label="Historial de cambios formales"
+      >
         <div className="border-b px-4 py-3">
           <h3 className="text-sm font-semibold">Cambios Formales</h3>
           <p className="text-xs text-muted-foreground mt-0.5">Historial de modificaciones de alcance</p>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto p-3">
+        <div className="min-h-0 flex-1 overflow-y-auto scroll-smooth scrollbar-thin p-3">
           {formalChanges.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
               <CheckCircle2 className="size-8 opacity-20" aria-hidden="true" />

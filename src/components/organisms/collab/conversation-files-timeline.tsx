@@ -1,15 +1,29 @@
-import { CalendarClock, CheckCircle2, Download, Eye, File as FileIconBase, FileImage, FileText, FileVideo, GitPullRequestArrow, UserRound } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import type { ProjectMember, ProjectTask, ProjectTimelineItem } from '@/features/collab/model'
+import {
+  CalendarClock,
+  CheckCircle2,
+  Download,
+  Eye,
+  File as FileIconBase,
+  FileImage,
+  FileText,
+  FileVideo,
+  GitPullRequestArrow,
+  UserRound,
+} from 'lucide-react'
+import type { ProjectContract, ProjectMember, ProjectTask, ProjectTimelineItem } from '@/features/collab/model'
 import { downloadGatewayFile, previewGatewayFile, triggerBlobDownload } from '@/features/collab/utils'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ContractTimelineCard } from './contract-timeline-card'
 
 type Props = {
   accessToken: string
   projectId: string
+  projectName?: string
+  contract?: ProjectContract | null
   timeline: ProjectTimelineItem[]
   tasks: ProjectTask[]
   members?: ProjectMember[]
@@ -57,7 +71,15 @@ const badgeClassByKind: Record<ProjectTimelineItem['kind'], string> = {
   change_accepted: 'bg-amber-100 text-amber-800 border-amber-200',
 }
 
-export function ConversationFilesTimeline({ accessToken, timeline, tasks, members = [], onError }: Props) {
+export function ConversationFilesTimeline({
+  accessToken,
+  projectName,
+  contract,
+  timeline,
+  tasks,
+  members = [],
+  onError,
+}: Props) {
   const [busyKey, setBusyKey] = useState<string | null>(null)
   const [imageZoom, setImageZoom] = useState(1)
   const [searchText, setSearchText] = useState('')
@@ -103,7 +125,7 @@ export function ConversationFilesTimeline({ accessToken, timeline, tasks, member
     })
   }, [timeline, kindFilter, searchText, emailBySub])
 
-  if (timeline.length === 0) {
+  if (timeline.length === 0 && !contract) {
     return <p className="text-sm text-muted-foreground">No hay eventos registrados para este proyecto.</p>
   }
 
@@ -185,6 +207,15 @@ export function ConversationFilesTimeline({ accessToken, timeline, tasks, member
             </SelectContent>
           </Select>
         </div>
+
+        {contract && (
+          <ContractTimelineCard
+            contract={contract}
+            projectName={projectName ?? ''}
+            onError={onError}
+          />
+        )}
+
         {filteredTimeline.length === 0 && (
           <p className="text-sm text-muted-foreground">No hay eventos que coincidan con la búsqueda o el filtro.</p>
         )}

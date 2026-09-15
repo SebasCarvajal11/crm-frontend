@@ -59,11 +59,15 @@ export function OverviewAdminBlockedTasksSection({
             </p>
           </div>
         ) : (
-          <div className="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
+          <div className="space-y-2.5 max-h-[320px] overflow-y-auto scroll-smooth scrollbar-thin pr-1">
             {tasks.map((task) => (
               <div
                 key={task.taskId}
-                className="flex flex-col justify-between gap-3 rounded-lg border border-destructive/25 bg-card/80 p-3.5 interactive-card hover:border-destructive/45 hover:bg-muted/40 sm:flex-row sm:items-center"
+                className={[
+                  'flex flex-col justify-between gap-3 rounded-lg border border-destructive/25',
+                  'bg-card/80 p-3.5 interactive-card hover:border-destructive/45 hover:bg-muted/40',
+                  'sm:flex-row sm:items-center',
+                ].join(' ')}
               >
                 <div className="min-w-0 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">

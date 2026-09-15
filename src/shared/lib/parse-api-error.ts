@@ -46,9 +46,12 @@ function messageFromStructuredIssues(data: unknown): string | null {
 function messageFromApiShape(data: unknown): string | null {
   if (!data || typeof data !== 'object') return null
   const o = data as Record<string, unknown>
+  if (typeof o.message === 'string' && o.message.length > 0) return o.message
   if (typeof o.error === 'string' && o.error.length > 0) return o.error
+  if (typeof o.detail === 'string' && o.detail.length > 0) return o.detail
   return null
 }
+
 
 async function readJsonPayload(response: Response): Promise<unknown> {
   const text = await response.text()
@@ -78,7 +81,9 @@ export async function parseApiError(error: unknown): Promise<string> {
   if (isHTTPError(error)) {
     const status = error.response.status
     try {
-      const raw = await readJsonPayload(error.response.clone())
+      const raw =
+        (error as { data?: unknown }).data ??
+        (!error.response.bodyUsed ? await readJsonPayload(error.response.clone()) : null)
       const fromZod = messageFromZodValidatorBody(raw)
       if (fromZod) return fromZod
       const fromIssues = messageFromStructuredIssues(raw)
@@ -92,6 +97,7 @@ export async function parseApiError(error: unknown): Promise<string> {
     if (fallback) return fallback
     return error.message || `Error HTTP ${status}`
   }
+
   if (error instanceof Error) return error.message
   return 'Error desconocido'
 }

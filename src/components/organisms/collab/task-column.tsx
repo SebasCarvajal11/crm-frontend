@@ -78,7 +78,11 @@ export function TaskColumn({
               type="button"
               size="icon"
               variant="ghost"
-              className="size-7 rounded-full text-muted-foreground transition-all duration-150 hover:scale-110 hover:bg-primary/10 hover:text-primary focus-visible:scale-110 focus-visible:bg-primary/10 focus-visible:text-primary"
+              className={[
+                'size-7 rounded-full text-muted-foreground transition-all duration-150',
+                'hover:scale-110 hover:bg-primary/10 hover:text-primary',
+                'focus-visible:scale-110 focus-visible:bg-primary/10 focus-visible:text-primary',
+              ].join(' ')}
               onClick={onCreateTask}
               aria-label={`Crear tarea en ${column.title}`}
               title={`Nueva tarea en ${column.title}`}
@@ -92,7 +96,7 @@ export function TaskColumn({
       {/* El cuerpo se adapta al alto disponible en móvil y conserva una referencia uniforme en escritorio. */}
       <div
         ref={parentRef}
-        className="h-[min(62dvh,520px)] overflow-y-auto p-2"
+        className="h-[min(62dvh,520px)] overflow-y-auto scroll-smooth scrollbar-thin p-2"
         style={{ position: 'relative' }}
         aria-label={`Tareas de la columna ${column.title}`}
       >

@@ -105,7 +105,13 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
       />
 
       <div className="min-h-0">
-        <div id="tabpanel-board" role="tabpanel" aria-label="Tablero de tareas" style={{ display: activeTab === 'board' ? 'block' : 'none' }}>
+        <div
+          id="tabpanel-board"
+          role="tabpanel"
+          aria-label="Tablero de tareas"
+          className={activeTab === 'board' ? 'tab-pane-transition' : undefined}
+          style={{ display: activeTab === 'board' ? 'block' : 'none' }}
+        >
           <TaskSearchBar
             searchableTasks={searchableTasks}
             isSearching={isSearching}
@@ -137,11 +143,16 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
               const task = taskIndexMap.get(taskId)
               const targetColumn = boardColumns.find((column) => column.id === targetColumnId)
               const hasSubtasks = (task?.subtasks?.length ?? 0) > 0
-              if (task && targetColumn && FINALIZATION_COLUMN_KEYS.has(targetColumn.key) && hasSubtasks && task.checklistProgress < 100) {
+              const isFinalColumn = targetColumn && FINALIZATION_COLUMN_KEYS.has(targetColumn.key)
+              if (task && isFinalColumn && hasSubtasks && task.checklistProgress < 100) {
                 setErrorMsg('No puedes mover la tarea a la columna final sin completar todas las subtareas')
                 return
               }
-              moveTask.mutate({ taskId, targetColumnId, position: (tasksByColumn[targetColumnId] ?? []).length })
+              moveTask.mutate({
+                taskId,
+                targetColumnId,
+                position: (tasksByColumn[targetColumnId] ?? []).length,
+              })
             }}
             onTaskSaved={invalidateBoardScope}
             onError={setErrorMsg}
@@ -149,7 +160,12 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
           />
         </div>
 
-        <div id="tabpanel-chat" role="tabpanel" style={{ display: activeTab === 'chat' ? 'block' : 'none' }}>
+        <div
+          id="tabpanel-chat"
+          role="tabpanel"
+          className={activeTab === 'chat' ? 'tab-pane-transition' : undefined}
+          style={{ display: activeTab === 'chat' ? 'block' : 'none' }}
+        >
           <ConversationPanel
             accessToken={accessToken}
             projectId={projectId}
@@ -164,7 +180,12 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
           />
         </div>
 
-        <div id="tabpanel-brief" role="tabpanel" style={{ display: activeTab === 'brief' ? 'block' : 'none' }}>
+        <div
+          id="tabpanel-brief"
+          role="tabpanel"
+          className={activeTab === 'brief' ? 'tab-pane-transition' : undefined}
+          style={{ display: activeTab === 'brief' ? 'block' : 'none' }}
+        >
           <BriefPanel
             brief={briefQ.data?.brief ?? null}
             formalChanges={briefQ.data?.formalChanges ?? []}
@@ -172,7 +193,12 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
           />
         </div>
 
-        <div id="tabpanel-contract" role="tabpanel" style={{ display: activeTab === 'contract' ? 'block' : 'none' }}>
+        <div
+          id="tabpanel-contract"
+          role="tabpanel"
+          className={activeTab === 'contract' ? 'tab-pane-transition' : undefined}
+          style={{ display: activeTab === 'contract' ? 'block' : 'none' }}
+        >
           <ContractPanel
             accessToken={accessToken}
             project={boardData?.project ?? null}
@@ -183,7 +209,12 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
           />
         </div>
 
-        <div id="tabpanel-members" role="tabpanel" style={{ display: activeTab === 'members' ? 'block' : 'none' }}>
+        <div
+          id="tabpanel-members"
+          role="tabpanel"
+          className={activeTab === 'members' ? 'tab-pane-transition' : undefined}
+          style={{ display: activeTab === 'members' ? 'block' : 'none' }}
+        >
           <ProjectMembers
             members={members}
             isLoading={boardQ.isLoading}

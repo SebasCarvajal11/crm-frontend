@@ -68,7 +68,7 @@ export function TaskBoard({
       <div
         role="region"
         aria-label={`Tablero de tareas con ${columns.length} columnas`}
-        className="overflow-x-auto -mx-1 px-1 pb-2"
+        className="overflow-x-auto scroll-smooth scrollbar-thin -mx-1 px-1 pb-2"
       >
         {columns.length > 1 ? (
           <p className="mb-2 text-xs text-muted-foreground md:hidden">

@@ -126,7 +126,7 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
             <h3 className="text-sm font-semibold">Agregar trabajador</h3>
             <p className="mt-0.5 text-xs text-muted-foreground">Busca y asigna nuevos integrantes al proyecto.</p>
           </div>
-          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto scroll-smooth scrollbar-thin p-4">
             <UserSearch
               accessToken={accessToken}
               role="worker"
@@ -134,7 +134,9 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
               excludedSubjects={excludedWorkerSubjects}
               onSelect={(worker) => {
                 if (memberSubs.has(worker.subject)) return
-                setSelectedWorkers((prev) => prev.some((w) => w.subject === worker.subject) ? prev : [...prev, worker])
+                setSelectedWorkers((prev) =>
+                  prev.some((w) => w.subject === worker.subject) ? prev : [...prev, worker]
+                )
               }}
               placeholder="Buscar trabajador por email..."
               queryKeyPrefix="project-member-worker"
@@ -142,7 +144,13 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
             {filteredSelection.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {filteredSelection.map((worker) => (
-                  <UserChip key={worker.subject} email={worker.email} onRemove={() => setSelectedWorkers((prev) => prev.filter((x) => x.subject !== worker.subject))} />
+                  <UserChip
+                    key={worker.subject}
+                    email={worker.email}
+                    onRemove={() =>
+                      setSelectedWorkers((prev) => prev.filter((x) => x.subject !== worker.subject))
+                    }
+                  />
                 ))}
               </div>
             )}
@@ -161,12 +169,15 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
         </section>
       )}
 
-      <section className={`order-1 flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm min-[1280px]:order-1`} aria-label="Integrantes del proyecto">
+      <section
+        className={`order-1 flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm min-[1280px]:order-1`}
+        aria-label="Integrantes del proyecto"
+      >
         <div className="border-b px-4 py-3">
           <h3 className="text-sm font-semibold">Integrantes del proyecto</h3>
           <p className="mt-0.5 text-xs text-muted-foreground">Personas asignadas y su actividad dentro del proyecto.</p>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto p-4">
+        <div className="min-h-0 flex-1 overflow-y-auto scroll-smooth scrollbar-thin p-4">
           <div className="rounded-lg border bg-muted/20 p-3">
         <div className="flex flex-wrap items-center gap-2">
           {(['admin', 'worker', 'client'] as ProjectMemberRole[]).map((role) => {

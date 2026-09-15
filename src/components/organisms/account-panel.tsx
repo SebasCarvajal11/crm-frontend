@@ -32,9 +32,11 @@ export function AccountPanel({ accessToken, identity }: Props) {
         icon={UserCircle2}
       />
 
-      <ProfileSection accessToken={accessToken} identity={identity} />
+      <div className="animate-fade-up">
+        <ProfileSection accessToken={accessToken} identity={identity} />
+      </div>
 
-      <div className="grid gap-6 [&>section]:min-w-0 xl:grid-cols-2 xl:items-stretch">
+      <div className="grid gap-6 [&>section]:min-w-0 xl:grid-cols-2 xl:items-stretch animate-fade-up stagger-1">
         <SessionsSection accessToken={accessToken} />
         <ChangePasswordSection accessToken={accessToken} />
       </div>

@@ -49,13 +49,17 @@ export function OverviewNotificationsSection({ notifications, isLoading, onOpen 
             </p>
           </div>
         ) : (
-          <div className="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
+          <div className="space-y-2.5 max-h-[340px] overflow-y-auto scroll-smooth scrollbar-thin pr-1">
             {notifications.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => onOpen(item)}
-                className="group relative flex w-full flex-col items-start rounded-lg border bg-card/60 p-3 text-left transition-all duration-150 cursor-pointer active:scale-[0.99] hover:border-primary/40 hover:bg-muted/60 hover:shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                className={[
+                  'group relative flex w-full flex-col items-start rounded-lg border bg-card/60 p-3 text-left',
+                  'transition-all duration-200 cursor-pointer active:scale-[0.99] hover:border-primary/40',
+                  'hover:bg-muted/60 hover:shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60',
+                ].join(' ')}
               >
                 <div className="flex w-full items-center justify-between gap-2 text-xs">
                   <span className="font-semibold text-primary truncate max-w-[200px]">

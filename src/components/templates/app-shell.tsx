@@ -124,7 +124,12 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 view-transition">
+        <main
+          className={cn(
+            'min-w-0 flex-1 overflow-x-hidden overflow-y-auto scroll-smooth',
+            'scrollbar-thin px-4 py-5 sm:px-6 sm:py-6 lg:px-8 view-transition'
+          )}
+        >
           {children}
         </main>
       </div>

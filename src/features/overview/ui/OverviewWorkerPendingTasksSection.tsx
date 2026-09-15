@@ -159,7 +159,7 @@ export function OverviewWorkerPendingTasksSection({
             </p>
           </div>
         ) : (
-          <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+          <div className="space-y-2.5 max-h-[380px] overflow-y-auto scroll-smooth scrollbar-thin pr-1">
             {tasks.map((task) => (
               <TaskRow
                 key={task.taskId}

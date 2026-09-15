@@ -1,4 +1,7 @@
+import { useQuery } from '@tanstack/react-query'
 import { useProjectTimeline } from '@/features/collab/hooks'
+import { collabKeys } from '@/features/collab/model'
+import { getProjectContractRequest } from '@/features/collab/api'
 import { ChatPanel } from './chat-panel'
 import { ConversationFilesTimeline } from './conversation-files-timeline'
 import { ConversationUploadForm } from './conversation-upload-form'
@@ -40,25 +43,56 @@ function ConversationSupportPanel({
   contentClassName = 'p-4',
 }: ConversationSupportPanelProps) {
   return (
-    <section className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`}>
+    <section
+      className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`}
+    >
       <div className="shrink-0 border-b bg-muted/20 px-4 py-3">
         <h3 className="text-sm font-semibold">{title}</h3>
         <p className="mt-0.5 text-xs leading-5 text-muted-foreground">{description}</p>
       </div>
-      <div className={`min-h-0 flex-1 overflow-y-auto ${contentClassName}`}>{children}</div>
+      <div className={`min-h-0 flex-1 overflow-y-auto scroll-smooth scrollbar-thin ${contentClassName}`}>
+        {children}
+      </div>
     </section>
   )
 }
 
-export function ConversationPanel({ accessToken, projectId, identity, isClient, initialChannel, initialMessageId, members, tasks, project, onError }: Props) {
+export function ConversationPanel({
+  accessToken,
+  projectId,
+  identity,
+  isClient,
+  initialChannel,
+  initialMessageId,
+  members,
+  tasks,
+  project,
+  onError,
+}: Props) {
   const canManageFiles = identity.role === 'admin' || identity.role === 'worker'
-
   const { timelineQ, timeline } = useProjectTimeline({ accessToken, projectId })
+
+  const contractQ = useQuery({
+    queryKey: collabKeys.contract(projectId),
+    queryFn: () => getProjectContractRequest(accessToken, projectId),
+    enabled: Boolean(projectId && accessToken),
+  })
+  const contract = contractQ.data?.data ?? null
 
   return (
     <div className="grid grid-cols-1 gap-4 min-[1280px]:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.9fr)_minmax(15rem,1fr)]">
       <div className="min-w-0">
-        <ChatPanel key={`${initialChannel ?? 'external'}:${initialMessageId ?? ''}`} accessToken={accessToken} projectId={projectId} identity={identity} isClient={isClient} initialChannel={initialChannel} initialMessageId={initialMessageId} members={members} onError={onError} />
+        <ChatPanel
+          key={`${initialChannel ?? 'external'}:${initialMessageId ?? ''}`}
+          accessToken={accessToken}
+          projectId={projectId}
+          identity={identity}
+          isClient={isClient}
+          initialChannel={initialChannel}
+          initialMessageId={initialMessageId}
+          members={members}
+          onError={onError}
+        />
       </div>
 
       <ConversationSupportPanel
@@ -87,11 +121,20 @@ export function ConversationPanel({ accessToken, projectId, identity, isClient, 
         contentClassName="px-4 py-3"
       >
         {timelineQ.isLoading && <p className="text-sm text-muted-foreground">Cargando trazabilidad...</p>}
-        {!timelineQ.isLoading && <ConversationFilesTimeline accessToken={accessToken} projectId={projectId} timeline={timeline} tasks={tasks} members={members} canManage={canManageFiles} onError={onError} />}
+        {!timelineQ.isLoading && (
+          <ConversationFilesTimeline
+            accessToken={accessToken}
+            projectId={projectId}
+            projectName={project?.name ?? ''}
+            contract={contract}
+            timeline={timeline}
+            tasks={tasks}
+            members={members}
+            canManage={canManageFiles}
+            onError={onError}
+          />
+        )}
       </ConversationSupportPanel>
     </div>
   )
 }
-
-
-

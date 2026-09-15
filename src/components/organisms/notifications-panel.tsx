@@ -80,13 +80,16 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
         <p className="text-sm text-muted-foreground">No tienes notificaciones sin leer.</p>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-2 animate-fade-up">
         {rows.map((n) => (
           <button
             key={n.id}
             type="button"
             onClick={() => void handleOpen(n)}
-            className="w-full rounded-lg border bg-card px-4 py-3 text-left interactive-row cursor-pointer active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+            className={[
+              'w-full rounded-lg border bg-card px-4 py-3 text-left interactive-row cursor-pointer',
+              'active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60',
+            ].join(' ')}
           >
             <p className="text-xs font-semibold text-primary">{n.project_name}</p>
             <p className="text-xs text-muted-foreground">{formatWhen(n.created_at)}</p>
@@ -94,7 +97,11 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
             <p className="mt-1 text-sm line-clamp-2">{n.body}</p>
             <div className="mt-2 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
               <MessageSquare className="size-3" />
-              {n.source === 'mention' ? 'Mención en chat' : n.channel === 'internal' ? 'Actividad interna' : 'Actividad del proyecto'}
+              {n.source === 'mention'
+                ? 'Mención en chat'
+                : n.channel === 'internal'
+                  ? 'Actividad interna'
+                  : 'Actividad del proyecto'}
             </div>
           </button>
         ))}

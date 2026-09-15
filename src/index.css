@@ -166,8 +166,13 @@
     @apply border-border outline-ring/50;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    scroll-behavior: smooth;
   }
 }
 
@@ -195,18 +200,43 @@
   }
 }
 
+/* Scrollbar ergonómica y fluida CIMA */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--muted-foreground) 35%, transparent) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--muted-foreground) 30%, transparent);
+  border-radius: 9999px;
+  transition: background-color 200ms ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--primary);
+}
+
 .scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: var(--muted-foreground);
-  border-radius: 2px;
+  background-color: color-mix(in srgb, var(--muted-foreground) 35%, transparent);
+  border-radius: 9999px;
 }
 
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: var(--primary);
 }
 
 /* Interacciones globales estandarizadas */
@@ -232,23 +262,50 @@
   transition: transform 100ms ease-out;
 }
 .interactive-scale:active {
-  transform: scale(0.98);
+  transform: scale(0.985);
 }
 
-.view-transition {
-  animation: fadeInView 220ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
+/* Animaciones de entrada estandarizadas */
 @keyframes fadeInView {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.view-transition {
+  animation: fadeInView 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.tab-pane-transition {
+  animation: fadeInView 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-up {
+  animation: fadeUp 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.stagger-1 { animation-delay: 40ms; }
+.stagger-2 { animation-delay: 80ms; }
+.stagger-3 { animation-delay: 120ms; }
+.stagger-4 { animation-delay: 160ms; }
+.stagger-5 { animation-delay: 200ms; }
+.stagger-6 { animation-delay: 240ms; }
 
 @media (prefers-reduced-motion: reduce) {
   *,

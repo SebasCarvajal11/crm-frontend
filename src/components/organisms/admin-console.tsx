@@ -29,9 +29,15 @@ export function AdminConsole({ accessToken }: Props) {
         description="Centro ejecutivo para la gobernanza de usuarios, control de roles y ciclo de vida de accesos."
         icon={ShieldCheck}
       />
-      <AdminKpiCards accessToken={accessToken} />
-      <AdminUserTable accessToken={accessToken} />
-      <AdminInviteForms accessToken={accessToken} />
+      <div className="animate-fade-up">
+        <AdminKpiCards accessToken={accessToken} />
+      </div>
+      <div className="animate-fade-up stagger-1">
+        <AdminUserTable accessToken={accessToken} />
+      </div>
+      <div className="animate-fade-up stagger-2">
+        <AdminInviteForms accessToken={accessToken} />
+      </div>
     </div>
   )
 }

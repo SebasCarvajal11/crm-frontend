@@ -83,7 +83,7 @@ export function DashboardOverview({
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
+      <div className="space-y-1 animate-fade-up">
         <p className="text-2xl font-medium text-muted-foreground sm:text-3xl">
           Hola <span className="font-black text-primary">{firstName}</span>
         </p>
@@ -95,7 +95,7 @@ export function DashboardOverview({
         </p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2 animate-fade-up stagger-1">
         <OverviewIdentityCard
           identity={identity}
           avatarUrl={avatarUrl}
@@ -108,21 +108,25 @@ export function DashboardOverview({
         />
       </div>
 
-      <OverviewMarketingKpisSection
-        metrics={metrics}
-        isLoading={isMarketingLoading}
-      />
+      <div className="animate-fade-up stagger-2">
+        <OverviewMarketingKpisSection
+          metrics={metrics}
+          isLoading={isMarketingLoading}
+        />
+      </div>
 
       {isWorker && (
-        <OverviewWorkerPendingTasksSection
-          tasks={workerPendingTasks}
-          isLoading={isCollabLoading}
-          onOpenProject={onOpenProject}
-        />
+        <div className="animate-fade-up stagger-3">
+          <OverviewWorkerPendingTasksSection
+            tasks={workerPendingTasks}
+            isLoading={isCollabLoading}
+            onOpenProject={onOpenProject}
+          />
+        </div>
       )}
 
       {isAdmin && (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-fade-up stagger-3">
           <OverviewAdminBlockedTasksSection
             tasks={adminBlockedTasks}
             isLoading={isCollabLoading}

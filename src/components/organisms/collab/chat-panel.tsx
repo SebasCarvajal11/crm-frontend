@@ -160,7 +160,13 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
         </div>
       </div>
 
-      <div ref={logRef} className="min-h-0 flex-1 space-y-1 overflow-y-auto px-4 py-4" role="log" aria-live="polite" aria-label="Mensajes">
+      <div
+        ref={logRef}
+        className="min-h-0 flex-1 space-y-1 overflow-y-auto scroll-smooth scrollbar-thin px-4 py-4"
+        role="log"
+        aria-live="polite"
+        aria-label="Mensajes"
+      >
         {hasMore && (
           <div className="mb-4 flex justify-center">
             <Button

@@ -66,27 +66,29 @@ export function MarketingPanel({ accessToken }: Props) {
         itemRole="button"
       />
 
-      {activeTab === 'clients' && <ClientPlansManager accessToken={accessToken} />}
+      <div key={activeTab} className="tab-pane-transition">
+        {activeTab === 'clients' && <ClientPlansManager accessToken={accessToken} />}
 
-      {activeTab === 'campaigns' && (
-        <CampaignsManager
-          accessToken={accessToken}
-          onSelectCampaignForWorkflows={handleSelectCampaignForWorkflows}
-        />
-      )}
+        {activeTab === 'campaigns' && (
+          <CampaignsManager
+            accessToken={accessToken}
+            onSelectCampaignForWorkflows={handleSelectCampaignForWorkflows}
+          />
+        )}
 
-      {activeTab === 'proposals' && <ProposalsManager accessToken={accessToken} />}
+        {activeTab === 'proposals' && <ProposalsManager accessToken={accessToken} />}
 
-      {activeTab === 'workflows' && (
-        <WorkflowsManager
-          accessToken={accessToken}
-          preselectedCampaignId={preselectedCampaignId}
-        />
-      )}
+        {activeTab === 'workflows' && (
+          <WorkflowsManager
+            accessToken={accessToken}
+            preselectedCampaignId={preselectedCampaignId}
+          />
+        )}
 
-      {activeTab === 'segments' && <SegmentsManager accessToken={accessToken} />}
+        {activeTab === 'segments' && <SegmentsManager accessToken={accessToken} />}
 
-      {activeTab === 'interactions' && <InteractionsManager accessToken={accessToken} />}
+        {activeTab === 'interactions' && <InteractionsManager accessToken={accessToken} />}
+      </div>
     </div>
   )
 }

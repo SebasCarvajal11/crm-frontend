@@ -282,7 +282,7 @@ export function InteractionsManager({ accessToken }: InteractionsManagerProps) {
       ) : (
         <Card>
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto scroll-smooth scrollbar-thin">
               <table className="w-full text-sm">
                 <thead className="border-b bg-muted/40">
                   <tr className="text-left">
