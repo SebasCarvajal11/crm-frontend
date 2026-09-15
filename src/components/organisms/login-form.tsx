@@ -15,16 +15,26 @@ import {
 
 export type LoginFormValues = LoginRequestValues
 
-function EmailInputSection({ register }: { register: ReturnType<typeof useForm<LoginFormValues>>['register'] }) {
+function EmailInputSection({
+  register,
+  id = 'email',
+  ...rest
+}: {
+  register: ReturnType<typeof useForm<LoginFormValues>>['register']
+  id?: string
+}) {
   return (
     <div className="relative">
       <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
       <Input
+        id={id}
+        aria-label="Correo"
         type="email"
         autoComplete="email"
         placeholder="ejemplo@cima.com"
         className="h-11 pl-10 text-sm transition-all focus-visible:ring-2 focus-visible:ring-primary/30"
         {...register('email')}
+        {...rest}
       />
     </div>
   )
@@ -34,20 +44,26 @@ function PasswordInputSection({
   register,
   showPassword,
   onTogglePassword,
+  id = 'password',
+  ...rest
 }: {
   register: ReturnType<typeof useForm<LoginFormValues>>['register']
   showPassword: boolean
   onTogglePassword: () => void
+  id?: string
 }) {
   return (
     <div className="relative">
       <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
       <Input
+        id={id}
+        aria-label="Contrasena"
         type={showPassword ? 'text' : 'password'}
         autoComplete="current-password"
         placeholder="••••••••"
         className="h-11 pl-10 pr-10 text-sm transition-all focus-visible:ring-2 focus-visible:ring-primary/30"
         {...register('password')}
+        {...rest}
       />
       <button
         type="button"
@@ -75,13 +91,13 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit((v) => mutation.mutate(v))} className="space-y-4">
-      <FormField id="email" label="Correo electrónico" error={errors.email?.message}>
+      <FormField id="email" label="Correo" error={errors.email?.message}>
         <EmailInputSection register={register} />
       </FormField>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label htmlFor="password" className="text-sm font-medium text-foreground">
+          <label htmlFor="password" aria-label="Contrasena" className="text-sm font-medium text-foreground">
             Contraseña
           </label>
           <Link
@@ -112,6 +128,7 @@ export function LoginForm() {
 
       <Button
         type="submit"
+        aria-label="Entrar"
         className="h-11 w-full gap-2 font-semibold shadow-sm hover:shadow-md transition-all active:scale-[0.99] text-white"
         disabled={mutation.isPending}
       >
@@ -122,7 +139,7 @@ export function LoginForm() {
           </>
         ) : (
           <>
-            <span>Ingresar al panel</span>
+            <span>Entrar al panel</span>
             <ArrowRight className="size-4 transition-transform group-hover/button:translate-x-0.5" />
           </>
         )}
