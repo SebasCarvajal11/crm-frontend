@@ -28,7 +28,6 @@ function EmailInputSection({
       <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         id={id}
-        aria-label="Correo"
         type="email"
         autoComplete="email"
         placeholder="ejemplo@cima.com"
@@ -57,7 +56,6 @@ function PasswordInputSection({
       <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         id={id}
-        aria-label="Contrasena"
         type={showPassword ? 'text' : 'password'}
         autoComplete="current-password"
         placeholder="••••••••"
@@ -97,8 +95,8 @@ export function LoginForm() {
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label htmlFor="password" aria-label="Contrasena" className="text-sm font-medium text-foreground">
-            Contraseña
+          <label htmlFor="password" className="text-sm font-medium text-foreground">
+            Contrasena
           </label>
           <Link
             to="/forgot-password"
