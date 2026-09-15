@@ -68,7 +68,7 @@ export class DashboardPage {
 
   async expectDashboardLoaded() {
     await this.page.waitForURL('**/dashboard')
-    await this.overviewTab.waitFor({ state: 'visible', timeout: 10_000 })
+    await this.collabTab.waitFor({ state: 'visible', timeout: 10_000 })
   }
 
   async isTabVisible(tabName: string): Promise<boolean> {

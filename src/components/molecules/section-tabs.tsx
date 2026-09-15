@@ -46,10 +46,10 @@ export function SectionTabs<T extends string>({
             aria-controls={itemRole === 'tab' ? getPanelId?.(tab.value) : undefined}
             onClick={() => onValueChange(tab.value)}
             className={[
-              'flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+              'flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-all duration-150 ease-out cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-1',
               isActive
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground',
             ].join(' ')}
           >
             <span aria-hidden="true">{tab.icon}</span>

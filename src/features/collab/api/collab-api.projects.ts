@@ -16,6 +16,7 @@ import type {
   ProjectSearchResult,
   ProjectTimelineItem,
   ProjectWorkspaceResponse,
+  ProjectContract,
 } from '@/features/collab/model'
 
 export { bearer }
@@ -41,6 +42,7 @@ export async function updateProjectRequest(
     status?: Project['status']
     estimated_due_date?: string | null
     progress_percent?: number
+    file_repository_url?: string | null
   }
 ): Promise<DataResponse<Project>> {
   return api.patch(PROJECT_ROUTES.update(projectId), { headers: bearer(accessToken), json: body }).json<DataResponse<Project>>()
@@ -56,6 +58,7 @@ export async function createProjectRequest(
     worker_subs: string[]
     type: Project['type']
     brief?: string
+    file_repository_url?: string
   }
 ): Promise<DataResponse<Project>> {
   return api.post(PROJECT_ROUTES.create, { headers: bearer(accessToken), json: body }).json<DataResponse<Project>>()
@@ -97,6 +100,47 @@ export async function updateBriefRequest(
   body: { body: string }
 ): Promise<DataResponse<ProjectBrief>> {
   return api.patch(PROJECT_ROUTES.brief(projectId), { headers: bearer(accessToken), json: body }).json<DataResponse<ProjectBrief>>()
+}
+
+export async function getProjectContractRequest(accessToken: string, projectId: string): Promise<DataResponse<ProjectContract | null>> {
+  return api.get(PROJECT_ROUTES.contract(projectId), { headers: bearer(accessToken) }).json<DataResponse<ProjectContract | null>>()
+}
+
+export type ProjectContractDraftInput = {
+  provider_kind: 'cima' | 'independent'
+  provider_name: string
+  provider_tax_id?: string | null
+  provider_representative?: string | null
+  provider_representative_document?: string | null
+  client_kind: 'natural' | 'juridical'
+  client_name: string
+  client_document?: string | null
+  client_company_name?: string | null
+  client_tax_id?: string | null
+  client_representative?: string | null
+  client_representative_document?: string | null
+  client_email: string
+  client_phone?: string | null
+  plan_name: string
+  monthly_fee: number
+  currency: 'COP'
+  tax_included: boolean
+  term_months: number
+  service_scope: string
+  additional_terms?: string | null
+  signature_city: string
+}
+
+export async function saveProjectContractDraftRequest(accessToken: string, projectId: string, body: ProjectContractDraftInput): Promise<DataResponse<ProjectContract>> {
+  return api.put(PROJECT_ROUTES.contract(projectId), { headers: bearer(accessToken), json: body }).json<DataResponse<ProjectContract>>()
+}
+
+export async function requestProjectContractSignatureRequest(accessToken: string, projectId: string): Promise<DataResponse<ProjectContract>> {
+  return api.post(PROJECT_ROUTES.contractRequestSignature(projectId), { headers: bearer(accessToken), json: {} }).json<DataResponse<ProjectContract>>()
+}
+
+export async function signProjectContractRequest(accessToken: string, projectId: string, body: { signer_name: string; signature_data_url: string; accept_terms: true }): Promise<DataResponse<ProjectContract>> {
+  return api.post(PROJECT_ROUTES.contractSign(projectId), { headers: bearer(accessToken), json: body }).json<DataResponse<ProjectContract>>()
 }
 
 export async function listProjectFilesEnrichedRequest(

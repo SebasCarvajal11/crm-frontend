@@ -46,25 +46,54 @@ export function DesktopSidebar({
       style={{ backgroundImage: `url(${sidebarTexture})` }}
       aria-label="Barra de navegacion lateral"
     >
-      <div className={cn('flex items-center gap-2 border-b border-primary-foreground/10 p-3', collapsed && 'justify-center')}>
-        <div className="min-w-0 flex-1 px-1">
-          <SidebarBrand
-            title={title}
-            compact={collapsed}
-            headerExtras={collapsed ? undefined : headerExtras}
-            closeOnNavigate={() => {}}
-          />
-        </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          onClick={() => onCollapsedChange(!collapsed)}
-          className="text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
-          aria-label={collapsed ? 'Expandir barra lateral' : 'Colapsar barra lateral'}
-        >
-          {collapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
-        </Button>
+      <div
+        className={cn(
+          'border-b border-primary-foreground/10',
+          collapsed ? 'flex flex-col items-center gap-2 px-2 py-3' : 'flex items-center gap-2 p-3'
+        )}
+      >
+        {collapsed ? (
+          <>
+            <SidebarBrand
+              title={title}
+              compact={true}
+              closeOnNavigate={() => {}}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => onCollapsedChange(false)}
+              className="text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+              aria-label="Expandir barra lateral"
+              title="Expandir barra lateral"
+            >
+              <PanelLeftOpen className="size-4" />
+            </Button>
+          </>
+        ) : (
+          <>
+            <div className="min-w-0 flex-1 px-1">
+              <SidebarBrand
+                title={title}
+                compact={false}
+                headerExtras={headerExtras}
+                closeOnNavigate={() => {}}
+              />
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => onCollapsedChange(true)}
+              className="text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+              aria-label="Colapsar barra lateral"
+              title="Colapsar barra lateral"
+            >
+              <PanelLeftClose className="size-4" />
+            </Button>
+          </>
+        )}
       </div>
       <SidebarNav items={items} compact={collapsed} onItemClick={() => {}} />
       <SidebarFooter

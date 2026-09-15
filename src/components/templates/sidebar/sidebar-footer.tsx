@@ -49,7 +49,7 @@ export function SidebarFooter({
           type="button"
           onClick={() => setOpen((v) => !v)}
           className={cn(
-            'flex w-full items-start gap-3 rounded-lg border border-transparent px-2 py-1.5 text-left transition-all hover:border-primary-foreground/15 hover:bg-primary-foreground/10',
+            'flex w-full items-start gap-3 rounded-lg border border-transparent px-2 py-1.5 text-left transition-all duration-150 cursor-pointer active:scale-[0.98] hover:border-primary-foreground/15 hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground/50',
             compact && 'justify-center px-0'
           )}
         >

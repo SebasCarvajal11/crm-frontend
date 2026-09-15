@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { AlertCircle, User, X } from 'lucide-react'
+import { AlertCircle, FolderOpen, User, X } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -33,6 +33,7 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
   const [name,           setName]           = useState('')
   const [description,    setDescription]    = useState('')
   const [brief,          setBrief]          = useState('')
+  const [fileRepositoryUrl, setFileRepositoryUrl] = useState('')
   const [type,           setType]           = useState<ProjectType>('campaign_service')
   const [errorMsg,       setErrorMsg]       = useState<string | null>(null)
   const [selectedClient, setSelectedClient] = useState<ClientSearchResult | null>(null)
@@ -48,6 +49,7 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
         type,
         description: description.trim() || `Proyecto de tipo ${type}`,
         brief:       brief.trim()       || 'Brief inicial del proyecto.',
+        file_repository_url: fileRepositoryUrl.trim() || undefined,
       }),
     onSuccess: (res) => {
       void queryClient.invalidateQueries({ queryKey: collabKeys.projects() })
@@ -58,7 +60,7 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
   })
 
   const handleClose = () => {
-    setName(''); setDescription(''); setBrief(''); setType('campaign_service')
+    setName(''); setDescription(''); setBrief(''); setFileRepositoryUrl(''); setType('campaign_service')
     setSelectedClient(null); setSelectedWorkers([]); setErrorMsg(null)
     onClose()
   }
@@ -164,6 +166,22 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
             <Label htmlFor="cp-brief">Brief inicial</Label>
             <Textarea id="cp-brief" placeholder="Objetivos, referencias, restricciones…" value={brief}
               onChange={(e) => setBrief(e.target.value)} className="min-h-[80px] resize-none" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="cp-file-repository" className="flex items-center gap-1.5">
+              <FolderOpen className="size-3.5 text-muted-foreground" aria-hidden="true" />
+              Repositorio de archivos pesados
+            </Label>
+            <Input
+              id="cp-file-repository"
+              type="url"
+              inputMode="url"
+              placeholder="https://drive.google.com/..."
+              value={fileRepositoryUrl}
+              onChange={(event) => setFileRepositoryUrl(event.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">Opcional. Enlace de Drive, OneDrive u otro repositorio externo para no almacenar archivos pesados en OCI.</p>
           </div>
 
           {errorMsg && (

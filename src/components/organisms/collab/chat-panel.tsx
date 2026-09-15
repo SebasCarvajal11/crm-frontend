@@ -7,6 +7,7 @@ import type { ProjectMember } from '@/features/collab/model'
 import type { MeResponse } from '@/shared/types'
 import { buildMentionSuggestions, extractActiveMentionQuery, mentionHints, resolveMentionsFromBody } from './chat-mentions'
 import { ChatMessageList } from './chat-message-list'
+import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 import { useChatScrollManager } from './use-chat-scroll-manager'
 
 type Channel = 'external' | 'internal'
@@ -114,7 +115,7 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
 
   return (
     <div
-      className="flex h-[min(32.5rem,62dvh)] flex-col overflow-hidden rounded-xl border bg-card shadow-sm sm:h-[min(35rem,64dvh)] min-[1400px]:h-[min(600px,70vh)]"
+      className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`}
       role="region"
       aria-label={channel === 'external' ? 'Chat con el cliente' : 'Chat interno del equipo'}
     >
@@ -139,7 +140,7 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
                   role="tab"
                   aria-selected={channel === nextChannel}
                   onClick={() => setChannel(nextChannel)}
-                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${channel === nextChannel ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150 cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${channel === nextChannel ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'}`}
                 >
                   {nextChannel === 'external' ? (
                     <>
@@ -159,7 +160,7 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
         </div>
       </div>
 
-      <div ref={logRef} className="flex-1 space-y-1 overflow-y-auto px-4 py-4" role="log" aria-live="polite" aria-label="Mensajes">
+      <div ref={logRef} className="min-h-0 flex-1 space-y-1 overflow-y-auto px-4 py-4" role="log" aria-live="polite" aria-label="Mensajes">
         {hasMore && (
           <div className="mb-4 flex justify-center">
             <Button

@@ -39,6 +39,7 @@ export type Project = ProjectListItem & {
   adminResponsibleSub: string
   estimatedDueDate: string | null
   latestApprovedFileId: string | null
+  fileRepositoryUrl: string | null
   isArchived: boolean
   createdAt: string
   updatedAt: string
@@ -151,6 +152,46 @@ export type ProjectBrief = {
   projectId: string
   content: string
   updatedBySub: string
+  updatedAt: string
+}
+
+export type ProjectContractStatus = 'draft' | 'pending_signature' | 'signed'
+export type ProjectContract = {
+  id: string
+  projectId: string
+  status: ProjectContractStatus
+  providerKind: 'cima' | 'independent'
+  providerName: string
+  providerTaxId: string | null
+  providerRepresentative: string | null
+  providerRepresentativeDocument: string | null
+  clientKind: 'natural' | 'juridical'
+  clientName: string
+  clientDocument: string | null
+  clientCompanyName: string | null
+  clientTaxId: string | null
+  clientRepresentative: string | null
+  clientRepresentativeDocument: string | null
+  clientEmail: string
+  clientPhone: string | null
+  planName: string
+  monthlyFee: number
+  currency: 'COP'
+  taxIncluded: boolean
+  termMonths: number
+  serviceScope: string
+  additionalTerms: string | null
+  contentSnapshot: string | null
+  contentHash: string | null
+  preparedBySub: string
+  requestedSignatureAt: string | null
+  signedAt: string | null
+  signedBySub: string | null
+  signerName: string | null
+  signatureDataUrl: string | null
+  consentAcceptedAt: string | null
+  signatureCity: string
+  createdAt: string
   updatedAt: string
 }
 

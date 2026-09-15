@@ -1,4 +1,4 @@
-﻿import { Calendar, Clock, GripVertical, User, CheckSquare } from 'lucide-react'
+import { Calendar, Clock, GripVertical, User, CheckSquare } from 'lucide-react'
 import { PriorityBadge } from '@/components/molecules/priority-badge'
 import type { ProjectTask } from '@/features/collab/model'
 
@@ -36,10 +36,10 @@ export function TaskCard({ task, isSelected, canDrag, onClick }: Props) {
       onClick={onClick}
       aria-pressed={isSelected}
       aria-label={`Tarea: ${task.title}. Prioridad: ${task.priority}.`}
-      className={`group w-full text-left rounded-lg border-l-4 border border-border bg-background p-3 shadow-sm transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 cursor-pointer ${borderLeft} ${
+      className={`group w-full text-left rounded-lg border-l-4 border border-border bg-background p-3 shadow-sm interactive-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 cursor-pointer ${borderLeft} ${
         isSelected
           ? 'ring-2 ring-primary ring-offset-1 shadow-md'
-          : 'hover:shadow-md hover:border-primary/30'
+          : ''
       }`}
     >
       <div className="flex items-start justify-between gap-2 mb-1">

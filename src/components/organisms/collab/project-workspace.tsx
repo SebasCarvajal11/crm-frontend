@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import { AlertCircle, ArrowLeft, FileText, KanbanSquare, MessageSquare, Users } from 'lucide-react'
+import { AlertCircle, ArrowLeft, FileSignature, FileText, KanbanSquare, MessageSquare, Users } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { SectionTabs, type SectionTabItem } from '@/components/molecules/section-tabs'
@@ -10,10 +10,11 @@ import { TaskBoard } from './task-board'
 import { ConversationPanel } from './conversation-panel'
 import { BriefPanel } from './brief-panel'
 import { ProjectMembers } from './project-members'
+import { ContractPanel } from './contract-panel'
 import type { ProjectListItem } from '@/features/collab/model'
 import type { MeResponse } from '@/shared/types'
 
-type WorkspaceTab = 'board' | 'chat' | 'brief' | 'members'
+type WorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'members'
 
 type Props = {
   accessToken: string
@@ -31,6 +32,7 @@ const TABS: SectionTabItem<WorkspaceTab>[] = [
   { value: 'board',   label: 'Tablero',      icon: <KanbanSquare  className="size-4" /> },
   { value: 'chat',    label: 'Conversacion', icon: <MessageSquare className="size-4" /> },
   { value: 'brief',   label: 'Brief',        icon: <FileText      className="size-4" /> },
+  { value: 'contract', label: 'Contrato',    icon: <FileSignature className="size-4" /> },
   { value: 'members', label: 'Integrantes',  icon: <Users         className="size-4" /> },
 ]
 
@@ -44,7 +46,7 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
   const isClient = identity.role === 'client'
   const canOperate = identity.role === 'admin' || identity.role === 'worker'
 
-  const { boardQ, briefQ } = useProjectWorkspaceData({ accessToken, projectId, activeTab, isClient })
+  const { boardQ, briefQ, contractQ } = useProjectWorkspaceData({ accessToken, projectId, activeTab, isClient })
   const { moveTask, invalidateBoardScope } = useProjectBoardMutations({ accessToken, projectId, onError: (message) => setErrorMsg(message) })
 
   const boardData = boardQ.data?.data
@@ -157,6 +159,7 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
             initialMessageId={chatMessageId}
             members={members}
             tasks={boardTasks}
+            project={boardData?.project ?? null}
             onError={setErrorMsg}
           />
         </div>
@@ -166,6 +169,17 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
             brief={briefQ.data?.brief ?? null}
             formalChanges={briefQ.data?.formalChanges ?? []}
             isLoading={briefQ.isLoading}
+          />
+        </div>
+
+        <div id="tabpanel-contract" role="tabpanel" style={{ display: activeTab === 'contract' ? 'block' : 'none' }}>
+          <ContractPanel
+            accessToken={accessToken}
+            project={boardData?.project ?? null}
+            contract={contractQ.data?.data ?? null}
+            members={members}
+            role={identity.role}
+            onError={setErrorMsg}
           />
         </div>
 

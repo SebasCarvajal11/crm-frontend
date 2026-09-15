@@ -86,7 +86,7 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
             key={n.id}
             type="button"
             onClick={() => void handleOpen(n)}
-            className="w-full rounded-lg border bg-card px-4 py-3 text-left transition-colors hover:bg-muted"
+            className="w-full rounded-lg border bg-card px-4 py-3 text-left interactive-row cursor-pointer active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
           >
             <p className="text-xs font-semibold text-primary">{n.project_name}</p>
             <p className="text-xs text-muted-foreground">{formatWhen(n.created_at)}</p>

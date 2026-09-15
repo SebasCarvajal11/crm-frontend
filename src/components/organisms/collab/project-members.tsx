@@ -8,6 +8,7 @@ import type { ProjectMember, ProjectMemberRole } from '@/features/collab/model'
 import type { ClientSearchResult } from '@/shared/types'
 import type { MeResponse } from '@/shared/types'
 import { getAvatarColor } from './avatar-color'
+import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 
 type Props = {
   members: ProjectMember[]
@@ -98,10 +99,10 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
   })
 
   if (isLoading || membersQ.isLoading) {
-    return <div className="flex items-center justify-center py-20"><div className="h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary" /></div>
+    return <div className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} items-center justify-center rounded-xl border bg-card shadow-sm`}><div className="h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary" /></div>
   }
   if (resolvedMembers.length === 0) {
-    return <div className="flex flex-col items-center justify-center gap-3 py-20 text-muted-foreground"><Users className="size-10 opacity-20" /><p className="text-sm">No hay integrantes en este proyecto.</p></div>
+    return <div className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} flex-col items-center justify-center gap-3 rounded-xl border bg-card text-muted-foreground shadow-sm`}><Users className="size-10 opacity-20" /><p className="text-sm">No hay integrantes en este proyecto.</p></div>
   }
 
   const memberSubs = new Set(resolvedMembers.map((m) => m.userSub))
@@ -118,14 +119,38 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
   }, { admin: [], worker: [], client: [] })
 
   return (
-    <div className="space-y-6">
+    <div className={`grid gap-4 ${canManageMembers ? 'min-[1280px]:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.8fr)]' : ''}`}>
       {canManageMembers && (
-        <div className="space-y-3 rounded-xl border bg-card p-4 shadow-sm">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <section className={`order-2 flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm min-[1280px]:order-2`} aria-label="Gestionar integrantes">
+          <div className="border-b px-4 py-3">
             <h3 className="text-sm font-semibold">Agregar trabajador</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">Busca y asigna nuevos integrantes al proyecto.</p>
+          </div>
+          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+            <UserSearch
+              accessToken={accessToken}
+              role="worker"
+              selected={filteredSelection}
+              excludedSubjects={excludedWorkerSubjects}
+              onSelect={(worker) => {
+                if (memberSubs.has(worker.subject)) return
+                setSelectedWorkers((prev) => prev.some((w) => w.subject === worker.subject) ? prev : [...prev, worker])
+              }}
+              placeholder="Buscar trabajador por email..."
+              queryKeyPrefix="project-member-worker"
+            />
+            {filteredSelection.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {filteredSelection.map((worker) => (
+                  <UserChip key={worker.subject} email={worker.email} onRemove={() => setSelectedWorkers((prev) => prev.filter((x) => x.subject !== worker.subject))} />
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="border-t p-4">
             <Button
               size="sm"
-              className="w-full sm:w-auto"
+              className="w-full"
               onClick={() => addWorker.mutate()}
               disabled={filteredSelection.length === 0 || addWorker.isPending}
             >
@@ -133,31 +158,16 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
               {addWorker.isPending ? 'Agregando...' : 'Agregar trabajador'}
             </Button>
           </div>
-
-          {filteredSelection.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {filteredSelection.map((worker) => (
-                <UserChip key={worker.subject} email={worker.email} onRemove={() => setSelectedWorkers((prev) => prev.filter((x) => x.subject !== worker.subject))} />
-              ))}
-            </div>
-          )}
-
-          <UserSearch
-            accessToken={accessToken}
-            role="worker"
-            selected={filteredSelection}
-            excludedSubjects={excludedWorkerSubjects}
-            onSelect={(worker) => {
-              if (memberSubs.has(worker.subject)) return
-              setSelectedWorkers((prev) => prev.some((w) => w.subject === worker.subject) ? prev : [...prev, worker])
-            }}
-            placeholder="Buscar trabajador por email..."
-            queryKeyPrefix="project-member-worker"
-          />
-        </div>
+        </section>
       )}
 
-      <div className="rounded-xl border bg-card p-4 shadow-sm">
+      <section className={`order-1 flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm min-[1280px]:order-1`} aria-label="Integrantes del proyecto">
+        <div className="border-b px-4 py-3">
+          <h3 className="text-sm font-semibold">Integrantes del proyecto</h3>
+          <p className="mt-0.5 text-xs text-muted-foreground">Personas asignadas y su actividad dentro del proyecto.</p>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-4">
+          <div className="rounded-lg border bg-muted/20 p-3">
         <div className="flex flex-wrap items-center gap-2">
           {(['admin', 'worker', 'client'] as ProjectMemberRole[]).map((role) => {
             const count = byRole[role].length
@@ -175,8 +185,9 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
             {resolvedMembers.length} en total
           </span>
         </div>
-      </div>
+          </div>
 
+          <div className="mt-5 space-y-6">
       {(['admin', 'worker', 'client'] as ProjectMemberRole[]).map((role) => {
         const group = byRole[role]
         if (!group.length) return null
@@ -191,13 +202,13 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
               <div className="h-px flex-1 bg-border" />
             </div>
 
-            <div className={group.length === 1 ? 'grid max-w-xl gap-3' : 'grid gap-3 sm:grid-cols-2 lg:grid-cols-3'}>
+            <div className={group.length === 1 ? 'grid gap-3' : 'grid gap-3 sm:grid-cols-2 min-[1280px]:grid-cols-3'}>
               {group.map((member) => {
                 const displayName = getDisplayName(member)
                 const showEmailLine = Boolean(member.email && member.email !== displayName)
                 const avatarUrl = memberAvatarUrl(member.userSub, member.email)
                 return (
-                  <article key={member.userSub} className={`rounded-xl border border-l-4 bg-card p-4 shadow-sm transition-shadow hover:shadow-md ${cfg.cardClass}`}>
+                  <article key={member.userSub} className={`rounded-xl border border-l-4 bg-card p-4 shadow-sm interactive-card ${cfg.cardClass}`}>
                     <div className="flex items-start gap-3">
                       <div className={`${getAvatarColor(member.userSub)} flex size-10 shrink-0 select-none items-center justify-center overflow-hidden rounded-full text-sm font-bold text-white`}>
                         {avatarUrl ? (
@@ -247,6 +258,9 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
           </section>
         )
       })}
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

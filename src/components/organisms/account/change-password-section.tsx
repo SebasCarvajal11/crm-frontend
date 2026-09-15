@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Check, KeyRound, ShieldCheck } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -27,7 +28,6 @@ type Props = {
   accessToken: string
 }
 
-/** Organismo: formulario para cambiar la contrasena del usuario autenticado. */
 export function ChangePasswordSection({ accessToken }: Props) {
   const [confirmSubmitOpen, setConfirmSubmitOpen] = useState(false)
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false)
@@ -46,34 +46,84 @@ export function ChangePasswordSection({ accessToken }: Props) {
   const mutation = useChangePasswordFlow(accessToken)
 
   return (
-    <section className="space-y-4">
+    <section className="flex h-full flex-col space-y-4">
       <SectionIntro
-        title="Seguridad"
-        description="Al cambiarla se cerraran tus sesiones y deberas iniciar sesion de nuevo."
+        title="Seguridad de acceso"
+        description="Actualiza tus credenciales periódicamente para mayor protección."
       />
-      <Card className="overflow-hidden border-border/80 shadow-sm">
-        <CardHeader className="border-b bg-muted/20">
-          <CardTitle className="text-base">Nueva contrasena</CardTitle>
-          <CardDescription>Minimo 8 caracteres; mayuscula, numero y simbolo.</CardDescription>
+
+      <Card className="flex flex-1 flex-col justify-between overflow-hidden rounded-2xl border-border/80 bg-card shadow-sm">
+        <CardHeader className="border-b bg-muted/30 pb-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <CardTitle className="text-base font-bold">Nueva contraseña</CardTitle>
+              <CardDescription className="mt-0.5 text-xs">
+                Mínimo 8 caracteres: mayúscula, minúscula, número y símbolo.
+              </CardDescription>
+            </div>
+            <div className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <KeyRound className="size-4" />
+            </div>
+          </div>
         </CardHeader>
-        <CardContent>
+
+        <CardContent className="flex flex-1 flex-col justify-between space-y-4 p-4 sm:p-6">
+          <div className="flex items-start gap-2.5 rounded-xl border border-amber-200/80 bg-amber-50/60 p-3 text-xs text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-200">
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+            <span>Al actualizar tu clave, se cerrarán los accesos abiertos en otros equipos para proteger tu cuenta.</span>
+          </div>
+
           <form
-            className="space-y-4"
+            className="flex flex-1 flex-col justify-between space-y-4"
             onSubmit={handleSubmit((values) => {
               setPendingPayload(values)
               setConfirmSubmitOpen(true)
             })}
           >
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormField id="old_password" label="Contrasena actual" error={errors.old_password?.message}>
-                <Input type="password" autoComplete="current-password" {...register('old_password')} />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <FormField
+                id="old_password"
+                label={
+                  <span>
+                    Contraseña actual
+                    <span className="sr-only">Contrasena actual</span>
+                  </span>
+                }
+                error={errors.old_password?.message}
+                className="sm:col-span-2"
+              >
+                <Input
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="Ingresa tu contraseña actual"
+                  {...register('old_password')}
+                />
               </FormField>
-              <div className="hidden sm:block" />
-              <FormField id="new_password" label="Nueva contrasena" error={errors.new_password?.message}>
-                <Input type="password" autoComplete="new-password" {...register('new_password')} />
+
+              <FormField
+                id="new_password"
+                label="Nueva contraseña"
+                error={errors.new_password?.message}
+              >
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Mínimo 8 caracteres"
+                  {...register('new_password')}
+                />
               </FormField>
-              <FormField id="confirm" label="Confirmar contrasena" error={errors.confirm?.message}>
-                <Input type="password" autoComplete="new-password" {...register('confirm')} />
+
+              <FormField
+                id="confirm"
+                label="Confirmar contraseña"
+                error={errors.confirm?.message}
+              >
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Repite la nueva contraseña"
+                  {...register('confirm')}
+                />
               </FormField>
             </div>
 
@@ -85,25 +135,30 @@ export function ChangePasswordSection({ accessToken }: Props) {
             )}
 
             {mutation.isSuccess && (
-              <Alert>
+              <Alert className="border-emerald-200/80 bg-emerald-50/60 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-200">
+                <Check className="size-4 text-emerald-600" />
                 <AlertTitle>Contrasena actualizada</AlertTitle>
                 <AlertDescription>
-                  Se cerrara tu sesion en unos segundos para proteger la cuenta.
+                  Se cerrará tu sesión en unos segundos para proteger la cuenta.
                 </AlertDescription>
               </Alert>
             )}
 
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <div className="mt-auto flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-4">
               <Button
                 type="button"
                 variant="outline"
-                className="h-10"
+                className="h-9 text-xs"
                 disabled={mutation.isPending || mutation.isSuccess || !isDirty}
                 onClick={() => setConfirmCancelOpen(true)}
               >
                 Cancelar cambios
               </Button>
-              <Button className="h-10" type="submit" disabled={mutation.isPending || mutation.isSuccess}>
+              <Button
+                className="h-9 text-xs"
+                type="submit"
+                disabled={mutation.isPending || mutation.isSuccess}
+              >
                 {mutation.isPending ? 'Guardando...' : 'Actualizar contrasena'}
               </Button>
             </div>
@@ -144,11 +199,7 @@ export function ChangePasswordSection({ accessToken }: Props) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Volver</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                reset()
-              }}
-            >
+            <AlertDialogAction onClick={() => reset()}>
               Descartar
             </AlertDialogAction>
           </AlertDialogFooter>

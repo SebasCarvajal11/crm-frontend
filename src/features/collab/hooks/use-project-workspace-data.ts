@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getBriefRequest,
+  getProjectContractRequest,
   getProjectBoardRequest,
   listExternalChatRequest,
   listFormalChangeLogRequest,
@@ -9,7 +10,7 @@ import {
 } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
 
-type WorkspaceTab = 'board' | 'chat' | 'brief' | 'members'
+type WorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'members'
 
 type Params = {
   accessToken: string
@@ -50,6 +51,13 @@ export function useProjectWorkspaceData({ accessToken, projectId, activeTab, isC
     staleTime: 60_000,
   })
 
+  const contractQ = useQuery({
+    queryKey: collabKeys.contract(projectId),
+    queryFn: () => getProjectContractRequest(accessToken, projectId),
+    enabled: activeTab === 'contract',
+    staleTime: 30_000,
+  })
+
   useEffect(() => {
     void queryClient.prefetchQuery({
       queryKey: [...collabKeys.chatExternal(projectId), 20],
@@ -72,7 +80,7 @@ export function useProjectWorkspaceData({ accessToken, projectId, activeTab, isC
     })
   }, [accessToken, isClient, projectId, queryClient])
 
-  return { boardQ, briefQ }
+  return { boardQ, briefQ, contractQ }
 }
 
 

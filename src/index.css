@@ -68,7 +68,6 @@
   --shadow-xl: 0 20px 30px -8px rgb(40 40 41 / 0.16), 0 8px 12px -8px rgb(40 40 41 / 0.12);
   --shadow-2xl: 0 25px 50px -12px rgb(40 40 41 / 0.25);
 }
-
 .dark {
   --background: #1b1b1c;
   --foreground: var(--cima-white);
@@ -172,6 +171,30 @@
   }
 }
 
+@layer components {
+  /*
+   * Las tres columnas de Conversación comparten esta altura. En escritorio
+   * llena el espacio útil del workspace; en resoluciones más estrechas queda
+   * acotada para que el apilamiento vertical siga siendo manejable.
+   */
+  .collab-workspace-panel {
+    height: min(32rem, 62dvh);
+  }
+
+  @media (min-width: 640px) {
+    .collab-workspace-panel {
+      height: min(35rem, 64dvh);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .collab-workspace-panel {
+      height: max(24rem, calc(100vh - 17rem));
+      height: max(24rem, calc(100dvh - 17rem));
+    }
+  }
+}
+
 .scrollbar-thin::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -184,4 +207,62 @@
 
 .scrollbar-thin::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* Interacciones globales estandarizadas */
+.interactive-card {
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.interactive-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+.interactive-row {
+  transition: background-color 150ms ease-out, border-color 150ms ease-out;
+}
+.interactive-row:hover {
+  background-color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+.interactive-scale {
+  transition: transform 100ms ease-out;
+}
+.interactive-scale:active {
+  transform: scale(0.98);
+}
+
+.view-transition {
+  animation: fadeInView 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInView {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .interactive-card:hover {
+    transform: none !important;
+  }
+  .interactive-scale:active {
+    transform: none !important;
+  }
 }

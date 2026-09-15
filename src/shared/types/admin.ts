@@ -12,6 +12,7 @@ export type AdminUserRow = {
   is_active: boolean
   deleted_at: string | null
   force_password_change: boolean
+  created_at?: string
 }
 
 export type AdminUsersListResponse = {

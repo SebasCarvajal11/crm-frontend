@@ -1,25 +1,39 @@
-import { Link } from '@tanstack/react-router'
-import { ExternalLink, Pencil, UserCircle2 } from 'lucide-react'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { DOCS_ROUTES } from '@/shared/lib/gateway-routes'
-import { getApiBaseUrl } from '@/app/session/session-store'
 import type { MeResponse } from '@/features/auth/model'
+import type { ProjectListItem } from '@/features/collab/model'
+import {
+  useOverviewCollab,
+  useOverviewMarketing,
+  useOverviewNotifications,
+  useOverviewRecentClients,
+} from '@/features/overview/hooks'
+import {
+  OverviewAdminBlockedTasksSection,
+  OverviewAdminClientRankingSection,
+  OverviewAdminRecentClientsSection,
+  OverviewAdminRecentProjectsSection,
+  OverviewAdminWorkloadSection,
+  OverviewIdentityCard,
+  OverviewMarketingKpisSection,
+  OverviewNotificationsSection,
+  OverviewWorkerPendingTasksSection,
+} from '@/features/overview/ui'
+
+type OpenNotificationPayload = {
+  projectId: string
+  channel: 'internal' | 'external' | 'system'
+  messageId?: string | null
+}
 
 type DashboardOverviewProps = {
   identity: MeResponse['data']
   avatarUrl?: string | null
+  accessToken: string
+  projects?: ProjectListItem[]
   onOpenProfile?: () => void
+  onOpenProject?: (projectId: string) => void
+  onOpenNotification?: (payload: OpenNotificationPayload) => void
 }
 
-/** Deriva un nombre corto para el saludo: nombre real o, si falta, la parte local del correo. */
 function displayFirstName(identity: MeResponse['data']) {
   if (identity.first_name) return identity.first_name
   const local = identity.email.split('@')[0] ?? ''
@@ -31,10 +45,41 @@ function displayFirstName(identity: MeResponse['data']) {
     .join(' ')
 }
 
-/** Organismo: resumen de identidad y enlaces útiles (documentación API en gateway). */
-export function DashboardOverview({ identity, avatarUrl, onOpenProfile }: DashboardOverviewProps) {
-  const docsBase = getApiBaseUrl()
+export function DashboardOverview({
+  identity,
+  avatarUrl,
+  accessToken,
+  projects = [],
+  onOpenProfile,
+  onOpenProject,
+  onOpenNotification,
+}: DashboardOverviewProps) {
   const firstName = displayFirstName(identity)
+  const isAdmin = identity.role === 'admin'
+  const isWorker = identity.role === 'worker'
+
+  const { notifications, isLoading: isNotifLoading, handleOpen } = useOverviewNotifications(
+    accessToken,
+    onOpenNotification
+  )
+
+  const { metrics, isLoading: isMarketingLoading } = useOverviewMarketing(accessToken)
+
+  const {
+    isLoading: isCollabLoading,
+    workerPendingTasks,
+    adminBlockedTasks,
+    adminWorkerWorkload,
+    adminClientRanking,
+    adminRecentProjects,
+  } = useOverviewCollab({
+    accessToken,
+    projects,
+    role: identity.role,
+    userSub: identity.id,
+  })
+
+  const recentClientsQ = useOverviewRecentClients(accessToken, isAdmin)
 
   return (
     <div className="space-y-6">
@@ -49,90 +94,65 @@ export function DashboardOverview({ identity, avatarUrl, onOpenProfile }: Dashbo
           </span>
         </p>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="shadow-md">
-          <CardContent className="flex items-center gap-4 pt-6">
-            <div className="relative shrink-0">
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt="Avatar del usuario"
-                  className="size-16 rounded-full border object-cover"
-                />
-              ) : (
-                <div className="flex size-16 items-center justify-center rounded-full border bg-muted">
-                  <UserCircle2 className="size-9 text-muted-foreground" />
-                </div>
-              )}
-              {onOpenProfile && (
-                <button
-                  type="button"
-                  onClick={onOpenProfile}
-                  aria-label="Editar perfil"
-                  className="absolute -bottom-1 -right-1 flex size-6 items-center justify-center rounded-full border-2 border-card bg-primary text-primary-foreground shadow-sm transition-transform hover:scale-105"
-                >
-                  <Pencil className="size-3" />
-                </button>
-              )}
-            </div>
-            <div className="min-w-0 space-y-1.5 text-sm">
-              <p className="text-base font-semibold">Tu cuenta</p>
-              <p className="text-xs text-muted-foreground">UUID público (subject)</p>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-muted-foreground">Email:</span>
-                <span className="truncate font-medium">{identity.email}</span>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-muted-foreground">Rol</span>
-                <Badge variant="secondary">{identity.role}</Badge>
-              </div>
-              {identity.force_password_change ? (
-                <p className="text-amber-600 dark:text-amber-500">
-                  Debes cambiar la contraseña (política de cuenta).
-                </p>
-              ) : null}
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Documentación</CardTitle>
-            <CardDescription>OpenAPI servido por el mismo gateway.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <Button variant="outline" size="sm" className="justify-between" asChild>
-              <a
-                href={`${docsBase}${DOCS_ROUTES.swaggerUi}`}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Abrir Swagger UI en una nueva pestaña"
-              >
-                Swagger UI
-                <ExternalLink className="size-4 opacity-70" />
-                <span className="sr-only">(se abre en una nueva pestaña)</span>
-              </a>
-            </Button>
-            <Button variant="outline" size="sm" className="justify-between" asChild>
-              <a
-                href={`${docsBase}${DOCS_ROUTES.openApiYaml}`}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Abrir archivo openapi.yaml en una nueva pestaña"
-              >
-                openapi.yaml
-                <ExternalLink className="size-4 opacity-70" />
-                <span className="sr-only">(se abre en una nueva pestaña)</span>
-              </a>
-            </Button>
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/">Volver al inicio</Link>
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <OverviewIdentityCard
+          identity={identity}
+          avatarUrl={avatarUrl}
+          onOpenProfile={onOpenProfile}
+        />
+        <OverviewNotificationsSection
+          notifications={notifications}
+          isLoading={isNotifLoading}
+          onOpen={handleOpen}
+        />
       </div>
+
+      <OverviewMarketingKpisSection
+        metrics={metrics}
+        isLoading={isMarketingLoading}
+      />
+
+      {isWorker && (
+        <OverviewWorkerPendingTasksSection
+          tasks={workerPendingTasks}
+          isLoading={isCollabLoading}
+          onOpenProject={onOpenProject}
+        />
+      )}
+
+      {isAdmin && (
+        <div className="space-y-6">
+          <OverviewAdminBlockedTasksSection
+            tasks={adminBlockedTasks}
+            isLoading={isCollabLoading}
+            onOpenProject={onOpenProject}
+          />
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <OverviewAdminRecentProjectsSection
+              projects={adminRecentProjects}
+              isLoading={isCollabLoading}
+              onOpenProject={onOpenProject}
+            />
+            <OverviewAdminRecentClientsSection
+              clients={recentClientsQ.data ?? []}
+              isLoading={recentClientsQ.isLoading}
+            />
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <OverviewAdminWorkloadSection
+              workload={adminWorkerWorkload}
+              isLoading={isCollabLoading}
+            />
+            <OverviewAdminClientRankingSection
+              items={adminClientRanking}
+              isLoading={isCollabLoading}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
-
-

@@ -1,11 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
 import { useCallback, useEffect, useMemo } from 'react'
 import { isHTTPError } from 'ky'
 import { BarChart3, KanbanSquare, ChartAreaIcon, Megaphone, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Skeleton } from '@/components/ui/skeleton'
+import {
+  DashboardBootstrapping,
+  DashboardLoadError,
+  DashboardMissingIdentity,
+  DashboardRedirecting,
+} from './dashboard-feedback'
+import { useDashboardNavigation } from './use-dashboard-navigation'
 import { AppShell } from '@/components/templates/app-shell'
 import { useSessionStore } from '@/app/session/session-store'
 import { logoutRequest } from '@/features/auth/api'
@@ -36,7 +41,14 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   const bootstrapped = useSessionStore((s) => s.bootstrapped)
   const emailStored = useSessionStore((s) => s.email)
   const clearSession = useSessionStore((s) => s.clearSession)
-  const navigate = useNavigate({ from: '/dashboard' })
+  const {
+    navigate,
+    goTo,
+    goToMention,
+    openProject,
+    closeProject,
+    changeWorkspaceTab,
+  } = useDashboardNavigation()
   const queryClient = useQueryClient()
 
   const dashboardQuery = useDashboardComposition(token, bootstrapped)
@@ -72,8 +84,17 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   }, [dashboardQuery.error, clearSession, navigate, queryClient])
 
   useEffect(() => {
-    if (tab === 'admin' && dashboardQuery.isSuccess && dashboardQuery.data?.identity?.role !== 'admin') {
-      navigate({ to: '/dashboard', search: (prev) => ({ ...prev, tab: 'overview' }), replace: true })
+    if (!dashboardQuery.isSuccess || !dashboardQuery.data?.identity) return
+    const role = dashboardQuery.data.identity.role
+    const isClient = role === 'client'
+    const fallbackTab: DashboardTab = isClient ? 'collab' : 'overview'
+
+    if (
+      (tab === 'overview' && isClient) ||
+      (tab === 'admin' && role !== 'admin') ||
+      ((tab === 'marketing' || tab === 'analytics') && role !== 'admin' && role !== 'worker')
+    ) {
+      navigate({ to: '/dashboard', search: (prev) => ({ ...prev, tab: fallbackTab }), replace: true })
     }
   }, [tab, dashboardQuery.isSuccess, dashboardQuery.data, navigate])
 
@@ -93,77 +114,6 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
       navigate({ to: '/login', replace: true })
     },
   })
-
-  const goTo = useCallback(
-    (next: DashboardTab) => {
-      navigate({
-        to: '/dashboard',
-        search: (prev) => ({
-          ...prev,
-          tab: next,
-          ...(next === 'collab'
-            ? {}
-            : {
-                project_id: undefined,
-                workspace_tab: undefined,
-                chat_channel: undefined,
-                chat_message_id: undefined,
-              }),
-        }),
-        replace: true,
-      })
-    },
-    [navigate],
-  )
-
-  const goToMention = useCallback(
-    (payload: { projectId: string; channel: 'internal' | 'external' | 'system'; messageId?: string | null }) => {
-      navigate({
-        to: '/dashboard',
-        search: (prev) => ({
-          ...prev,
-          tab: 'collab',
-          project_id: payload.projectId,
-          workspace_tab: payload.messageId ? 'chat' : 'board',
-          chat_channel: payload.messageId ? (payload.channel === 'internal' ? 'internal' : 'external') : undefined,
-          chat_message_id: payload.messageId ?? undefined,
-        }),
-        replace: true,
-      })
-    },
-    [navigate],
-  )
-
-  const openProject = useCallback(
-    (projectId: string) => {
-      navigate({
-        to: '/dashboard',
-        search: (prev) => ({ ...prev, tab: 'collab', project_id: projectId, workspace_tab: 'board' }),
-        replace: true,
-      })
-    },
-    [navigate],
-  )
-
-  const closeProject = useCallback(() => {
-    navigate({
-      to: '/dashboard',
-      search: (prev) => ({ ...prev, project_id: undefined, workspace_tab: undefined, chat_channel: undefined, chat_message_id: undefined }),
-      replace: true,
-    })
-  }, [navigate])
-
-  const changeWorkspaceTab = useCallback(
-    (workspaceTab: 'board' | 'chat' | 'brief' | 'contract' | 'members') => {
-      navigate({
-        to: '/dashboard',
-        search: (prev) => ({ ...prev, workspace_tab: workspaceTab }),
-        replace: true,
-      })
-    },
-    [navigate],
-  )
-
   const handleOpenProfile = useCallback(() => goTo('account'), [goTo])
   const handleOpenNotifications = useCallback(() => goTo('notifications'), [goTo])
   const handleLogout = useCallback(() => { logoutMutation.mutate() }, [logoutMutation])
@@ -179,75 +129,69 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   const hasRoleMismatch = Boolean(identity && accessTokenRole && identity.role !== accessTokenRole)
   const isAdmin = identity?.role === 'admin'
   const canUseMarketing = !hasRoleMismatch && (identity?.role === 'admin' || identity?.role === 'worker')
+  const canViewOverview = !hasRoleMismatch && (identity?.role === 'admin' || identity?.role === 'worker')
+  const defaultTab: DashboardTab = canViewOverview ? 'overview' : 'collab'
+
   const activeTab: DashboardTab = useMemo(() => {
-    const currentTab = tab ?? 'overview'
-    if (currentTab === 'admin' && !isAdmin) return 'overview'
-    if ((currentTab === 'marketing' || currentTab === 'analytics') && !canUseMarketing) return 'overview'
+    const currentTab = tab ?? defaultTab
+    if (currentTab === 'overview' && !canViewOverview) return defaultTab
+    if (currentTab === 'admin' && !isAdmin) return defaultTab
+    if ((currentTab === 'marketing' || currentTab === 'analytics') && !canUseMarketing) return defaultTab
     return currentTab
-  }, [tab, isAdmin, canUseMarketing])
+  }, [tab, defaultTab, canViewOverview, isAdmin, canUseMarketing])
 
   const sidebarItems = useMemo(
     () => [
-      { key: 'overview', label: 'Resumen', icon: <BarChart3 className="size-4" />, onClick: () => goTo('overview'), isActive: activeTab === 'overview' },
-      { key: 'collab', label: 'Colaboración', icon: <KanbanSquare className="size-4" />, onClick: () => goTo('collab'), isActive: activeTab === 'collab' },
-      { key: 'marketing', label: 'Marketing', icon: <Megaphone className="size-4" />, onClick: () => goTo('marketing'), isActive: activeTab === 'marketing', hidden: !canUseMarketing },
-      { key: 'admin', label: 'Administración', icon: <ShieldCheck className="size-4" />, onClick: () => goTo('admin'), isActive: activeTab === 'admin', hidden: !isAdmin },
-      { key: 'analytics', label: 'Analítica', icon: <ChartAreaIcon className="size-4" />, onClick: () => goTo('analytics'), isActive: activeTab === 'analytics', hidden: !canUseMarketing },
+      {
+        key: 'overview',
+        label: 'Resumen',
+        icon: <BarChart3 className="size-4" />,
+        onClick: () => goTo('overview'),
+        isActive: activeTab === 'overview',
+        hidden: !canViewOverview,
+      },
+      {
+        key: 'collab',
+        label: 'Colaboración',
+        icon: <KanbanSquare className="size-4" />,
+        onClick: () => goTo('collab'),
+        isActive: activeTab === 'collab',
+      },
+      {
+        key: 'marketing',
+        label: 'Marketing',
+        icon: <Megaphone className="size-4" />,
+        onClick: () => goTo('marketing'),
+        isActive: activeTab === 'marketing',
+        hidden: !canUseMarketing,
+      },
+      {
+        key: 'analytics',
+        label: 'Analítica',
+        icon: <ChartAreaIcon className="size-4" />,
+        onClick: () => goTo('analytics'),
+        isActive: activeTab === 'analytics',
+        hidden: !canUseMarketing,
+      },
+      {
+        key: 'admin',
+        label: 'Administración',
+        icon: <ShieldCheck className="size-4" />,
+        onClick: () => goTo('admin'),
+        isActive: activeTab === 'admin',
+        hidden: !isAdmin,
+      },
     ],
-    [activeTab, goTo, isAdmin, canUseMarketing],
+    [activeTab, goTo, canViewOverview, canUseMarketing, isAdmin],
   )
 
-  if (isUnauthorized) {
-    return (
-      <div className="flex min-h-screen items-center justify-center px-4" role="status" aria-live="polite">
-        <p className="text-sm text-muted-foreground">Redirigiendo al inicio de sesión…</p>
-      </div>
-    )
-  }
-
-  if (!bootstrapped || dashboardQuery.isPending || !token) {
-    return (
-      <div className="flex items-center justify-center min-h-screen px-4" role="status" aria-live="polite" aria-busy="true">
-        <div className="w-full max-w-sm space-y-4">
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
-          <p className="text-sm text-muted-foreground text-center">Comprobando sesión…</p>
-        </div>
-      </div>
-    )
-  }
-
+  if (isUnauthorized) return <DashboardRedirecting />
+  if (!bootstrapped || dashboardQuery.isPending || !token) return <DashboardBootstrapping />
   if (dashboardQuery.isError && !isHTTPError(dashboardQuery.error)) {
-    return (
-      <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="w-full max-w-sm space-y-4">
-          <Alert variant="destructive">
-            <AlertTitle>No se pudo cargar tu perfil</AlertTitle>
-            <AlertDescription>
-              {dashboardQuery.error instanceof Error
-                ? dashboardQuery.error.message
-                : 'Ocurrió un error inesperado al validar tu sesión.'}
-            </AlertDescription>
-          </Alert>
-          <Button variant="outline" className="w-full" onClick={() => dashboardQuery.refetch()}>
-            Reintentar
-          </Button>
-        </div>
-      </div>
-    )
+    return <DashboardLoadError error={dashboardQuery.error} onRetry={() => dashboardQuery.refetch()} />
   }
-
   if (!identity) {
-    return (
-      <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="w-full max-w-sm space-y-4">
-          <Alert variant="destructive"><AlertTitle>No se pudo cargar tu identidad</AlertTitle><AlertDescription>La sesión no trajo información de usuario. Reintenta o vuelve a iniciar sesión.</AlertDescription></Alert>
-          <Button variant="outline" className="w-full" onClick={() => dashboardQuery.refetch()}>Reintentar</Button>
-          <Button className="w-full" onClick={handleGoToLogin}>Ir al login</Button>
-        </div>
-      </div>
-    )
+    return <DashboardMissingIdentity onRetry={() => dashboardQuery.refetch()} onGoToLogin={handleGoToLogin} />
   }
 
   return (
@@ -274,14 +218,31 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
           </AlertDescription>
         </Alert>
       )}
-      {activeTab === 'overview' && (
+      {activeTab === 'overview' && canViewOverview && (
         <DashboardOverview
           identity={identity}
           avatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}
+          accessToken={token}
+          projects={projects?.data}
           onOpenProfile={handleOpenProfile}
+          onOpenProject={openProject}
+          onOpenNotification={goToMention}
         />
       )}
-      {activeTab === 'collab' && <CollabPanel accessToken={token} identity={identity} initialProjects={projects?.data} openProjectId={project_id} workspaceTab={workspace_tab} chatChannel={chat_channel} chatMessageId={chat_message_id} onOpenProject={openProject} onCloseProject={closeProject} onTabChange={changeWorkspaceTab} />}
+      {activeTab === 'collab' && (
+        <CollabPanel
+          accessToken={token}
+          identity={identity}
+          initialProjects={projects?.data}
+          openProjectId={project_id}
+          workspaceTab={workspace_tab}
+          chatChannel={chat_channel}
+          chatMessageId={chat_message_id}
+          onOpenProject={openProject}
+          onCloseProject={closeProject}
+          onTabChange={changeWorkspaceTab}
+        />
+      )}
       {activeTab === 'marketing' && canUseMarketing && <MarketingPanel accessToken={token} />}
       {activeTab === 'account' && <AccountPanel accessToken={token} identity={identity} />}
       {activeTab === 'notifications' && <NotificationsPanel accessToken={token} onOpenNotification={goToMention} />}
@@ -290,5 +251,3 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     </AppShell>
   )
 }
-
-

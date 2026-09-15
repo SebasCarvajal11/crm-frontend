@@ -66,6 +66,9 @@ export const PROJECT_ROUTES = {
   workspace: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/workspace`,
   members: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/members`,
   brief: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/brief`,
+  contract: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/contract`,
+  contractRequestSignature: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/contract/request-signature`,
+  contractSign: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/contract/sign`,
   timeline: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/timeline`,
   columns: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/columns`,
   // Files

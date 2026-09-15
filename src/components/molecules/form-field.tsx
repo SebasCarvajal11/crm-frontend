@@ -1,4 +1,4 @@
-﻿import * as React from 'react'
+import * as React from 'react'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/shared/lib/utils'
 
@@ -10,7 +10,7 @@ export type FormFieldControlProps = {
 
 type FormFieldProps = {
   id: string
-  label: string
+  label: React.ReactNode
   required?: boolean
   error?: string
   hint?: string

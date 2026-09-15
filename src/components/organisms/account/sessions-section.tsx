@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Clock, Globe, LaptopMinimal, ShieldAlert } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   AlertDialog,
@@ -28,7 +28,14 @@ function formatDateTime(value: string) {
   return date.toLocaleString()
 }
 
-/** Organismo: listado y revocacion de sesiones activas del usuario. */
+function sessionTitle(deviceLabel: string) {
+  if (/chrome/i.test(deviceLabel)) return 'Google Chrome'
+  if (/safari/i.test(deviceLabel)) return 'Apple Safari'
+  if (/firefox/i.test(deviceLabel)) return 'Mozilla Firefox'
+  if (/edge/i.test(deviceLabel)) return 'Microsoft Edge'
+  return deviceLabel.length > 40 ? 'Dispositivo conectado' : deviceLabel
+}
+
 export function SessionsSection({ accessToken }: Props) {
   const {
     pageSafe,
@@ -43,56 +50,68 @@ export function SessionsSection({ accessToken }: Props) {
   } = useSessionsSection(accessToken)
 
   return (
-    <section className="space-y-4">
+    <section className="flex h-full flex-col space-y-4">
       <SectionIntro
         title="Sesiones activas"
         description="Cierra sesiones en otros dispositivos para proteger tu cuenta."
       />
 
-      <Card className="overflow-hidden border-border/80 shadow-sm">
-        <CardHeader className="border-b bg-muted/20">
-          <CardTitle className="text-base">Dispositivos conectados</CardTitle>
+      <Card className="flex flex-1 flex-col justify-between overflow-hidden rounded-2xl border-border/80 bg-card shadow-sm">
+        <CardHeader className="border-b bg-muted/30 pb-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <CardTitle className="text-base font-bold">Dispositivos conectados</CardTitle>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Revisa y administra los accesos vigentes a tu cuenta.
+              </p>
+            </div>
+            <div className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <LaptopMinimal className="size-4" />
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-3">
+
+        <CardContent className="flex flex-1 flex-col justify-between space-y-4 p-4 sm:p-6">
           {sessionsQ.isLoading ? (
             <div className="space-y-3" role="status" aria-live="polite" aria-busy="true">
-              <Skeleton className="h-24 w-full" />
-              <Skeleton className="h-24 w-full" />
-              <p className="text-sm text-muted-foreground">Cargando sesiones activas...</p>
+              <Skeleton className="h-20 w-full rounded-xl" />
+              <Skeleton className="h-20 w-full rounded-xl" />
             </div>
           ) : sessionsQ.isError ? (
             <Alert variant="destructive">
               <AlertTitle>No se pudieron cargar las sesiones</AlertTitle>
-              <AlertDescription>Intenta recargar la pagina en unos segundos.</AlertDescription>
+              <AlertDescription>Intenta recargar la página en unos segundos.</AlertDescription>
             </Alert>
           ) : sessions.length === 0 ? (
             <Alert>
               <AlertTitle>Sin sesiones registradas</AlertTitle>
-              <AlertDescription>Cuando inicies sesion en nuevos dispositivos, apareceran aqui.</AlertDescription>
+              <AlertDescription>Cuando inicies sesión en nuevos dispositivos aparecerán aquí.</AlertDescription>
             </Alert>
           ) : (
-            <div className="space-y-4">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm text-muted-foreground">
-                  Pagina {pageSafe} de {totalPages} - {sessions.length} sesiones
+            <div className="space-y-3">
+              <div className="flex flex-col gap-2 rounded-xl border border-border/60 bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs font-medium text-muted-foreground">
+                  Página {pageSafe} de {totalPages} • {sessions.length} {sessions.length === 1 ? 'sesión' : 'sesiones'}
                 </p>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
                       type="button"
                       variant="destructive"
-                      size="default"
-                      className="h-10 w-full sm:w-auto"
+                      size="sm"
+                      className="h-8 shadow-xs sm:w-auto"
                       disabled={revokeAllMutation.isPending || revokeMutation.isPending}
                     >
-                      {revokeAllMutation.isPending ? 'Cerrando sesiones...' : 'Cerrar sesion en todos los dispositivos'}
+                      {revokeAllMutation.isPending
+                        ? 'Cerrando sesiones...'
+                        : 'Cerrar sesion en todos los dispositivos'}
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Cerrar sesion en todos los dispositivos</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Esta accion cerrara todas tus sesiones activas. Tendras que iniciar sesion de nuevo.
+                        Esta acción cerrará todas tus sesiones activas excepto la actual. Tendrás que volver a ingresar.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -108,30 +127,54 @@ export function SessionsSection({ accessToken }: Props) {
               {pageSessions.map((session) => (
                 <div
                   key={session.family}
-                  className="flex flex-col gap-3 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between"
+                  className={`flex flex-col gap-3 rounded-xl border p-3.5 transition-all sm:flex-row sm:items-center sm:justify-between ${
+                    session.is_current
+                      ? 'border-primary/40 bg-primary/[0.03] shadow-xs'
+                      : 'border-border/70 bg-card hover:border-border'
+                  }`}
                 >
-                  <div className="min-w-0 space-y-1">
-                    <p className="truncate font-medium">
-                      {session.device_label}
-                      {session.is_current && (
-                        <Badge className="ml-2 align-middle" variant="secondary">
-                          Actual
-                        </Badge>
-                      )}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Expira: {formatDateTime(session.expires_at)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Ultima actividad: {formatDateTime(session.last_activity_at)}
-                    </p>
+                  <div className="flex min-w-0 items-start gap-3">
+                    <div
+                      className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg ${
+                        session.is_current
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      <LaptopMinimal className="size-4" />
+                    </div>
+
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="truncate text-sm font-semibold text-foreground">
+                          {sessionTitle(session.device_label)}
+                        </p>
+                        {session.is_current && (
+                          <Badge variant="outline" className="border-emerald-500/40 bg-emerald-500/10 text-emerald-700 text-[10px] py-0">
+                            <span className="mr-1 size-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                            Actual
+                          </Badge>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Clock className="size-3 opacity-70" />
+                          Última actividad: {formatDateTime(session.last_activity_at)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Globe className="size-3 opacity-70" />
+                          Expira: {formatDateTime(session.expires_at)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="w-full sm:w-auto"
+                    className="h-8 text-xs font-medium text-destructive hover:bg-destructive hover:text-destructive-foreground sm:w-auto"
                     aria-label={`Revocar sesion de ${session.device_label}`}
                     disabled={revokeMutation.isPending}
                     onClick={() => revokeMutation.mutate(session.family)}
@@ -141,59 +184,58 @@ export function SessionsSection({ accessToken }: Props) {
                 </div>
               ))}
 
-              <div className="flex flex-wrap items-center justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-9 w-9"
-                  disabled={pageSafe <= 1}
-                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                >
-                  <ChevronLeft className="size-4" />
-                  <span className="sr-only">Anterior</span>
-                </Button>
-                {pageWindow.map((pageNumber) => (
+              {totalPages > 1 && (
+                <div className="flex items-center justify-end gap-1.5 pt-2">
                   <Button
-                    key={pageNumber}
                     type="button"
-                    variant={pageNumber === pageSafe ? 'default' : 'outline'}
-                    size="sm"
-                    className="h-9 min-w-9 px-3"
-                    onClick={() => setPage(pageNumber)}
+                    variant="outline"
+                    size="icon"
+                    className="size-8"
+                    disabled={pageSafe <= 1}
+                    onClick={() => setPage((prev) => Math.max(1, prev - 1))}
                   >
-                    {pageNumber}
+                    <ChevronLeft className="size-3.5" />
+                    <span className="sr-only">Anterior</span>
                   </Button>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-9 w-9"
-                  disabled={pageSafe >= totalPages}
-                  onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                >
-                  <ChevronRight className="size-4" />
-                  <span className="sr-only">Siguiente</span>
-                </Button>
-              </div>
+                  {pageWindow.map((pageNumber) => (
+                    <Button
+                      key={pageNumber}
+                      type="button"
+                      variant={pageNumber === pageSafe ? 'default' : 'outline'}
+                      size="sm"
+                      className="size-8 p-0 text-xs"
+                      onClick={() => setPage(pageNumber)}
+                    >
+                      {pageNumber}
+                    </Button>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="size-8"
+                    disabled={pageSafe >= totalPages}
+                    onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                  >
+                    <ChevronRight className="size-3.5" />
+                    <span className="sr-only">Siguiente</span>
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 
           {revokeMutation.isError && (
             <Alert variant="destructive">
-              <AlertTitle>No se pudo revocar la sesion</AlertTitle>
+              <AlertTitle>No se pudo revocar la sesión</AlertTitle>
               <AlertDescription>{revokeMutation.error.message}</AlertDescription>
             </Alert>
           )}
-          {revokeAllMutation.isError && (
-            <Alert variant="destructive">
-              <AlertTitle>No se pudieron cerrar todas las sesiones</AlertTitle>
-              <AlertDescription>
-                Ocurrio un error al cerrar sesiones en todos los dispositivos.
-              </AlertDescription>
-            </Alert>
-          )}
+
+          <div className="flex items-start gap-2.5 rounded-xl border border-border/50 bg-muted/40 p-3 text-xs text-muted-foreground">
+            <ShieldAlert className="mt-0.5 size-4 shrink-0 text-primary" />
+            <span>Cerrar una sesión revoca el acceso de ese navegador sin modificar tu clave principal.</span>
+          </div>
         </CardContent>
       </Card>
     </section>

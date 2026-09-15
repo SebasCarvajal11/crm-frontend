@@ -1,4 +1,4 @@
-﻿import { User } from 'lucide-react'
+import { User } from 'lucide-react'
 import { ProjectTypeBadge } from '@/components/molecules/project-type-badge'
 import type { ProjectListItem } from '@/features/collab/model'
 
@@ -21,7 +21,7 @@ export function ProjectCard({ project, onClick }: Props) {
       type="button"
       onClick={onClick}
       aria-label={`Abrir proyecto ${project.name}, cliente ${project.clientName}, ${pct}% completado`}
-      className="group w-full text-left rounded-lg border border-border bg-background p-3.5 shadow-sm transition-all duration-150 hover:shadow-md hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer"
+      className="group w-full text-left rounded-lg border border-border bg-background p-3.5 shadow-sm interactive-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer"
     >
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <span className="font-semibold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors">

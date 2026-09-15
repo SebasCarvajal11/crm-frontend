@@ -1,5 +1,6 @@
 import { CheckCircle2, FileText } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 
 type BriefData = {
   projectId: string
@@ -25,15 +26,15 @@ type Props = {
 export function BriefPanel({ brief, formalChanges, isLoading }: Props) {
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-16" role="status" aria-label="Cargando brief">
+      <div className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} items-center justify-center rounded-xl border bg-card shadow-sm`} role="status" aria-label="Cargando brief">
         <div className="animate-spin rounded-full h-6 w-6 border-2 border-muted border-t-primary" />
       </div>
     )
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
-      <div className="overflow-hidden rounded-xl border bg-card shadow-sm" role="region" aria-label="Brief del proyecto">
+    <div className="grid gap-4 min-[1280px]:grid-cols-[minmax(0,1fr)_minmax(20rem,0.6fr)]">
+      <div className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`} role="region" aria-label="Brief del proyecto">
         <div className="flex items-center justify-between border-b px-4 py-3">
           <div>
             <h3 className="text-sm font-semibold">Brief del Proyecto</h3>
@@ -45,13 +46,13 @@ export function BriefPanel({ brief, formalChanges, isLoading }: Props) {
             )}
           </div>
         </div>
-        <div className="p-5">
+        <div className="min-h-0 flex-1 overflow-y-auto p-5">
           {brief?.content ? (
             <div className="break-words whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
               {brief.content}
             </div>
           ) : (
-            <div className="flex flex-col items-center py-10 gap-2 text-muted-foreground">
+            <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
               <FileText className="size-10 opacity-20" aria-hidden="true" />
               <p>Sin brief configurado para este proyecto.</p>
             </div>
@@ -59,21 +60,21 @@ export function BriefPanel({ brief, formalChanges, isLoading }: Props) {
         </div>
       </div>
 
-      <div className="flex max-h-[min(600px,70vh)] flex-col overflow-hidden rounded-xl border bg-card shadow-sm" role="region" aria-label="Historial de cambios formales">
+      <div className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`} role="region" aria-label="Historial de cambios formales">
         <div className="border-b px-4 py-3">
           <h3 className="text-sm font-semibold">Cambios Formales</h3>
           <p className="text-xs text-muted-foreground mt-0.5">Historial de modificaciones de alcance</p>
         </div>
-        <div className="flex-1 overflow-y-auto p-3">
+        <div className="min-h-0 flex-1 overflow-y-auto p-3">
           {formalChanges.length === 0 ? (
-            <div className="flex flex-col items-center py-8 gap-2 text-muted-foreground">
+            <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
               <CheckCircle2 className="size-8 opacity-20" aria-hidden="true" />
               <p className="text-sm">Sin cambios formales registrados.</p>
             </div>
           ) : (
             <ol className="space-y-2" aria-label="Lista de cambios formales">
               {formalChanges.map((fc) => (
-                <li key={fc.id} className="rounded-lg border bg-background p-3">
+                <li key={fc.id} className="rounded-lg border bg-background p-3 interactive-row">
                   <p className="text-sm font-medium">{fc.title}</p>
                   <div className="flex items-center justify-between mt-1.5 gap-2">
                     <Badge variant="outline" className="text-[10px]">{fc.status}</Badge>

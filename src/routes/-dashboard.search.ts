@@ -3,7 +3,7 @@ export type DashboardTab = 'overview' | 'collab' | 'marketing' | 'account' | 'no
 export type DashboardSearch = {
   tab?: DashboardTab
   project_id?: string
-  workspace_tab?: 'board' | 'chat' | 'brief' | 'members'
+  workspace_tab?: 'board' | 'chat' | 'brief' | 'contract' | 'members'
   chat_channel?: 'internal' | 'external'
   chat_message_id?: string
 }
@@ -26,6 +26,7 @@ export const parseDashboardSearch = (search: Record<string, unknown>): Dashboard
       search.workspace_tab === 'board' ||
       search.workspace_tab === 'chat' ||
       search.workspace_tab === 'brief' ||
+      search.workspace_tab === 'contract' ||
       search.workspace_tab === 'members'
         ? search.workspace_tab
         : undefined,

@@ -9,6 +9,7 @@ export type ProjectListItem = {
   type: ProjectType
   status: ParentProjectStatus
   progressPercent: number
+  fileRepositoryUrl?: string | null
   estimatedDueDate?: string | null
   createdAt?: string
   updatedAt?: string

@@ -9,6 +9,8 @@ dist-ssr/
 build/
 out/
 *.tsbuildinfo
+.turbo/
+.vite/
 
 # Environment files
 .env

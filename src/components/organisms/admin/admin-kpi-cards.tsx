@@ -20,7 +20,7 @@ type KpiItem = {
 function KpiCard({ item, isLoading }: { item: KpiItem; isLoading: boolean }) {
   return (
     <Card
-      className={`relative overflow-hidden rounded-2xl border ${item.borderColor} bg-card/80 p-5 shadow-sm backdrop-blur-sm transition-all hover:shadow-md`}
+      className={`relative overflow-hidden rounded-2xl border ${item.borderColor} bg-card/80 p-5 shadow-sm backdrop-blur-sm interactive-card`}
     >
       <CardContent className="flex items-center justify-between p-0">
         <div className="space-y-1">

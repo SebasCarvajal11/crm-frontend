@@ -75,7 +75,7 @@ interface KpiCardProps {
 function KpiCard({ label, value, subtitle, icon: Icon, accent, loading }: KpiCardProps) {
   const styles = ACCENT_STYLES[accent]
   return (
-    <div className="group relative overflow-hidden rounded-xl border bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+    <div className="group relative overflow-hidden rounded-xl border bg-card p-5 shadow-sm interactive-card">
       <div className={`absolute inset-x-0 top-0 h-1 ${styles.bar}`} />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -365,7 +365,7 @@ export function DashboardAnalytics({ accessToken }: Props) {
                 {lowStockQuery.data.map((item) => {
                   const severity = getStockSeverity(item)
                   return (
-                    <tr key={item.inventoryId} className="border-b hover:bg-muted/50">
+                    <tr key={item.inventoryId} className="border-b interactive-row">
                       <td className="py-2 px-4 font-medium">{item.productName}</td>
                       <td className="py-2 px-4 text-muted-foreground">{item.inventoryType}</td>
                       <td className="py-2 px-4 text-right">{item.totalStock}</td>

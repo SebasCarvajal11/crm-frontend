@@ -15,7 +15,7 @@ test.describe('Client - Login y Navegacion', () => {
 
     await expect(page).toHaveURL(/\/dashboard/)
     const dashboard = new DashboardPage(page)
-    await expect(dashboard.overviewTab).toBeVisible()
+    await expect(dashboard.overviewTab).not.toBeVisible()
     await expect(dashboard.collabTab).toBeVisible()
 
     await logger.persist(false)
@@ -27,6 +27,9 @@ test.describe('Client - Login y Navegacion', () => {
 
     const dashboard = new DashboardPage(clientPage)
     await dashboard.expectDashboardLoaded()
+
+    const overviewVisible = await dashboard.isTabVisible('Resumen')
+    expect(overviewVisible).toBe(false)
 
     const adminVisible = await dashboard.isTabVisible('Administracion')
     expect(adminVisible).toBe(false)

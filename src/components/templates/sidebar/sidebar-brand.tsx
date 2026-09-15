@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { cn } from '@/shared/lib/utils'
 import { CimaLogo } from '@/components/ui/cima-logo'
 
 export function SidebarBrand({
@@ -13,16 +14,19 @@ export function SidebarBrand({
   closeOnNavigate: () => void
 }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className={cn('flex items-center gap-3', compact && 'w-full justify-center')}>
       <Link
         to="/dashboard"
         aria-label={title || 'Inicio'}
-        className="flex items-center gap-2.5 min-w-0 transition-opacity hover:opacity-90"
+        className={cn(
+          'flex items-center gap-2.5 min-w-0 transition-opacity hover:opacity-90',
+          compact && 'justify-center'
+        )}
         onClick={closeOnNavigate}
       >
         <CimaLogo size={28} showText={!compact} textColor="text-white" subtitle={false} />
       </Link>
-      {headerExtras ? <div className="ml-auto shrink-0">{headerExtras}</div> : null}
+      {!compact && headerExtras ? <div className="ml-auto shrink-0">{headerExtras}</div> : null}
     </div>
   )
 }

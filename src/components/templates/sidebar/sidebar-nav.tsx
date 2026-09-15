@@ -24,6 +24,7 @@ export function SidebarNav({
             item.onClick()
             onItemClick()
           }}
+          title={compact ? item.label : undefined}
           aria-current={item.isActive ? 'page' : undefined}
           className={cn(
             navItemBaseClass,
