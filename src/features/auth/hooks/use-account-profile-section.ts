@@ -109,7 +109,20 @@ export function useAccountProfileSection(accessToken: string) {
     setSelectedImageSrc(src)
     setCrop({ x: 0, y: 0 })
     setZoom(1)
-    setCroppedAreaPixels(null)
+
+    // Pre-calcular recorte cuadrado centrado por defecto
+    const img = new Image()
+    img.onload = () => {
+      const minSide = Math.min(img.naturalWidth, img.naturalHeight)
+      setCroppedAreaPixels({
+        x: Math.round((img.naturalWidth - minSide) / 2),
+        y: Math.round((img.naturalHeight - minSide) / 2),
+        width: minSide,
+        height: minSide,
+      })
+    }
+    img.src = src
+
     event.currentTarget.value = ''
   }
 
@@ -123,11 +136,28 @@ export function useAccountProfileSection(accessToken: string) {
   }
 
   const onSaveCroppedAvatar = async () => {
-    if (!croppedAreaPixels || !selectedFileRef.current) return
+    if (!selectedFileRef.current) return
+    const fileRef = selectedFileRef.current
+    let targetCrop = croppedAreaPixels
+    if (!targetCrop) {
+      const bitmap = await createImageBitmap(fileRef).catch(() => null)
+      if (bitmap) {
+        const minSide = Math.min(bitmap.width, bitmap.height)
+        targetCrop = {
+          x: Math.round((bitmap.width - minSide) / 2),
+          y: Math.round((bitmap.height - minSide) / 2),
+          width: minSide,
+          height: minSide,
+        }
+        bitmap.close()
+      } else {
+        targetCrop = { x: 0, y: 0, width: 512, height: 512 }
+      }
+    }
     // Lee el ArrayBuffer del File original — no usa fetch(), no viola CSP.
-    const buffer = await selectedFileRef.current.arrayBuffer()
-    const mimeType = selectedFileRef.current.type || 'image/jpeg'
-    const file = await getCroppedFileViaWorker(buffer, mimeType, croppedAreaPixels)
+    const buffer = await fileRef.arrayBuffer()
+    const mimeType = fileRef.type || 'image/jpeg'
+    const file = await getCroppedFileViaWorker(buffer, mimeType, targetCrop)
     uploadAvatarMutation.mutate(file)
   }
 

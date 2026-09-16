@@ -24,7 +24,6 @@ export function ProfileSection({ accessToken, identity }: Props) {
     avatarUrl,
     clearSelectedImage,
     crop,
-    croppedAreaPixels,
     onAvatarFileSelect,
     onCropComplete,
     onSaveCroppedAvatar,
@@ -106,7 +105,6 @@ export function ProfileSection({ accessToken, identity }: Props) {
         setZoom={setZoom}
         onCropComplete={onCropComplete}
         onSaveCroppedAvatar={onSaveCroppedAvatar}
-        hasCroppedArea={Boolean(croppedAreaPixels)}
         isUploading={uploadAvatarMutation.isPending}
       />
     </section>

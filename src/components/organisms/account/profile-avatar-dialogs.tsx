@@ -24,7 +24,6 @@ interface ProfileAvatarDialogsProps {
   setZoom: (zoom: number) => void
   onCropComplete: (croppedArea: Area, croppedAreaPixels: Area) => void
   onSaveCroppedAvatar: () => Promise<void>
-  hasCroppedArea: boolean
   isUploading: boolean
 }
 
@@ -40,7 +39,6 @@ export function ProfileAvatarDialogs({
   setZoom,
   onCropComplete,
   onSaveCroppedAvatar,
-  hasCroppedArea,
   isUploading,
 }: ProfileAvatarDialogsProps) {
   return (
@@ -129,7 +127,7 @@ export function ProfileAvatarDialogs({
             </Button>
             <Button
               onClick={() => void onSaveCroppedAvatar()}
-              disabled={!hasCroppedArea || isUploading}
+              disabled={isUploading}
             >
               {isUploading ? (
                 <>
