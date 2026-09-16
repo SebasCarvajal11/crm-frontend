@@ -8,7 +8,7 @@ export type MentionPayload = {
   messageId?: string | null
 }
 
-export type WorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'members'
+export type WorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
 
 export function useDashboardNavigation() {
   const navigate = useNavigate({ from: '/dashboard' })

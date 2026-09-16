@@ -9,6 +9,7 @@ import {
   FileText,
   FileVideo,
   GitPullRequestArrow,
+  GitPullRequestClosed,
   UserRound,
 } from 'lucide-react'
 import type { ProjectContract, ProjectMember, ProjectTask, ProjectTimelineItem } from '@/features/collab/model'
@@ -43,6 +44,7 @@ const fileIcon = (mimeType: string) =>
 const itemIcon = (item: ProjectTimelineItem) => {
   if (item.kind === 'task_completed') return CheckCircle2
   if (item.kind === 'change_accepted') return GitPullRequestArrow
+  if (item.kind === 'change_rejected') return GitPullRequestClosed
   return fileIcon(item.mimeType ?? 'application/octet-stream')
 }
 
@@ -66,9 +68,10 @@ const formatBogotaDate = (iso: string | null | undefined): string => {
 }
 
 const badgeClassByKind: Record<ProjectTimelineItem['kind'], string> = {
-  file: 'bg-sky-100 text-sky-800 border-sky-200',
-  task_completed: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  change_accepted: 'bg-amber-100 text-amber-800 border-amber-200',
+  file: 'bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800',
+  task_completed: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800',
+  change_accepted: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800',
+  change_rejected: 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800',
 }
 
 export function ConversationFilesTimeline({
@@ -203,6 +206,7 @@ export function ConversationFilesTimeline({
               <SelectItem value="all">Todos</SelectItem>
               <SelectItem value="file">Archivo</SelectItem>
               <SelectItem value="change_accepted">Cambio aceptado</SelectItem>
+              <SelectItem value="change_rejected">Cambio rechazado</SelectItem>
               <SelectItem value="task_completed">Tarea finalizada</SelectItem>
             </SelectContent>
           </Select>
@@ -245,15 +249,33 @@ export function ConversationFilesTimeline({
                     {item.kind === 'task_completed' && linkedTask && (
                       <p className="mt-0.5 text-[11px] text-muted-foreground">Progreso final: {linkedTask.checklistProgress}%</p>
                     )}
+                    {item.resolutionComment && (
+                      <div className={`mt-2 rounded-md border p-2 text-[11px] ${item.kind === 'change_rejected' ? 'border-rose-200 bg-rose-50/60 text-rose-900 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-200' : 'border-emerald-200 bg-emerald-50/60 text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-200'}`}>
+                        <p className="font-semibold">{item.kind === 'change_rejected' ? 'Motivo del rechazo:' : 'Nota de resolución:'}</p>
+                        <p className="mt-0.5 leading-relaxed">{item.resolutionComment}</p>
+                      </div>
+                    )}
                     <div className="mt-2.5 grid gap-1 text-[10px] text-muted-foreground">
                       <p className="inline-flex items-center gap-1.5 leading-none">
                         <CalendarClock className="size-3" />
                         {formatBogotaDate(item.occurredAt)}
                       </p>
-                      {actorEmail && (
+                      {item.requestedBySub && emailBySub.get(item.requestedBySub) && (
+                        <p className="inline-flex items-center gap-1.5 leading-none">
+                          <UserRound className="size-3" />
+                          Solicitante: {emailBySub.get(item.requestedBySub)}
+                        </p>
+                      )}
+                      {actorEmail && !item.requestedBySub && (
                         <p className="inline-flex items-center gap-1.5 leading-none">
                           <UserRound className="size-3" />
                           {actorEmail}
+                        </p>
+                      )}
+                      {item.resolvedBySub && emailBySub.get(item.resolvedBySub) && (
+                        <p className="inline-flex items-center gap-1.5 leading-none font-medium text-foreground/80">
+                          <CheckCircle2 className="size-3 text-primary" />
+                          {item.kind === 'change_rejected' ? 'Rechazado por: ' : 'Aceptado por: '}{emailBySub.get(item.resolvedBySub)}
                         </p>
                       )}
                     </div>

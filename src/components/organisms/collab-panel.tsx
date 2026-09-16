@@ -27,12 +27,12 @@ type Props = {
   identity: MeResponse['data']
   initialProjects?: ProjectListItem[]
   openProjectId?: string
-  workspaceTab?: 'board' | 'chat' | 'brief' | 'contract' | 'members'
+  workspaceTab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
   chatChannel?: 'internal' | 'external'
   chatMessageId?: string
   onOpenProject: (projectId: string) => void
   onCloseProject: () => void
-  onTabChange: (tab: 'board' | 'chat' | 'brief' | 'contract' | 'members') => void
+  onTabChange: (tab: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members') => void
 }
 
 export function CollabPanel({

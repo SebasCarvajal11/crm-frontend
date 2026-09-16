@@ -7,10 +7,11 @@ import {
   listExternalChatRequest,
   listFormalChangeLogRequest,
   listInternalChatRequest,
+  listProjectChangeRequestsRequest,
 } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
 
-type WorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'members'
+type WorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
 
 type Params = {
   accessToken: string
@@ -58,6 +59,13 @@ export function useProjectWorkspaceData({ accessToken, projectId, activeTab, isC
     staleTime: 30_000,
   })
 
+  const changeRequestsQ = useQuery({
+    queryKey: collabKeys.changeRequests(projectId),
+    queryFn: () => listProjectChangeRequestsRequest(accessToken, projectId),
+    enabled: activeTab === 'change-requests',
+    staleTime: 15_000,
+  })
+
   useEffect(() => {
     void queryClient.prefetchQuery({
       queryKey: [...collabKeys.chatExternal(projectId), 20],
@@ -80,7 +88,7 @@ export function useProjectWorkspaceData({ accessToken, projectId, activeTab, isC
     })
   }, [accessToken, isClient, projectId, queryClient])
 
-  return { boardQ, briefQ, contractQ }
+  return { boardQ, briefQ, contractQ, changeRequestsQ }
 }
 
 

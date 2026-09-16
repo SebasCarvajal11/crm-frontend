@@ -228,8 +228,8 @@ export type ProjectFileEnriched = ProjectFile & {
 
 export type ProjectTimelineItem = {
   id: string
-  kind: 'file' | 'task_completed' | 'change_accepted'
-  label: 'Archivo' | 'Tarea finalizada' | 'Cambio aceptado'
+  kind: 'file' | 'task_completed' | 'change_accepted' | 'change_rejected'
+  label: 'Archivo' | 'Tarea finalizada' | 'Cambio aceptado' | 'Cambio rechazado'
   title: string
   occurredAt: string
   fileId: string | null
@@ -239,6 +239,9 @@ export type ProjectTimelineItem = {
   changeRequestId: string | null
   createdBySub: string | null
   createdByEmail: string | null
+  requestedBySub?: string | null
+  resolvedBySub?: string | null
+  resolutionComment?: string | null
   isClientVisible: boolean
 }
 
@@ -260,6 +263,7 @@ export type ProjectTaskComment = {
 
 export type ChangeRequestType = 'minor' | 'formal'
 export type ChangeRequestStatus = 'open' | 'accepted' | 'rejected' | 'escalated' | 'approved'
+export type ChangeRequestPriority = 'low' | 'medium' | 'high' | 'urgent'
 
 export type ProjectChangeRequest = {
   id: string
@@ -267,11 +271,13 @@ export type ProjectChangeRequest = {
   taskId: string | null
   type: ChangeRequestType
   status: ChangeRequestStatus
+  priority?: ChangeRequestPriority
   requestedBySub: string
   resolvedBySub: string | null
   title: string
   description: string
   justification: string | null
+  resolutionComment?: string | null
   createdAt: string
   resolvedAt: string | null
 }

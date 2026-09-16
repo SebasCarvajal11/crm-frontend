@@ -93,6 +93,7 @@ export const PROJECT_ROUTES = {
   chatInternal: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/internal`,
   chatInternalRead: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/internal/read`,
   // Change Requests
+  changeRequests: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/change-requests`,
   changeRequestMinor: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/change-requests/minor`,
   changeRequestFormal: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/change-requests/formal`,
   changeRequest: (projectId: string, changeRequestId: string) =>

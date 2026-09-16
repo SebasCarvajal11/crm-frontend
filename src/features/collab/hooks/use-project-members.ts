@@ -35,7 +35,9 @@ export function useProjectMembers({
     staleTime: 20_000,
   })
 
-  const resolvedMembers = membersQ.data?.data ?? members
+  const resolvedMembers = Array.isArray(membersQ.data?.data)
+    ? membersQ.data.data
+    : Array.isArray(members) ? members : []
   const avatarSubjects = Array.from(new Set(resolvedMembers.map((m) => m.userSub)))
 
   const avatarsQ = useQuery({

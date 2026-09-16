@@ -31,7 +31,7 @@ import { DashboardAnalytics} from '@/components/organisms/dashboard-analytics'
 type Props = {
   tab?: DashboardTab
   project_id?: string
-  workspace_tab?: 'board' | 'chat' | 'brief' | 'contract' | 'members'
+  workspace_tab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
   chat_channel?: 'internal' | 'external'
   chat_message_id?: string
 }

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
-import { AlertCircle, ArrowLeft, FileSignature, FileText, KanbanSquare, MessageSquare, Users } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { AlertCircle, ArrowLeft, FileSignature, FileText, GitPullRequest, KanbanSquare, MessageSquare, Users } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { SectionTabs, type SectionTabItem } from '@/components/molecules/section-tabs'
@@ -11,10 +12,11 @@ import { ConversationPanel } from './conversation-panel'
 import { BriefPanel } from './brief-panel'
 import { ProjectMembers } from './project-members'
 import { ContractPanel } from './contract-panel'
-import type { ProjectListItem } from '@/features/collab/model'
+import { ChangeRequestsPanel } from './change-requests'
+import { collabKeys, type ProjectListItem } from '@/features/collab/model'
 import type { MeResponse } from '@/shared/types'
 
-type WorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'members'
+type WorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
 
 type Props = {
   accessToken: string
@@ -29,16 +31,18 @@ type Props = {
 }
 
 const TABS: SectionTabItem<WorkspaceTab>[] = [
-  { value: 'board',   label: 'Tablero',      icon: <KanbanSquare  className="size-4" /> },
-  { value: 'chat',    label: 'Conversacion', icon: <MessageSquare className="size-4" /> },
-  { value: 'brief',   label: 'Brief',        icon: <FileText      className="size-4" /> },
-  { value: 'contract', label: 'Contrato',    icon: <FileSignature className="size-4" /> },
-  { value: 'members', label: 'Integrantes',  icon: <Users         className="size-4" /> },
+  { value: 'board',           label: 'Tablero',              icon: <KanbanSquare  className="size-4" /> },
+  { value: 'chat',            label: 'Conversación',         icon: <MessageSquare className="size-4" /> },
+  { value: 'brief',           label: 'Brief',                icon: <FileText      className="size-4" /> },
+  { value: 'contract',        label: 'Contrato',             icon: <FileSignature className="size-4" /> },
+  { value: 'change-requests', label: 'Solicitud de cambios', icon: <GitPullRequest className="size-4" /> },
+  { value: 'members',         label: 'Integrantes',          icon: <Users         className="size-4" /> },
 ]
 
 const FINALIZATION_COLUMN_KEYS = new Set(['done', 'completed'])
 
 export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta, activeTab = 'board', chatChannel, chatMessageId, onBack, onTabChange }: Props) {
+  const queryClient = useQueryClient()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [taskSearchDebounced, setTaskSearchDebounced] = useState('')
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null)
@@ -46,7 +50,7 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
   const isClient = identity.role === 'client'
   const canOperate = identity.role === 'admin' || identity.role === 'worker'
 
-  const { boardQ, briefQ, contractQ } = useProjectWorkspaceData({ accessToken, projectId, activeTab, isClient })
+  const { boardQ, briefQ, contractQ, changeRequestsQ } = useProjectWorkspaceData({ accessToken, projectId, activeTab, isClient })
   const { moveTask, invalidateBoardScope } = useProjectBoardMutations({ accessToken, projectId, onError: (message) => setErrorMsg(message) })
 
   const boardData = boardQ.data?.data
@@ -205,6 +209,28 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
             contract={contractQ.data?.data ?? null}
             members={members}
             role={identity.role}
+            onError={setErrorMsg}
+          />
+        </div>
+
+        <div
+          id="tabpanel-change-requests"
+          role="tabpanel"
+          className={activeTab === 'change-requests' ? 'tab-pane-transition' : undefined}
+          style={{ display: activeTab === 'change-requests' ? 'block' : 'none' }}
+        >
+          <ChangeRequestsPanel
+            accessToken={accessToken}
+            projectId={projectId}
+            identity={identity}
+            tasks={boardTasks}
+            members={members}
+            changeRequests={changeRequestsQ?.data?.data ?? []}
+            isLoading={changeRequestsQ?.isLoading ?? false}
+            onRefresh={() => {
+              void changeRequestsQ?.refetch()
+              void queryClient.invalidateQueries({ queryKey: collabKeys.timeline(projectId) })
+            }}
             onError={setErrorMsg}
           />
         </div>
