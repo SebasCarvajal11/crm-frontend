@@ -5,7 +5,6 @@ import {
   getProjectContractRequest,
   getProjectBoardRequest,
   listExternalChatRequest,
-  listFormalChangeLogRequest,
   listInternalChatRequest,
   listProjectChangeRequestsRequest,
 } from '@/features/collab/api'
@@ -21,18 +20,13 @@ type Params = {
 }
 
 async function fetchBriefPanel(accessToken: string, projectId: string) {
-  const [briefRes, formalRes] = await Promise.all([
+  const [briefRes, crRes] = await Promise.all([
     getBriefRequest(accessToken, projectId),
-    listFormalChangeLogRequest(accessToken, projectId),
+    listProjectChangeRequestsRequest(accessToken, projectId),
   ])
   return {
     brief: briefRes.data ?? null,
-    formalChanges: (formalRes.data.items ?? []).map((row) => ({
-      id: row.id,
-      title: row.description,
-      status: 'approved' as const,
-      createdAt: row.createdAt,
-    })),
+    changeRequests: crRes.data ?? [],
   }
 }
 

@@ -54,10 +54,10 @@ export function useDashboardNavigation() {
   )
 
   const openProject = useCallback(
-    (projectId: string) => {
+    (projectId: string, workspaceTab: WorkspaceTab = 'board') => {
       navigate({
         to: '/dashboard',
-        search: (prev) => ({ ...prev, tab: 'collab', project_id: projectId, workspace_tab: 'board' }),
+        search: (prev) => ({ ...prev, tab: 'collab', project_id: projectId, workspace_tab: workspaceTab }),
         replace: true,
       })
     },

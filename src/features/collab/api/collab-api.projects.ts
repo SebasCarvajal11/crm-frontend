@@ -18,6 +18,7 @@ import type {
   ProjectWorkspaceResponse,
   ProjectContract,
 } from '@/features/collab/model'
+import type { AdminPendingChangeRequestItem } from '@/features/overview/model/overview.types'
 
 export { bearer }
 
@@ -408,4 +409,12 @@ export async function listFormalChangeLogRequest(
   return api
     .get(PROJECT_ROUTES.changeLogFormal(projectId), { headers: bearer(accessToken), searchParams })
     .json<DataResponse<PaginatedData<{ id: string; description: string; createdAt: string }>>>()
+}
+
+export async function listPendingChangeRequestsRequest(
+  accessToken: string,
+): Promise<DataResponse<AdminPendingChangeRequestItem[]>> {
+  return api
+    .get(PROJECT_ROUTES.pendingChangeRequests, { headers: bearer(accessToken) })
+    .json<DataResponse<AdminPendingChangeRequestItem[]>>()
 }

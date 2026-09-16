@@ -99,6 +99,7 @@ export const PROJECT_ROUTES = {
   changeRequest: (projectId: string, changeRequestId: string) =>
     `${COLLAB_API}/collab/projects/${projectId}/change-requests/${changeRequestId}`,
   changeLogFormal: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/change-log/formal`,
+  pendingChangeRequests: `${COLLAB_API}/collab/change-requests/pending`,
 } as const
 
 // ── Columns (autenticado) ───────────────────────────────────────────────────

@@ -192,7 +192,7 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
         >
           <BriefPanel
             brief={briefQ.data?.brief ?? null}
-            formalChanges={briefQ.data?.formalChanges ?? []}
+            changeRequests={briefQ.data?.changeRequests ?? []}
             isLoading={briefQ.isLoading}
           />
         </div>
@@ -230,6 +230,8 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
             onRefresh={() => {
               void changeRequestsQ?.refetch()
               void queryClient.invalidateQueries({ queryKey: collabKeys.timeline(projectId) })
+              void queryClient.invalidateQueries({ queryKey: collabKeys.brief(projectId) })
+              void queryClient.invalidateQueries({ queryKey: collabKeys.pendingChangeRequests() })
             }}
             onError={setErrorMsg}
           />

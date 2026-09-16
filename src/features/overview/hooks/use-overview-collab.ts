@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useQueries, useQuery } from '@tanstack/react-query'
-import { getProjectBoardRequest } from '@/features/collab/api'
+import { getProjectBoardRequest, listPendingChangeRequestsRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
 import { adminListUsersRequest } from '@/features/admin/api'
 import type { ProjectListItem } from '@/features/collab/model'
@@ -39,6 +39,13 @@ export function useOverviewCollab({
     queryFn: () => adminListUsersRequest(accessToken, { role: 'worker', limit: 100 }),
     enabled: Boolean(accessToken && isAdmin),
     staleTime: 120_000,
+  })
+
+  const pendingChangeRequestsQ = useQuery({
+    queryKey: collabKeys.pendingChangeRequests(),
+    queryFn: () => listPendingChangeRequestsRequest(accessToken),
+    enabled: Boolean(accessToken && isAdmin),
+    staleTime: 30_000,
   })
 
   const isLoading = boardQueries.some((q) => q.isLoading)
@@ -198,5 +205,7 @@ export function useOverviewCollab({
     adminWorkerWorkload,
     adminClientRanking,
     adminRecentProjects,
+    adminPendingChangeRequests: pendingChangeRequestsQ.data?.data ?? [],
+    isAdminPendingChangeRequestsLoading: pendingChangeRequestsQ.isLoading,
   }
 }

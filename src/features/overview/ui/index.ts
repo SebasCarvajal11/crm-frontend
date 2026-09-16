@@ -7,3 +7,4 @@ export { OverviewAdminRecentProjectsSection } from './OverviewAdminRecentProject
 export { OverviewAdminBlockedTasksSection } from './OverviewAdminBlockedTasksSection'
 export { OverviewAdminWorkloadSection } from './OverviewAdminWorkloadSection'
 export { OverviewAdminClientRankingSection } from './OverviewAdminClientRankingSection'
+export { OverviewAdminPendingChangeRequestsSection } from './OverviewAdminPendingChangeRequestsSection'

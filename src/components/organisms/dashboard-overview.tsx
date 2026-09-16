@@ -9,6 +9,7 @@ import {
 import {
   OverviewAdminBlockedTasksSection,
   OverviewAdminClientRankingSection,
+  OverviewAdminPendingChangeRequestsSection,
   OverviewAdminRecentClientsSection,
   OverviewAdminRecentProjectsSection,
   OverviewAdminWorkloadSection,
@@ -30,7 +31,7 @@ type DashboardOverviewProps = {
   accessToken: string
   projects?: ProjectListItem[]
   onOpenProfile?: () => void
-  onOpenProject?: (projectId: string) => void
+  onOpenProject?: (projectId: string, tab?: any) => void
   onOpenNotification?: (payload: OpenNotificationPayload) => void
 }
 
@@ -72,6 +73,8 @@ export function DashboardOverview({
     adminWorkerWorkload,
     adminClientRanking,
     adminRecentProjects,
+    adminPendingChangeRequests,
+    isAdminPendingChangeRequestsLoading,
   } = useOverviewCollab({
     accessToken,
     projects,
@@ -127,6 +130,12 @@ export function DashboardOverview({
 
       {isAdmin && (
         <div className="space-y-6 animate-fade-up stagger-3">
+          <OverviewAdminPendingChangeRequestsSection
+            items={adminPendingChangeRequests}
+            isLoading={isAdminPendingChangeRequestsLoading}
+            onOpenProject={(projectId) => onOpenProject?.(projectId, 'change-requests')}
+          />
+
           <OverviewAdminBlockedTasksSection
             tasks={adminBlockedTasks}
             isLoading={isCollabLoading}

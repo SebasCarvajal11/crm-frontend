@@ -12,6 +12,7 @@ export const collabKeys = {
   timeline: (projectId: string) => [...collabKeys.all, 'timeline', projectId] as const,
   changeLog: (projectId: string) => [...collabKeys.all, 'change-log', projectId] as const,
   changeRequests: (projectId: string) => [...collabKeys.all, 'change-requests', projectId] as const,
+  pendingChangeRequests: () => [...collabKeys.all, 'pending-change-requests'] as const,
   taskComments: (taskId: string) => [...collabKeys.all, 'task-comments', taskId] as const,
   taskFiles: (taskId: string) => [...collabKeys.all, 'task-files', taskId] as const,
   taskAssignees: (taskId: string) => [...collabKeys.all, 'task-assignees', taskId] as const,

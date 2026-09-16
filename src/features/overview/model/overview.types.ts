@@ -1,4 +1,9 @@
-import type { TaskPriority } from '@/features/collab/model'
+import type { ProjectChangeRequest, TaskPriority } from '@/features/collab/model'
+
+export type AdminPendingChangeRequestItem = ProjectChangeRequest & {
+  projectName: string
+  clientName: string
+}
 
 export type WorkerPendingTaskItem = {
   taskId: string
