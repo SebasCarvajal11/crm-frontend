@@ -96,7 +96,7 @@ export function LoginForm() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label htmlFor="password" className="text-sm font-medium text-foreground">
-            Contrasena
+            Contraseña
           </label>
           <Link
             to="/forgot-password"

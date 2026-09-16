@@ -9,11 +9,15 @@ type AuthSplitLayoutProps = {
   description?: string
   children: ReactNode
   footer?: ReactNode
+  heroTitle?: string
+  heroDescription?: string
+  features?: string[]
+  badgeText?: string
 }
 
-const FEATURE_HIGHLIGHTS = [
+const DEFAULT_FEATURE_HIGHLIGHTS = [
   'Gestión 360° de Clientes y Oportunidades',
-  'Espacios de Colaboración y Kanban',
+  'Espacios de Colaboración y Tableros Kanban',
   'Métricas y Rendimiento en Tiempo Real',
 ]
 
@@ -28,7 +32,17 @@ function HeroFeatureItem({ text }: { text: string }) {
   )
 }
 
-function HeroBrandPanel() {
+function HeroBrandPanel({
+  heroTitle = 'Centro de Innovación Multimedia y Artística',
+  heroDescription = 'Plataforma centralizada para la aceleración comercial, gestión operativa y colaboración ágil.',
+  features = DEFAULT_FEATURE_HIGHLIGHTS,
+  badgeText = 'Acceso empresarial seguro y encriptado',
+}: {
+  heroTitle?: string
+  heroDescription?: string
+  features?: string[]
+  badgeText?: string
+}) {
   return (
     <aside
       className="relative flex flex-col justify-between overflow-hidden bg-primary bg-cover bg-center p-5 text-primary-foreground sm:p-8 lg:col-span-5 lg:p-10"
@@ -41,14 +55,14 @@ function HeroBrandPanel() {
         <CimaLogo size={36} inverted subtitle />
         <div className="space-y-1.5 sm:space-y-2 pt-1 sm:pt-2">
           <h2 className="text-xl font-bold tracking-tight text-white sm:text-2xl lg:text-3xl">
-            Centro de Innovación y Medios
+            {heroTitle}
           </h2>
           <p className="text-xs leading-relaxed text-primary-foreground/80 sm:text-sm">
-            Plataforma centralizada para la aceleración comercial, gestión operativa y colaboración ágil.
+            {heroDescription}
           </p>
         </div>
         <div className="hidden space-y-2.5 pt-2 sm:block">
-          {FEATURE_HIGHLIGHTS.map((feature) => (
+          {features.map((feature) => (
             <HeroFeatureItem key={feature} text={feature} />
           ))}
         </div>
@@ -56,7 +70,7 @@ function HeroBrandPanel() {
 
       <div className="relative z-10 hidden pt-6 sm:flex items-center gap-2 text-xs text-primary-foreground/75 border-t border-white/10">
         <ShieldCheck className="size-4 shrink-0 text-white/90" />
-        <span>Acceso empresarial seguro y encriptado</span>
+        <span>{badgeText}</span>
       </div>
     </aside>
   )
@@ -67,6 +81,10 @@ export function AuthSplitLayout({
   description,
   children,
   footer,
+  heroTitle,
+  heroDescription,
+  features,
+  badgeText,
 }: AuthSplitLayoutProps) {
   return (
     <main
@@ -74,7 +92,12 @@ export function AuthSplitLayout({
       style={{ backgroundImage: `url(${appTexture})` }}
     >
       <div className="w-full max-w-5xl overflow-hidden rounded-2xl border border-border/80 bg-card/95 shadow-2xl backdrop-blur-xs grid grid-cols-1 lg:grid-cols-12 min-h-[540px]">
-        <HeroBrandPanel />
+        <HeroBrandPanel
+          heroTitle={heroTitle}
+          heroDescription={heroDescription}
+          features={features}
+          badgeText={badgeText}
+        />
         <section className="flex flex-col justify-between p-5 sm:p-8 md:p-10 lg:col-span-7">
           <div className="mx-auto w-full max-w-md space-y-5 sm:space-y-6">
             <div className="space-y-1.5 sm:space-y-2 text-left">
