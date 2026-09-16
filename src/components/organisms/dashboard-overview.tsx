@@ -1,5 +1,6 @@
 import type { MeResponse } from '@/features/auth/model'
 import type { ProjectListItem } from '@/features/collab/model'
+import type { WorkspaceTab } from '@/pages/dashboard/use-dashboard-navigation'
 import {
   useOverviewCollab,
   useOverviewMarketing,
@@ -31,7 +32,7 @@ type DashboardOverviewProps = {
   accessToken: string
   projects?: ProjectListItem[]
   onOpenProfile?: () => void
-  onOpenProject?: (projectId: string, tab?: any) => void
+  onOpenProject?: (projectId: string, tab?: WorkspaceTab) => void
   onOpenNotification?: (payload: OpenNotificationPayload) => void
 }
 

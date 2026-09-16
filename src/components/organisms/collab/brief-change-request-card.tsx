@@ -1,22 +1,7 @@
 import { AlertCircle, AlertTriangle, CheckCircle2, Clock, XCircle } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import type { ProjectChangeRequest } from '@/features/collab/model'
-
-export function formatBogotaDate(iso: string | null | undefined): string {
-  if (!iso) return '—'
-  const ts = Date.parse(iso)
-  if (!Number.isFinite(ts)) return '—'
-  try {
-    return new Date(ts).toLocaleString('es-CO', {
-      timeZone: 'America/Bogota',
-      dateStyle: 'medium',
-      timeStyle: 'short',
-      hour12: false,
-    })
-  } catch {
-    return '—'
-  }
-}
+import { formatBogotaDate } from '@/features/collab/utils/collab-date'
 
 export function StatusBadge({ status }: { status: string }) {
   if (status === 'open') {

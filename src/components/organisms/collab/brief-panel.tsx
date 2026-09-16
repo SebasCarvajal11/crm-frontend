@@ -3,7 +3,8 @@ import { CheckCircle2, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { ProjectChangeRequest } from '@/features/collab/model'
 import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
-import { ChangeRequestItemCard, formatBogotaDate } from './brief-change-request-card'
+import { ChangeRequestItemCard } from './brief-change-request-card'
+import { formatBogotaDate } from '@/features/collab/utils/collab-date'
 
 type BriefData = {
   projectId: string
