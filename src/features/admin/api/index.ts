@@ -130,14 +130,31 @@ export async function adminSoftDeleteUserRequest(
     .json<{ message: string }>()
 }
 
+export type CloudStorageStats = {
+  quotaBytes: number
+  usedBytes: number
+  availableBytes: number
+  usedPercentage: number
+  totalFilesCount: number
+  projectFilesCount: number
+  projectFilesBytes: number
+  avatarsCount: number
+  avatarsBytes: number
+  documentsCount: number
+  documentsBytes: number
+}
+
+export type DiskStats = {
+  totalBytes: number
+  usedBytes: number
+  availableBytes: number
+  usedPercentage: number
+}
+
 export type StorageStatsResponse = {
   data: {
-    disk: {
-      totalBytes: number
-      usedBytes: number
-      availableBytes: number
-      usedPercentage: number
-    }
+    cloudStorage?: CloudStorageStats
+    disk: DiskStats
     assets: {
       totalAssetsCount: number
       totalAssetsBytes: number
