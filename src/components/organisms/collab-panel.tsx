@@ -175,8 +175,8 @@ export function CollabPanel({
             className="grid grid-cols-4 gap-4 min-w-[960px]"
             style={{
               height: total > 0
-                ? 'max(420px, calc(100dvh - 20.5rem))'
-                : 'max(460px, calc(100dvh - 15.5rem))',
+                ? 'max(440px, calc(100dvh - 18.25rem))'
+                : 'max(480px, calc(100dvh - 13.5rem))',
             }}
             role="main"
             aria-label="Tablero Kanban de proyectos"

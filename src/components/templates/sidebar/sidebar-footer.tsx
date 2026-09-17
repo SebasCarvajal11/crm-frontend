@@ -53,17 +53,33 @@ export function SidebarFooter({
             compact && 'justify-center px-0'
           )}
         >
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-foreground/20 text-xs font-semibold text-primary-foreground">
+          <div className="relative flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-foreground/20 text-xs font-semibold text-primary-foreground">
             {userAvatarUrl ? (
               <img src={userAvatarUrl} alt="Foto de perfil" className="size-8 rounded-full object-cover" />
             ) : (
               roleInitial(userRole)
             )}
+            {unreadNotificationsCount > 0 && compact && (
+              <span
+                className="absolute -top-0.5 -right-0.5 flex size-2.5 rounded-full bg-rose-500 ring-2 ring-primary"
+                aria-label={`${unreadNotificationsCount} notificaciones pendientes`}
+              />
+            )}
           </div>
           {!compact && (
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs text-primary-foreground/70">{userEmail}</p>
-              <p className="text-xs font-medium text-primary-foreground/90">{roleLabel}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs font-medium text-primary-foreground/90">{roleLabel}</p>
+                {unreadNotificationsCount > 0 && (
+                  <span
+                    className="inline-flex size-4.5 min-w-4.5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white shadow-xs"
+                    aria-label={`${unreadNotificationsCount} notificaciones pendientes`}
+                  >
+                    {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                  </span>
+                )}
+              </div>
             </div>
           )}
           {!compact && (
@@ -109,7 +125,7 @@ export function SidebarFooter({
               <span>Notificaciones</span>
               {unreadNotificationsCount > 0 && (
                 <span
-                  className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-primary-foreground px-1.5 py-0.5 text-[10px] font-bold text-primary"
+                  className="ml-auto inline-flex size-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white shadow-xs"
                   aria-label={`${unreadNotificationsCount} notificaciones sin leer`}
                 >
                   {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
