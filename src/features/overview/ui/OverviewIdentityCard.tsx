@@ -2,6 +2,8 @@ import {
   AlertTriangle,
   Briefcase,
   HardHat,
+  KeyRound,
+  Lock,
   Mail,
   Pencil,
   ShieldCheck,
@@ -77,6 +79,43 @@ function UserAvatar({
   )
 }
 
+function AccountContextStats({ role }: { role: string }) {
+  const isAdm = role === 'admin'
+  const isWrk = role === 'worker'
+
+  const roleTitle = isAdm ? 'Control Total' : isWrk ? 'Gestión Operativa' : 'Portal Clientes'
+  const roleDesc = isAdm
+    ? 'Supervisión y gestión global'
+    : isWrk
+      ? 'Proyectos, tareas y colaboración'
+      : 'Seguimiento de requerimientos'
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+      <div className="rounded-lg border bg-card/40 p-2.5 transition-colors">
+        <div className="flex items-center gap-1.5">
+          <KeyRound className="size-3.5 text-primary shrink-0" />
+          <p className="text-[11px] font-semibold text-foreground">Nivel de Acceso</p>
+        </div>
+        <p className="mt-1 text-xs font-bold text-foreground">{roleTitle}</p>
+        <p className="text-[11px] text-muted-foreground truncate">{roleDesc}</p>
+      </div>
+
+      <div className="rounded-lg border bg-card/40 p-2.5 transition-colors">
+        <div className="flex items-center gap-1.5">
+          <Lock className="size-3.5 text-emerald-500 shrink-0" />
+          <p className="text-[11px] font-semibold text-foreground">Seguridad de Sesión</p>
+        </div>
+        <div className="mt-1 flex items-center gap-1.5">
+          <span className="size-1.5 rounded-full bg-emerald-500" />
+          <p className="text-xs font-bold text-foreground">Token Seguro (JWT)</p>
+        </div>
+        <p className="text-[11px] text-muted-foreground truncate">Cifrado activo • HTTPS</p>
+      </div>
+    </div>
+  )
+}
+
 function IdentityFooter({ identity }: { identity: MeResponse['data'] }) {
   if (identity.force_password_change) {
     return (
@@ -88,7 +127,7 @@ function IdentityFooter({ identity }: { identity: MeResponse['data'] }) {
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-3 text-xs text-muted-foreground">
+    <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-2.5 text-xs text-muted-foreground">
       <div className="flex items-center gap-1.5">
         <ShieldCheck className="size-3.5 text-emerald-500" />
         <span>Credenciales verificadas</span>
@@ -124,8 +163,8 @@ export function OverviewIdentityCard({ identity, avatarUrl, onOpenProfile }: Pro
           Activa
         </Badge>
       </CardHeader>
-      <CardContent className="flex flex-col flex-1 justify-between gap-4 pt-1">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg border bg-card/60 p-4">
+      <CardContent className="flex flex-col flex-1 justify-between gap-3 pt-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg border bg-card/60 p-3.5">
           <div className="flex items-center gap-3.5 min-w-0">
             <UserAvatar avatarUrl={avatarUrl} onOpenProfile={onOpenProfile} />
             <div className="min-w-0 space-y-1">
@@ -153,6 +192,8 @@ export function OverviewIdentityCard({ identity, avatarUrl, onOpenProfile }: Pro
             </Button>
           )}
         </div>
+
+        <AccountContextStats role={identity.role} />
 
         <IdentityFooter identity={identity} />
       </CardContent>
