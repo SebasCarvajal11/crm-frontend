@@ -25,7 +25,7 @@ export function OverviewAdminClientRankingSection({ items, isLoading }: Props) {
   }, [items, currentPage])
 
   return (
-    <Card className="shadow-sm border border-border/80">
+    <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between">
       <CardHeader className="flex flex-row items-center justify-between pb-3">
         <div className="space-y-0.5">
           <div className="flex items-center gap-2">
@@ -40,7 +40,7 @@ export function OverviewAdminClientRankingSection({ items, isLoading }: Props) {
           {items.length} {items.length === 1 ? 'cliente' : 'clientes'}
         </Badge>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col flex-1 justify-between gap-3">
         {isLoading ? (
           <div className="space-y-2.5">
             <Skeleton className="h-12 w-full rounded-lg" />
@@ -56,7 +56,7 @@ export function OverviewAdminClientRankingSection({ items, isLoading }: Props) {
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="flex flex-col flex-1 justify-between gap-3">
             <div className="divide-y divide-border/60">
               {pagedItems.map((item, idx) => {
                 const rank = (currentPage - 1) * PAGE_SIZE + idx + 1
