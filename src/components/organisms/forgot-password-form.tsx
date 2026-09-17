@@ -62,7 +62,7 @@ export function ForgotPasswordForm() {
             type="email"
             autoComplete="email"
             placeholder="ejemplo@cima.com"
-            className="h-11 pl-10 text-sm transition-all focus-visible:ring-2 focus-visible:ring-primary/30"
+            className="h-11 pl-10 text-base transition-all focus-visible:ring-2 focus-visible:ring-primary/30 md:text-sm"
             {...register('email')}
           />
         </div>

@@ -65,7 +65,7 @@ export function AppShell({
 
   return (
     <div
-      className={cn('flex min-h-screen bg-background bg-cover bg-center bg-fixed', className)}
+      className={cn('flex min-h-screen bg-background bg-cover bg-center md:bg-fixed', className)}
       style={{ backgroundImage: `url(${appTexture})` }}
     >
       <DesktopSidebar

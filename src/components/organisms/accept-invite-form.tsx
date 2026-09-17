@@ -106,7 +106,7 @@ export function AcceptInviteForm({ token }: AcceptInviteFormProps) {
             type={showPassword ? 'text' : 'password'}
             autoComplete="new-password"
             placeholder="Mínimo 8 caracteres"
-            className="h-11 pl-10 pr-10 text-sm transition-all focus-visible:ring-2 focus-visible:ring-primary/30"
+            className="h-11 pl-10 pr-10 text-base transition-all focus-visible:ring-2 focus-visible:ring-primary/30 md:text-sm"
             {...register('password')}
           />
           <button
