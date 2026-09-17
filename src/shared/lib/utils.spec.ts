@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import { cn, isoToLocalDate } from "./utils";
 
 describe("utils", () => {
-  // ci: verificacion de integracion y despliegue continuo v2.5.0
   describe("cn", () => {
     it("should merge class names correctly", () => {
       const result = cn("text-red-500", "bg-blue-500");
