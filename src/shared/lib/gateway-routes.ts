@@ -135,6 +135,7 @@ export const MEDIA_ROUTES = {
   avatarsUsers: `${MEDIA_API}/media/avatars/users`,
   documentsUploadUrl: `${MEDIA_API}/media/documents/upload-url`,
   documentsConfirm: `${MEDIA_API}/media/documents/confirm`,
+  storageStats: `${MEDIA_API}/media/storage/stats`,
 } as const
 // ── Docs (público) ──────────────────────────────────────────────────────────
 export const DOCS_ROUTES = {

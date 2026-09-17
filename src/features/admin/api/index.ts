@@ -1,6 +1,6 @@
 import { api } from '@/shared/lib'
 import { bearer } from '@/shared/lib/bearer'
-import { ADMIN_ROUTES } from '@/shared/lib/gateway-routes'
+import { ADMIN_ROUTES, MEDIA_ROUTES } from '@/shared/lib/gateway-routes'
 import type {
   AdminUsersListResponse,
   InviteAdminResponse,
@@ -129,3 +129,34 @@ export async function adminSoftDeleteUserRequest(
     })
     .json<{ message: string }>()
 }
+
+export type StorageStatsResponse = {
+  data: {
+    disk: {
+      totalBytes: number
+      usedBytes: number
+      availableBytes: number
+      usedPercentage: number
+    }
+    assets: {
+      totalAssetsCount: number
+      totalAssetsBytes: number
+      documentsCount: number
+      documentsBytes: number
+      avatarsCount: number
+      avatarsBytes: number
+    }
+    cachedAt: string
+  }
+}
+
+export async function adminGetStorageStatsRequest(
+  accessToken: string,
+): Promise<StorageStatsResponse> {
+  return api
+    .get(MEDIA_ROUTES.storageStats, {
+      headers: bearer(accessToken),
+    })
+    .json<StorageStatsResponse>()
+}
+

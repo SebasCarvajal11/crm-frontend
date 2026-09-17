@@ -1,6 +1,7 @@
 import { ShieldCheck } from 'lucide-react'
 import { PageHeader } from '@/components/molecules/page-header'
 import { AdminKpiCards } from './admin/admin-kpi-cards'
+import { AdminStorageCard } from './admin/admin-storage-card'
 import { AdminUserTable } from './admin/user-table'
 import { AdminInviteForms } from './admin/invite-forms'
 
@@ -33,9 +34,12 @@ export function AdminConsole({ accessToken }: Props) {
         <AdminKpiCards accessToken={accessToken} />
       </div>
       <div className="animate-fade-up stagger-1">
-        <AdminUserTable accessToken={accessToken} />
+        <AdminStorageCard accessToken={accessToken} />
       </div>
       <div className="animate-fade-up stagger-2">
+        <AdminUserTable accessToken={accessToken} />
+      </div>
+      <div className="animate-fade-up stagger-3">
         <AdminInviteForms accessToken={accessToken} />
       </div>
     </div>

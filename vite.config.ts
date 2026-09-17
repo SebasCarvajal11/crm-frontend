@@ -31,6 +31,8 @@ export default defineConfig(({ mode }) => {
           "img-src 'self' data: blob: https:",
           "font-src 'self' data: https://fonts.gstatic.com",
           "connect-src 'self' blob: https: ws: wsc:",
+          "frame-src 'self' blob:",
+          "media-src 'self' blob: data: https:",
           "worker-src 'self' blob:",
           "frame-ancestors 'none'",
           "base-uri 'self'",

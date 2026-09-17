@@ -215,6 +215,7 @@ export async function uploadProjectFilePresignedRequest(
   accessToken: string,
   projectId: string,
   file: File,
+  onProgress?: (percentage: number) => void,
 ): Promise<{ objectKey: string }> {
   const mimeType = file.type || 'application/octet-stream'
 
@@ -229,7 +230,7 @@ export async function uploadProjectFilePresignedRequest(
     })
     .json<PresignedUploadUrlResponse>()
 
-  await putFileToPresignedUrl(step.data.uploadUrl, file, mimeType)
+  await putFileToPresignedUrl(step.data.uploadUrl, file, mimeType, onProgress)
   return { objectKey: step.data.objectKey }
 }
 
@@ -290,8 +291,9 @@ export async function uploadProjectFileWithMetadataRequest(
   projectId: string,
   file: File,
   metadata: ProjectFileMetadataInput,
+  onProgress?: (percentage: number) => void,
 ): Promise<DataResponse<ProjectFileEnriched>> {
-  const upload = await uploadProjectFilePresignedRequest(accessToken, projectId, file)
+  const upload = await uploadProjectFilePresignedRequest(accessToken, projectId, file, onProgress)
   try {
     return await withUploadRegistrationRetries(() =>
       createProjectFileMetadataRequest(accessToken, projectId, {
