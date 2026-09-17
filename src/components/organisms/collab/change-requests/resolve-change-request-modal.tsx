@@ -81,28 +81,35 @@ export function ResolveChangeRequestModal({
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
       <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-            {isReject ? (
-              <XCircle className="size-4 text-rose-600" />
-            ) : (
-              <CheckCircle2 className="size-4 text-emerald-600" />
-            )}
-            {isReject ? 'Rechazar solicitud de cambio' : 'Aceptar solicitud de cambio'}
-          </DialogTitle>
-          <DialogDescription className="text-xs">
-            {isReject
-              ? 'Indica el motivo del rechazo. El cliente recibirá una notificación con tu justificación.'
-              : 'La solicitud será aprobada y quedará registrada formalmente en la trazabilidad del proyecto.'}
-          </DialogDescription>
+        <DialogHeader className="flex flex-row items-start gap-3 space-y-0">
+          <div
+            className={`flex size-10 shrink-0 items-center justify-center rounded-xl ring-1 ${
+              isReject
+                ? 'bg-destructive/10 text-destructive ring-destructive/20'
+                : 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20'
+            }`}
+          >
+            {isReject ? <XCircle className="size-5" /> : <CheckCircle2 className="size-5" />}
+          </div>
+          <div className="flex flex-col gap-1 text-left">
+            <DialogTitle className="text-base font-semibold tracking-tight">
+              {isReject ? 'Rechazar solicitud de cambio' : 'Aceptar solicitud de cambio'}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              {isReject
+                ? 'Indica el motivo del rechazo. El cliente recibirá una notificación con tu justificación.'
+                : 'La solicitud será aprobada y quedará registrada formalmente en la trazabilidad del proyecto.'}
+            </DialogDescription>
+          </div>
         </DialogHeader>
 
-        {errorMsg && (
-          <Alert variant="destructive" className="py-2">
-            <AlertCircle className="size-4" />
-            <AlertDescription className="text-xs">{errorMsg}</AlertDescription>
-          </Alert>
-        )}
+        <div className="px-5 py-4 sm:px-6">
+          {errorMsg && (
+            <Alert variant="destructive" className="mb-4 py-2">
+              <AlertCircle className="size-4" />
+              <AlertDescription className="text-xs">{errorMsg}</AlertDescription>
+            </Alert>
+          )}
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div className="rounded-lg border bg-muted/40 p-3 text-xs">
@@ -128,32 +135,33 @@ export function ResolveChangeRequestModal({
             />
           </div>
 
-          <DialogFooter className="pt-2">
-            <Button type="button" variant="outline" size="sm" onClick={handleClose} disabled={isSubmitting} className="text-xs">
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              size="sm"
-              variant={isReject ? 'destructive' : 'default'}
-              disabled={isSubmitting}
-              className={
-                !isReject
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white text-xs gap-1.5'
-                  : 'text-xs gap-1.5'
-              }
-            >
-              {isSubmitting ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : isReject ? (
-                <XCircle className="size-3.5" />
-              ) : (
-                <CheckCircle2 className="size-3.5" />
-              )}
-              {isSubmitting ? 'Procesando...' : isReject ? 'Rechazar cambio' : 'Aceptar cambio'}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter className="pt-2">
+              <Button type="button" variant="outline" size="sm" onClick={handleClose} disabled={isSubmitting} className="text-xs">
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                variant={isReject ? 'destructive' : 'default'}
+                disabled={isSubmitting}
+                className={
+                  !isReject
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white text-xs gap-1.5'
+                    : 'text-xs gap-1.5'
+                }
+              >
+                {isSubmitting ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : isReject ? (
+                  <XCircle className="size-3.5" />
+                ) : (
+                  <CheckCircle2 className="size-3.5" />
+                )}
+                {isSubmitting ? 'Procesando...' : isReject ? 'Rechazar cambio' : 'Aceptar cambio'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   )

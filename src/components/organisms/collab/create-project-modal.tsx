@@ -69,17 +69,24 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose() }}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>Nuevo proyecto</DialogTitle>
-          <DialogDescription>
-            Completa los datos y asocia un cliente para crear el proyecto.
-          </DialogDescription>
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0 ring-1 ring-primary/20">
+              <FolderOpen className="size-5" />
+            </div>
+            <div>
+              <DialogTitle>Nuevo proyecto</DialogTitle>
+              <DialogDescription>
+                Completa los datos y asocia un cliente para crear el espacio de trabajo.
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
         <form
           id="create-project-form"
-          className="space-y-4 px-5 sm:px-6"
+          className="space-y-4 px-5 py-4 sm:px-6"
           onSubmit={(event) => {
             event.preventDefault()
             createProject.mutate()

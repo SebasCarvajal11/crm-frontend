@@ -115,15 +115,22 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
 
       <Dialog open={open} onOpenChange={(v) => !v && cerrar()}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Registrar un contacto realizado</DialogTitle>
-            <DialogDescription>
-              Deje constancia de una llamada, reunión o mensaje que ya ocurrió fuera del
-              sistema. Esto no envía nada: solo completa el historial del cliente.
-            </DialogDescription>
+          <DialogHeader className="flex flex-row items-start gap-3 space-y-0">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20">
+              <PhoneCall className="size-5" />
+            </div>
+            <div className="flex flex-col gap-1 text-left">
+              <DialogTitle className="text-base font-semibold tracking-tight">
+                Registrar un contacto realizado
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                Deje constancia de una llamada, reunión o mensaje que ya ocurrió fuera del
+                sistema. Esto no envía nada: solo completa el historial del cliente.
+              </DialogDescription>
+            </div>
           </DialogHeader>
 
-          <div className="space-y-4 py-2">
+          <div className="space-y-4 px-5 py-4 sm:px-6">
             <div className="space-y-2">
               <Label htmlFor="rc-client">Cliente</Label>
               <NativeSelect

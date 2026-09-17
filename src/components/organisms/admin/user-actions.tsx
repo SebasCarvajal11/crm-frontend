@@ -9,6 +9,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
@@ -102,6 +103,9 @@ export function AdminUserActions({
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
+            <AlertDialogMedia>
+              <ShieldAlert className="size-6 text-destructive" />
+            </AlertDialogMedia>
             <AlertDialogTitle>Archivar usuario</AlertDialogTitle>
             <AlertDialogDescription>
               Se revocarán las sesiones activas. Puedes restaurar desde la vista con
@@ -111,6 +115,7 @@ export function AdminUserActions({
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
                 clearActionMessage()
                 softDelete.mutate(row.id)

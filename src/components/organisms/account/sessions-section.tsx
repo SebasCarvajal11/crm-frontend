@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Clock, Globe, LaptopMinimal, ShieldAlert } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Clock, Globe, LaptopMinimal, LogOut, ShieldAlert } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   AlertDialog,
@@ -8,6 +8,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
@@ -109,14 +110,20 @@ export function SessionsSection({ accessToken }: Props) {
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Cerrar sesion en todos los dispositivos</AlertDialogTitle>
+                      <AlertDialogMedia>
+                        <LogOut className="size-6 text-destructive" />
+                      </AlertDialogMedia>
+                      <AlertDialogTitle>Cerrar sesión en todos los dispositivos</AlertDialogTitle>
                       <AlertDialogDescription>
                         Esta acción cerrará todas tus sesiones activas excepto la actual. Tendrás que volver a ingresar.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => revokeAllMutation.mutate()}>
+                      <AlertDialogAction
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        onClick={() => revokeAllMutation.mutate()}
+                      >
                         Confirmar cierre global
                       </AlertDialogAction>
                     </AlertDialogFooter>

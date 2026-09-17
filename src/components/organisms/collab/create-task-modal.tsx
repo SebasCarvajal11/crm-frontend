@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Lock } from 'lucide-react'
+import { ListTodo, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -107,17 +107,24 @@ export function CreateTaskModal({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => { if (!nextOpen) handleClose() }}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>Nueva tarea</DialogTitle>
-          <DialogDescription>
-            {column ? `Completa los datos para crear la tarea en ${column.title}.` : 'Completa los datos para crear la tarea en el tablero.'}
-          </DialogDescription>
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0 ring-1 ring-primary/20">
+              <ListTodo className="size-5" />
+            </div>
+            <div>
+              <DialogTitle>Nueva tarea</DialogTitle>
+              <DialogDescription>
+                {column ? `Completa los datos para crear la tarea en ${column.title}.` : 'Completa los datos para crear la tarea en el tablero.'}
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
         <form
           id="create-task-form"
-          className="space-y-4 px-5 sm:px-6"
+          className="space-y-4 px-5 py-4 sm:px-6"
           onSubmit={(event) => {
             event.preventDefault()
             createTask.mutate()

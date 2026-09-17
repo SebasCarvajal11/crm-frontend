@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, KeyRound, ShieldCheck } from 'lucide-react'
+import { AlertTriangle, Check, KeyRound, ShieldCheck } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -11,6 +11,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
@@ -169,9 +170,12 @@ export function ChangePasswordSection({ accessToken }: Props) {
       <AlertDialog open={confirmSubmitOpen} onOpenChange={setConfirmSubmitOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar actualizacion de contrasena</AlertDialogTitle>
+            <AlertDialogMedia className="bg-primary/10 text-primary ring-primary/20">
+              <KeyRound className="size-6" />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Confirmar actualización de contraseña</AlertDialogTitle>
             <AlertDialogDescription>
-              Se cerraran tus sesiones activas y tendras que iniciar sesion nuevamente.
+              Se cerrarán tus sesiones activas en otros equipos y tendrás que iniciar sesión nuevamente con tu nueva clave.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -192,9 +196,12 @@ export function ChangePasswordSection({ accessToken }: Props) {
       <AlertDialog open={confirmCancelOpen} onOpenChange={setConfirmCancelOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
+            <AlertDialogMedia className="bg-muted text-muted-foreground ring-border">
+              <AlertTriangle className="size-6" />
+            </AlertDialogMedia>
             <AlertDialogTitle>Descartar cambios</AlertDialogTitle>
             <AlertDialogDescription>
-              Se limpiaran los campos del formulario de seguridad.
+              Se limpiarán los campos del formulario de seguridad y se perderán las modificaciones no guardadas.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -89,22 +89,27 @@ export function CreateChangeRequestModal({ open, accessToken, projectId, tasks, 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { resetForm(); onClose() } }}>
       <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-            <GitPullRequest className="size-4 text-primary" />
-            Solicitar cambio de proyecto
-          </DialogTitle>
-          <DialogDescription className="text-xs">
-            Describe el requerimiento o ajuste que deseas solicitar. Será revisado por un administrador.
-          </DialogDescription>
+        <DialogHeader className="flex flex-row items-start gap-3 space-y-0">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20">
+            <GitPullRequest className="size-5" />
+          </div>
+          <div className="flex flex-col gap-1 text-left">
+            <DialogTitle className="text-base font-semibold tracking-tight">
+              Solicitar cambio de proyecto
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Describe el requerimiento o ajuste que deseas solicitar. Será revisado por un administrador.
+            </DialogDescription>
+          </div>
         </DialogHeader>
 
-        {errorMsg && (
-          <Alert variant="destructive" className="py-2">
-            <AlertCircle className="size-4" />
-            <AlertDescription className="text-xs">{errorMsg}</AlertDescription>
-          </Alert>
-        )}
+        <div className="px-5 py-4 sm:px-6">
+          {errorMsg && (
+            <Alert variant="destructive" className="mb-4 py-2">
+              <AlertCircle className="size-4" />
+              <AlertDescription className="text-xs">{errorMsg}</AlertDescription>
+            </Alert>
+          )}
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div className="grid grid-cols-2 gap-3">
@@ -192,16 +197,17 @@ export function CreateChangeRequestModal({ open, accessToken, projectId, tasks, 
             </div>
           )}
 
-          <DialogFooter className="pt-2">
-            <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={isSubmitting} className="text-xs">
-              Cancelar
-            </Button>
-            <Button type="submit" size="sm" disabled={isSubmitting} className="text-xs gap-1.5">
-              {isSubmitting ? <Loader2 className="size-3.5 animate-spin" /> : <GitPullRequest className="size-3.5" />}
-              {isSubmitting ? 'Enviando...' : 'Solicitar cambio'}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter className="pt-2">
+              <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={isSubmitting} className="text-xs">
+                Cancelar
+              </Button>
+              <Button type="submit" size="sm" disabled={isSubmitting} className="text-xs gap-1.5">
+                {isSubmitting ? <Loader2 className="size-3.5 animate-spin" /> : <GitPullRequest className="size-3.5" />}
+                {isSubmitting ? 'Enviando...' : 'Solicitar cambio'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   )
