@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback, useEffect, useMemo } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo } from 'react'
 import { isHTTPError } from 'ky'
 import { BarChart3, KanbanSquare, ChartAreaIcon, Megaphone, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -14,19 +14,48 @@ import { useDashboardNavigation } from './use-dashboard-navigation'
 import { AppShell } from '@/components/templates/app-shell'
 import { useSessionStore } from '@/app/session/session-store'
 import { logoutRequest } from '@/features/auth/api'
-import { AccountPanel } from '@/features/auth/ui'
-import { AdminConsole } from '@/features/admin/ui'
 import { useDashboardComposition } from '@/features/composition'
 import { DashboardOverview } from '@/features/composition/ui'
-import { CollabPanel, NotificationsPanel } from '@/features/collab/ui'
 import { countUnreadNotificationsRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
-import { MarketingPanel } from '@/features/marketing'
 import { getCurrentAvatarRequestOptional } from '@/shared/api'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 import { getAccessTokenRole } from '@/shared/lib/access-token-role'
 import type { DashboardTab } from '@/routes/-dashboard.search'
-import { DashboardAnalytics} from '@/components/organisms/dashboard-analytics'
+
+const CollabPanel = lazy(() =>
+  import('@/features/collab/ui').then((m) => ({ default: m.CollabPanel }))
+)
+const NotificationsPanel = lazy(() =>
+  import('@/features/collab/ui').then((m) => ({ default: m.NotificationsPanel }))
+)
+const MarketingPanel = lazy(() =>
+  import('@/features/marketing').then((m) => ({ default: m.MarketingPanel }))
+)
+const DashboardAnalytics = lazy(() =>
+  import('@/components/organisms/dashboard-analytics').then((m) => ({ default: m.DashboardAnalytics }))
+)
+const AdminConsole = lazy(() =>
+  import('@/features/admin/ui').then((m) => ({ default: m.AdminConsole }))
+)
+const AccountPanel = lazy(() =>
+  import('@/components/organisms/account-panel').then((m) => ({ default: m.AccountPanel }))
+)
+
+function DashboardTabSkeleton() {
+  return (
+    <div className="space-y-4 animate-pulse" role="status" aria-label="Cargando sección">
+      <div className="h-9 w-48 rounded-xl bg-muted/60" />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="h-28 rounded-xl bg-muted/40" />
+        <div className="h-28 rounded-xl bg-muted/40" />
+        <div className="h-28 rounded-xl bg-muted/40" />
+        <div className="h-28 rounded-xl bg-muted/40" />
+      </div>
+      <div className="h-64 rounded-xl bg-muted/30" />
+    </div>
+  )
+}
 
 type Props = {
   tab?: DashboardTab
@@ -229,25 +258,27 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
           onOpenNotification={goToMention}
         />
       )}
-      {activeTab === 'collab' && (
-        <CollabPanel
-          accessToken={token}
-          identity={identity}
-          initialProjects={projects?.data}
-          openProjectId={project_id}
-          workspaceTab={workspace_tab}
-          chatChannel={chat_channel}
-          chatMessageId={chat_message_id}
-          onOpenProject={openProject}
-          onCloseProject={closeProject}
-          onTabChange={changeWorkspaceTab}
-        />
-      )}
-      {activeTab === 'marketing' && canUseMarketing && <MarketingPanel accessToken={token} />}
-      {activeTab === 'account' && <AccountPanel accessToken={token} identity={identity} />}
-      {activeTab === 'notifications' && <NotificationsPanel accessToken={token} onOpenNotification={goToMention} />}
-      {activeTab === 'admin' && isAdmin && <AdminConsole accessToken={token} />}
-      {activeTab === 'analytics' && canUseMarketing && <DashboardAnalytics accessToken={token} />}
+      <Suspense fallback={<DashboardTabSkeleton />}>
+        {activeTab === 'collab' && (
+          <CollabPanel
+            accessToken={token}
+            identity={identity}
+            initialProjects={projects?.data}
+            openProjectId={project_id}
+            workspaceTab={workspace_tab}
+            chatChannel={chat_channel}
+            chatMessageId={chat_message_id}
+            onOpenProject={openProject}
+            onCloseProject={closeProject}
+            onTabChange={changeWorkspaceTab}
+          />
+        )}
+        {activeTab === 'marketing' && canUseMarketing && <MarketingPanel accessToken={token} />}
+        {activeTab === 'account' && <AccountPanel accessToken={token} identity={identity} />}
+        {activeTab === 'notifications' && <NotificationsPanel accessToken={token} onOpenNotification={goToMention} />}
+        {activeTab === 'admin' && isAdmin && <AdminConsole accessToken={token} />}
+        {activeTab === 'analytics' && canUseMarketing && <DashboardAnalytics accessToken={token} />}
+      </Suspense>
     </AppShell>
   )
 }

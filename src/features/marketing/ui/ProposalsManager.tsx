@@ -198,8 +198,8 @@ export function ProposalsManager({ accessToken }: ProposalsManagerProps) {
     onSuccess: invalidate,
   })
 
-  const proposals = proposalsQuery.data ?? []
-  const clients = clientsQuery.data ?? []
+  const proposals = useMemo(() => proposalsQuery.data ?? [], [proposalsQuery.data])
+  const clients = useMemo(() => clientsQuery.data ?? [], [clientsQuery.data])
 
   const clientLabel = useMemo(() => {
     const mapa = new Map<string, string>()

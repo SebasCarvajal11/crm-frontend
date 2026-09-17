@@ -1,6 +1,6 @@
 import { api } from '@/shared/lib'
 import { bearer } from '@/shared/lib/bearer'
-import { MARKETING_ROUTES, ANALYTICS_ROUTES } from '@/shared/lib/gateway-routes'
+import { MARKETING_ROUTES } from '@/shared/lib/gateway-routes'
 
 // ── Tipos y Enums de Campañas ───────────────────────────────────────────────
 export type CampaignType = 'Positioning' | 'Direct_sales' | 'Value_content' | 'Testimonial' | 'Reactivation'
@@ -79,63 +79,15 @@ export interface WorkflowExecution {
   errorDetail?: string | null
 }
 
-// ── Tipos de Analítica y Reportes ───────────────────────────────────────────
-export interface AnalyticsSummary {
-  totalClients: number
-  totalUsers: number
-  totalCampaigns: number
-  activeCampaigns: number
-  totalProjects: number
-  projectsInProgress: number
-  totalProducts: number
-  totalInventoryItems: number
-  totalStock: number
-  lowStockAlerts: number
-  totalKpiSnapshots: number
-  totalMarketingInteractions: number
-}
-
-export interface ClientPlanDistribution {
-  plan: string
-  clientCount: number
-}
-
-export interface ClientActivity {
-  clientId: string
-  plan: string
-  campaignCount: number
-  projectCount: number
-}
-
-export interface CampaignStatusReport {
-  status: string
-  campaignCount: number
-}
-
-export interface InventoryAlert {
-  inventoryId: number
-  productId: number
-  productName: string
-  totalStock: number
-  pointOfSaleStock?: number | null
-  lowStockAlert: number
-  inventoryType?: string | null
-}
-
-export interface KpiSnapshot {
-  snapshotsId: number
-  period: string
-  calculatedAt?: string | null
-  newClients?: number | null
-  closedProjects?: number | null
-  estimatedRevenue?: number | null
-  activeCampaigns?: number | null
-  clientsContacted?: number | null
-  responseRate?: number | null
-  avgCloseDays?: number | null
-  projectsInProgress?: number | null
-  calculatedBy?: string | null
-}
+// ── Tipos de Analítica y Reportes (Re-exportados desde @/features/analytics/model) ──
+export type {
+  AnalyticsSummaryDto as AnalyticsSummary,
+  ClientPlanDistributionDto as ClientPlanDistribution,
+  ClientActivityDto as ClientActivity,
+  CampaignStatusReportDto as CampaignStatusReport,
+  InventoryAlertDto as InventoryAlert,
+  KpiSnapshotDto as KpiSnapshot,
+} from '@/features/analytics/model'
 
 // ── Peticiones API: Campañas ───────────────────────────────────────────────
 export async function listCampaignsRequest(accessToken: string): Promise<Campaign[]> {
@@ -224,27 +176,12 @@ export async function getExecutionsByClientRequest(accessToken: string, clientId
   return api.get(MARKETING_ROUTES.executionsByClient(clientId), { headers: bearer(accessToken) }).json<WorkflowExecution[]>()
 }
 
-// ── Peticiones API: Analítica ───────────────────────────────────────────────
-export async function getAnalyticsSummaryRequest(accessToken: string): Promise<AnalyticsSummary> {
-  return api.get(ANALYTICS_ROUTES.summary, { headers: bearer(accessToken) }).json<AnalyticsSummary>()
-}
-
-export async function getClientPlanDistributionRequest(accessToken: string): Promise<ClientPlanDistribution[]> {
-  return api.get(ANALYTICS_ROUTES.planDistribution, { headers: bearer(accessToken) }).json<ClientPlanDistribution[]>()
-}
-
-export async function getClientActivityRequest(accessToken: string): Promise<ClientActivity[]> {
-  return api.get(ANALYTICS_ROUTES.activity, { headers: bearer(accessToken) }).json<ClientActivity[]>()
-}
-
-export async function getCampaignStatusReportRequest(accessToken: string): Promise<CampaignStatusReport[]> {
-  return api.get(ANALYTICS_ROUTES.campaignsStatus, { headers: bearer(accessToken) }).json<CampaignStatusReport[]>()
-}
-
-export async function getLowStockAlertsRequest(accessToken: string): Promise<InventoryAlert[]> {
-  return api.get(ANALYTICS_ROUTES.lowStock, { headers: bearer(accessToken) }).json<InventoryAlert[]>()
-}
-
-export async function getKpiSnapshotsRequest(accessToken: string): Promise<KpiSnapshot[]> {
-  return api.get(ANALYTICS_ROUTES.kpis, { headers: bearer(accessToken) }).json<KpiSnapshot[]>()
-}
+// ── Peticiones API: Analítica (Re-exportadas desde @/features/analytics/api) ─
+export {
+  getAnalyticsSummaryRequest,
+  getClientPlanDistributionRequest,
+  getClientActivityRequest,
+  getCampaignStatusReportRequest,
+  getLowStockAlertsRequest,
+  getKpiSnapshotsRequest,
+} from '@/features/analytics/api'

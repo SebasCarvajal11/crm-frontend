@@ -26,7 +26,7 @@ import {
   type ExportFormat,
 } from '@/features/analytics/api'
 import { CampaignStatusChart } from '@/features/analytics/ui/charts'
-import type { InventoryAlertDto } from '@/features/analytics/model'
+import { analyticsKeys, type InventoryAlertDto } from '@/features/analytics/model'
 import { KpiDashboard } from '@/features/analytics/ui/KpiDashboard'
 
 interface Props {
@@ -141,18 +141,21 @@ function ExportButtons({ label, onExport, isPending, pendingFormat }: ExportButt
 
 export function DashboardAnalytics({ accessToken }: Props) {
   const summaryQuery = useQuery({
-    queryKey: ['analytics', 'summary'],
+    queryKey: analyticsKeys.summary(),
     queryFn: () => getAnalyticsSummaryRequest(accessToken),
+    staleTime: 60_000,
   })
 
   const campaignStatusQuery = useQuery({
-    queryKey: ['analytics', 'campaign-status'],
+    queryKey: analyticsKeys.campaignStatus(),
     queryFn: () => getCampaignStatusReportRequest(accessToken),
+    staleTime: 60_000,
   })
 
   const lowStockQuery = useQuery({
-    queryKey: ['analytics', 'low-stock'],
+    queryKey: analyticsKeys.lowStock(),
     queryFn: () => getLowStockAlertsRequest(accessToken),
+    staleTime: 60_000,
   })
 
   const summary = summaryQuery.data

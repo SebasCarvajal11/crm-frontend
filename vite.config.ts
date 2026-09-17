@@ -19,6 +19,23 @@ export default defineConfig(({ mode }) => {
     test: {
       exclude: [...configDefaults.exclude, "tests/playwright/**"],
     },
+    build: {
+      chunkSizeWarningLimit: 600,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('recharts')) return 'vendor-charts'
+              if (id.includes('pdf-lib')) return 'vendor-pdf'
+              if (id.includes('react-easy-crop')) return 'vendor-crop'
+              if (id.includes('@tanstack')) return 'vendor-tanstack'
+              if (id.includes('lucide-react')) return 'vendor-icons'
+              if (id.includes('react') || id.includes('react-dom')) return 'vendor-core'
+            }
+          },
+        },
+      },
+    },
     server: {
       headers: {
         // Mantiene paridad con snippets/security-headers.conf (producción).

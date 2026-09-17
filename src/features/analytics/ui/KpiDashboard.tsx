@@ -24,6 +24,7 @@ import {
   ultimosPeriodos,
   type KpiSnapshot,
 } from '../api/kpis-api'
+import { analyticsKeys } from '../model/query-keys'
 
 interface KpiDashboardProps {
   accessToken: string
@@ -131,14 +132,15 @@ export function KpiDashboard({ accessToken }: KpiDashboardProps) {
   const [aviso, setAviso] = useState<string | null>(null)
 
   const kpisQuery = useQuery({
-    queryKey: ['analytics', 'kpis', 'current', period],
+    queryKey: analyticsKeys.kpis(period),
     queryFn: () => getCurrentKpisRequest(accessToken, period),
+    staleTime: 60_000,
   })
 
   const calculateMutation = useMutation({
     mutationFn: () => calculateKpisRequest(accessToken, period),
     onSuccess: (data) => {
-      void queryClient.invalidateQueries({ queryKey: ['analytics'] })
+      void queryClient.invalidateQueries({ queryKey: analyticsKeys.all })
       setAviso(
         `Indicadores de ${etiquetaPeriodo(period)} consolidados y guardados el ${formatearFechaHora(
           data.calculatedAt

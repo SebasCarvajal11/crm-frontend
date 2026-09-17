@@ -25,13 +25,25 @@ export function useOverviewCollab({
   const isAdmin = role === 'admin'
   const isWorker = role === 'worker'
 
-  const boardQueries = useQueries({
-    queries: projects.map((p) => ({
+  const activeProjects = useMemo(
+    () => projects.filter((p) => p.status !== 'completed'),
+    [projects]
+  )
+
+  const { boardResults, isBoardsLoading } = useQueries({
+    queries: activeProjects.map((p) => ({
       queryKey: collabKeys.projectBoard(p.id),
       queryFn: () => getProjectBoardRequest(accessToken, p.id),
       enabled: Boolean(accessToken && p.id),
       staleTime: 60_000,
     })),
+    combine: (results) => ({
+      boardResults: results.map((r, idx) => ({
+        board: r.data?.data?.board,
+        project: activeProjects[idx],
+      })),
+      isBoardsLoading: results.some((r) => r.isLoading),
+    }),
   })
 
   const workersQ = useQuery({
@@ -48,17 +60,13 @@ export function useOverviewCollab({
     staleTime: 30_000,
   })
 
-  const isLoading = boardQueries.some((q) => q.isLoading)
-
   // ── Worker: Tareas pendientes (no hechas) de más antigua a más reciente ────
   const workerPendingTasks: WorkerPendingTaskItem[] = useMemo(() => {
     if (!isWorker || !userSub) return []
     const result: WorkerPendingTaskItem[] = []
 
-    boardQueries.forEach((bq, idx) => {
-      const board = bq.data?.data?.board
-      const project = projects[idx]
-      if (!board || !project) return
+    for (const { board, project } of boardResults) {
+      if (!board || !project) continue
 
       const colMap = new Map(board.columns.map((c) => [c.id, c]))
       for (const task of board.tasks) {
@@ -77,20 +85,18 @@ export function useOverviewCollab({
           createdAt: task.createdAt,
         })
       }
-    })
+    }
 
     return result.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-  }, [isWorker, userSub, boardQueries, projects])
+  }, [isWorker, userSub, boardResults])
 
   // ── Admin: Tareas bloqueadas en cualquier proyecto ─────────────────────────
   const adminBlockedTasks: AdminBlockedTaskItem[] = useMemo(() => {
     if (!isAdmin) return []
     const result: AdminBlockedTaskItem[] = []
 
-    boardQueries.forEach((bq, idx) => {
-      const board = bq.data?.data?.board
-      const project = projects[idx]
-      if (!board || !project) return
+    for (const { board, project } of boardResults) {
+      if (!board || !project) continue
 
       const blockedColIds = new Set(
         board.columns.filter((c) => c.key === 'blocked').map((c) => c.id)
@@ -109,19 +115,18 @@ export function useOverviewCollab({
           createdAt: task.createdAt,
         })
       }
-    })
+    }
 
     return result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-  }, [isAdmin, boardQueries, projects])
+  }, [isAdmin, boardResults])
 
   // ── Admin: Top de trabajadores por carga y % de resolución ─────────────────
   const adminWorkerWorkload: WorkerWorkloadItem[] = useMemo(() => {
     if (!isAdmin) return []
     const statsBySub = new Map<string, { total: number; completed: number }>()
 
-    boardQueries.forEach((bq) => {
-      const board = bq.data?.data?.board
-      if (!board) return
+    for (const { board } of boardResults) {
+      if (!board) continue
 
       const doneColIds = new Set(
         board.columns.filter((c) => c.key === 'done' || c.key === 'completed').map((c) => c.id)
@@ -136,7 +141,7 @@ export function useOverviewCollab({
         }
         statsBySub.set(task.assigneeSub, current)
       }
-    })
+    }
 
     const workersList = workersQ.data?.data?.items ?? []
     const workerMap = new Map(workersList.map((w) => [w.id, w]))
@@ -160,7 +165,7 @@ export function useOverviewCollab({
     })
 
     return rows.sort((a, b) => b.totalAssigned - a.totalAssigned)
-  }, [isAdmin, boardQueries, workersQ.data])
+  }, [isAdmin, boardResults, workersQ.data])
 
   // ── Admin: Clientes ordenados por cantidad de proyectos ────────────────────
   const adminClientRanking: ClientProjectCountItem[] = useMemo(() => {
@@ -199,7 +204,7 @@ export function useOverviewCollab({
   }, [isAdmin, projects])
 
   return {
-    isLoading,
+    isLoading: isBoardsLoading,
     workerPendingTasks,
     adminBlockedTasks,
     adminWorkerWorkload,

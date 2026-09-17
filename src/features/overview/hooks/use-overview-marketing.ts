@@ -4,11 +4,12 @@ import {
   getAnalyticsSummaryRequest,
   getCurrentKpisRequest,
 } from '@/features/analytics/api'
+import { analyticsKeys } from '@/features/analytics/model'
 import type { OverviewMarketingMetrics } from '../model/overview.types'
 
 export function useOverviewMarketing(accessToken: string) {
   const summaryQ = useQuery({
-    queryKey: ['overview', 'marketing', 'summary', accessToken],
+    queryKey: analyticsKeys.summary(),
     queryFn: () => getAnalyticsSummaryRequest(accessToken),
     enabled: Boolean(accessToken?.trim()),
     staleTime: 60_000,
@@ -16,7 +17,7 @@ export function useOverviewMarketing(accessToken: string) {
   })
 
   const kpisQ = useQuery({
-    queryKey: ['overview', 'marketing', 'kpis', accessToken],
+    queryKey: analyticsKeys.kpis(''),
     queryFn: () => getCurrentKpisRequest(accessToken),
     enabled: Boolean(accessToken?.trim()),
     staleTime: 60_000,

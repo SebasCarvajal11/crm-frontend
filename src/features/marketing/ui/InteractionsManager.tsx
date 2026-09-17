@@ -96,8 +96,8 @@ export function InteractionsManager({ accessToken }: InteractionsManagerProps) {
     onError: () => setFormError('No se pudo registrar la respuesta. Intente nuevamente.'),
   })
 
-  const interactions = interactionsQuery.data ?? []
-  const clients = clientsQuery.data ?? []
+  const interactions = useMemo(() => interactionsQuery.data ?? [], [interactionsQuery.data])
+  const clients = useMemo(() => clientsQuery.data ?? [], [clientsQuery.data])
 
   const clientLabel = useMemo(() => {
     const mapa = new Map<string, string>()

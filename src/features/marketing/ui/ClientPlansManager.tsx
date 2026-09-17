@@ -103,7 +103,7 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
       setFeedback('No se pudo sincronizar. Verifique que el CRM base esté disponible.'),
   })
 
-  const clients = clientsQuery.data ?? []
+  const clients = useMemo(() => clientsQuery.data ?? [], [clientsQuery.data])
 
   const sinPlan = useMemo(() => clients.filter((c) => !c.plan), [clients])
 
