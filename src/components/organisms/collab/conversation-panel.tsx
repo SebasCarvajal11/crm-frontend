@@ -22,6 +22,7 @@ type Props = {
   tasks: ProjectTask[]
   project: Project | null
   onError: (msg: string) => void
+  isVisible?: boolean
 }
 
 type ConversationSupportPanelProps = {
@@ -68,6 +69,7 @@ export function ConversationPanel({
   tasks,
   project,
   onError,
+  isVisible = true,
 }: Props) {
   const canManageFiles = identity.role === 'admin' || identity.role === 'worker'
   const { timelineQ, timeline } = useProjectTimeline({ accessToken, projectId })
@@ -76,6 +78,7 @@ export function ConversationPanel({
     queryKey: collabKeys.contract(projectId),
     queryFn: () => getProjectContractRequest(accessToken, projectId),
     enabled: Boolean(projectId && accessToken),
+    staleTime: 30_000,
   })
   const contract = contractQ.data?.data ?? null
 
@@ -92,6 +95,7 @@ export function ConversationPanel({
           initialMessageId={initialMessageId}
           members={members}
           onError={onError}
+          isVisible={isVisible}
         />
       </div>
 

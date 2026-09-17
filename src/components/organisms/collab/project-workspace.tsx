@@ -46,6 +46,13 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [taskSearchDebounced, setTaskSearchDebounced] = useState('')
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null)
+  const [prevActiveTab, setPrevActiveTab] = useState<WorkspaceTab>(activeTab)
+  const [visitedTabs, setVisitedTabs] = useState<Set<WorkspaceTab>>(() => new Set([activeTab]))
+
+  if (activeTab !== prevActiveTab) {
+    setPrevActiveTab(activeTab)
+    setVisitedTabs((prev) => new Set(prev).add(activeTab))
+  }
 
   const isClient = identity.role === 'client'
   const canOperate = identity.role === 'admin' || identity.role === 'worker'
@@ -164,95 +171,106 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
           />
         </div>
 
-        <div
-          id="tabpanel-chat"
-          role="tabpanel"
-          className={activeTab === 'chat' ? 'tab-pane-transition' : undefined}
-          style={{ display: activeTab === 'chat' ? 'block' : 'none' }}
-        >
-          <ConversationPanel
-            accessToken={accessToken}
-            projectId={projectId}
-            identity={identity}
-            isClient={isClient}
-            initialChannel={chatChannel}
-            initialMessageId={chatMessageId}
-            members={members}
-            tasks={boardTasks}
-            project={boardData?.project ?? null}
-            onError={setErrorMsg}
-          />
-        </div>
+        {visitedTabs.has('chat') && (
+          <div
+            id="tabpanel-chat"
+            role="tabpanel"
+            className={activeTab === 'chat' ? 'tab-pane-transition' : undefined}
+            style={{ display: activeTab === 'chat' ? 'block' : 'none' }}
+          >
+            <ConversationPanel
+              accessToken={accessToken}
+              projectId={projectId}
+              identity={identity}
+              isClient={isClient}
+              initialChannel={chatChannel}
+              initialMessageId={chatMessageId}
+              members={members}
+              tasks={boardTasks}
+              project={boardData?.project ?? null}
+              onError={setErrorMsg}
+              isVisible={activeTab === 'chat'}
+            />
+          </div>
+        )}
 
-        <div
-          id="tabpanel-brief"
-          role="tabpanel"
-          className={activeTab === 'brief' ? 'tab-pane-transition' : undefined}
-          style={{ display: activeTab === 'brief' ? 'block' : 'none' }}
-        >
-          <BriefPanel
-            brief={briefQ.data?.brief ?? null}
-            changeRequests={briefQ.data?.changeRequests ?? []}
-            isLoading={briefQ.isLoading}
-          />
-        </div>
+        {visitedTabs.has('brief') && (
+          <div
+            id="tabpanel-brief"
+            role="tabpanel"
+            className={activeTab === 'brief' ? 'tab-pane-transition' : undefined}
+            style={{ display: activeTab === 'brief' ? 'block' : 'none' }}
+          >
+            <BriefPanel
+              brief={briefQ.data?.brief ?? null}
+              changeRequests={briefQ.data?.changeRequests ?? []}
+              isLoading={briefQ.isLoading}
+            />
+          </div>
+        )}
 
-        <div
-          id="tabpanel-contract"
-          role="tabpanel"
-          className={activeTab === 'contract' ? 'tab-pane-transition' : undefined}
-          style={{ display: activeTab === 'contract' ? 'block' : 'none' }}
-        >
-          <ContractPanel
-            accessToken={accessToken}
-            project={boardData?.project ?? null}
-            contract={contractQ.data?.data ?? null}
-            members={members}
-            role={identity.role}
-            onError={setErrorMsg}
-          />
-        </div>
+        {visitedTabs.has('contract') && (
+          <div
+            id="tabpanel-contract"
+            role="tabpanel"
+            className={activeTab === 'contract' ? 'tab-pane-transition' : undefined}
+            style={{ display: activeTab === 'contract' ? 'block' : 'none' }}
+          >
+            <ContractPanel
+              accessToken={accessToken}
+              project={boardData?.project ?? null}
+              contract={contractQ.data?.data ?? null}
+              members={members}
+              role={identity.role}
+              onError={setErrorMsg}
+            />
+          </div>
+        )}
 
-        <div
-          id="tabpanel-change-requests"
-          role="tabpanel"
-          className={activeTab === 'change-requests' ? 'tab-pane-transition' : undefined}
-          style={{ display: activeTab === 'change-requests' ? 'block' : 'none' }}
-        >
-          <ChangeRequestsPanel
-            accessToken={accessToken}
-            projectId={projectId}
-            identity={identity}
-            tasks={boardTasks}
-            members={members}
-            changeRequests={changeRequestsQ?.data?.data ?? []}
-            isLoading={changeRequestsQ?.isLoading ?? false}
-            onRefresh={() => {
-              void changeRequestsQ?.refetch()
-              void queryClient.invalidateQueries({ queryKey: collabKeys.timeline(projectId) })
-              void queryClient.invalidateQueries({ queryKey: collabKeys.brief(projectId) })
-              void queryClient.invalidateQueries({ queryKey: collabKeys.pendingChangeRequests() })
-            }}
-            onError={setErrorMsg}
-          />
-        </div>
+        {visitedTabs.has('change-requests') && (
+          <div
+            id="tabpanel-change-requests"
+            role="tabpanel"
+            className={activeTab === 'change-requests' ? 'tab-pane-transition' : undefined}
+            style={{ display: activeTab === 'change-requests' ? 'block' : 'none' }}
+          >
+            <ChangeRequestsPanel
+              accessToken={accessToken}
+              projectId={projectId}
+              identity={identity}
+              tasks={boardTasks}
+              members={members}
+              changeRequests={changeRequestsQ?.data?.data ?? []}
+              isLoading={changeRequestsQ?.isLoading ?? false}
+              onRefresh={() => {
+                void changeRequestsQ?.refetch()
+                void queryClient.invalidateQueries({ queryKey: collabKeys.timeline(projectId) })
+                void queryClient.invalidateQueries({ queryKey: collabKeys.brief(projectId) })
+                void queryClient.invalidateQueries({ queryKey: collabKeys.pendingChangeRequests() })
+              }}
+              onError={setErrorMsg}
+            />
+          </div>
+        )}
 
-        <div
-          id="tabpanel-members"
-          role="tabpanel"
-          className={activeTab === 'members' ? 'tab-pane-transition' : undefined}
-          style={{ display: activeTab === 'members' ? 'block' : 'none' }}
-        >
-          <ProjectMembers
-            members={members}
-            isLoading={boardQ.isLoading}
-            accessToken={accessToken}
-            projectId={projectId}
-            identity={identity}
-            canManageMembers={identity.role === 'admin'}
-            onError={setErrorMsg}
-          />
-        </div>
+        {visitedTabs.has('members') && (
+          <div
+            id="tabpanel-members"
+            role="tabpanel"
+            className={activeTab === 'members' ? 'tab-pane-transition' : undefined}
+            style={{ display: activeTab === 'members' ? 'block' : 'none' }}
+          >
+            <ProjectMembers
+              members={members}
+              isLoading={boardQ.isLoading}
+              accessToken={accessToken}
+              projectId={projectId}
+              identity={identity}
+              canManageMembers={identity.role === 'admin'}
+              onError={setErrorMsg}
+            />
+          </div>
+        )}
       </div>
     </div>
   )

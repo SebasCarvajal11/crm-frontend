@@ -7,12 +7,19 @@ type Params = {
   channel: Channel
   messageCount: number
   containerRef: RefObject<HTMLDivElement | null>
+  isVisible?: boolean
 }
 
 const STICK_TO_BOTTOM_THRESHOLD = 56
 
-export function useChatScrollManager({ channel, messageCount, containerRef }: Params) {
+export function useChatScrollManager({
+  channel,
+  messageCount,
+  containerRef,
+  isVisible = true,
+}: Params) {
   const activeChannelRef = useRef(channel)
+  const isVisibleRef = useRef(isVisible)
   const previousMessageCountRef = useRef<Record<Channel, number>>({ external: 0, internal: 0 })
   const initializedScrollRef = useRef<Record<Channel, boolean>>({ external: false, internal: false })
   const stickToBottomRef = useRef<Record<Channel, boolean>>({ external: true, internal: true })
@@ -21,23 +28,33 @@ export function useChatScrollManager({ channel, messageCount, containerRef }: Pa
     activeChannelRef.current = channel
   }, [channel])
 
+  useEffect(() => {
+    isVisibleRef.current = isVisible
+  }, [isVisible])
+
   useLayoutEffect(() => {
     const container = containerRef.current
-    if (!container) return
+    if (!container || !isVisible) return
 
     const previousCount = previousMessageCountRef.current[channel]
-    const isInitialPaint = !initializedScrollRef.current[channel]
+    const hasHeight = container.clientHeight > 0
+    const isInitialPaint = !initializedScrollRef.current[channel] && messageCount > 0 && hasHeight
     const shouldStick = stickToBottomRef.current[channel]
 
     if (isInitialPaint) {
       container.scrollTop = container.scrollHeight
       initializedScrollRef.current[channel] = true
-    } else if (messageCount > previousCount && shouldStick) {
+    } else if (messageCount > previousCount && shouldStick && hasHeight) {
       container.scrollTop = container.scrollHeight
     }
 
+    if (hasHeight && !initializedScrollRef.current[channel] && messageCount > 0) {
+      container.scrollTop = container.scrollHeight
+      initializedScrollRef.current[channel] = true
+    }
+
     previousMessageCountRef.current[channel] = messageCount
-  }, [channel, messageCount, containerRef])
+  }, [channel, messageCount, isVisible, containerRef])
 
   useEffect(() => {
     const container = containerRef.current
@@ -53,8 +70,9 @@ export function useChatScrollManager({ channel, messageCount, containerRef }: Pa
     container.addEventListener('scroll', updateStickState, { passive: true })
 
     const resizeObserver = new ResizeObserver(() => {
+      if (!isVisibleRef.current) return
       const activeChannel = activeChannelRef.current
-      if (stickToBottomRef.current[activeChannel]) {
+      if (stickToBottomRef.current[activeChannel] && container.clientHeight > 0) {
         container.scrollTop = container.scrollHeight
       }
     })
@@ -67,3 +85,4 @@ export function useChatScrollManager({ channel, messageCount, containerRef }: Pa
     }
   }, [containerRef])
 }
+

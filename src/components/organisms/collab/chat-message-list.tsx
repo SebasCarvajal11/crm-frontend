@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Check, CheckCheck, MessageSquare } from 'lucide-react'
 import type { MeResponse } from '@/shared/types'
 import type { ProjectChatMessage, ProjectMember } from '@/features/collab/model'
@@ -50,7 +51,13 @@ const formatDaySeparator = (iso: string): string => {
   return date.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-export function ChatMessageList({ messages, identity, memberBySub, avatarBySub, highlightMessageId }: Props) {
+export const ChatMessageList = memo(function ChatMessageList({
+  messages,
+  identity,
+  memberBySub,
+  avatarBySub,
+  highlightMessageId,
+}: Props) {
   const getDisplayName = (message: ProjectChatMessage): string => {
     const member = message.authorSub ? memberBySub.get(message.authorSub) : undefined
     const memberFullName = `${member?.first_name ?? ''} ${member?.last_name ?? ''}`.trim()
@@ -181,4 +188,4 @@ export function ChatMessageList({ messages, identity, memberBySub, avatarBySub, 
       </div>
     )
   })
-}
+})

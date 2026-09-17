@@ -38,6 +38,7 @@ type Params = {
   channel: Channel
   members: ProjectMember[]
   lastMarkedRef: MutableRefObject<Record<Channel, string | null>>
+  isVisible?: boolean
 }
 
 export function useProjectChatData({
@@ -47,6 +48,7 @@ export function useProjectChatData({
   channel,
   members,
   lastMarkedRef,
+  isVisible = true,
 }: Params) {
   const queryClient = useQueryClient()
   const [limit, setLimit] = useState(20)
@@ -55,7 +57,7 @@ export function useProjectChatData({
     queryKey: [...collabKeys.chatExternal(projectId), limit],
     queryFn: () => listExternalChatRequest(accessToken, projectId, { limit, page: 1 }),
     staleTime: 15_000,
-    refetchInterval: 15_000,
+    refetchInterval: isVisible && channel === 'external' ? 15_000 : false,
   })
 
   const internalQ = useQuery({
@@ -63,7 +65,7 @@ export function useProjectChatData({
     queryFn: () => listInternalChatRequest(accessToken, projectId, { limit, page: 1 }),
     enabled: !isClient,
     staleTime: 15_000,
-    refetchInterval: 15_000,
+    refetchInterval: isVisible && channel === 'internal' ? 15_000 : false,
   })
 
   const externalMessages = externalQ.data?.data.items ?? EMPTY_MESSAGES
@@ -88,7 +90,7 @@ export function useProjectChatData({
   const avatarBySub = avatarsQ.data?.data.items ?? {}
 
   useEffect(() => {
-    if (!readUpToMessageId) return
+    if (!isVisible || !readUpToMessageId) return
     if (lastMarkedRef.current[channel] === readUpToMessageId) return
 
     const req = channel === 'external' ? markExternalChatReadRequest : markInternalChatReadRequest
@@ -100,7 +102,7 @@ export function useProjectChatData({
         void queryClient.invalidateQueries({ queryKey: collabKeys.mentionNotificationsCount() })
       })
       .catch(() => undefined)
-  }, [accessToken, projectId, channel, readUpToMessageId, queryClient, lastMarkedRef])
+  }, [accessToken, projectId, channel, readUpToMessageId, queryClient, lastMarkedRef, isVisible])
 
   const totalCount = useMemo(() => {
     return channel === 'external'

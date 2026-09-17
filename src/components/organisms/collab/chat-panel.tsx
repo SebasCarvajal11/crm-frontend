@@ -21,9 +21,20 @@ type Props = {
   initialMessageId?: string
   members: ProjectMember[]
   onError: (msg: string) => void
+  isVisible?: boolean
 }
 
-export function ChatPanel({ accessToken, projectId, identity, isClient, initialChannel, initialMessageId, members, onError }: Props) {
+export function ChatPanel({
+  accessToken,
+  projectId,
+  identity,
+  isClient,
+  initialChannel,
+  initialMessageId,
+  members,
+  onError,
+  isVisible = true,
+}: Props) {
   const [channel, setChannel] = useState<Channel>(initialChannel ?? 'external')
   const [body, setBody] = useState('')
   const [activeIdx, setActiveIdx] = useState(0)
@@ -41,12 +52,14 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
     channel,
     members,
     lastMarkedRef,
+    isVisible,
   })
 
   useChatScrollManager({
     channel,
     messageCount: messages.length,
     containerRef: logRef,
+    isVisible,
   })
 
   const mentionQuery = useMemo(() => {
@@ -162,7 +175,7 @@ export function ChatPanel({ accessToken, projectId, identity, isClient, initialC
 
       <div
         ref={logRef}
-        className="min-h-0 flex-1 space-y-1 overflow-y-auto scroll-smooth scrollbar-thin px-4 py-4"
+        className="min-h-0 flex-1 space-y-1 overflow-y-auto scroll-auto scrollbar-thin px-4 py-4"
         role="log"
         aria-live="polite"
         aria-label="Mensajes"

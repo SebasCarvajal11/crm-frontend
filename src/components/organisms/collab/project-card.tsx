@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { User } from 'lucide-react'
 import { ProjectTypeBadge } from '@/components/molecules/project-type-badge'
 import type { ProjectListItem } from '@/features/collab/model'
@@ -8,7 +9,7 @@ type Props = {
 }
 
 /** Organismo: tarjeta kanban de un proyecto en el tablero padre. */
-export function ProjectCard({ project, onClick }: Props) {
+export const ProjectCard = memo(function ProjectCard({ project, onClick }: Props) {
   const pct = project.progressPercent
 
   const progressColor =
@@ -61,5 +62,5 @@ export function ProjectCard({ project, onClick }: Props) {
       </div>
     </button>
   )
-}
+})
 

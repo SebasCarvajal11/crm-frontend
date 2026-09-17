@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Calendar, Clock, GripVertical, User, CheckSquare } from 'lucide-react'
 import { PriorityBadge } from '@/components/molecules/priority-badge'
 import type { ProjectTask } from '@/features/collab/model'
@@ -16,7 +17,7 @@ const fmtShort = (d: string) =>
   new Date(d).toLocaleDateString('es', { day: 'numeric', month: 'short' })
 
 /** Organismo: tarjeta arrastrable de tarea en el tablero hijo. */
-export function TaskCard({ task, isSelected, canDrag, onClick }: Props) {
+export const TaskCard = memo(function TaskCard({ task, isSelected, canDrag, onClick }: Props) {
   const borderLeft = {
     low:    'border-l-slate-300',
     medium: 'border-l-sky-400',
@@ -96,5 +97,5 @@ export function TaskCard({ task, isSelected, canDrag, onClick }: Props) {
       </div>
     </button>
   )
-}
+})
 
