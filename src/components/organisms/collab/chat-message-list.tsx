@@ -1,10 +1,11 @@
-import { memo } from 'react'
+import { memo, useMemo, useState } from 'react'
 import { Check, CheckCheck, MessageSquare } from 'lucide-react'
 import type { MeResponse } from '@/shared/types'
 import type { ProjectChatMessage, ProjectMember } from '@/features/collab/model'
 import type { UserAvatarsResponse } from '@/shared/types'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 import { getAvatarColor } from './avatar-color'
+import { ChatMessageInfoDialog } from './chat-message-info-dialog'
 
 type Props = {
   messages: ProjectChatMessage[]
@@ -12,6 +13,7 @@ type Props = {
   memberBySub: Map<string, ProjectMember>
   avatarBySub: UserAvatarsResponse['data']['items']
   highlightMessageId: string | null
+  members?: ProjectMember[]
 }
 
 
@@ -57,7 +59,15 @@ export const ChatMessageList = memo(function ChatMessageList({
   memberBySub,
   avatarBySub,
   highlightMessageId,
+  members: propMembers,
 }: Props) {
+  const [selectedMessageForInfo, setSelectedMessageForInfo] = useState<ProjectChatMessage | null>(null)
+
+  const resolvedMembers = useMemo(() => {
+    if (propMembers && propMembers.length > 0) return propMembers
+    return Array.from(memberBySub.values())
+  }, [propMembers, memberBySub])
+
   const getDisplayName = (message: ProjectChatMessage): string => {
     const member = message.authorSub ? memberBySub.get(message.authorSub) : undefined
     const memberFullName = `${member?.first_name ?? ''} ${member?.last_name ?? ''}`.trim()
@@ -76,6 +86,42 @@ export const ChatMessageList = memo(function ChatMessageList({
     return 'Sistema'
   }
 
+  const renderReadReceipt = (message: ProjectChatMessage) => {
+    const readStatus = message.readStatus
+    const seenCount = readStatus?.seenCount ?? 0
+    const requiredCount = readStatus?.requiredCount ?? 0
+    const isSeenByAll = readStatus?.isSeen ?? false
+
+    let checkIcon: React.ReactNode
+    let checkTitle: string
+
+    if (seenCount === 0) {
+      checkIcon = <Check className="size-3 text-muted-foreground" />
+      checkTitle = 'Enviado'
+    } else if (isSeenByAll || (requiredCount > 0 && seenCount >= requiredCount)) {
+      checkIcon = <CheckCheck className="size-3 text-sky-500" />
+      checkTitle = `Leído por todos (${seenCount}/${requiredCount})`
+    } else {
+      checkIcon = <CheckCheck className="size-3 text-muted-foreground" />
+      checkTitle = `Leído por ${seenCount} de ${requiredCount}`
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          setSelectedMessageForInfo(message)
+        }}
+        className="inline-flex items-center gap-0.5 rounded p-0.5 transition-colors hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        title={`${checkTitle} · Ver quién ha leído`}
+        aria-label={`Estado de lectura: ${checkTitle}. Clic para ver detalles`}
+      >
+        {checkIcon}
+      </button>
+    )
+  }
+
   if (messages.length === 0) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
@@ -85,7 +131,9 @@ export const ChatMessageList = memo(function ChatMessageList({
     )
   }
 
-  return messages.map((message, index) => {
+  return (
+    <>
+      {messages.map((message, index) => {
     const isOwn = message.authorSub === identity.id
     const isSystem = message.messageType !== 'text'
     const isMentionedToCurrentUser = Array.isArray(message.mentionedSubs) && message.mentionedSubs.includes(identity.id)
@@ -176,16 +224,23 @@ export const ChatMessageList = memo(function ChatMessageList({
             {!sameAuthorAsNext && (
               <span className="mt-0.5 inline-flex items-center gap-1 px-1 text-[10px] text-muted-foreground" title={formatMessageDateTime(message.createdAt)}>
                 {formatMessageTime(message.createdAt)}
-                {isOwn && (
-                  message.readStatus?.isSeen
-                    ? <CheckCheck className="size-3 text-sky-500" />
-                    : <Check className="size-3 text-muted-foreground" />
-                )}
+                {isOwn && renderReadReceipt(message)}
               </span>
             )}
           </div>
         </div>
       </div>
     )
-  })
+  })}
+  <ChatMessageInfoDialog
+    open={Boolean(selectedMessageForInfo)}
+    onOpenChange={(open) => {
+      if (!open) setSelectedMessageForInfo(null)
+    }}
+    message={selectedMessageForInfo}
+    members={resolvedMembers}
+    avatarBySub={avatarBySub}
+  />
+</>
+  )
 })

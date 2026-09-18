@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Bell, ChevronUp, LogOut, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { NotificationCounterBadge } from '@/components/atoms/notification-counter-badge'
 import { cn } from '@/shared/lib/utils'
 import { ROLE_LABEL, roleInitial } from './utils'
 
@@ -60,9 +61,10 @@ export function SidebarFooter({
               roleInitial(userRole)
             )}
             {unreadNotificationsCount > 0 && compact && (
-              <span
-                className="absolute -top-0.5 -right-0.5 flex size-2.5 rounded-full bg-rose-500 ring-2 ring-primary"
-                aria-label={`${unreadNotificationsCount} notificaciones pendientes`}
+              <NotificationCounterBadge
+                variant="dot"
+                count={unreadNotificationsCount}
+                className="absolute -top-0.5 -right-0.5"
               />
             )}
           </div>
@@ -71,14 +73,7 @@ export function SidebarFooter({
               <p className="truncate text-xs text-primary-foreground/70">{userEmail}</p>
               <div className="flex items-center gap-1.5">
                 <p className="text-xs font-medium text-primary-foreground/90">{roleLabel}</p>
-                {unreadNotificationsCount > 0 && (
-                  <span
-                    className="inline-flex size-4.5 min-w-4.5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white shadow-xs"
-                    aria-label={`${unreadNotificationsCount} notificaciones pendientes`}
-                  >
-                    {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
-                  </span>
-                )}
+                <NotificationCounterBadge count={unreadNotificationsCount} maxCount={9} size="sm" />
               </div>
             </div>
           )}
@@ -123,14 +118,12 @@ export function SidebarFooter({
             >
               <Bell className="size-4" />
               <span>Notificaciones</span>
-              {unreadNotificationsCount > 0 && (
-                <span
-                  className="ml-auto inline-flex size-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white shadow-xs"
-                  aria-label={`${unreadNotificationsCount} notificaciones sin leer`}
-                >
-                  {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
-                </span>
-              )}
+              <NotificationCounterBadge
+                count={unreadNotificationsCount}
+                maxCount={99}
+                size="md"
+                className="ml-auto"
+              />
             </Button>
             <Button
               type="button"

@@ -1,7 +1,5 @@
 import type { ProjectType as _ProjectType, ParentProjectStatus as _ParentProjectStatus, ProjectListItem as _ProjectListItem } from '@/shared/types'
 export type { DataResponse, PaginatedData } from '@sebascarvajal11/cima-contracts'
-
-
 export type ProjectType = _ProjectType
 export type ParentProjectStatus = _ParentProjectStatus
 export type ProjectListItem = _ProjectListItem
@@ -9,18 +7,9 @@ export type ProjectListItem = _ProjectListItem
 export type ProjectMemberRole = 'admin' | 'worker' | 'client'
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
 export type TaskColumnKey =
-  | 'pending'
-  | 'doing'
-  | 'internal_review'
-  | 'client_approval'
-  | 'blocked'
-  | 'done'
-  | 'art_approved'
-  | 'in_production'
-  | 'quality_control'
-  | 'shipped'
-  | 'completed'
-  | 'waiting_material'
+  | 'pending' | 'doing' | 'internal_review' | 'client_approval'
+  | 'blocked' | 'done' | 'art_approved' | 'in_production'
+  | 'quality_control' | 'shipped' | 'completed' | 'waiting_material'
 
 export type ProjectSearchResult = {
   id: string
@@ -94,6 +83,11 @@ export type ProjectTask = {
   updatedAt: string
 }
 
+export type ChatMessageReadReceipt = {
+  userSub: string
+  readAt: string
+}
+
 export type ProjectChatMessage = {
   id: string
   projectId: string
@@ -113,6 +107,7 @@ export type ProjectChatMessage = {
     isSeen: boolean
     requiredCount: number
     seenCount: number
+    reads?: ChatMessageReadReceipt[]
   }
 }
 

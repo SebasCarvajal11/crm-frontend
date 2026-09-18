@@ -1,9 +1,11 @@
 import { useCallback, useMemo, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { AlertCircle, ArrowLeft, FileSignature, FileText, GitPullRequest, KanbanSquare, MessageSquare, Users } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { SectionTabs, type SectionTabItem } from '@/components/molecules/section-tabs'
+import { NotificationCounterBadge } from '@/components/atoms/notification-counter-badge'
+import { listUnreadNotificationsRequest } from '@/features/collab/api'
 import { useProjectBoardMutations, useProjectWorkspaceData, useTaskSearch, useBoardData } from '@/features/collab/hooks'
 import { ProjectHeader } from './project-header'
 import { TaskSearchBar } from './task-search-bar'
@@ -31,15 +33,6 @@ type Props = {
   onTabChange: (tab: WorkspaceTab) => void
 }
 
-const TABS: SectionTabItem<WorkspaceTab>[] = [
-  { value: 'board',           label: 'Tablero',              icon: <KanbanSquare  className="size-4" /> },
-  { value: 'chat',            label: 'Conversación',         icon: <MessageSquare className="size-4" /> },
-  { value: 'brief',           label: 'Brief',                icon: <FileText      className="size-4" /> },
-  { value: 'contract',        label: 'Contrato',             icon: <FileSignature className="size-4" /> },
-  { value: 'change-requests', label: 'Solicitud de cambios', icon: <GitPullRequest className="size-4" /> },
-  { value: 'members',         label: 'Integrantes',          icon: <Users         className="size-4" /> },
-]
-
 const FINALIZATION_COLUMN_KEYS = new Set(['done', 'completed'])
 
 export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta, activeTab = 'board', chatChannel, chatMessageId, initialTaskId, onBack, onTabChange }: Props) {
@@ -51,11 +44,32 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
   const [prevActiveTab, setPrevActiveTab] = useState<WorkspaceTab>(activeTab)
   const [visitedTabs, setVisitedTabs] = useState<Set<WorkspaceTab>>(() => new Set([activeTab]))
 
+  const notificationsQ = useQuery({
+    queryKey: collabKeys.notifications(),
+    queryFn: () => listUnreadNotificationsRequest(accessToken),
+    staleTime: 12_000,
+  })
+
+  const unreadChatCount = useMemo(() => {
+    const list = notificationsQ.data?.data ?? []
+    return list.filter((n) => n.project_id === projectId && (n.resource_type === 'chat_message' || n.source === 'mention')).length
+  }, [notificationsQ.data, projectId])
+
+  const tabs = useMemo<SectionTabItem<WorkspaceTab>[]>(() => [
+    { value: 'board', label: 'Tablero', icon: <KanbanSquare className="size-4" /> },
+    {
+      value: 'chat', label: 'Conversación', icon: <MessageSquare className="size-4" />,
+      badge: unreadChatCount > 0 ? <NotificationCounterBadge count={unreadChatCount} maxCount={9} size="sm" /> : undefined,
+    },
+    { value: 'brief', label: 'Brief', icon: <FileText className="size-4" /> },
+    { value: 'contract', label: 'Contrato', icon: <FileSignature className="size-4" /> },
+    { value: 'change-requests', label: 'Solicitud de cambios', icon: <GitPullRequest className="size-4" /> },
+    { value: 'members', label: 'Integrantes', icon: <Users className="size-4" /> },
+  ], [unreadChatCount])
+
   if (initialTaskId !== prevInitialTaskId) {
     setPrevInitialTaskId(initialTaskId)
-    if (initialTaskId) {
-      setFocusedTaskId(initialTaskId)
-    }
+    if (initialTaskId) setFocusedTaskId(initialTaskId)
   }
 
   if (activeTab !== prevActiveTab) {
@@ -117,7 +131,7 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
       )}
 
       <SectionTabs
-        items={TABS}
+        items={tabs}
         value={activeTab}
         onValueChange={onTabChange}
         ariaLabel="Secciones del proyecto"
@@ -168,11 +182,8 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
                 setErrorMsg('No puedes mover la tarea a la columna final sin completar todas las subtareas')
                 return
               }
-              moveTask.mutate({
-                taskId,
-                targetColumnId,
-                position: (tasksByColumn[targetColumnId] ?? []).length,
-              })
+              moveTask.mutate({ taskId, targetColumnId,
+                position: (tasksByColumn[targetColumnId] ?? []).length })
             }}
             onTaskSaved={invalidateBoardScope}
             onError={setErrorMsg}

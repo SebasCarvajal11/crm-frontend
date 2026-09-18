@@ -4,6 +4,7 @@ export type SectionTabItem<T extends string> = {
   value: T
   label: string
   icon: ReactNode
+  badge?: ReactNode
 }
 
 type SectionTabsProps<T extends string> = {
@@ -56,6 +57,7 @@ export function SectionTabs<T extends string>({
           >
             <span aria-hidden="true">{tab.icon}</span>
             <span>{tab.label}</span>
+            {tab.badge && <span className="ml-1 inline-flex items-center">{tab.badge}</span>}
           </button>
         )
       })}

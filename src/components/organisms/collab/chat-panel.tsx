@@ -199,6 +199,7 @@ export function ChatPanel({
           memberBySub={memberBySub}
           avatarBySub={avatarBySub}
           highlightMessageId={highlightMessageId}
+          members={members}
         />
       </div>
 
