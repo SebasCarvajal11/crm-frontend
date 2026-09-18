@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle, ArrowLeft, FileSignature, FileText, GitPullRequest, KanbanSquare, MessageSquare, Users } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -47,14 +47,16 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [taskSearchDebounced, setTaskSearchDebounced] = useState('')
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(initialTaskId ?? null)
+  const [prevInitialTaskId, setPrevInitialTaskId] = useState<string | undefined>(initialTaskId)
   const [prevActiveTab, setPrevActiveTab] = useState<WorkspaceTab>(activeTab)
   const [visitedTabs, setVisitedTabs] = useState<Set<WorkspaceTab>>(() => new Set([activeTab]))
 
-  useEffect(() => {
+  if (initialTaskId !== prevInitialTaskId) {
+    setPrevInitialTaskId(initialTaskId)
     if (initialTaskId) {
       setFocusedTaskId(initialTaskId)
     }
-  }, [initialTaskId])
+  }
 
   if (activeTab !== prevActiveTab) {
     setPrevActiveTab(activeTab)

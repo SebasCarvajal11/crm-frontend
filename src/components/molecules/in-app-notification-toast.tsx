@@ -11,19 +11,18 @@ type ToastItemProps = {
   onDismiss: (id: string) => void
 }
 
-function resolveNotificationIcon(type: string, source: string) {
-  if (source === 'mention' || type === 'chat_message') return MessageSquare
-  if (type === 'project_task') return CheckSquare
-  if (type === 'project_change_request') return GitPullRequest
-  if (type === 'project_file') return FileText
-  return Bell
+function NotificationBadgeIcon({ type, source }: { type: string; source: string }) {
+  if (source === 'mention' || type === 'chat_message') return <MessageSquare className="size-4" />
+  if (type === 'project_task') return <CheckSquare className="size-4" />
+  if (type === 'project_change_request') return <GitPullRequest className="size-4" />
+  if (type === 'project_file') return <FileText className="size-4" />
+  return <Bell className="size-4" />
 }
 
 export function InAppNotificationToastItem({ notification, onOpen, onDismiss }: ToastItemProps) {
   const [isPaused, setIsPaused] = useState(false)
   const [remainingMs, setRemainingMs] = useState(TOAST_DURATION_MS)
-  const lastTickRef = useRef<number>(Date.now())
-  const Icon = resolveNotificationIcon(notification.resource_type, notification.source)
+  const lastTickRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (isPaused) return
@@ -31,7 +30,7 @@ export function InAppNotificationToastItem({ notification, onOpen, onDismiss }: 
 
     const interval = window.setInterval(() => {
       const now = Date.now()
-      const delta = now - lastTickRef.current
+      const delta = now - (lastTickRef.current ?? now)
       lastTickRef.current = now
       setRemainingMs((prev) => {
         const next = prev - delta
@@ -63,7 +62,7 @@ export function InAppNotificationToastItem({ notification, onOpen, onDismiss }: 
     >
       <div className="flex items-start gap-3 p-3.5">
         <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Icon className="size-4" />
+          <NotificationBadgeIcon type={notification.resource_type} source={notification.source} />
         </div>
         <button
           type="button"
