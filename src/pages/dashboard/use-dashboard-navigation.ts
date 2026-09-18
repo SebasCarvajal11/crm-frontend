@@ -6,6 +6,8 @@ export type MentionPayload = {
   projectId: string
   channel: 'internal' | 'external' | 'system'
   messageId?: string | null
+  resourceType?: string
+  resourceId?: string | null
 }
 
 export type WorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
@@ -27,7 +29,37 @@ export function useDashboardNavigation() {
                 workspace_tab: undefined,
                 chat_channel: undefined,
                 chat_message_id: undefined,
+                task_id: undefined,
               }),
+        }),
+        replace: true,
+      })
+    },
+    [navigate],
+  )
+
+  const openNotificationTarget = useCallback(
+    (payload: MentionPayload) => {
+      const isChat = payload.resourceType === 'chat_message' || Boolean(payload.messageId)
+      const isTask = payload.resourceType === 'project_task'
+      const isChangeRequest = payload.resourceType === 'project_change_request'
+      const channel = payload.channel === 'internal' ? 'internal' : 'external'
+      const messageId = payload.messageId ?? (isChat ? payload.resourceId ?? undefined : undefined)
+
+      let workspaceTab: WorkspaceTab = 'board'
+      if (isChat) workspaceTab = 'chat'
+      else if (isChangeRequest) workspaceTab = 'change-requests'
+
+      navigate({
+        to: '/dashboard',
+        search: (prev) => ({
+          ...prev,
+          tab: 'collab',
+          project_id: payload.projectId,
+          workspace_tab: workspaceTab,
+          chat_channel: isChat ? channel : undefined,
+          chat_message_id: isChat ? messageId : undefined,
+          task_id: isTask ? payload.resourceId ?? undefined : undefined,
         }),
         replace: true,
       })
@@ -37,27 +69,22 @@ export function useDashboardNavigation() {
 
   const goToMention = useCallback(
     (payload: MentionPayload) => {
+      openNotificationTarget(payload)
+    },
+    [openNotificationTarget],
+  )
+
+  const openProject = useCallback(
+    (projectId: string, workspaceTab: WorkspaceTab = 'board', taskId?: string) => {
       navigate({
         to: '/dashboard',
         search: (prev) => ({
           ...prev,
           tab: 'collab',
-          project_id: payload.projectId,
-          workspace_tab: payload.messageId ? 'chat' : 'board',
-          chat_channel: payload.messageId ? (payload.channel === 'internal' ? 'internal' : 'external') : undefined,
-          chat_message_id: payload.messageId ?? undefined,
+          project_id: projectId,
+          workspace_tab: workspaceTab,
+          task_id: taskId,
         }),
-        replace: true,
-      })
-    },
-    [navigate],
-  )
-
-  const openProject = useCallback(
-    (projectId: string, workspaceTab: WorkspaceTab = 'board') => {
-      navigate({
-        to: '/dashboard',
-        search: (prev) => ({ ...prev, tab: 'collab', project_id: projectId, workspace_tab: workspaceTab }),
         replace: true,
       })
     },
@@ -73,6 +100,7 @@ export function useDashboardNavigation() {
         workspace_tab: undefined,
         chat_channel: undefined,
         chat_message_id: undefined,
+        task_id: undefined,
       }),
       replace: true,
     })
@@ -93,6 +121,7 @@ export function useDashboardNavigation() {
     navigate,
     goTo,
     goToMention,
+    openNotificationTarget,
     openProject,
     closeProject,
     changeWorkspaceTab,

@@ -54,29 +54,38 @@ export function DashboardLoadError({
   )
 }
 
-export function DashboardMissingIdentity({
-  onRetry,
-  onGoToLogin,
-}: {
-  onRetry: () => void
-  onGoToLogin: () => void
-}) {
+export function DashboardMissingIdentity({ onRetry, onGoToLogin }: { onRetry: () => void; onGoToLogin: () => void }) {
   return (
-    <div className="flex items-center justify-center min-h-screen px-4">
-      <div className="w-full max-w-sm space-y-4">
-        <Alert variant="destructive">
-          <AlertTitle>No se pudo cargar tu identidad</AlertTitle>
-          <AlertDescription>
-            La sesión no trajo información de usuario. Reintenta o vuelve a iniciar sesión.
-          </AlertDescription>
-        </Alert>
-        <Button variant="outline" className="w-full" onClick={onRetry}>
-          Reintentar
-        </Button>
-        <Button className="w-full" onClick={onGoToLogin}>
-          Ir al login
-        </Button>
+    <div className="flex min-h-screen items-center justify-center px-4" role="alert">
+      <Alert className="max-w-md">
+        <AlertTitle>Sesión incompleta</AlertTitle>
+        <AlertDescription className="space-y-4">
+          <p>No se pudo cargar la información del usuario actual.</p>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={onRetry}>
+              Reintentar
+            </Button>
+            <Button variant="outline" size="sm" onClick={onGoToLogin}>
+              Ir a iniciar sesión
+            </Button>
+          </div>
+        </AlertDescription>
+      </Alert>
+    </div>
+  )
+}
+
+export function DashboardTabSkeleton() {
+  return (
+    <div className="space-y-4 animate-pulse" role="status" aria-label="Cargando sección">
+      <div className="h-9 w-48 rounded-xl bg-muted/60" />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="h-28 rounded-xl bg-muted/40" />
+        <div className="h-28 rounded-xl bg-muted/40" />
+        <div className="h-28 rounded-xl bg-muted/40" />
+        <div className="h-28 rounded-xl bg-muted/40" />
       </div>
+      <div className="h-64 rounded-xl bg-muted/30" />
     </div>
   )
 }

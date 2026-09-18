@@ -11,7 +11,13 @@ import { PageHeader } from '@/components/molecules/page-header'
 
 type Props = {
   accessToken: string
-  onOpenNotification: (payload: { projectId: string; channel: 'internal' | 'external' | 'system'; messageId?: string | null }) => void
+  onOpenNotification: (payload: {
+    projectId: string
+    channel: 'internal' | 'external' | 'system'
+    messageId?: string | null
+    resourceType?: string
+    resourceId?: string | null
+  }) => void
 }
 
 const formatWhen = (iso: string) => {
@@ -26,7 +32,6 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
     queryKey: collabKeys.notifications(),
     queryFn: () => listUnreadNotificationsRequest(accessToken),
     enabled: Boolean(accessToken?.trim()),
-    refetchInterval: 20_000,
     select: (d) => d.data,
   })
 
@@ -43,7 +48,13 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
   const handleOpen = async (item: (typeof rows)[number]) => {
     try {
       await markSeen.mutateAsync(item.id)
-      onOpenNotification({ projectId: item.project_id, channel: item.channel, messageId: item.message_id })
+      onOpenNotification({
+        projectId: item.project_id,
+        channel: item.channel,
+        messageId: item.message_id,
+        resourceType: item.resource_type,
+        resourceId: item.resource_id,
+      })
     } catch {
       notifyTransientNotice('No se pudo abrir la notificación. Intenta de nuevo.')
     }

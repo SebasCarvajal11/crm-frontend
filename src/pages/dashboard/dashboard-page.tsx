@@ -9,6 +9,7 @@ import {
   DashboardLoadError,
   DashboardMissingIdentity,
   DashboardRedirecting,
+  DashboardTabSkeleton,
 } from './dashboard-feedback'
 import { useDashboardNavigation } from './use-dashboard-navigation'
 import { AppShell } from '@/components/templates/app-shell'
@@ -16,8 +17,8 @@ import { useSessionStore } from '@/app/session/session-store'
 import { logoutRequest } from '@/features/auth/api'
 import { useDashboardComposition } from '@/features/composition'
 import { DashboardOverview } from '@/features/composition/ui'
-import { countUnreadNotificationsRequest } from '@/features/collab/api'
-import { collabKeys } from '@/features/collab/model'
+import { useNotificationSync } from '@/features/collab/hooks'
+import { InAppNotificationToastContainer } from '@/components/molecules/in-app-notification-toast'
 import { getCurrentAvatarRequestOptional } from '@/shared/api'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 import { getAccessTokenRole } from '@/shared/lib/access-token-role'
@@ -42,30 +43,16 @@ const AccountPanel = lazy(() =>
   import('@/components/organisms/account-panel').then((m) => ({ default: m.AccountPanel }))
 )
 
-function DashboardTabSkeleton() {
-  return (
-    <div className="space-y-4 animate-pulse" role="status" aria-label="Cargando sección">
-      <div className="h-9 w-48 rounded-xl bg-muted/60" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="h-28 rounded-xl bg-muted/40" />
-        <div className="h-28 rounded-xl bg-muted/40" />
-        <div className="h-28 rounded-xl bg-muted/40" />
-        <div className="h-28 rounded-xl bg-muted/40" />
-      </div>
-      <div className="h-64 rounded-xl bg-muted/30" />
-    </div>
-  )
-}
-
 type Props = {
   tab?: DashboardTab
   project_id?: string
   workspace_tab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
   chat_channel?: 'internal' | 'external'
   chat_message_id?: string
+  task_id?: string
 }
 
-export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, chat_message_id }: Props) {
+export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, chat_message_id, task_id }: Props) {
   const token = useSessionStore((s) => s.token)
   const bootstrapped = useSessionStore((s) => s.bootstrapped)
   const emailStored = useSessionStore((s) => s.email)
@@ -73,7 +60,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   const {
     navigate,
     goTo,
-    goToMention,
+    openNotificationTarget,
     openProject,
     closeProject,
     changeWorkspaceTab,
@@ -87,12 +74,22 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     enabled: bootstrapped && Boolean(token),
     retry: false,
   })
-  const unreadNotificationsQuery = useQuery({
-    queryKey: collabKeys.notificationsCount(),
-    queryFn: () => countUnreadNotificationsRequest(token!),
-    enabled: bootstrapped && Boolean(token),
-    refetchInterval: 20_000,
-    select: (response) => response.data.unread_count,
+  const {
+    unreadCount,
+    activeToasts,
+    dismissToast,
+    handleOpenNotification,
+  } = useNotificationSync({
+    accessToken: bootstrapped && token ? token : null,
+    onOpenTarget: (item) => {
+      openNotificationTarget({
+        projectId: item.project_id,
+        channel: item.channel,
+        resourceType: item.resource_type,
+        resourceId: item.resource_id,
+        messageId: item.message_id,
+      })
+    },
   })
 
   const isUnauthorized = dashboardQuery.isError && isHTTPError(dashboardQuery.error) && dashboardQuery.error.response.status === 401
@@ -232,10 +229,15 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
       userAvatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}
       onOpenProfile={handleOpenProfile}
       onOpenNotifications={handleOpenNotifications}
-      unreadNotificationsCount={unreadNotificationsQuery.data ?? 0}
+      unreadNotificationsCount={unreadCount}
       onLogout={handleLogout}
       isLoggingOut={logoutMutation.isPending}
     >
+      <InAppNotificationToastContainer
+        toasts={activeToasts}
+        onOpen={handleOpenNotification}
+        onDismiss={dismissToast}
+      />
       {hasRoleMismatch && (
         <Alert variant="destructive" className="mb-6">
           <AlertTitle>Tu sesión necesita actualizarse</AlertTitle>
@@ -255,7 +257,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
           projects={projects?.data}
           onOpenProfile={handleOpenProfile}
           onOpenProject={openProject}
-          onOpenNotification={goToMention}
+          onOpenNotification={openNotificationTarget}
         />
       )}
       <Suspense fallback={<DashboardTabSkeleton />}>
@@ -268,6 +270,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
             workspaceTab={workspace_tab}
             chatChannel={chat_channel}
             chatMessageId={chat_message_id}
+            taskId={task_id}
             onOpenProject={openProject}
             onCloseProject={closeProject}
             onTabChange={changeWorkspaceTab}
@@ -275,7 +278,12 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
         )}
         {activeTab === 'marketing' && canUseMarketing && <MarketingPanel accessToken={token} />}
         {activeTab === 'account' && <AccountPanel accessToken={token} identity={identity} />}
-        {activeTab === 'notifications' && <NotificationsPanel accessToken={token} onOpenNotification={goToMention} />}
+        {activeTab === 'notifications' && (
+          <NotificationsPanel
+            accessToken={token}
+            onOpenNotification={openNotificationTarget}
+          />
+        )}
         {activeTab === 'admin' && isAdmin && <AdminConsole accessToken={token} />}
         {activeTab === 'analytics' && canUseMarketing && <DashboardAnalytics accessToken={token} />}
       </Suspense>

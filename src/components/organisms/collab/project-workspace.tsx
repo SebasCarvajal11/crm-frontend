@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle, ArrowLeft, FileSignature, FileText, GitPullRequest, KanbanSquare, MessageSquare, Users } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -26,6 +26,7 @@ type Props = {
   activeTab?: WorkspaceTab
   chatChannel?: 'internal' | 'external'
   chatMessageId?: string
+  initialTaskId?: string
   onBack: () => void
   onTabChange: (tab: WorkspaceTab) => void
 }
@@ -41,13 +42,19 @@ const TABS: SectionTabItem<WorkspaceTab>[] = [
 
 const FINALIZATION_COLUMN_KEYS = new Set(['done', 'completed'])
 
-export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta, activeTab = 'board', chatChannel, chatMessageId, onBack, onTabChange }: Props) {
+export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta, activeTab = 'board', chatChannel, chatMessageId, initialTaskId, onBack, onTabChange }: Props) {
   const queryClient = useQueryClient()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [taskSearchDebounced, setTaskSearchDebounced] = useState('')
-  const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null)
+  const [focusedTaskId, setFocusedTaskId] = useState<string | null>(initialTaskId ?? null)
   const [prevActiveTab, setPrevActiveTab] = useState<WorkspaceTab>(activeTab)
   const [visitedTabs, setVisitedTabs] = useState<Set<WorkspaceTab>>(() => new Set([activeTab]))
+
+  useEffect(() => {
+    if (initialTaskId) {
+      setFocusedTaskId(initialTaskId)
+    }
+  }, [initialTaskId])
 
   if (activeTab !== prevActiveTab) {
     setPrevActiveTab(activeTab)

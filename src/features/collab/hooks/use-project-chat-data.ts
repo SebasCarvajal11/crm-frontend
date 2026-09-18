@@ -98,8 +98,8 @@ export function useProjectChatData({
     void req(accessToken, projectId, { up_to_message_id: readUpToMessageId })
       .then(() => {
         lastMarkedRef.current[channel] = readUpToMessageId
-        void queryClient.invalidateQueries({ queryKey: collabKeys.mentionNotifications() })
-        void queryClient.invalidateQueries({ queryKey: collabKeys.mentionNotificationsCount() })
+        void queryClient.invalidateQueries({ queryKey: collabKeys.notifications() })
+        void queryClient.invalidateQueries({ queryKey: collabKeys.notificationsCount() })
       })
       .catch(() => undefined)
   }, [accessToken, projectId, channel, readUpToMessageId, queryClient, lastMarkedRef, isVisible])

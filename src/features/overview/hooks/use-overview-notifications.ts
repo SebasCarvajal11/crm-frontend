@@ -11,6 +11,8 @@ type OpenNotificationPayload = {
   projectId: string
   channel: 'internal' | 'external' | 'system'
   messageId?: string | null
+  resourceType?: string
+  resourceId?: string | null
 }
 
 export function useOverviewNotifications(
@@ -23,7 +25,6 @@ export function useOverviewNotifications(
     queryKey: collabKeys.notifications(),
     queryFn: () => listUnreadNotificationsRequest(accessToken),
     enabled: Boolean(accessToken?.trim()),
-    refetchInterval: 30_000,
     select: (d) => d.data,
   })
 
@@ -52,6 +53,8 @@ export function useOverviewNotifications(
           projectId: item.project_id,
           channel: item.channel,
           messageId: item.message_id,
+          resourceType: item.resource_type,
+          resourceId: item.resource_id,
         })
       }
     },

@@ -6,6 +6,7 @@ export type DashboardSearch = {
   workspace_tab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
   chat_channel?: 'internal' | 'external'
   chat_message_id?: string
+  task_id?: string
 }
 
 export const parseDashboardSearch = (search: Record<string, unknown>): DashboardSearch => {
@@ -35,5 +36,6 @@ export const parseDashboardSearch = (search: Record<string, unknown>): Dashboard
       ? search.chat_channel
       : undefined,
     chat_message_id: typeof search.chat_message_id === 'string' ? search.chat_message_id : undefined,
+    task_id: typeof search.task_id === 'string' ? search.task_id : undefined,
   }
 }

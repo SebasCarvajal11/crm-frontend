@@ -30,6 +30,7 @@ type Props = {
   workspaceTab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
   chatChannel?: 'internal' | 'external'
   chatMessageId?: string
+  taskId?: string
   onOpenProject: (projectId: string) => void
   onCloseProject: () => void
   onTabChange: (tab: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members') => void
@@ -43,6 +44,7 @@ export function CollabPanel({
   workspaceTab,
   chatChannel,
   chatMessageId,
+  taskId,
   onOpenProject,
   onCloseProject,
   onTabChange,
@@ -102,6 +104,7 @@ export function CollabPanel({
         activeTab={workspaceTab}
         chatChannel={chatChannel}
         chatMessageId={chatMessageId}
+        initialTaskId={taskId}
         onBack={onCloseProject}
         onTabChange={onTabChange}
       />
