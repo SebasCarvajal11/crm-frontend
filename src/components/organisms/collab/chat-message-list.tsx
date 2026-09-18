@@ -61,7 +61,12 @@ export const ChatMessageList = memo(function ChatMessageList({
   highlightMessageId,
   members: propMembers,
 }: Props) {
-  const [selectedMessageForInfo, setSelectedMessageForInfo] = useState<ProjectChatMessage | null>(null)
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null)
+
+  const selectedMessageForInfo = useMemo(
+    () => (selectedMessageId ? messages.find((m) => m.id === selectedMessageId) ?? null : null),
+    [messages, selectedMessageId]
+  )
 
   const resolvedMembers = useMemo(() => {
     if (propMembers && propMembers.length > 0) return propMembers
@@ -111,7 +116,7 @@ export const ChatMessageList = memo(function ChatMessageList({
         type="button"
         onClick={(e) => {
           e.stopPropagation()
-          setSelectedMessageForInfo(message)
+          setSelectedMessageId(message.id)
         }}
         className="inline-flex items-center gap-0.5 rounded p-0.5 transition-colors hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         title={`${checkTitle} · Ver quién ha leído`}
@@ -233,9 +238,9 @@ export const ChatMessageList = memo(function ChatMessageList({
     )
   })}
   <ChatMessageInfoDialog
-    open={Boolean(selectedMessageForInfo)}
+    open={Boolean(selectedMessageId)}
     onOpenChange={(open) => {
-      if (!open) setSelectedMessageForInfo(null)
+      if (!open) setSelectedMessageId(null)
     }}
     message={selectedMessageForInfo}
     members={resolvedMembers}

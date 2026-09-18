@@ -56,16 +56,16 @@ export function useProjectChatData({
   const externalQ = useQuery({
     queryKey: [...collabKeys.chatExternal(projectId), limit],
     queryFn: () => listExternalChatRequest(accessToken, projectId, { limit, page: 1 }),
-    staleTime: 15_000,
-    refetchInterval: isVisible && channel === 'external' ? 15_000 : false,
+    staleTime: 3_000,
+    refetchInterval: isVisible && channel === 'external' ? 4_000 : false,
   })
 
   const internalQ = useQuery({
     queryKey: [...collabKeys.chatInternal(projectId), limit],
     queryFn: () => listInternalChatRequest(accessToken, projectId, { limit, page: 1 }),
     enabled: !isClient,
-    staleTime: 15_000,
-    refetchInterval: isVisible && channel === 'internal' ? 15_000 : false,
+    staleTime: 3_000,
+    refetchInterval: isVisible && channel === 'internal' ? 4_000 : false,
   })
 
   const externalMessages = externalQ.data?.data.items ?? EMPTY_MESSAGES
@@ -78,13 +78,23 @@ export function useProjectChatData({
     return getLastPersistedMessageId(messages)
   }, [messages])
   const memberBySub = useMemo(() => new Map(members.map((member) => [member.userSub, member] as const)), [members])
-  const avatarSubjects = useMemo(() => Array.from(new Set(members.map((m) => m.userSub))), [members])
+  const avatarSubjects = useMemo(() => {
+    const subs = new Set<string>()
+    for (const m of members) if (m.userSub) subs.add(m.userSub)
+    for (const msg of messages) {
+      if (msg.authorSub) subs.add(msg.authorSub)
+      if (msg.readStatus?.reads) {
+        for (const r of msg.readStatus.reads) if (r.userSub) subs.add(r.userSub)
+      }
+    }
+    return Array.from(subs)
+  }, [members, messages])
 
   const avatarsQ = useQuery({
-    queryKey: ['media', 'avatars', 'users', projectId],
+    queryKey: ['media', 'avatars', 'users', projectId, avatarSubjects.length],
     queryFn: () => getUserAvatarsRequest(accessToken, avatarSubjects),
     enabled: avatarSubjects.length > 0,
-    staleTime: 60_000,
+    staleTime: 30_000,
   })
 
   const avatarBySub = avatarsQ.data?.data.items ?? {}
