@@ -108,6 +108,9 @@ export function useProjectChatData({
     void req(accessToken, projectId, { up_to_message_id: readUpToMessageId })
       .then(() => {
         lastMarkedRef.current[channel] = readUpToMessageId
+        void queryClient.invalidateQueries({
+          queryKey: channel === 'external' ? collabKeys.chatExternal(projectId) : collabKeys.chatInternal(projectId),
+        })
         void queryClient.invalidateQueries({ queryKey: collabKeys.notifications() })
         void queryClient.invalidateQueries({ queryKey: collabKeys.notificationsCount() })
       })

@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Check, CheckCheck, Clock } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
-import type { ProjectChatMessage, ProjectMember } from '@/features/collab/model'
+import type { ChatMessageReadReceipt, ProjectChatMessage, ProjectMember } from '@/features/collab/model'
 import type { UserAvatarsResponse } from '@/shared/types'
 import { getAvatarColor } from './avatar-color'
 
@@ -28,33 +28,45 @@ function formatExactReadTime(iso: string): string {
   })
 }
 
-function getMemberDisplayName(member?: ProjectMember, fallbackSub?: string): string {
-  if (!member) return fallbackSub ? `Usuario (${fallbackSub.slice(0, 6)})` : 'Usuario'
-  const full = `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim()
+function getMemberDisplayName(
+  member?: ProjectMember,
+  fallbackSub?: string,
+  receipt?: ChatMessageReadReceipt
+): string {
+  const firstName = member?.first_name ?? receipt?.firstName ?? ''
+  const lastName = member?.last_name ?? receipt?.lastName ?? ''
+  const full = `${firstName} ${lastName}`.trim()
   if (full) return full
-  if (member.role === 'client' && member.client_kind === 'juridical' && member.company_name) {
-    return member.company_name
+  const company = member?.company_name ?? receipt?.companyName
+  if ((member?.role === 'client' || receipt?.role === 'client') && company) {
+    return company
   }
-  return member.email || 'Sin nombre registrado'
+  return member?.email || (fallbackSub ? `Usuario (${fallbackSub.slice(0, 6)})` : 'Usuario')
 }
 
-function getMemberRoleText(member?: ProjectMember): string {
-  if (!member) return 'Miembro'
-  if (member.role === 'worker') return member.profession?.trim() || 'Trabajador'
-  if (member.role === 'client') return 'Cliente'
-  return 'Administrador'
+function getMemberRoleText(member?: ProjectMember, receipt?: ChatMessageReadReceipt): string {
+  const role = member?.role ?? receipt?.role
+  const profession = member?.profession?.trim() || receipt?.profession?.trim()
+  if (role === 'worker') return profession || 'Trabajador'
+  if (role === 'client') return 'Cliente'
+  if (role === 'admin') return 'Administrador'
+  return 'Miembro'
 }
 
-function getMemberInitials(member?: ProjectMember, fallback?: string): string {
-  if (member) {
-    const full = `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim()
-    if (full) {
-      const parts = full.split(/\s+/).filter(Boolean)
-      if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-      return parts[0].slice(0, 2).toUpperCase()
-    }
-    if (member.email) return member.email.slice(0, 2).toUpperCase()
+function getMemberInitials(
+  member?: ProjectMember,
+  fallback?: string,
+  receipt?: ChatMessageReadReceipt
+): string {
+  const firstName = member?.first_name ?? receipt?.firstName ?? ''
+  const lastName = member?.last_name ?? receipt?.lastName ?? ''
+  const full = `${firstName} ${lastName}`.trim()
+  if (full) {
+    const parts = full.split(/\s+/).filter(Boolean)
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+    return parts[0].slice(0, 2).toUpperCase()
   }
+  if (member?.email) return member.email.slice(0, 2).toUpperCase()
   return fallback?.slice(0, 2).toUpperCase() || '?'
 }
 
@@ -68,6 +80,7 @@ export function ChatMessageInfoDialog({ open, onOpenChange, message, members, av
       .map((r) => ({
         sub: r.userSub,
         member: memberBySub.get(r.userSub),
+        receipt: r,
         readAt: r.readAt,
       }))
       .sort((a, b) => new Date(b.readAt).getTime() - new Date(a.readAt).getTime())
@@ -110,11 +123,11 @@ export function ChatMessageInfoDialog({ open, onOpenChange, message, members, av
               <p className="py-2 text-xs text-muted-foreground">Aún nadie ha leído este mensaje.</p>
             ) : (
               <div className="space-y-2">
-                {readMembers.map(({ sub, member, readAt }) => {
-                  const name = getMemberDisplayName(member, sub)
-                  const roleText = getMemberRoleText(member)
+                {readMembers.map(({ sub, member, receipt, readAt }) => {
+                  const name = getMemberDisplayName(member, sub, receipt)
+                  const roleText = getMemberRoleText(member, receipt)
                   const avatarUrl = pickAvatarUrl(avatarBySub[sub]?.urls, '64')
-                  const initials = getMemberInitials(member, sub)
+                  const initials = getMemberInitials(member, sub, receipt)
 
                   return (
                     <div key={sub} className="flex items-center justify-between rounded-lg p-2 transition-colors hover:bg-muted/40">

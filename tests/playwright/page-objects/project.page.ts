@@ -17,7 +17,7 @@ export class ProjectPage {
     this.backButton = page.getByLabel('Volver al tablero de proyectos')
     this.tabList = page.getByLabel('Secciones del proyecto')
     this.boardTab = page.getByRole('tab', { name: /tablero/i })
-    this.chatTab = page.getByRole('tab', { name: /conversacion/i })
+    this.chatTab = page.getByRole('tab', { name: /conversaci(?:o|ó)n/i })
     this.briefTab = page.getByRole('tab', { name: /brief/i })
     this.membersTab = page.getByRole('tab', { name: /integrantes/i })
     this.progressBar = page.getByLabel(/progreso/i).first()

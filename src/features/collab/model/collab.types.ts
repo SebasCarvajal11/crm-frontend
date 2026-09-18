@@ -87,6 +87,9 @@ export type ProjectTask = {
 export type ChatMessageReadReceipt = {
   userSub: string
   readAt: string
+  firstName?: string | null; lastName?: string | null
+  role?: string | null
+  profession?: string | null; companyName?: string | null
 }
 
 export type ProjectChatMessage = {
@@ -96,10 +99,8 @@ export type ProjectChatMessage = {
   messageType: 'text' | 'minor_request' | 'formal_request' | 'milestone'
   authorSub: string | null
   authorEmail: string | null
-  authorFirstName: string | null
-  authorLastName: string | null
-  authorRole: string | null
-  authorProfession: string | null
+  authorFirstName: string | null; authorLastName: string | null
+  authorRole: string | null; authorProfession: string | null
   body: string
   mentionedSubs: string[] | null
   metadata: Record<string, unknown> | null
