@@ -50,22 +50,25 @@ export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta
     staleTime: 12_000,
   })
 
-  const unreadChatCount = useMemo(() => {
+  const { unreadChatCount, hasUnreadMention } = useMemo(() => {
     const list = notificationsQ.data?.data ?? []
-    return list.filter((n) => n.project_id === projectId && (n.resource_type === 'chat_message' || n.source === 'mention')).length
+    const chat = list.filter((n) => n.project_id === projectId && (n.resource_type === 'chat_message' || n.source === 'mention'))
+    return { unreadChatCount: chat.length, hasUnreadMention: chat.some((n) => n.source === 'mention') }
   }, [notificationsQ.data, projectId])
 
   const tabs = useMemo<SectionTabItem<WorkspaceTab>[]>(() => [
     { value: 'board', label: 'Tablero', icon: <KanbanSquare className="size-4" /> },
     {
       value: 'chat', label: 'Conversación', icon: <MessageSquare className="size-4" />,
-      badge: unreadChatCount > 0 ? <NotificationCounterBadge count={unreadChatCount} maxCount={9} size="sm" /> : undefined,
+      badge: unreadChatCount > 0
+        ? <NotificationCounterBadge count={unreadChatCount} maxCount={9} size="sm" hasMention={hasUnreadMention} />
+        : undefined,
     },
     { value: 'brief', label: 'Brief', icon: <FileText className="size-4" /> },
     { value: 'contract', label: 'Contrato', icon: <FileSignature className="size-4" /> },
     { value: 'change-requests', label: 'Solicitud de cambios', icon: <GitPullRequest className="size-4" /> },
     { value: 'members', label: 'Integrantes', icon: <Users className="size-4" /> },
-  ], [unreadChatCount])
+  ], [unreadChatCount, hasUnreadMention])
 
   if (initialTaskId !== prevInitialTaskId) {
     setPrevInitialTaskId(initialTaskId)

@@ -38,6 +38,8 @@ export function CreateTaskSubtasksEditor({
     return worker ? getProjectMemberLabel(worker) : sub
   }
 
+  const assignableWorkers = selectedWorkers.length > 0 ? selectedWorkers : workerMembers
+
   return (
     <div className="space-y-2 border-t pt-2">
       <div className="flex items-center justify-between">
@@ -96,7 +98,7 @@ export function CreateTaskSubtasksEditor({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Sin asignar</SelectItem>
-                {selectedWorkers.map((worker) => (
+                {assignableWorkers.map((worker) => (
                   <SelectItem key={worker.userSub} value={worker.userSub}>
                     {worker.email?.split('@')[0] ?? worker.userSub.slice(0, 8)}
                   </SelectItem>

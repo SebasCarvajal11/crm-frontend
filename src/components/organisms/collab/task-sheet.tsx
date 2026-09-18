@@ -50,10 +50,11 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
 
   const assignableMembers = projectWorkers(members)
 
-  const subtaskAssignees = useMemo(
-    () => task.assigneeSub ? assignableMembers.filter(m => m.userSub === task.assigneeSub) : [],
-    [assignableMembers, task.assigneeSub]
-  )
+  const subtaskAssignees = useMemo(() => {
+    if (!task.assigneeSub) return assignableMembers
+    const assigned = assignableMembers.filter((m) => m.userSub === task.assigneeSub)
+    return assigned.length > 0 ? assigned : assignableMembers
+  }, [assignableMembers, task.assigneeSub])
 
   const startEditing = useCallback(() => {
     setEditTitle(task.title)
@@ -90,7 +91,6 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
     const updated = [
       ...mapTaskSubtasksToDrafts(task),
       {
-        id: crypto.randomUUID(),
         title: newSubtask.trim(),
         is_completed: false,
         assignee_sub: newSubtaskAssignee === 'none' ? null : newSubtaskAssignee,

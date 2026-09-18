@@ -58,7 +58,7 @@ export async function patchTaskRequest(
     checklist_progress?: number
     client_visible?: boolean
     position?: number
-    subtasks?: { id: string; title: string; is_completed: boolean; assignee_sub?: string | null }[]
+    subtasks?: { id?: string; title: string; is_completed: boolean; assignee_sub?: string | null }[]
   }
 ): Promise<DataResponse<ProjectTask>> {
   return api

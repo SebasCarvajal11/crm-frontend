@@ -17,7 +17,7 @@ export class ChatPage {
     this.internalChannel = page.getByRole('tab', { name: /equipo/i })
     this.messageInput = page.getByLabel('Escribir mensaje')
     this.sendButton = page.getByLabel('Enviar mensaje')
-    this.messageLog = page.getByLabel('Mensajes')
+    this.messageLog = page.getByRole('log', { name: 'Mensajes' })
     this.loadMoreButton = page.getByRole('button', { name: /cargar mensajes anteriores/i })
   }
 

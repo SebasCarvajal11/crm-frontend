@@ -1,4 +1,4 @@
-import { AlertCircle, CheckSquare, Lock, Plus, Trash2, User } from 'lucide-react'
+import { AlertCircle, CheckSquare, Plus, Trash2, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -104,13 +104,8 @@ export function TaskSheetSubtasksSection({
         ))}
 
         {canEdit && (
-          subtaskAssignees.length === 0 ? (
-            <div className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-2.5 text-xs text-muted-foreground">
-              <Lock className="size-3.5 shrink-0" />
-              <span>No hay trabajadores asignados a esta tarea.</span>
-            </div>
-          ) : (
-            <div className="mt-2 space-y-2 border-t pt-1">
+          <div className="mt-2 space-y-2 border-t pt-1">
+            {subtaskAssignees.length > 0 && (
               <Select value={newSubtaskAssignee} onValueChange={onNewSubtaskAssigneeChange}>
                 <SelectTrigger className="h-8 w-full text-xs">
                   <User className="mr-1 size-3 shrink-0" />
@@ -125,33 +120,39 @@ export function TaskSheetSubtasksSection({
                   ))}
                 </SelectContent>
               </Select>
+            )}
 
-              <div className="flex items-center gap-2">
-                <Input
-                  placeholder="Describe la subtarea..."
-                  value={newSubtask}
-                  onChange={(event) => onNewSubtaskChange(event.target.value)}
-                  className="h-8 text-sm"
-                  disabled={isPending}
-                />
-                <Button
-                  type="button"
-                  size="icon"
-                  className="size-8 shrink-0"
-                  onClick={onAddSubtask}
-                  disabled={!canAddSubtask || isPending}
-                  title="Agregar subtarea"
-                >
-                  <Plus className="size-4" />
-                </Button>
-              </div>
-
-              <p className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                <AlertCircle className="size-3 shrink-0" />
-                El asignado de la subtarea es opcional.
-              </p>
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="Describe la subtarea..."
+                value={newSubtask}
+                onChange={(event) => onNewSubtaskChange(event.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    if (canAddSubtask && !isPending) onAddSubtask()
+                  }
+                }}
+                className="h-8 text-sm"
+                disabled={isPending}
+              />
+              <Button
+                type="button"
+                size="icon"
+                className="size-8 shrink-0"
+                onClick={onAddSubtask}
+                disabled={!canAddSubtask || isPending}
+                title="Agregar subtarea"
+              >
+                <Plus className="size-4" />
+              </Button>
             </div>
-          )
+
+            <p className="flex items-center gap-1 text-[10px] text-muted-foreground">
+              <AlertCircle className="size-3 shrink-0" />
+              El asignado de la subtarea es opcional.
+            </p>
+          </div>
         )}
       </div>
     </div>

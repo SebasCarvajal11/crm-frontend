@@ -4,7 +4,7 @@ import { patchTaskRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
 
 type SubtaskItem = {
-  id: string
+  id?: string
   title: string
   is_completed: boolean
   assignee_sub: string | null
