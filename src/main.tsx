@@ -5,6 +5,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { isHTTPError } from 'ky'
 import './index.css'
+import { applyDocumentZoom, getStoredZoom } from './features/accessibility/hooks/use-accessibility-zoom'
+
+// Aplica el zoom almacenado inmediatamente antes del render para evitar parpadeos visuales (FOUC).
+applyDocumentZoom(getStoredZoom())
 
 import { routeTree } from './routeTree.gen'
 import { bootstrapSession, useSessionStore } from './app/session/session-store'
