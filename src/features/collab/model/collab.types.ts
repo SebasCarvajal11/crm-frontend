@@ -1,5 +1,6 @@
 import type { ProjectType as _ProjectType, ParentProjectStatus as _ParentProjectStatus, ProjectListItem as _ProjectListItem } from '@/shared/types'
-export type { DataResponse, PaginatedData } from '@sebascarvajal11/cima-contracts'
+import type { DataResponse, PaginatedData } from '@sebascarvajal11/cima-contracts'
+export type { DataResponse, PaginatedData }
 export type ProjectType = _ProjectType
 export type ParentProjectStatus = _ParentProjectStatus
 export type ProjectListItem = _ProjectListItem
@@ -109,6 +110,10 @@ export type ProjectChatMessage = {
     seenCount: number
     reads?: ChatMessageReadReceipt[]
   }
+}
+
+export type ChatPaginatedData = PaginatedData<ProjectChatMessage> & {
+  typing?: string[]
 }
 
 export type ProjectWorkspaceResponse = {

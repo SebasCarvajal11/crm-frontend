@@ -70,3 +70,16 @@ export async function markInternalChatReadRequest(
     .post(PROJECT_ROUTES.chatInternalRead(projectId), { headers: bearer(accessToken), json: body })
     .json()
 }
+
+export async function sendChatTypingRequest(
+  accessToken: string,
+  projectId: string,
+  channel: 'external' | 'internal'
+) {
+  const route = channel === 'external'
+    ? PROJECT_ROUTES.chatExternalTyping(projectId)
+    : PROJECT_ROUTES.chatInternalTyping(projectId)
+  return api
+    .post(route, { headers: bearer(accessToken) })
+    .json()
+}

@@ -90,8 +90,10 @@ export const PROJECT_ROUTES = {
   // Chat
   chatExternal: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/external`,
   chatExternalRead: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/external/read`,
+  chatExternalTyping: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/external/typing`,
   chatInternal: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/internal`,
   chatInternalRead: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/internal/read`,
+  chatInternalTyping: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/internal/typing`,
   // Change Requests
   changeRequests: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/change-requests`,
   changeRequestMinor: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/change-requests/minor`,

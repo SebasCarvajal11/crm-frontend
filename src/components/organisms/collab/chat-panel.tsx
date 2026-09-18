@@ -7,8 +7,10 @@ import type { ProjectMember } from '@/features/collab/model'
 import type { MeResponse } from '@/shared/types'
 import { buildMentionSuggestions, extractActiveMentionQuery, mentionHints, resolveMentionsFromBody } from './chat-mentions'
 import { ChatMessageList } from './chat-message-list'
+import { ChatTypingIndicator } from './chat-typing-indicator'
 import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 import { useChatScrollManager } from './use-chat-scroll-manager'
+import { useChatTypingSender } from './use-chat-typing-sender'
 
 type Channel = 'external' | 'internal'
 
@@ -45,7 +47,7 @@ export function ChatPanel({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const lastMarkedRef = useRef<Record<Channel, string | null>>({ external: null, internal: null })
 
-  const { messages, memberBySub, avatarBySub, hasMore, loadMore, isFetching } = useProjectChatData({
+  const { messages, memberBySub, avatarBySub, hasMore, loadMore, isFetching, activeTypers } = useProjectChatData({
     accessToken,
     projectId,
     isClient,
@@ -54,6 +56,7 @@ export function ChatPanel({
     lastMarkedRef,
     isVisible,
   })
+  const { notifyTyping } = useChatTypingSender({ accessToken, projectId, channel })
 
   useChatScrollManager({
     channel,
@@ -204,6 +207,7 @@ export function ChatPanel({
       </div>
 
       <div className="shrink-0 border-t bg-background/80 p-3">
+        <ChatTypingIndicator typers={activeTypers} />
         <div className="relative flex items-end gap-2">
           <div className="min-w-0 flex-1">
             <Textarea
@@ -215,6 +219,7 @@ export function ChatPanel({
                 setActiveIdx(0)
                 setMentionPickerSuppressed(false)
                 setCursorPos(event.target.selectionStart ?? event.target.value.length)
+                notifyTyping()
               }}
               onKeyDown={(event) => {
                 if (mentionSuggestions.length > 0) {

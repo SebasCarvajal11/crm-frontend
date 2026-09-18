@@ -132,6 +132,13 @@ export function useProjectChatData({
 
   const isFetching = channel === 'external' ? externalQ.isFetching : internalQ.isFetching
 
+  const activeTypers = useMemo<string[]>(() => {
+    const rawTypers = (channel === 'external' ? externalQ.data?.data : internalQ.data?.data) as
+      | { typing?: string[] }
+      | undefined
+    return rawTypers?.typing ?? []
+  }, [channel, externalQ.data, internalQ.data])
+
   return {
     externalQ,
     internalQ,
@@ -142,5 +149,6 @@ export function useProjectChatData({
     hasMore,
     loadMore,
     isFetching,
+    activeTypers,
   }
 }
