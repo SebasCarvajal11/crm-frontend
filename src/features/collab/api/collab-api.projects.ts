@@ -17,6 +17,10 @@ import type {
   ProjectTimelineItem,
   ProjectWorkspaceResponse,
   ProjectContract,
+  ProjectContractAmendment,
+  CreateAmendmentDraftInput,
+  RequestClientAmendmentInput,
+  SignAmendmentInput,
 } from '@/features/collab/model'
 import type { AdminPendingChangeRequestItem } from '@/features/overview/model/overview.types'
 
@@ -142,6 +146,62 @@ export async function requestProjectContractSignatureRequest(accessToken: string
 
 export async function signProjectContractRequest(accessToken: string, projectId: string, body: { signer_name: string; signature_data_url: string; accept_terms: true }): Promise<DataResponse<ProjectContract>> {
   return api.post(PROJECT_ROUTES.contractSign(projectId), { headers: bearer(accessToken), json: body }).json<DataResponse<ProjectContract>>()
+}
+
+export async function listProjectContractAmendmentsRequest(
+  accessToken: string,
+  projectId: string,
+): Promise<DataResponse<ProjectContractAmendment[]>> {
+  return api
+    .get(PROJECT_ROUTES.contractAmendments(projectId), { headers: bearer(accessToken) })
+    .json<DataResponse<ProjectContractAmendment[]>>()
+}
+
+export async function saveProjectContractAmendmentDraftRequest(
+  accessToken: string,
+  projectId: string,
+  body: CreateAmendmentDraftInput,
+): Promise<DataResponse<ProjectContractAmendment>> {
+  return api
+    .post(PROJECT_ROUTES.contractAmendments(projectId), { headers: bearer(accessToken), json: body })
+    .json<DataResponse<ProjectContractAmendment>>()
+}
+
+export async function requestClientContractAmendmentRequest(
+  accessToken: string,
+  projectId: string,
+  body: RequestClientAmendmentInput,
+): Promise<DataResponse<ProjectContractAmendment>> {
+  return api
+    .post(PROJECT_ROUTES.contractAmendmentsRequest(projectId), { headers: bearer(accessToken), json: body })
+    .json<DataResponse<ProjectContractAmendment>>()
+}
+
+export async function requestProjectContractAmendmentSignatureRequest(
+  accessToken: string,
+  projectId: string,
+  amendmentId: string,
+): Promise<DataResponse<ProjectContractAmendment>> {
+  return api
+    .post(PROJECT_ROUTES.contractAmendmentRequestSignature(projectId, amendmentId), {
+      headers: bearer(accessToken),
+      json: {},
+    })
+    .json<DataResponse<ProjectContractAmendment>>()
+}
+
+export async function signProjectContractAmendmentRequest(
+  accessToken: string,
+  projectId: string,
+  amendmentId: string,
+  body: SignAmendmentInput,
+): Promise<DataResponse<ProjectContractAmendment>> {
+  return api
+    .post(PROJECT_ROUTES.contractAmendmentSign(projectId, amendmentId), {
+      headers: bearer(accessToken),
+      json: body,
+    })
+    .json<DataResponse<ProjectContractAmendment>>()
 }
 
 export async function listProjectFilesEnrichedRequest(
