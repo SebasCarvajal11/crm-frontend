@@ -57,7 +57,7 @@ El frontend se sirve como contenedor Nginx con el build de producción:
 ./deploy/remote/deploy-component.sh frontend
 ```
 
-El proxy de producción está definido en [`nginx.conf`](./nginx.conf). Ver [crm-infra/ONBOARDING.md](../crm-infra/ONBOARDING.md).
+El proxy de producción está definido en [`nginx.conf`](./nginx.conf). Ver [crm-infra/docs/ONBOARDING.md](../crm-infra/docs/ONBOARDING.md).
 
 ## Tests
 
