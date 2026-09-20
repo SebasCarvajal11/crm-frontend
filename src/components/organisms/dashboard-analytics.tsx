@@ -24,8 +24,10 @@ import {
 import { CampaignStatusChart } from '@/features/analytics/ui/charts'
 import { analyticsKeys } from '@/features/analytics/model'
 import { KpiDashboard } from '@/features/analytics/ui/KpiDashboard'
-import { KpiCard, ACCENT_STYLES } from './analytics-kpi-card'
-import { ExportButtons, triggerDownload } from './analytics-export-buttons'
+import { KpiCard } from './analytics-kpi-card'
+import { ACCENT_STYLES } from './analytics-kpi-styles'
+import { ExportButtons } from './analytics-export-buttons'
+import { triggerDownload } from '@/features/analytics/utils'
 import { InventoryAlertsCard } from './analytics-inventory-alerts'
 
 interface Props {

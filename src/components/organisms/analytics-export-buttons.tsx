@@ -2,17 +2,6 @@ import { FileSpreadsheet, FileText, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { ExportFormat } from '@/features/analytics/api'
 
-export function triggerDownload(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  URL.revokeObjectURL(url)
-}
-
 export interface ExportButtonsProps {
   label: string
   onExport: (format: ExportFormat) => void

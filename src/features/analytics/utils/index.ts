@@ -1,2 +1,1 @@
-// Utils placeholder for marketing feature
-export {}
+export { triggerDownload } from './download'

@@ -17,11 +17,11 @@ import {
 import { listWorkflowsRequest } from '../api/marketing-api'
 import { SegmentSchedulerCard } from './segment-scheduler-card'
 import { SegmentPreviewCard } from './segment-preview-card'
+import { TriEstado } from './tri-estado'
 import {
   PLANES,
   ESTADOS_PROPUESTA,
   CRITERIOS_VACIOS,
-  TriEstado,
   limpiar,
 } from './segment-criteria.utils'
 

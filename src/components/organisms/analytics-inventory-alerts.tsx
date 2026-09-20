@@ -12,7 +12,7 @@ interface Props {
   exportFormat: ExportFormat | null
 }
 
-export function getStockSeverity(item: InventoryAlertDto): 'critical' | 'warning' {
+function getStockSeverity(item: InventoryAlertDto): 'critical' | 'warning' {
   if (item.pointOfSaleStock <= 0) return 'critical'
   const ratio = item.pointOfSaleStock / Math.max(item.lowStockAlert, 1)
   return ratio <= 0.5 ? 'critical' : 'warning'
