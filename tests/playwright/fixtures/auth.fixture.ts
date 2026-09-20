@@ -36,7 +36,7 @@ export const USERS: Record<string, TestUser> = {
 async function loginViaUI(page: Page, user: TestUser): Promise<void> {
   await page.goto('/login')
   await page.getByLabel('Correo').fill(user.email)
-  await page.getByLabel(/contrase(?:n|ñ)a/i).fill(user.password)
+  await page.locator('#password').fill(user.password)
   await page.getByRole('button', { name: 'Entrar' }).click()
   await page.waitForURL('**/dashboard', { timeout: 15_000 })
   await page.waitForLoadState('networkidle')
