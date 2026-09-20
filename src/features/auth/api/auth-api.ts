@@ -58,6 +58,7 @@ export async function getInvitationPreviewRequest(
 export async function acceptInviteRequest(body: {
   token: string
   password: string
+  terms_accepted?: boolean
 }): Promise<AcceptInviteResponse> {
   return api.post(AUTH_ROUTES.acceptInvite, { json: body }).json<AcceptInviteResponse>()
 }

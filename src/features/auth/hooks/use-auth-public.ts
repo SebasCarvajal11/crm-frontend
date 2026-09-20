@@ -87,9 +87,13 @@ export function useAcceptInviteFlow(token: string) {
   })
 
   const mutation = useMutation({
-    mutationFn: async (body: { password: string }) => {
+    mutationFn: async (body: { password: string; terms_accepted?: boolean }) => {
       try {
-        return await acceptInviteRequest({ token, password: body.password })
+        return await acceptInviteRequest({
+          token,
+          password: body.password,
+          terms_accepted: body.terms_accepted,
+        })
       } catch (e) {
         throw new Error(await parseApiError(e), { cause: e })
       }
