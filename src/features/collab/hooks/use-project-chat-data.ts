@@ -14,7 +14,7 @@ import type { ProjectChatMessage, ProjectMember } from '@/features/collab/model'
 type Channel = 'external' | 'internal'
 const EMPTY_MESSAGES: ProjectChatMessage[] = []
 
-/** IDs persistidos en mod-collab (UUID). Los optimistas usan `temp-…` y no deben ir a mark-read. */
+/** IDs persistidos en crm-collab (UUID). Los optimistas usan `temp-…` y no deben ir a mark-read. */
 const PERSISTED_CHAT_MESSAGE_ID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 

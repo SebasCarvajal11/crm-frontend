@@ -3,11 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   AlertTriangle,
   CheckCircle2,
-  Crown,
-  Gem,
   RefreshCw,
   Search,
-  Sparkles,
   Users,
   XCircle,
 } from 'lucide-react'
@@ -22,40 +19,12 @@ import {
   assignClientPlansBulkRequest,
   syncCrmRequest,
   type ClientPlan,
-  type MarketingClient,
 } from '../api/clients-api'
+import { PLANS, clientLabel } from './client-plans.constants'
+import { ClientPlansTable } from './client-plans-table'
 
 interface ClientPlansManagerProps {
   accessToken: string
-}
-
-const PLANS: { value: ClientPlan; label: string; icon: typeof Crown; chip: string }[] = [
-  {
-    value: 'Oro',
-    label: 'Oro',
-    icon: Crown,
-    chip: 'bg-amber-50 text-amber-800 border-amber-300',
-  },
-  {
-    value: 'Esmeralda',
-    label: 'Esmeralda',
-    icon: Gem,
-    chip: 'bg-emerald-50 text-emerald-800 border-emerald-300',
-  },
-  {
-    value: 'Premium',
-    label: 'Premium',
-    icon: Sparkles,
-    chip: 'bg-violet-50 text-violet-800 border-violet-300',
-  },
-]
-
-function planMeta(plan?: string | null) {
-  return PLANS.find((p) => p.value === plan) ?? null
-}
-
-function clientLabel(client: MarketingClient) {
-  return client.contactInfo || client.additionalInfo || client.clientId
 }
 
 export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
@@ -294,78 +263,11 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto scroll-smooth scrollbar-thin">
-              <table className="w-full text-sm">
-                <thead className="border-b bg-muted/40">
-                  <tr className="text-left">
-                    <th className="px-4 py-3 font-semibold">Cliente</th>
-                    <th className="px-4 py-3 font-semibold">Identificador</th>
-                    <th className="px-4 py-3 font-semibold">Plan actual</th>
-                    <th className="px-4 py-3 text-right font-semibold">Asignar plan</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((client) => {
-                    const meta = planMeta(client.plan)
-                    const Icon = meta?.icon
-                    return (
-                      <tr key={client.clientId} className="border-b last:border-0 hover:bg-muted/30">
-                        <td className="px-4 py-3 font-medium">{clientLabel(client)}</td>
-                        <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                          {client.clientId.slice(0, 13)}…
-                        </td>
-                        <td className="px-4 py-3">
-                          {meta && Icon ? (
-                            <span
-                              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${meta.chip}`}
-                            >
-                              <Icon className="h-3 w-3" />
-                              {meta.label}
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">
-                              Sin clasificar
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <select
-                            value={client.plan ?? ''}
-                            disabled={isBusy}
-                            onChange={(e) =>
-                              assignMutation.mutate({
-                                clientId: client.clientId,
-                                plan: e.target.value as ClientPlan,
-                              })
-                            }
-                            className="h-8 rounded-md border border-input bg-background px-2 text-xs disabled:opacity-60"
-                          >
-                            <option value="" disabled>
-                              Elegir…
-                            </option>
-                            {PLANS.map((p) => (
-                              <option key={p.value} value={p.value}>
-                                {p.label}
-                              </option>
-                            ))}
-                          </select>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {filtered.length === 0 && (
-              <p className="py-10 text-center text-sm text-muted-foreground">
-                Ningún cliente coincide con el filtro.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+        <ClientPlansTable
+          clients={filtered}
+          isBusy={isBusy}
+          onAssignPlan={(clientId, plan) => assignMutation.mutate({ clientId, plan })}
+        />
       )}
     </div>
   )

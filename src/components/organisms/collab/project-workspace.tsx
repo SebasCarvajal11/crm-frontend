@@ -15,27 +15,25 @@ import { BriefPanel } from './brief-panel'
 import { ProjectMembers } from './project-members'
 import { ContractPanel } from './contract-panel'
 import { ChangeRequestsPanel } from './change-requests'
-import { collabKeys, type ProjectListItem } from '@/features/collab/model'
-import type { MeResponse } from '@/shared/types'
+import { collabKeys } from '@/features/collab/model'
+import {
+  type WorkspaceTab,
+  type ProjectWorkspaceProps as Props,
+  FINALIZATION_COLUMN_KEYS,
+} from './project-workspace.types'
 
-type WorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
-
-type Props = {
-  accessToken: string
-  identity: MeResponse['data']
-  projectId: string
-  projectMeta: ProjectListItem | null
-  activeTab?: WorkspaceTab
-  chatChannel?: 'internal' | 'external'
-  chatMessageId?: string
-  initialTaskId?: string
-  onBack: () => void
-  onTabChange: (tab: WorkspaceTab) => void
-}
-
-const FINALIZATION_COLUMN_KEYS = new Set(['done', 'completed'])
-
-export function ProjectWorkspace({ accessToken, identity, projectId, projectMeta, activeTab = 'board', chatChannel, chatMessageId, initialTaskId, onBack, onTabChange }: Props) {
+export function ProjectWorkspace({
+  accessToken,
+  identity,
+  projectId,
+  projectMeta,
+  activeTab = 'board',
+  chatChannel,
+  chatMessageId,
+  initialTaskId,
+  onBack,
+  onTabChange,
+}: Props) {
   const queryClient = useQueryClient()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [taskSearchDebounced, setTaskSearchDebounced] = useState('')

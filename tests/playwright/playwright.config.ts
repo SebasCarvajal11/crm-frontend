@@ -56,6 +56,48 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
       metadata: { role: 'guest' },
     },
+    {
+      name: 'desktop-2k',
+      testMatch: /guest\/07-responsive-viewports\.spec\.ts$/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 2560, height: 1440 },
+      },
+      metadata: { role: 'guest', viewport: '2k' },
+    },
+    {
+      name: 'desktop-1080p',
+      testMatch: /guest\/07-responsive-viewports\.spec\.ts$/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1920, height: 1080 },
+      },
+      metadata: { role: 'guest', viewport: '1080p' },
+    },
+    {
+      name: 'tablet-ipad',
+      testMatch: /guest\/07-responsive-viewports\.spec\.ts$/,
+      use: {
+        ...devices['iPad Pro 11'],
+      },
+      metadata: { role: 'guest', viewport: 'tablet' },
+    },
+    {
+      name: 'mobile-safari-ios',
+      testMatch: /guest\/07-responsive-viewports\.spec\.ts$/,
+      use: {
+        ...devices['iPhone 14'],
+      },
+      metadata: { role: 'guest', viewport: 'mobile-ios' },
+    },
+    {
+      name: 'mobile-chrome-android',
+      testMatch: /guest\/07-responsive-viewports\.spec\.ts$/,
+      use: {
+        ...devices['Pixel 7'],
+      },
+      metadata: { role: 'guest', viewport: 'mobile-android' },
+    },
   ],
 
   globalSetup: './global-setup.ts',

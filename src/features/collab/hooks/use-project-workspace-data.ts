@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  getBriefRequest,
+  getProjectBriefRequest,
   getProjectContractRequest,
   getProjectBoardRequest,
   listExternalChatRequest,
@@ -10,7 +10,7 @@ import {
 } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
 
-type WorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
+import type { WorkspaceTab } from '@/components/organisms/collab/project-workspace.types'
 
 type Params = {
   accessToken: string
@@ -21,7 +21,7 @@ type Params = {
 
 async function fetchBriefPanel(accessToken: string, projectId: string) {
   const [briefRes, crRes] = await Promise.all([
-    getBriefRequest(accessToken, projectId),
+    getProjectBriefRequest(accessToken, projectId),
     listProjectChangeRequestsRequest(accessToken, projectId),
   ])
   return {

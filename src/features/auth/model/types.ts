@@ -1,4 +1,4 @@
-/** Contratos alineados con mod-auth via KrakenD (`mod-auth/openapi/openapi.yaml`). */
+/** Contratos alineados con crm-auth via KrakenD (`crm-auth/openapi/openapi.yaml`). */
 
 import type {
   AdminUserRow,

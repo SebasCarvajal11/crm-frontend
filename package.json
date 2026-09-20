@@ -28,9 +28,9 @@
     "test:e2e:heal:guest": "tsx tests/playwright/helpers/heal-runner.ts --project=guest",
     "test:e2e:heal:dry": "tsx tests/playwright/helpers/heal-runner.ts --dry-run",
     "preinstall": "pnpm dlx only-allow pnpm",
-    "codegen:auth": "openapi-typescript http://localhost:8080/api/v1/docs/auth/v1/openapi.yaml -o src/shared/api-types/auth.gen.ts",
-    "codegen:collab": "openapi-typescript http://localhost:8080/api/v1/docs/collab/v1/openapi.yaml -o src/shared/api-types/collab.gen.ts",
-    "codegen:media": "openapi-typescript http://localhost:8080/api/v1/docs/media/v1/openapi.yaml -o src/shared/api-types/media.gen.ts",
+    "codegen:auth": "openapi-typescript http://localhost:28080/api/v1/docs/auth/v1/openapi.yaml -o src/shared/api-types/auth.gen.ts",
+    "codegen:collab": "openapi-typescript http://localhost:28080/api/v1/docs/collab/v1/openapi.yaml -o src/shared/api-types/collab.gen.ts",
+    "codegen:media": "openapi-typescript http://localhost:28080/api/v1/docs/media/v1/openapi.yaml -o src/shared/api-types/media.gen.ts",
     "codegen:all": "pnpm codegen:auth && pnpm codegen:collab && pnpm codegen:media"
   },
   "repository": {

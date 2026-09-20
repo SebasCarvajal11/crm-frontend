@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 const FRONTEND_DEFAULT_URL = 'http://localhost:5173'
-const GATEWAY_DEFAULT_URL = 'http://localhost:18080'
+const GATEWAY_DEFAULT_URL = 'http://localhost:28080'
 
 type EnvFile = Record<string, string>
 

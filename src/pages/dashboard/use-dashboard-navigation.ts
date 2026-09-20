@@ -10,7 +10,8 @@ export type MentionPayload = {
   resourceId?: string | null
 }
 
-export type WorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
+import type { WorkspaceTab } from '@/components/organisms/collab/project-workspace.types'
+export type { WorkspaceTab }
 
 export function useDashboardNavigation() {
   const navigate = useNavigate({ from: '/dashboard' })

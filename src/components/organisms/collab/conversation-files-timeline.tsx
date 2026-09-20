@@ -1,24 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
-import {
-  CalendarClock,
-  CheckCircle2,
-  Download,
-  Eye,
-  File as FileIconBase,
-  FileImage,
-  FileText,
-  FileVideo,
-  GitPullRequestArrow,
-  GitPullRequestClosed,
-  UserRound,
-} from 'lucide-react'
+import { CalendarClock, CheckCircle2, Download, Eye, UserRound } from 'lucide-react'
 import type { ProjectContract, ProjectMember, ProjectTask, ProjectTimelineItem } from '@/features/collab/model'
 import { downloadGatewayFile, previewGatewayFile, triggerBlobDownload } from '@/features/collab/utils'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ContractTimelineCard } from './contract-timeline-card'
+import { TimelinePreviewDialog, type PreviewState } from './timeline-preview-dialog'
+import {
+  itemIcon,
+  supportsPreview,
+  formatBogotaDate,
+  badgeClassByKind,
+} from './timeline-utils'
 
 type Props = {
   accessToken: string
@@ -32,47 +26,6 @@ type Props = {
   onError: (msg: string) => void
 }
 
-const fileIcon = (mimeType: string) =>
-  mimeType.startsWith('image/')
-    ? FileImage
-    : mimeType.startsWith('video/')
-      ? FileVideo
-      : mimeType.includes('pdf') || mimeType.startsWith('text/')
-        ? FileText
-        : FileIconBase
-
-const itemIcon = (item: ProjectTimelineItem) => {
-  if (item.kind === 'task_completed') return CheckCircle2
-  if (item.kind === 'change_accepted') return GitPullRequestArrow
-  if (item.kind === 'change_rejected') return GitPullRequestClosed
-  return fileIcon(item.mimeType ?? 'application/octet-stream')
-}
-
-const supportsPreview = (mimeType: string) =>
-  mimeType.startsWith('image/') || mimeType.startsWith('video/') || mimeType === 'application/pdf' || mimeType.startsWith('text/')
-
-const formatBogotaDate = (iso: string | null | undefined): string => {
-  if (!iso) return '—'
-  const ts = Date.parse(iso)
-  if (!Number.isFinite(ts)) return '—'
-  try {
-    return new Date(ts).toLocaleString('es-CO', {
-      timeZone: 'America/Bogota',
-      dateStyle: 'medium',
-      timeStyle: 'short',
-      hour12: false,
-    })
-  } catch {
-    return '—'
-  }
-}
-
-const badgeClassByKind: Record<ProjectTimelineItem['kind'], string> = {
-  file: 'bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800',
-  task_completed: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800',
-  change_accepted: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800',
-  change_rejected: 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800',
-}
 
 export function ConversationFilesTimeline({
   accessToken,
@@ -87,13 +40,7 @@ export function ConversationFilesTimeline({
   const [imageZoom, setImageZoom] = useState(1)
   const [searchText, setSearchText] = useState('')
   const [kindFilter, setKindFilter] = useState<'all' | ProjectTimelineItem['kind']>('all')
-  const [preview, setPreview] = useState<{
-    open: boolean
-    url: string | null
-    blob: Blob | null
-    mime: string
-    fileName: string
-  }>({
+  const [preview, setPreview] = useState<PreviewState>({
     open: false,
     url: null,
     blob: null,
@@ -316,51 +263,15 @@ export function ConversationFilesTimeline({
         })}
       </div>
 
-      <Dialog open={preview.open} onOpenChange={(open) => { if (!open) closePreview() }}>
-        <DialogContent className="max-w-5xl">
-          <DialogHeader>
-            <DialogTitle className="truncate pr-8">{preview.fileName}</DialogTitle>
-            <DialogDescription className="sr-only">Previsualización del archivo seleccionado</DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              {preview.mime.startsWith('image/') && (
-                <>
-                  <Button type="button" variant="outline" size="sm" onClick={() => setImageZoom((z) => Math.max(0.25, Number((z - 0.25).toFixed(2))))}>-</Button>
-                  <Button type="button" variant="outline" size="sm" onClick={() => setImageZoom(1)}>{Math.round(imageZoom * 100)}%</Button>
-                  <Button type="button" variant="outline" size="sm" onClick={() => setImageZoom((z) => Math.min(4, Number((z + 0.25).toFixed(2))))}>+</Button>
-                </>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={openPreviewInNewTab}>Abrir en pestaña</Button>
-              <Button type="button" size="sm" onClick={downloadPreviewFile}>
-                <Download className="mr-1 size-3.5" />
-                Descargar
-              </Button>
-            </div>
-          </div>
-          <div className="max-h-[75vh] overflow-auto rounded-md border bg-muted/20 p-2">
-            {preview.url && preview.mime.startsWith('image/') && (
-              <img
-                src={preview.url}
-                alt={preview.fileName}
-                className="mx-auto h-auto max-h-[70vh] w-auto rounded"
-                style={{ transform: `scale(${imageZoom})`, transformOrigin: 'top center' }}
-              />
-            )}
-            {preview.url && preview.mime === 'application/pdf' && (
-              <iframe src={preview.url} title={preview.fileName} className="h-[70vh] w-full rounded border-0" />
-            )}
-            {preview.url && preview.mime.startsWith('video/') && (
-              <video src={preview.url} controls className="mx-auto max-h-[70vh] w-auto max-w-full rounded" />
-            )}
-            {preview.url && preview.mime.startsWith('text/') && (
-              <iframe src={preview.url} title={preview.fileName} className="h-[70vh] w-full rounded border-0" />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <TimelinePreviewDialog
+        preview={preview}
+        imageZoom={imageZoom}
+        onClose={closePreview}
+        onZoomChange={setImageZoom}
+        onZoomReset={() => setImageZoom(1)}
+        onOpenInNewTab={openPreviewInNewTab}
+        onDownload={downloadPreviewFile}
+      />
     </>
   )
 }
