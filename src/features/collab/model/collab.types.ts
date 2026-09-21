@@ -7,10 +7,24 @@ export type ProjectListItem = _ProjectListItem
 
 export type ProjectMemberRole = 'admin' | 'worker' | 'client'
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
+/** Columnas canónicas del tablero kanban (aplican a todos los proyectos). */
+export type CanonicalTaskColumnKey =
+  | 'pending'
+  | 'doing'
+  | 'internal_review'
+  | 'client_approval'
+  | 'blocked'
+  | 'done'
+
+/** Claves de columna admitidas (incluye valores legacy para retrocompatibilidad). */
 export type TaskColumnKey =
-  | 'pending' | 'doing' | 'internal_review' | 'client_approval'
-  | 'blocked' | 'done' | 'art_approved' | 'in_production'
-  | 'quality_control' | 'shipped' | 'completed' | 'waiting_material'
+  | CanonicalTaskColumnKey
+  | 'art_approved'
+  | 'in_production'
+  | 'quality_control'
+  | 'shipped'
+  | 'completed'
+  | 'waiting_material'
 
 export type ProjectSearchResult = {
   id: string

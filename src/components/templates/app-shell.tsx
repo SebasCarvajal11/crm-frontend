@@ -106,7 +106,7 @@ export function AppShell({
           desktopCollapsed ? collapsedSidebarOffset : shellSidebarOffset,
         )}
       >
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b bg-card/95 p-3 backdrop-blur md:hidden">
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b bg-card/95 p-3 backdrop-blur md:hidden">
           <Button
             type="button"
             variant="ghost"
