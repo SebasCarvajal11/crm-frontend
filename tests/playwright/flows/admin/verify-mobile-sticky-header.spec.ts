@@ -59,8 +59,10 @@ test.describe('Cabecera Móvil Anclada (Sticky Header) y Menú Hamburguesa', () 
     await menuBtn.click()
 
     // 6. Validar que el drawer/sidebar móvil se despliega correctamente
-    const mobileNav = page.locator('aside, [role="dialog"]').filter({ hasText: /Resumen|Colaboración/i }).first()
+    const mobileNav = page.locator('aside[aria-label="Menu de navegacion"]')
     await expect(mobileNav).toBeVisible()
+    await expect(mobileNav).toHaveClass(/translate-x-0/)
+    await page.waitForTimeout(400) // Esperar duración de animación (300ms)
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/07-mobile-header-scrolled-menu-open.png`,
