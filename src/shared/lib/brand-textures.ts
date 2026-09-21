@@ -23,21 +23,23 @@ export function useTextureLoaded(src: string): boolean {
   useEffect(() => {
     if (loaded) return
 
+    let active = true
     const img = new Image()
     img.src = src
 
-    if (img.complete) {
-      setLoaded(true)
-      return
+    const onComplete = () => {
+      if (active) setLoaded(true)
     }
 
     if (typeof img.decode === 'function') {
-      img.decode()
-        .then(() => setLoaded(true))
-        .catch(() => setLoaded(true))
+      img.decode().then(onComplete).catch(onComplete)
     } else {
-      img.onload = () => setLoaded(true)
-      img.onerror = () => setLoaded(true)
+      img.onload = onComplete
+      img.onerror = onComplete
+    }
+
+    return () => {
+      active = false
     }
   }, [src, loaded])
 
