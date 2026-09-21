@@ -80,6 +80,18 @@ export function useProjectWorkspaceData({ accessToken, projectId, activeTab, isC
       queryFn: () => fetchBriefPanel(accessToken, projectId),
       staleTime: 60_000,
     })
+
+    void queryClient.prefetchQuery({
+      queryKey: collabKeys.contract(projectId),
+      queryFn: () => getProjectContractRequest(accessToken, projectId),
+      staleTime: 30_000,
+    })
+
+    void queryClient.prefetchQuery({
+      queryKey: collabKeys.changeRequests(projectId),
+      queryFn: () => listProjectChangeRequestsRequest(accessToken, projectId),
+      staleTime: 15_000,
+    })
   }, [accessToken, isClient, projectId, queryClient])
 
   return { boardQ, briefQ, contractQ, changeRequestsQ }

@@ -122,8 +122,6 @@ export const COLUMN_ROUTES = {
 // ── Tasks (autenticado) ─────────────────────────────────────────────────────
 export const TASK_ROUTES = {
   update: (taskId: string) => `${COLLAB_API}/collab/tasks/${taskId}`,
-  block: (taskId: string) => `${COLLAB_API}/collab/tasks/${taskId}/block`,
-  unblock: (taskId: string) => `${COLLAB_API}/collab/tasks/${taskId}/unblock`,
 } as const
 
 // ── Files (autenticado) ─────────────────────────────────────────────────────

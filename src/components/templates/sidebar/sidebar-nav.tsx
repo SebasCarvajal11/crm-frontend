@@ -20,6 +20,8 @@ export function SidebarNav({
         <button
           key={item.key}
           type="button"
+          onMouseEnter={item.onMouseEnter}
+          onFocus={item.onMouseEnter}
           onClick={() => {
             item.onClick()
             onItemClick()

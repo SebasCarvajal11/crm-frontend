@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { lazy, Suspense, useCallback, useEffect, useMemo } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { isHTTPError } from 'ky'
-import { BarChart3, KanbanSquare, ChartAreaIcon, Megaphone, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
@@ -12,6 +11,8 @@ import {
   DashboardTabSkeleton,
 } from './dashboard-feedback'
 import { useDashboardNavigation } from './use-dashboard-navigation'
+import { warmDashboardChunks } from './dashboard-tab-preload'
+import { useDashboardSidebar } from './use-dashboard-sidebar'
 import { AppShell } from '@/components/templates/app-shell'
 import { useSessionStore } from '@/app/session/session-store'
 import { logoutRequest } from '@/features/auth/api'
@@ -166,50 +167,26 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     return currentTab
   }, [tab, defaultTab, canViewOverview, isAdmin, canUseMarketing])
 
-  const sidebarItems = useMemo(
-    () => [
-      {
-        key: 'overview',
-        label: 'Resumen',
-        icon: <BarChart3 className="size-4" />,
-        onClick: () => goTo('overview'),
-        isActive: activeTab === 'overview',
-        hidden: !canViewOverview,
-      },
-      {
-        key: 'collab',
-        label: 'Colaboración',
-        icon: <KanbanSquare className="size-4" />,
-        onClick: () => goTo('collab'),
-        isActive: activeTab === 'collab',
-      },
-      {
-        key: 'marketing',
-        label: 'Marketing',
-        icon: <Megaphone className="size-4" />,
-        onClick: () => goTo('marketing'),
-        isActive: activeTab === 'marketing',
-        hidden: !canUseMarketing,
-      },
-      {
-        key: 'analytics',
-        label: 'Analítica',
-        icon: <ChartAreaIcon className="size-4" />,
-        onClick: () => goTo('analytics'),
-        isActive: activeTab === 'analytics',
-        hidden: !canUseMarketing,
-      },
-      {
-        key: 'admin',
-        label: 'Administración',
-        icon: <ShieldCheck className="size-4" />,
-        onClick: () => goTo('admin'),
-        isActive: activeTab === 'admin',
-        hidden: !isAdmin,
-      },
-    ],
-    [activeTab, goTo, canViewOverview, canUseMarketing, isAdmin],
-  )
+  const [visitedTabs, setVisitedTabs] = useState<Set<DashboardTab>>(() => new Set([activeTab]))
+  const [prevActiveTab, setPrevActiveTab] = useState(activeTab)
+
+  if (activeTab !== prevActiveTab) {
+    setPrevActiveTab(activeTab)
+    setVisitedTabs((prev) => (prev.has(activeTab) ? prev : new Set(prev).add(activeTab)))
+  }
+
+  useEffect(() => {
+    if (!identity?.role) return
+    warmDashboardChunks(identity.role)
+  }, [identity?.role])
+
+  const sidebarItems = useDashboardSidebar({
+    activeTab,
+    goTo,
+    canViewOverview,
+    canUseMarketing,
+    isAdmin,
+  })
 
   if (isUnauthorized) return <DashboardRedirecting />
   if (!bootstrapped || dashboardQuery.isPending || !token) return <DashboardBootstrapping />
@@ -249,43 +226,65 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
           </AlertDescription>
         </Alert>
       )}
-      {activeTab === 'overview' && canViewOverview && (
-        <DashboardOverview
-          identity={identity}
-          avatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}
-          accessToken={token}
-          projects={projects?.data}
-          onOpenProfile={handleOpenProfile}
-          onOpenProject={openProject}
-          onOpenNotification={openNotificationTarget}
-        />
-      )}
-      <Suspense fallback={<DashboardTabSkeleton />}>
-        {activeTab === 'collab' && (
-          <CollabPanel
-            accessToken={token}
+      {visitedTabs.has('overview') && canViewOverview && (
+        <div style={{ display: activeTab === 'overview' ? 'block' : 'none' }}>
+          <DashboardOverview
             identity={identity}
-            initialProjects={projects?.data}
-            openProjectId={project_id}
-            workspaceTab={workspace_tab}
-            chatChannel={chat_channel}
-            chatMessageId={chat_message_id}
-            taskId={task_id}
-            onOpenProject={openProject}
-            onCloseProject={closeProject}
-            onTabChange={changeWorkspaceTab}
-          />
-        )}
-        {activeTab === 'marketing' && canUseMarketing && <MarketingPanel accessToken={token} />}
-        {activeTab === 'account' && <AccountPanel accessToken={token} identity={identity} />}
-        {activeTab === 'notifications' && (
-          <NotificationsPanel
+            avatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}
             accessToken={token}
+            projects={projects?.data}
+            onOpenProfile={handleOpenProfile}
+            onOpenProject={openProject}
             onOpenNotification={openNotificationTarget}
           />
+        </div>
+      )}
+      <Suspense fallback={<DashboardTabSkeleton />}>
+        {visitedTabs.has('collab') && (
+          <div style={{ display: activeTab === 'collab' ? 'block' : 'none' }}>
+            <CollabPanel
+              accessToken={token}
+              identity={identity}
+              initialProjects={projects?.data}
+              openProjectId={project_id}
+              workspaceTab={workspace_tab}
+              chatChannel={chat_channel}
+              chatMessageId={chat_message_id}
+              taskId={task_id}
+              onOpenProject={openProject}
+              onCloseProject={closeProject}
+              onTabChange={changeWorkspaceTab}
+            />
+          </div>
         )}
-        {activeTab === 'admin' && isAdmin && <AdminConsole accessToken={token} />}
-        {activeTab === 'analytics' && canUseMarketing && <DashboardAnalytics accessToken={token} />}
+        {visitedTabs.has('marketing') && canUseMarketing && (
+          <div style={{ display: activeTab === 'marketing' ? 'block' : 'none' }}>
+            <MarketingPanel accessToken={token} />
+          </div>
+        )}
+        {visitedTabs.has('account') && (
+          <div style={{ display: activeTab === 'account' ? 'block' : 'none' }}>
+            <AccountPanel accessToken={token} identity={identity} />
+          </div>
+        )}
+        {visitedTabs.has('notifications') && (
+          <div style={{ display: activeTab === 'notifications' ? 'block' : 'none' }}>
+            <NotificationsPanel
+              accessToken={token}
+              onOpenNotification={openNotificationTarget}
+            />
+          </div>
+        )}
+        {visitedTabs.has('admin') && isAdmin && (
+          <div style={{ display: activeTab === 'admin' ? 'block' : 'none' }}>
+            <AdminConsole accessToken={token} />
+          </div>
+        )}
+        {visitedTabs.has('analytics') && canUseMarketing && (
+          <div style={{ display: activeTab === 'analytics' ? 'block' : 'none' }}>
+            <DashboardAnalytics accessToken={token} />
+          </div>
+        )}
       </Suspense>
     </AppShell>
   )

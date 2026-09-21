@@ -32,11 +32,17 @@ const TABS: SectionTabItem<MarketingTab>[] = [
 
 export function MarketingPanel({ accessToken }: Props) {
   const [activeTab, setActiveTab] = useState<MarketingTab>('clients')
+  const [visitedTabs, setVisitedTabs] = useState<Set<MarketingTab>>(() => new Set([activeTab]))
   const [preselectedCampaignId, setPreselectedCampaignId] = useState<number | null>(null)
+
+  const handleTabChange = (nextTab: MarketingTab) => {
+    setActiveTab(nextTab)
+    setVisitedTabs((prev) => (prev.has(nextTab) ? prev : new Set(prev).add(nextTab)))
+  }
 
   const handleSelectCampaignForWorkflows = (campaignId: number) => {
     setPreselectedCampaignId(campaignId)
-    setActiveTab('workflows')
+    handleTabChange('workflows')
   }
 
   return (
@@ -61,33 +67,53 @@ export function MarketingPanel({ accessToken }: Props) {
       <SectionTabs
         items={TABS}
         value={activeTab}
-        onValueChange={setActiveTab}
+        onValueChange={handleTabChange}
         ariaLabel="Secciones de marketing"
         itemRole="button"
       />
 
-      <div key={activeTab} className="tab-pane-transition">
-        {activeTab === 'clients' && <ClientPlansManager accessToken={accessToken} />}
-
-        {activeTab === 'campaigns' && (
-          <CampaignsManager
-            accessToken={accessToken}
-            onSelectCampaignForWorkflows={handleSelectCampaignForWorkflows}
-          />
+      <div className="tab-pane-transition">
+        {visitedTabs.has('clients') && (
+          <div style={{ display: activeTab === 'clients' ? 'block' : 'none' }}>
+            <ClientPlansManager accessToken={accessToken} />
+          </div>
         )}
 
-        {activeTab === 'proposals' && <ProposalsManager accessToken={accessToken} />}
-
-        {activeTab === 'workflows' && (
-          <WorkflowsManager
-            accessToken={accessToken}
-            preselectedCampaignId={preselectedCampaignId}
-          />
+        {visitedTabs.has('campaigns') && (
+          <div style={{ display: activeTab === 'campaigns' ? 'block' : 'none' }}>
+            <CampaignsManager
+              accessToken={accessToken}
+              onSelectCampaignForWorkflows={handleSelectCampaignForWorkflows}
+            />
+          </div>
         )}
 
-        {activeTab === 'segments' && <SegmentsManager accessToken={accessToken} />}
+        {visitedTabs.has('proposals') && (
+          <div style={{ display: activeTab === 'proposals' ? 'block' : 'none' }}>
+            <ProposalsManager accessToken={accessToken} />
+          </div>
+        )}
 
-        {activeTab === 'interactions' && <InteractionsManager accessToken={accessToken} />}
+        {visitedTabs.has('workflows') && (
+          <div style={{ display: activeTab === 'workflows' ? 'block' : 'none' }}>
+            <WorkflowsManager
+              accessToken={accessToken}
+              preselectedCampaignId={preselectedCampaignId}
+            />
+          </div>
+        )}
+
+        {visitedTabs.has('segments') && (
+          <div style={{ display: activeTab === 'segments' ? 'block' : 'none' }}>
+            <SegmentsManager accessToken={accessToken} />
+          </div>
+        )}
+
+        {visitedTabs.has('interactions') && (
+          <div style={{ display: activeTab === 'interactions' ? 'block' : 'none' }}>
+            <InteractionsManager accessToken={accessToken} />
+          </div>
+        )}
       </div>
     </div>
   )
