@@ -35,6 +35,10 @@ test.describe('Admin - Gestor y Explorador de Archivos por Cliente (Gobernanza d
     await expect(page.getByText('Proyectos Registrados')).toBeVisible()
     await expect(page.getByText('Espacio Activo en Nube')).toBeVisible()
 
+    // Scroll al gestor de archivos
+    await title.scrollIntoViewIfNeeded()
+    await page.waitForTimeout(500)
+
     // Screenshot inicial del gestor de archivos
     await page.screenshot({ path: path.join(outputDir, '13-admin-file-manager-overview.png'), fullPage: false })
   })
@@ -57,12 +61,23 @@ test.describe('Admin - Gestor y Explorador de Archivos por Cliente (Gobernanza d
     // Esperar carga de clientes en el panel lateral izquierdo
     const clientItems = page.getByTestId('storage-client-item')
     await expect(clientItems.first()).toBeVisible({ timeout: 15_000 })
+    
+    // Seleccionar cliente con archivos (ej. GreenLoop Logistics o el primero con archivos)
+    const clientWithFiles = page.getByTestId('storage-client-item').filter({ hasText: 'GreenLoop Logistics' })
+    if (await clientWithFiles.count() > 0) {
+      await clientWithFiles.first().scrollIntoViewIfNeeded()
+      await clientWithFiles.first().click()
+    } else {
+      await clientItems.first().scrollIntoViewIfNeeded()
+      await clientItems.first().click()
+    }
+    await page.waitForTimeout(1000)
 
     // Validar que la tabla de archivos y filtros de categoría están presentes
     await expect(page.getByRole('button', { name: /Todos \(/i })).toBeVisible()
     await expect(page.getByRole('button', { name: /Contratos y Adendas/i })).toBeVisible()
 
-    // Screenshot detallado de archivos del proyecto
+    // Screenshot detallado de archivos del proyecto con tabla poblada
     await page.screenshot({ path: path.join(outputDir, '14-admin-file-manager-project-files.png'), fullPage: false })
 
     // Si existen archivos con botón de depurar, validar apertura del modal de confirmación
