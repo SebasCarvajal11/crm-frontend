@@ -67,11 +67,11 @@ async function readJsonPayload(response: Response): Promise<unknown> {
 function fallbackMessageForStatus(status: number): string | null {
   switch (status) {
     case 401:
-      return 'No se pudo iniciar sesion. Revisa correo y contrasena.'
+      return 'No se pudo iniciar sesión. Revisa correo y contraseña.'
     case 403:
-      return 'No tienes permiso para esta operacion.'
+      return 'No tienes permiso para esta operación.'
     case 429:
-      return 'Demasiados intentos. Espera un momento e intentalo de nuevo.'
+      return 'Demasiados intentos. Espera un momento e inténtalo de nuevo.'
     default:
       return null
   }

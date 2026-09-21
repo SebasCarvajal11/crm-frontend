@@ -130,7 +130,7 @@ export function ChangePasswordSection({ accessToken }: Props) {
 
             {mutation.isError && (
               <Alert variant="destructive">
-                <AlertTitle>No se pudo cambiar la contrasena</AlertTitle>
+                <AlertTitle>No se pudo cambiar la contraseña</AlertTitle>
                 <AlertDescription>{mutation.error.message}</AlertDescription>
               </Alert>
             )}
@@ -138,7 +138,7 @@ export function ChangePasswordSection({ accessToken }: Props) {
             {mutation.isSuccess && (
               <Alert className="border-emerald-200/80 bg-emerald-50/60 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-200">
                 <Check className="size-4 text-emerald-600" />
-                <AlertTitle>Contrasena actualizada</AlertTitle>
+                <AlertTitle>Contraseña actualizada</AlertTitle>
                 <AlertDescription>
                   Se cerrará tu sesión en unos segundos para proteger la cuenta.
                 </AlertDescription>
@@ -160,7 +160,7 @@ export function ChangePasswordSection({ accessToken }: Props) {
                 type="submit"
                 disabled={mutation.isPending || mutation.isSuccess}
               >
-                {mutation.isPending ? 'Guardando...' : 'Actualizar contrasena'}
+                {mutation.isPending ? 'Guardando...' : 'Actualizar contraseña'}
               </Button>
             </div>
           </form>

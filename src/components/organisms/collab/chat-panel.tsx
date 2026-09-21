@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Send, Shield, User, Users } from 'lucide-react'
+import { Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useProjectChatData, useProjectChatSend } from '@/features/collab/hooks'
 import type { ProjectMember } from '@/features/collab/model'
 import type { MeResponse } from '@/shared/types'
 import { buildMentionSuggestions, extractActiveMentionQuery, mentionHints, resolveMentionsFromBody } from './chat-mentions'
+import { ChatExportDialog } from './chat-export-dialog'
 import { ChatMessageList } from './chat-message-list'
+import { ChatPanelHeader } from './chat-panel-header'
 import { ChatTypingIndicator } from './chat-typing-indicator'
 import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 import { useChatScrollManager } from './use-chat-scroll-manager'
@@ -17,6 +19,7 @@ type Channel = 'external' | 'internal'
 type Props = {
   accessToken: string
   projectId: string
+  projectName?: string
   identity: MeResponse['data']
   isClient: boolean
   initialChannel?: Channel
@@ -29,6 +32,7 @@ type Props = {
 export function ChatPanel({
   accessToken,
   projectId,
+  projectName,
   identity,
   isClient,
   initialChannel,
@@ -38,6 +42,7 @@ export function ChatPanel({
   isVisible = true,
 }: Props) {
   const [channel, setChannel] = useState<Channel>(initialChannel ?? 'external')
+  const [exportDialogOpen, setExportDialogOpen] = useState(false)
   const [body, setBody] = useState('')
   const [activeIdx, setActiveIdx] = useState(0)
   const [highlightMessageId, setHighlightMessageId] = useState<string | null>(initialMessageId ?? null)
@@ -135,46 +140,13 @@ export function ChatPanel({
       role="region"
       aria-label={channel === 'external' ? 'Chat con el cliente' : 'Chat interno del equipo'}
     >
-      <div className="shrink-0 border-b bg-muted/20 px-4 py-3">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold">{channel === 'external' ? 'Chat con el Cliente' : 'Chat del Equipo'}</p>
-            <p className="text-xs text-muted-foreground">
-              {channel === 'external' ? 'Canal compartido con el cliente' : (
-                <span className="flex items-center gap-1">
-                  <Shield className="size-3 inline" />
-                  Canal privado del equipo
-                </span>
-              )}
-            </p>
-          </div>
-          {!isClient && (
-            <div className="flex gap-1 rounded-lg border bg-background p-0.5" role="tablist" aria-label="Seleccionar canal">
-              {(['external', 'internal'] as const).map((nextChannel) => (
-                <button
-                  key={nextChannel}
-                  role="tab"
-                  aria-selected={channel === nextChannel}
-                  onClick={() => setChannel(nextChannel)}
-                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150 cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${channel === nextChannel ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'}`}
-                >
-                  {nextChannel === 'external' ? (
-                    <>
-                      <Users className="size-3" aria-hidden="true" />
-                      Cliente
-                    </>
-                  ) : (
-                    <>
-                      <User className="size-3" aria-hidden="true" />
-                      Equipo
-                    </>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+      <ChatPanelHeader
+        channel={channel}
+        onChannelChange={setChannel}
+        isClient={isClient}
+        isAdmin={identity.role === 'admin'}
+        onOpenExport={() => setExportDialogOpen(true)}
+      />
 
       <div
         ref={logRef}
@@ -293,6 +265,20 @@ export function ChatPanel({
 
         <p className="mt-1 text-[11px] text-muted-foreground">Menciones permitidas: {mentionHints(identity.role).join(' · ')}</p>
       </div>
+
+      {identity.role === 'admin' && (
+        <ChatExportDialog
+          open={exportDialogOpen}
+          onOpenChange={setExportDialogOpen}
+          accessToken={accessToken}
+          projectId={projectId}
+          projectName={projectName}
+          currentChannel={channel}
+          members={members}
+          identity={identity}
+          onError={onError}
+        />
+      )}
     </div>
   )
 }

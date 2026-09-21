@@ -99,7 +99,7 @@ async function refreshAccessToken(): Promise<string> {
 
     if (!refreshResponse.ok) {
       throw new RefreshTokenError(
-        'No se pudo renovar la sesion',
+        'No se pudo renovar la sesión',
         classifyRefreshHttpStatus(refreshResponse.status),
       )
     }

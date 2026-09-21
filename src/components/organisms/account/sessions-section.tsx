@@ -105,7 +105,7 @@ export function SessionsSection({ accessToken }: Props) {
                     >
                       {revokeAllMutation.isPending
                         ? 'Cerrando sesiones...'
-                        : 'Cerrar sesion en todos los dispositivos'}
+                        : 'Cerrar sesión en todos los dispositivos'}
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -182,7 +182,7 @@ export function SessionsSection({ accessToken }: Props) {
                     variant="outline"
                     size="sm"
                     className="h-8 text-xs font-medium text-destructive hover:bg-destructive hover:text-destructive-foreground sm:w-auto"
-                    aria-label={`Revocar sesion de ${session.device_label}`}
+                    aria-label={`Revocar sesión de ${session.device_label}`}
                     disabled={revokeMutation.isPending}
                     onClick={() => revokeMutation.mutate(session.family)}
                   >

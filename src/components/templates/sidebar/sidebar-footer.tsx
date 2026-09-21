@@ -134,7 +134,7 @@ export function SidebarFooter({
               className="h-8 w-full justify-start rounded-md text-primary-foreground/80 hover:bg-primary-foreground/12 hover:text-primary-foreground"
             >
               <LogOut className="size-4" />
-              <span>{isLoggingOut ? 'Cerrando sesion...' : 'Cerrar Sesion'}</span>
+              <span>{isLoggingOut ? 'Cerrando sesión...' : 'Cerrar Sesión'}</span>
             </Button>
           </div>
         )}

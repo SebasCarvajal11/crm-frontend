@@ -66,10 +66,10 @@ export function TaskSheetDetailView({
       />
 
       <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Descripcion</p>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Descripción</p>
         {task.description
           ? <p className="text-sm leading-relaxed">{task.description}</p>
-          : <p className="text-sm italic text-muted-foreground">Sin descripcion.</p>}
+          : <p className="text-sm italic text-muted-foreground">Sin descripción.</p>}
       </div>
 
       <Separator />

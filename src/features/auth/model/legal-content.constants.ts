@@ -41,6 +41,14 @@ export const TERMS_AND_CONDITIONS: LegalSection[] = [
       'CIMA se reserva el derecho de revocar credenciales y suspender el acceso de inmediato ante sospechas fundadas de uso indebido o vulneración de seguridad.',
     ],
   },
+  {
+    id: 'trazabilidad-conversaciones',
+    title: '5. Trazabilidad de Comunicaciones y Registro Probatorio',
+    content: [
+      'Con el fin de garantizar la seguridad jurídica, la transparencia operativa y la resolución expedita de controversias, las comunicaciones intercambiadas en los canales de proyecto constituyen mensajes de datos con plena validez probatoria.',
+      'Los administradores designados podrán emitir copias de auditoría y registros probatorios inmutables de las conversaciones bajo estrictos estándares de integridad criptográfica y cadena de custodia.',
+    ],
+  },
 ]
 
 export const PRIVACY_POLICY: LegalSection[] = [
@@ -73,18 +81,18 @@ export const PRIVACY_POLICY: LegalSection[] = [
 export const CLOUD_SECURITY_POLICY: LegalSection[] = [
   {
     id: 'almacenamiento-nube',
-    title: '1. Infraestructura y Almacenamiento en la Nube',
+    title: '1. Infraestructura y Almacenamiento Seguro en la Nube',
     content: [
-      'Los archivos, entregables y documentos de proyecto se alojan en la nube de Oracle Cloud Infrastructure (OCI Object Storage) con cifrado en tránsito (TLS 1.3) y en reposo (AES-256).',
-      'La transferencia de archivos pesados se realiza directamente entre el cliente y los buckets de Oracle mediante solicitudes prefirmadas temporales (PAR), garantizando que las credenciales maestras nunca queden expuestas en el navegador.',
+      'Los archivos, entregables y documentos de proyecto se custodian en infraestructura empresarial de alta disponibilidad con cifrado robusto en tránsito (TLS 1.3) y en reposo (AES-256).',
+      'La transferencia segura de archivos se realiza mediante canales cifrados y tokens temporales de acceso con privilegios mínimos, garantizando que las credenciales maestras nunca queden expuestas en el navegador.',
     ],
   },
   {
     id: 'cuarentena-antivirus',
-    title: '2. Filtro Antivirus y Protocolo de Cuarentena',
+    title: '2. Protocolo de Inspección y Cuarentena de Archivos',
     content: [
-      'Todo archivo subido a la plataforma pasa por una etapa obligatoria de cuarentena y escaneo automatizado con ClamAV.',
-      'Únicamente los archivos certificados como limpios y libres de amenazas son promovidos al almacenamiento definitivo de producción para su descarga o visualización.',
+      'Todo archivo cargado en la plataforma pasa por una etapa obligatoria de cuarentena y escaneo automatizado contra malware y amenazas digitales.',
+      'Únicamente los archivos validados y verificados como seguros son promovidos al almacenamiento de producción para su visualización y descarga.',
     ],
   },
 ]

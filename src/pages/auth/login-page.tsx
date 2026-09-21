@@ -53,7 +53,7 @@ export function LoginPage() {
                 onClick={() => openLegalDialog('security')}
                 className="underline hover:text-foreground transition-colors cursor-pointer"
               >
-                Seguridad OCI
+                Seguridad en la Nube
               </button>
             </div>
           </div>

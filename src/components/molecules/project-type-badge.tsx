@@ -1,4 +1,4 @@
-﻿import type { ProjectType } from '@/features/collab/model'
+import type { ProjectType } from '@/features/collab/model'
 import { PROJECT_TYPE_CONFIG } from './project-type-config'
 
 type Props = {
@@ -6,7 +6,7 @@ type Props = {
   className?: string
 }
 
-/** Molecula: badge de tipo de proyecto (campana/producto). */
+/** Molécula: badge de tipo de proyecto (campaña/producto). */
 export function ProjectTypeBadge({ type, className = '' }: Props) {
   const cfg = PROJECT_TYPE_CONFIG[type]
   return (

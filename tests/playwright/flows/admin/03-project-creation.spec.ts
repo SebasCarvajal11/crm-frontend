@@ -48,7 +48,7 @@ test.describe('Admin - Creacion de Proyectos', () => {
 
     const projectData = TestData.projects.campaign()
     await adminPage.locator('#cp-name').fill(projectData.name)
-    await chooseRadixSelectOption(adminPage, adminPage.locator('#cp-type'), 'Campana / Servicio')
+    await chooseRadixSelectOption(adminPage, adminPage.locator('#cp-type'), 'Campaña / Servicio')
     await fillRequiredProjectRelations(adminPage)
     await adminPage.locator('#cp-desc').fill(projectData.description)
     await adminPage.locator('#cp-brief').fill(projectData.brief)

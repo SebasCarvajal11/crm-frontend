@@ -12,7 +12,7 @@ export const changePasswordSchema = z
     confirm: z.string(),
   })
   .refine((d) => d.new_password === d.confirm, {
-    message: 'Las contrasenas no coinciden',
+    message: 'Las contraseñas no coinciden',
     path: ['confirm'],
   })
 

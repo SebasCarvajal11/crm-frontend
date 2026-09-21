@@ -38,13 +38,13 @@ export function TaskSearchBar({ searchableTasks, isSearching, boardColumns, onDe
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
         <div className="min-w-0">
         <h3 className="text-sm font-semibold">Buscar tareas</h3>
-        <p className="text-xs text-muted-foreground">Filtra por nombre, descripcion o columna del tablero.</p>
+        <p className="text-xs text-muted-foreground">Filtra por nombre, descripción o columna del tablero.</p>
         </div>
       <div className="relative w-full lg:max-w-md lg:shrink-0">
         <Input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Buscar tareas por nombre, descripcion o columna"
+          placeholder="Buscar tareas por nombre, descripción o columna"
           aria-label="Buscar tareas del proyecto"
         />
         {hasQuery && (

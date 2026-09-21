@@ -26,7 +26,7 @@ test.describe('Legal Compliance & Brand Design Integrity', () => {
     // 2. Validate legal links in footer
     const termsLink = page.getByRole('button', { name: /términos y condiciones/i })
     const privacyLink = page.getByRole('button', { name: /política de privacidad/i })
-    const securityLink = page.getByRole('button', { name: /seguridad oci/i })
+    const securityLink = page.getByRole('button', { name: /seguridad en la nube/i })
 
     await expect(termsLink).toBeVisible()
     await expect(privacyLink).toBeVisible()
@@ -56,12 +56,12 @@ test.describe('Legal Compliance & Brand Design Integrity', () => {
       path: path.join(SCREENSHOT_DIR, '03-modal-tab-privacy.png'),
     })
 
-    // 6. Switch to OCI Cloud Security tab & screenshot
-    const securityTabBtn = page.getByRole('button', { name: /seguridad en nube/i })
+    // 6. Switch to Cloud Security tab & screenshot
+    const securityTabBtn = page.getByRole('button', { name: /seguridad en la nube/i })
     await securityTabBtn.click()
     await expect(securityTabBtn).toHaveClass(/border-primary/)
-    await expect(page.getByRole('heading', { name: /almacenamiento en la nube/i })).toBeVisible()
-    await expect(page.getByText('Oracle Cloud Infrastructure')).toBeVisible()
+    await expect(page.getByRole('heading', { name: /almacenamiento seguro en la nube/i })).toBeVisible()
+    await expect(page.getByText(/cifrado robusto en tránsito/i)).toBeVisible()
     await page.screenshot({
       path: path.join(SCREENSHOT_DIR, '04-modal-tab-security.png'),
     })

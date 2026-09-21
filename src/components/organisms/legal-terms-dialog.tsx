@@ -28,7 +28,7 @@ interface Props {
 const TABS: { id: LegalTab; label: string; icon: typeof Scale }[] = [
   { id: 'terms', label: 'Términos de Uso', icon: FileText },
   { id: 'privacy', label: 'Tratamiento de Datos (Ley 1581)', icon: Shield },
-  { id: 'security', label: 'Seguridad en Nube (OCI)', icon: Cloud },
+  { id: 'security', label: 'Seguridad en la Nube', icon: Cloud },
 ]
 
 function TabNavigation({

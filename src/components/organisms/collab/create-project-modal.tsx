@@ -103,7 +103,7 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
             <Select value={type} onValueChange={(v) => setType(v as ProjectType)}>
               <SelectTrigger id="cp-type"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="campaign_service">Campana / Servicio</SelectItem>
+                <SelectItem value="campaign_service">Campaña / Servicio</SelectItem>
                 <SelectItem value="product_order">Pedido de Producto</SelectItem>
               </SelectContent>
             </Select>
