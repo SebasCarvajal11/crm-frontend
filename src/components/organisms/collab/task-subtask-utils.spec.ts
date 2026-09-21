@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { ProjectMember, ProjectTask } from '@/features/collab/model'
 import {
   deleteTaskSubtask,
   toCreateTaskSubtasks,
@@ -45,14 +46,14 @@ describe('toCreateTaskSubtasks', () => {
   it('resuelve los trabajadores asignados de la tarea', () => {
     const task = {
       assigneeSub: 'w-1',
-    } as any
+    } as unknown as ProjectTask
     const members = [
       { userSub: 'w-1', email: 'worker@cima.dev' },
-    ] as any
+    ] as unknown as ProjectMember[]
 
     expect(workersFromTask(task, members)).toEqual([
       { subject: 'w-1', email: 'worker@cima.dev', role: 'worker' },
     ])
-    expect(workersFromTask({ assigneeSub: null } as any, members)).toEqual([])
+    expect(workersFromTask({ assigneeSub: null } as unknown as ProjectTask, members)).toEqual([])
   })
 })
