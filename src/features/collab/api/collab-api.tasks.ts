@@ -66,6 +66,34 @@ export async function patchTaskRequest(
     .json<DataResponse<ProjectTask>>()
 }
 
+export async function blockTaskRequest(
+  accessToken: string,
+  projectId: string,
+  taskId: string,
+  body: { reason: string }
+): Promise<DataResponse<ProjectTask>> {
+  return api
+    .post(PROJECT_ROUTES.taskBlock(projectId, taskId), {
+      headers: bearer(accessToken),
+      json: body,
+    })
+    .json<DataResponse<ProjectTask>>()
+}
+
+export async function unblockTaskRequest(
+  accessToken: string,
+  projectId: string,
+  taskId: string,
+  body?: { target_column_id?: string; resolution_comment?: string }
+): Promise<DataResponse<ProjectTask>> {
+  return api
+    .post(PROJECT_ROUTES.taskUnblock(projectId, taskId), {
+      headers: bearer(accessToken),
+      json: body ?? {},
+    })
+    .json<DataResponse<ProjectTask>>()
+}
+
 export async function listTaskCommentsRequest(
   accessToken: string,
   projectId: string,

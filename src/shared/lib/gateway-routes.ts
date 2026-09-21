@@ -93,6 +93,10 @@ export const PROJECT_ROUTES = {
     `${COLLAB_API}/collab/projects/${projectId}/tasks/${taskId}/files/upload-url`,
   taskFilesMetadata: (projectId: string, taskId: string) =>
     `${COLLAB_API}/collab/projects/${projectId}/tasks/${taskId}/files/metadata`,
+  taskBlock: (projectId: string, taskId: string) =>
+    `${COLLAB_API}/collab/projects/${projectId}/tasks/${taskId}/block`,
+  taskUnblock: (projectId: string, taskId: string) =>
+    `${COLLAB_API}/collab/projects/${projectId}/tasks/${taskId}/unblock`,
   // Chat
   chatExternal: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/external`,
   chatExternalRead: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/chat/external/read`,
@@ -118,6 +122,8 @@ export const COLUMN_ROUTES = {
 // ── Tasks (autenticado) ─────────────────────────────────────────────────────
 export const TASK_ROUTES = {
   update: (taskId: string) => `${COLLAB_API}/collab/tasks/${taskId}`,
+  block: (taskId: string) => `${COLLAB_API}/collab/tasks/${taskId}/block`,
+  unblock: (taskId: string) => `${COLLAB_API}/collab/tasks/${taskId}/unblock`,
 } as const
 
 // ── Files (autenticado) ─────────────────────────────────────────────────────

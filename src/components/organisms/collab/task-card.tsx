@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { Calendar, Clock, GripVertical, User, CheckSquare } from 'lucide-react'
+import { AlertOctagon, Calendar, Clock, GripVertical, User, CheckSquare } from 'lucide-react'
 import { PriorityBadge } from '@/components/molecules/priority-badge'
 import type { ProjectTask } from '@/features/collab/model'
 
@@ -18,12 +18,15 @@ const fmtShort = (d: string) =>
 
 /** Organismo: tarjeta arrastrable de tarea en el tablero hijo. */
 export const TaskCard = memo(function TaskCard({ task, isSelected, canDrag, onClick }: Props) {
-  const borderLeft = {
-    low:    'border-l-slate-300',
-    medium: 'border-l-sky-400',
-    high:   'border-l-amber-400',
-    urgent: 'border-l-rose-500',
-  }[task.priority]
+  const isBlocked = Boolean(task.blockType)
+  const borderLeft = isBlocked
+    ? 'border-l-rose-600'
+    : {
+        low:    'border-l-slate-300',
+        medium: 'border-l-sky-400',
+        high:   'border-l-amber-400',
+        urgent: 'border-l-rose-500',
+      }[task.priority]
 
   return (
     <button
@@ -59,6 +62,15 @@ export const TaskCard = memo(function TaskCard({ task, isSelected, canDrag, onCl
 
       <div className="flex flex-wrap gap-1.5 mt-1.5">
         <PriorityBadge priority={task.priority} />
+        {task.blockType && (
+          <span
+            className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400 font-semibold gap-0.5"
+            title={task.blockReason ? `Bloqueada: ${task.blockReason}` : 'Tarea Bloqueada'}
+          >
+            <AlertOctagon className="size-2.5" aria-hidden="true" />
+            {task.blockType === 'client_timeout' ? 'Timeout 48h' : 'Bloqueada'}
+          </span>
+        )}
         {task.isClientVisible && (
           <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700 gap-0.5">
             <User className="size-2.5" aria-hidden="true" />

@@ -1,13 +1,17 @@
-import { Calendar, Pencil } from 'lucide-react'
+import { AlertOctagon, Calendar, CheckCircle2, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { PRIORITY_CONFIG } from '@/components/molecules/priority-config'
 import type { ProjectMember, ProjectTask } from '@/features/collab/model'
 import { TaskSheetSubtasksSection } from './task-sheet-subtasks-section'
+import { TaskBlockerBanner } from './task-blocker-banner'
 
 type Props = {
   task: ProjectTask
   canEdit: boolean
+  canBlock?: boolean
+  canUnblock?: boolean
+  isUnblocking?: boolean
   assignableMembers: ProjectMember[]
   subtaskAssignees: ProjectMember[]
   newSubtask: string
@@ -19,11 +23,16 @@ type Props = {
   onToggleSubtask: (subtaskId: string, isCompleted: boolean) => void
   onDeleteSubtask: (subtaskId: string) => void
   onStartEditing: () => void
+  onOpenBlock?: () => void
+  onOpenUnblock?: () => void
 }
 
 export function TaskSheetDetailView({
   task,
   canEdit,
+  canBlock = false,
+  canUnblock = false,
+  isUnblocking = false,
   assignableMembers,
   subtaskAssignees,
   newSubtask,
@@ -35,6 +44,8 @@ export function TaskSheetDetailView({
   onToggleSubtask,
   onDeleteSubtask,
   onStartEditing,
+  onOpenBlock,
+  onOpenUnblock,
 }: Props) {
   const priorityConfig = PRIORITY_CONFIG[task.priority]
   const createdAtLabel = new Date(task.createdAt).toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' })
@@ -45,6 +56,13 @@ export function TaskSheetDetailView({
 
   return (
     <div className="space-y-5">
+      <TaskBlockerBanner
+        task={task}
+        canUnblock={canUnblock}
+        isUnblocking={isUnblocking}
+        onOpenUnblock={onOpenUnblock ?? (() => {})}
+      />
+
       <div>
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Descripcion</p>
         {task.description
@@ -99,13 +117,39 @@ export function TaskSheetDetailView({
         onDeleteSubtask={onDeleteSubtask}
       />
 
-      {canEdit && (
+      {(canEdit || (canBlock && !task.blockType) || (canUnblock && task.blockType)) && (
         <>
           <Separator />
-          <Button className="w-full" variant="outline" onClick={onStartEditing}>
-            <Pencil className="mr-2 size-4" />
-            Editar tarea
-          </Button>
+          <div className="flex flex-col gap-2">
+            {canUnblock && task.blockType && (
+              <Button
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                disabled={isUnblocking}
+                onClick={onOpenUnblock}
+              >
+                <CheckCircle2 className="mr-2 size-4" />
+                Desbloquear tarea
+              </Button>
+            )}
+
+            {canEdit && (
+              <Button className="w-full" variant="outline" onClick={onStartEditing}>
+                <Pencil className="mr-2 size-4" />
+                Editar tarea
+              </Button>
+            )}
+
+            {canBlock && !task.blockType && (
+              <Button
+                className="w-full border-rose-200 text-rose-700 hover:bg-rose-50 dark:border-rose-900/50 dark:text-rose-300 dark:hover:bg-rose-950/40"
+                variant="outline"
+                onClick={onOpenBlock}
+              >
+                <AlertOctagon className="mr-2 size-4 text-rose-600" />
+                Bloquear tarea
+              </Button>
+            )}
+          </div>
         </>
       )}
     </div>

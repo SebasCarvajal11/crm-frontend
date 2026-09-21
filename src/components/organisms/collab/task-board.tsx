@@ -117,6 +117,7 @@ export function TaskBoard({
               canEdit={canOperate}
               accessToken={accessToken}
               projectId={projectId}
+              identity={identity}
               members={members}
               columns={columns}
               onClose={() => setSelectedTaskId(null)}

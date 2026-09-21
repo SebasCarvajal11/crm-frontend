@@ -76,6 +76,11 @@ export type ProjectTask = {
   deadline: string | null
   checklistProgress: number
   blockedByTaskId: string | null
+  blockReason?: string | null
+  blockType?: 'client_timeout' | 'internal_impediment' | null
+  blockedAt?: string | null
+  blockedBySub?: string | null
+  clientApprovalRequestedAt?: string | null
   isClientVisible: boolean
   position: number
   subtasks: { id: string; title: string; isCompleted: boolean; assigneeSub?: string | null }[] | null
@@ -282,18 +287,4 @@ export type ProjectChangeRequest = {
   createdAt: string
   resolvedAt: string | null
 }
-export type ProjectNotification = {
-  id: string
-  source: 'mention' | 'activity'
-  project_id: string
-  project_name: string
-  channel: 'internal' | 'external' | 'system'
-  created_at: string
-  title: string
-  body: string
-  resource_type: string
-  resource_id: string | null
-  message_id: string | null
-  author_sub: string | null
-  author_email: string | null
-}
+export type { ProjectNotification } from './notification.types'

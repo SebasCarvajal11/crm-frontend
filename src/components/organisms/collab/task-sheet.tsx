@@ -3,16 +3,23 @@ import { FileText, MessageSquare, Paperclip, Pencil, User, X } from 'lucide-reac
 import { Button } from '@/components/ui/button'
 import { SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { PriorityBadge } from '@/components/molecules/priority-badge'
-import { useSubtaskMutate, useTaskSheetSave } from '@/features/collab/hooks'
+import { useBlockTask, useSubtaskMutate, useTaskSheetSave } from '@/features/collab/hooks'
 import { getProjectMemberLabel, projectWorkers } from '@/features/collab/lib/member-display'
 import type { ProjectMember, ProjectTask, ProjectTaskColumn } from '@/features/collab/model'
-import type { ClientSearchResult } from '@/shared/types'
+import type { ClientSearchResult, MeResponse } from '@/shared/types'
 import { isoToLocalDate } from '@/shared/lib'
 import { TaskComments } from './task-comments'
 import { TaskSheetDetailView } from './task-sheet-detail-view'
 import { TaskSheetEditForm } from './task-sheet-edit-form'
 import { TaskFilesTab } from './task-files-tab'
-import { mapTaskSubtasksToDrafts } from './task-subtask-utils'
+import { BlockTaskDialog } from './block-task-dialog'
+import { UnblockTaskDialog } from './unblock-task-dialog'
+import {
+  deleteTaskSubtask,
+  mapTaskSubtasksToDrafts,
+  toggleTaskSubtask,
+  workersFromTask,
+} from './task-subtask-utils'
 
 type Tab = 'info' | 'comments' | 'files'
 
@@ -21,6 +28,7 @@ type Props = {
   canEdit: boolean
   accessToken: string
   projectId: string
+  identity: MeResponse['data']
   members: ProjectMember[]
   columns: ProjectTaskColumn[]
   onClose: () => void
@@ -28,14 +36,10 @@ type Props = {
   onError: (msg: string) => void
 }
 
-function workersFromTask(task: ProjectTask, members: ProjectMember[]): ClientSearchResult[] {
-  if (!task.assigneeSub) return []
-  const member = members.find((entry) => entry.userSub === task.assigneeSub)
-  if (!member) return []
-  return [{ subject: member.userSub, email: member.email ?? getProjectMemberLabel(member), role: 'worker' }]
-}
-
-export function TaskSheet({ task, canEdit, accessToken, projectId, members, columns, onClose, onSaved, onError }: Props) {
+export function TaskSheet({
+  task, canEdit, accessToken, projectId, identity, members, columns,
+  onClose, onSaved, onError,
+}: Props) {
   const [tab, setTab] = useState<Tab>('info')
   const [editing, setEditing] = useState(false)
   const [editTitle, setEditTitle] = useState(task.title)
@@ -47,6 +51,21 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
   const [editWorkers, setEditWorkers] = useState<ClientSearchResult[]>(() => workersFromTask(task, members))
   const [newSubtask, setNewSubtask] = useState('')
   const [newSubtaskAssignee, setNewSubtaskAssignee] = useState<string>('none')
+  const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false)
+  const [isUnblockDialogOpen, setIsUnblockDialogOpen] = useState(false)
+
+  const isAdmin = identity.role === 'admin'
+  const isClient = identity.role === 'client'
+  const isWorker = identity.role === 'worker'
+  const isAssignee =
+    task.assigneeSub === identity.id ||
+    Boolean(task.subtasks?.some((s) => s.assigneeSub === identity.id))
+
+  const canBlock = isAdmin || (isWorker && canEdit)
+  const canUnblock =
+    isAdmin ||
+    (task.blockType === 'client_timeout' && isClient) ||
+    (task.blockType === 'internal_impediment' && isWorker && isAssignee)
 
   const assignableMembers = projectWorkers(members)
 
@@ -78,6 +97,18 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
     onError,
   })
 
+  const { blockTask, isBlocking, unblockTask, isUnblocking } = useBlockTask({
+    accessToken,
+    projectId,
+    taskId: task.id,
+    onSuccess: () => {
+      setIsBlockDialogOpen(false)
+      setIsUnblockDialogOpen(false)
+      onSaved()
+    },
+    onError,
+  })
+
   const subtaskMutate = useSubtaskMutate({
     accessToken,
     projectId,
@@ -103,31 +134,11 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
   }
 
   const handleToggleSubtask = (subtaskId: string, isCompleted: boolean) => {
-    if (!task.subtasks) return
-
-    const updated = task.subtasks.map((subtask) => ({
-      id: subtask.id,
-      title: subtask.title,
-      is_completed: subtask.id === subtaskId ? isCompleted : subtask.isCompleted,
-      assignee_sub: subtask.assigneeSub ?? null,
-    }))
-
-    subtaskMutate.mutate(updated)
+    subtaskMutate.mutate(toggleTaskSubtask(task.subtasks, subtaskId, isCompleted))
   }
 
   const handleDeleteSubtask = (subtaskId: string) => {
-    if (!task.subtasks) return
-
-    const updated = task.subtasks
-      .filter((subtask) => subtask.id !== subtaskId)
-      .map((subtask) => ({
-        id: subtask.id,
-        title: subtask.title,
-        is_completed: subtask.isCompleted,
-        assignee_sub: subtask.assigneeSub ?? null,
-      }))
-
-    subtaskMutate.mutate(updated)
+    subtaskMutate.mutate(deleteTaskSubtask(task.subtasks, subtaskId))
   }
 
   return (
@@ -229,6 +240,9 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
             <TaskSheetDetailView
               task={task}
               canEdit={canEdit}
+              canBlock={canBlock}
+              canUnblock={canUnblock}
+              isUnblocking={isUnblocking}
               assignableMembers={assignableMembers}
               subtaskAssignees={subtaskAssignees}
               newSubtask={newSubtask}
@@ -240,6 +254,8 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
               onToggleSubtask={handleToggleSubtask}
               onDeleteSubtask={handleDeleteSubtask}
               onStartEditing={startEditing}
+              onOpenBlock={() => setIsBlockDialogOpen(true)}
+              onOpenUnblock={() => setIsUnblockDialogOpen(true)}
             />
           )
         )}
@@ -252,6 +268,28 @@ export function TaskSheet({ task, canEdit, accessToken, projectId, members, colu
           <TaskFilesTab accessToken={accessToken} projectId={projectId} taskId={task.id} canUpload={canEdit} onError={onError} />
         )}
       </div>
+
+      <BlockTaskDialog
+        open={isBlockDialogOpen}
+        taskTitle={task.title}
+        isPending={isBlocking}
+        onClose={() => setIsBlockDialogOpen(false)}
+        onConfirm={(reason) => blockTask(reason)}
+      />
+
+      <UnblockTaskDialog
+        open={isUnblockDialogOpen}
+        taskTitle={task.title}
+        blockType={task.blockType}
+        blockReason={task.blockReason}
+        columns={columns}
+        isPending={isUnblocking}
+        onClose={() => setIsUnblockDialogOpen(false)}
+        onConfirm={(payload) => unblockTask({
+          target_column_id: payload.targetColumnId,
+          resolution_comment: payload.resolutionComment,
+        })}
+      />
     </>
   )
 }

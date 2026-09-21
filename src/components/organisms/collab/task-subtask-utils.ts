@@ -1,4 +1,13 @@
-import type { ProjectTask } from '@/features/collab/model'
+import type { ProjectMember, ProjectTask } from '@/features/collab/model'
+import type { ClientSearchResult } from '@/shared/types'
+import { getProjectMemberLabel } from '@/features/collab/lib/member-display'
+
+export function workersFromTask(task: ProjectTask, members: ProjectMember[]): ClientSearchResult[] {
+  if (!task.assigneeSub) return []
+  const member = members.find((entry) => entry.userSub === task.assigneeSub)
+  if (!member) return []
+  return [{ subject: member.userSub, email: member.email ?? getProjectMemberLabel(member), role: 'worker' }]
+}
 
 export type TaskSubtaskDraft = {
   id: string
@@ -27,4 +36,30 @@ export function mapTaskSubtasksToDrafts(task: ProjectTask): TaskSubtaskDraft[] {
     is_completed: subtask.isCompleted,
     assignee_sub: subtask.assigneeSub ?? null,
   })) ?? []
+}
+
+export function toggleTaskSubtask(
+  subtasks: ProjectTask['subtasks'],
+  subtaskId: string,
+  isCompleted: boolean
+) {
+  if (!subtasks) return []
+  return subtasks.map((s) => ({
+    id: s.id,
+    title: s.title,
+    is_completed: s.id === subtaskId ? isCompleted : s.isCompleted,
+    assignee_sub: s.assigneeSub ?? null,
+  }))
+}
+
+export function deleteTaskSubtask(subtasks: ProjectTask['subtasks'], subtaskId: string) {
+  if (!subtasks) return []
+  return subtasks
+    .filter((s) => s.id !== subtaskId)
+    .map((s) => ({
+      id: s.id,
+      title: s.title,
+      is_completed: s.isCompleted,
+      assignee_sub: s.assigneeSub ?? null,
+    }))
 }
