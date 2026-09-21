@@ -85,7 +85,7 @@ export function ChatExportDialog({
       const filename = `conversacion-${sanitizedName}-${selectedChannel}-${dateTag}.${fileExtension}`
 
       triggerFileDownload(filename, fileContent, mimeType)
-    } catch (err) {
+    } catch {
       onError('Ocurrió un error al generar la exportación probatoria de la conversación.')
     } finally {
       setIsExporting(false)

@@ -167,14 +167,14 @@ describe('Chat Export Utilities (Evidentiary & WhatsApp Forensic Standard)', () 
         page: 1,
         limit: 100,
       },
-    } as any).mockResolvedValueOnce({
+    } as never).mockResolvedValueOnce({
       data: {
         items: [mockMessages[1]],
         total: 101,
         page: 2,
         limit: 100,
       },
-    } as any)
+    } as never)
 
     const result = await fetchAllExportMessages('fake-token', 'proj-1', 'external')
     expect(result).toHaveLength(2)
