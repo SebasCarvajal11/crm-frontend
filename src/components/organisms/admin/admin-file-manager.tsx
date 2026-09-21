@@ -164,6 +164,7 @@ export function AdminFileManager({ accessToken }: Props) {
               return (
                 <div
                   key={client.clientSub}
+                  data-testid="storage-client-item"
                   className={`rounded-lg border p-2.5 transition-colors cursor-pointer text-xs ${
                     isSelected
                       ? 'border-primary bg-primary/5'
