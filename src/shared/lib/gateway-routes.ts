@@ -212,3 +212,10 @@ export const ANALYTICS_ROUTES = {
   kpisCurrentByPeriod: (period: string) => `${API_PREFIX}/analytics/kpis/current/${period}`,
   kpisCalculateByPeriod: (period: string) => `${API_PREFIX}/analytics/kpis/calculate/${period}`,
 } as const
+
+// ── Admin Storage (autenticado, rol admin) ──────────────────────────────────
+export const ADMIN_STORAGE_ROUTES = {
+  tree: `${COLLAB_API}/collab/admin/storage/tree`,
+  purgeFile: (fileId: string) => `${COLLAB_API}/collab/admin/storage/files/${fileId}`,
+  purgeBatch: `${COLLAB_API}/collab/admin/storage/purge`,
+} as const
