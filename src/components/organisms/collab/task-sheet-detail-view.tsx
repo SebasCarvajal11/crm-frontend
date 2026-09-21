@@ -12,6 +12,7 @@ type Props = {
   canBlock?: boolean
   canUnblock?: boolean
   isUnblocking?: boolean
+  isFinalColumn?: boolean
   assignableMembers: ProjectMember[]
   subtaskAssignees: ProjectMember[]
   newSubtask: string
@@ -33,6 +34,7 @@ export function TaskSheetDetailView({
   canBlock = false,
   canUnblock = false,
   isUnblocking = false,
+  isFinalColumn = false,
   assignableMembers,
   subtaskAssignees,
   newSubtask,
@@ -105,6 +107,7 @@ export function TaskSheetDetailView({
       <TaskSheetSubtasksSection
         task={task}
         canEdit={canEdit}
+        isFinalColumn={isFinalColumn}
         assignableMembers={assignableMembers}
         subtaskAssignees={subtaskAssignees}
         newSubtask={newSubtask}

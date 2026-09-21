@@ -13,6 +13,7 @@ type Props = {
   newSubtask: string
   newSubtaskAssignee: string
   isPending: boolean
+  isFinalColumn?: boolean
   onNewSubtaskChange: (value: string) => void
   onNewSubtaskAssigneeChange: (value: string) => void
   onAddSubtask: () => void
@@ -28,6 +29,7 @@ export function TaskSheetSubtasksSection({
   newSubtask,
   newSubtaskAssignee,
   isPending,
+  isFinalColumn = false,
   onNewSubtaskChange,
   onNewSubtaskAssigneeChange,
   onAddSubtask,
@@ -65,15 +67,22 @@ export function TaskSheetSubtasksSection({
         </div>
       )}
 
+      {isFinalColumn && (
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-50/60 p-2.5 text-xs text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
+          <CheckSquare className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+          <span>Tarea finalizada. Para modificar o desmarcar subtareas, muévela primero a otra columna (ej. "En Curso").</span>
+        </div>
+      )}
+
       <div className="mt-1 space-y-2">
         {task.subtasks?.map((subtask) => (
           <div key={subtask.id} className="group flex items-start gap-2 rounded-md py-1">
             <input
               type="checkbox"
               checked={subtask.isCompleted}
-              disabled={!canEdit || isPending}
+              disabled={!canEdit || isPending || isFinalColumn}
               onChange={(event) => onToggleSubtask(subtask.id, event.target.checked)}
-              className="mt-0.5 size-4 shrink-0 cursor-pointer rounded accent-primary"
+              className="mt-0.5 size-4 shrink-0 cursor-pointer rounded accent-primary disabled:cursor-not-allowed"
             />
             <div className="min-w-0 flex-1">
               <span className={`break-words text-sm transition-colors ${subtask.isCompleted ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
@@ -88,7 +97,7 @@ export function TaskSheetSubtasksSection({
                 </div>
               )}
             </div>
-            {canEdit && (
+            {canEdit && !isFinalColumn && (
               <Button
                 variant="ghost"
                 size="icon"
@@ -103,7 +112,7 @@ export function TaskSheetSubtasksSection({
           </div>
         ))}
 
-        {canEdit && (
+        {canEdit && !isFinalColumn && (
           <div className="mt-2 space-y-2 border-t pt-1">
             {subtaskAssignees.length > 0 && (
               <Select value={newSubtaskAssignee} onValueChange={onNewSubtaskAssigneeChange}>

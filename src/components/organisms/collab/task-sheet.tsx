@@ -20,6 +20,7 @@ import {
   toggleTaskSubtask,
   workersFromTask,
 } from './task-subtask-utils'
+import { FINALIZATION_COLUMN_KEYS } from './project-workspace.types'
 
 type Tab = 'info' | 'comments' | 'files'
 
@@ -53,6 +54,9 @@ export function TaskSheet({
   const [newSubtaskAssignee, setNewSubtaskAssignee] = useState<string>('none')
   const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false)
   const [isUnblockDialogOpen, setIsUnblockDialogOpen] = useState(false)
+
+  const currentColumn = columns.find((c) => c.id === task.columnId)
+  const isFinalColumn = Boolean(currentColumn && FINALIZATION_COLUMN_KEYS.has(currentColumn.key))
 
   const isAdmin = identity.role === 'admin'
   const isClient = identity.role === 'client'
@@ -225,15 +229,24 @@ export function TaskSheet({
                     : [...previous, { subject: worker.userSub, email: worker.email ?? getProjectMemberLabel(worker), role: 'worker' }]
                 ))
               }}
-              onSave={() => save.mutate({
-                editTitle,
-                editDesc,
-                editPriority,
-                editVisible,
-                editDeadline,
-                editColumnId,
-                editWorkers,
-              })}
+              onSave={() => {
+                const targetColumn = columns.find((c) => c.id === editColumnId)
+                const isTargetFinal = Boolean(targetColumn && FINALIZATION_COLUMN_KEYS.has(targetColumn.key))
+                const hasUnfinishedSubtasks = (task.subtasks ?? []).some((s) => !s.isCompleted)
+                if (isTargetFinal && hasUnfinishedSubtasks) {
+                  onError('No puedes mover la tarea a la columna final sin completar todas las subtareas')
+                  return
+                }
+                save.mutate({
+                  editTitle,
+                  editDesc,
+                  editPriority,
+                  editVisible,
+                  editDeadline,
+                  editColumnId,
+                  editWorkers,
+                })
+              }}
               onCancel={() => setEditing(false)}
             />
           ) : (
@@ -243,6 +256,7 @@ export function TaskSheet({
               canBlock={canBlock}
               canUnblock={canUnblock}
               isUnblocking={isUnblocking}
+              isFinalColumn={isFinalColumn}
               assignableMembers={assignableMembers}
               subtaskAssignees={subtaskAssignees}
               newSubtask={newSubtask}
