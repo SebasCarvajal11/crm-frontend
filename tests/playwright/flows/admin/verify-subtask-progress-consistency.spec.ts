@@ -22,11 +22,11 @@ test.describe('Coherencia de Subtareas y Progreso en Tablero', () => {
     await page.locator('#password').fill('Demo123!')
     await page.getByRole('button', { name: 'Entrar' }).click()
     await page.waitForURL('**/dashboard', { timeout: 15_000 })
-    await page.waitForLoadState('networkidle')
+    await expect(page.getByText(/Hola Valeria/i)).toBeVisible({ timeout: 15_000 })
 
-    // 2. Navegar al módulo de Colaboración
     const dashboard = new DashboardPage(page)
-    await dashboard.navigateToCollab()
+    await dashboard.collabTab.click()
+
     const collab = new CollabPage(page)
     await collab.expectLoaded()
 
@@ -37,11 +37,11 @@ test.describe('Coherencia de Subtareas y Progreso en Tablero', () => {
 
     const project = new ProjectPage(page)
     await project.expectLoaded()
-    await project.navigateToBoard()
+    await project.boardTab.click()
 
     // 4. Localizar la columna "Terminado"
     const doneColumn = page.locator('[aria-label^="Columna Terminado"]')
-    await expect(doneColumn).toBeVisible()
+    await expect(doneColumn).toBeVisible({ timeout: 15_000 })
 
     // 5. Validar que las tareas en "Terminado" no tengan 0% y estén 100% consistentes
     const doneTasks = doneColumn.locator('button').filter({ hasText: /Creada:/i })
