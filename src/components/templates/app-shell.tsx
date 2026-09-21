@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/shared/lib/utils'
 import type { SidebarItem } from './sidebar'
 import { DesktopSidebar, MobileSidebar } from './sidebar'
-import appTexture from '@/assets/backgrounds/app-texture.jpg'
+import { BRAND_TEXTURES, useTextureLoaded } from '@/shared/lib/brand-textures'
 
 export type { SidebarItem }
 
@@ -53,6 +53,7 @@ export function AppShell({
 }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [desktopCollapsed, setDesktopCollapsed] = useState(readSidebarPreference)
+  const isTextureLoaded = useTextureLoaded(BRAND_TEXTURES.app)
 
   useEffect(() => {
     try {
@@ -64,10 +65,16 @@ export function AppShell({
   }, [desktopCollapsed])
 
   return (
-    <div
-      className={cn('flex min-h-screen bg-background bg-cover bg-center md:bg-fixed', className)}
-      style={{ backgroundImage: `url(${appTexture})` }}
-    >
+    <div className={cn('relative flex min-h-screen bg-background', className)}>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center md:bg-fixed transition-opacity duration-300 ease-out"
+        style={{
+          backgroundImage: `url(${BRAND_TEXTURES.app})`,
+          opacity: isTextureLoaded ? 1 : 0,
+        }}
+      />
+      <div className="relative z-10 flex min-h-screen w-full flex-1">
       <DesktopSidebar
         title={title}
         items={sidebarItems}
@@ -132,6 +139,7 @@ export function AppShell({
         >
           {children}
         </main>
+      </div>
       </div>
     </div>
   )

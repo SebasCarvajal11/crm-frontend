@@ -6,7 +6,7 @@ import { shellSidebarWidth } from './utils'
 import { SidebarBrand } from './sidebar-brand'
 import { SidebarNav } from './sidebar-nav'
 import { SidebarFooter } from './sidebar-footer'
-import sidebarTexture from '@/assets/backgrounds/sidebar-texture.jpg'
+import { BRAND_TEXTURES, useTextureLoaded } from '@/shared/lib/brand-textures'
 
 export function DesktopSidebar({
   title,
@@ -37,15 +37,25 @@ export function DesktopSidebar({
   collapsed: boolean
   onCollapsedChange: (collapsed: boolean) => void
 }) {
+  const isTextureLoaded = useTextureLoaded(BRAND_TEXTURES.sidebar)
+
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-30 hidden shrink-0 flex-col bg-primary bg-cover bg-center text-primary-foreground transition-[width] duration-200 ease-out md:flex',
+        'fixed inset-y-0 left-0 z-30 hidden shrink-0 flex-col overflow-hidden bg-primary text-primary-foreground transition-[width] duration-200 ease-out md:flex',
         collapsed ? 'md:w-20' : shellSidebarWidth
       )}
-      style={{ backgroundImage: `url(${sidebarTexture})` }}
       aria-label="Barra de navegacion lateral"
     >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-300 ease-out"
+        style={{
+          backgroundImage: `url(${BRAND_TEXTURES.sidebar})`,
+          opacity: isTextureLoaded ? 1 : 0,
+        }}
+      />
+      <div className="relative z-10 flex h-full flex-col">
       <div
         className={cn(
           'border-b border-primary-foreground/10',
@@ -108,6 +118,7 @@ export function DesktopSidebar({
         compact={collapsed}
         menuPlacement="side"
       />
+      </div>
     </aside>
   )
 }

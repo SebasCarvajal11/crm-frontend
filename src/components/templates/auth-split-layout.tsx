@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react'
 import { ShieldCheck, Sparkles } from 'lucide-react'
 import { CimaLogo } from '@/components/ui/cima-logo'
-import appTexture from '@/assets/backgrounds/app-texture.jpg'
-import sidebarTexture from '@/assets/backgrounds/sidebar-texture.jpg'
+import { BRAND_TEXTURES, useTextureLoaded } from '@/shared/lib/brand-textures'
 
 type AuthSplitLayoutProps = {
   title: string
@@ -43,13 +42,22 @@ function HeroBrandPanel({
   features?: string[]
   badgeText?: string
 }) {
+  const isSidebarLoaded = useTextureLoaded(BRAND_TEXTURES.sidebar)
+
   return (
     <aside
-      className="relative flex flex-col justify-between overflow-hidden bg-primary bg-cover bg-center p-5 text-primary-foreground sm:p-8 lg:col-span-5 lg:p-10"
-      style={{ backgroundImage: `url(${sidebarTexture})` }}
+      className="relative flex flex-col justify-between overflow-hidden bg-primary p-5 text-primary-foreground sm:p-8 lg:col-span-5 lg:p-10"
       aria-label="Presentación CIMA"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/85 to-[#4d0407]/90 backdrop-blur-[1px]" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-300 ease-out"
+        style={{
+          backgroundImage: `url(${BRAND_TEXTURES.sidebar})`,
+          opacity: isSidebarLoaded ? 1 : 0,
+        }}
+      />
+      <div className="absolute inset-0 z-1 bg-gradient-to-br from-primary/95 via-primary/85 to-[#4d0407]/90 backdrop-blur-[1px]" />
 
       <div className="relative z-10 space-y-4 sm:space-y-6">
         <CimaLogo size={36} inverted subtitle />
@@ -86,12 +94,19 @@ export function AuthSplitLayout({
   features,
   badgeText,
 }: AuthSplitLayoutProps) {
+  const isAppLoaded = useTextureLoaded(BRAND_TEXTURES.app)
+
   return (
-    <main
-      className="relative flex min-h-[100dvh] items-center justify-center bg-background bg-cover bg-center bg-fixed p-4 sm:p-6 lg:p-10"
-      style={{ backgroundImage: `url(${appTexture})` }}
-    >
-      <div className="w-full max-w-5xl overflow-hidden rounded-2xl border border-border/80 bg-card/95 shadow-2xl backdrop-blur-xs grid grid-cols-1 lg:grid-cols-12 min-h-[540px]">
+    <main className="relative flex min-h-[100dvh] items-center justify-center bg-background p-4 sm:p-6 lg:p-10">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center bg-fixed transition-opacity duration-300 ease-out"
+        style={{
+          backgroundImage: `url(${BRAND_TEXTURES.app})`,
+          opacity: isAppLoaded ? 1 : 0,
+        }}
+      />
+      <div className="relative z-10 w-full max-w-5xl overflow-hidden rounded-2xl border border-border/80 bg-card/95 shadow-2xl backdrop-blur-xs grid grid-cols-1 lg:grid-cols-12 min-h-[540px]">
         <HeroBrandPanel
           heroTitle={heroTitle}
           heroDescription={heroDescription}

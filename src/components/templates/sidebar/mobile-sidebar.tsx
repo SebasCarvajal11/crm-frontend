@@ -5,7 +5,7 @@ import type { SidebarItem } from './types'
 import { SidebarBrand } from './sidebar-brand'
 import { SidebarNav } from './sidebar-nav'
 import { SidebarFooter } from './sidebar-footer'
-import sidebarTexture from '@/assets/backgrounds/sidebar-texture.jpg'
+import { BRAND_TEXTURES, useTextureLoaded } from '@/shared/lib/brand-textures'
 
 export function MobileSidebar({
   open,
@@ -36,6 +36,8 @@ export function MobileSidebar({
   isLoggingOut: boolean
   headerExtras?: React.ReactNode
 }) {
+  const isTextureLoaded = useTextureLoaded(BRAND_TEXTURES.sidebar)
+
   return (
     <>
       {open && (
@@ -48,14 +50,22 @@ export function MobileSidebar({
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex w-[calc(100vw-2.5rem)] max-w-72 flex-col bg-primary bg-cover bg-center text-primary-foreground shadow-xl transition-transform duration-300 md:hidden',
+          'fixed inset-y-0 left-0 z-50 flex w-[calc(100vw-2.5rem)] max-w-72 flex-col overflow-hidden bg-primary text-primary-foreground shadow-xl transition-transform duration-300 md:hidden',
           open ? 'translate-x-0' : '-translate-x-full'
         )}
-        style={{ backgroundImage: `url(${sidebarTexture})` }}
         aria-label="Menu de navegacion"
         aria-hidden={!open}
         {...(!open ? { inert: true } : {})}
       >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-300 ease-out"
+          style={{
+            backgroundImage: `url(${BRAND_TEXTURES.sidebar})`,
+            opacity: isTextureLoaded ? 1 : 0,
+          }}
+        />
+        <div className="relative z-10 flex h-full flex-col">
         <div className="flex items-center justify-between border-b border-primary-foreground/10 px-4 py-4">
           <div className="min-w-0 flex-1">
             <SidebarBrand title={title} headerExtras={headerExtras} closeOnNavigate={() => setOpen(false)} />
@@ -84,6 +94,7 @@ export function MobileSidebar({
           menuPlacement="inline"
           onCloseSidebar={() => setOpen(false)}
         />
+        </div>
       </aside>
     </>
   )

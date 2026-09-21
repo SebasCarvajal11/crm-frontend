@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { CimaLogo } from '@/components/ui/cima-logo'
-import appTexture from '@/assets/backgrounds/app-texture.jpg'
+import { BRAND_TEXTURES, useTextureLoaded } from '@/shared/lib/brand-textures'
 
 type AuthCardLayoutProps = {
   title: string
@@ -23,12 +23,19 @@ export function AuthCardLayout({
   children,
   footer,
 }: AuthCardLayoutProps) {
+  const isAppLoaded = useTextureLoaded(BRAND_TEXTURES.app)
+
   return (
-    <div
-      className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-background bg-cover bg-center bg-fixed px-4 py-8 sm:px-6"
-      style={{ backgroundImage: `url(${appTexture})` }}
-    >
-      <div className="w-full max-w-md">
+    <div className="relative flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-background px-4 py-8 sm:px-6">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center bg-fixed transition-opacity duration-300 ease-out"
+        style={{
+          backgroundImage: `url(${BRAND_TEXTURES.app})`,
+          opacity: isAppLoaded ? 1 : 0,
+        }}
+      />
+      <div className="relative z-10 w-full max-w-md">
         <CimaLogo className="mb-5 justify-center" size={34} textColor="text-foreground" subtitle />
         <Card className="w-full border-border/80 bg-card/95 backdrop-blur-xs shadow-lg">
         <CardHeader className="space-y-1.5">
