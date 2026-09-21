@@ -89,6 +89,7 @@ export function ConversationPanel({
           key={`${initialChannel ?? 'external'}:${initialMessageId ?? ''}`}
           accessToken={accessToken}
           projectId={projectId}
+          projectName={project?.name}
           identity={identity}
           isClient={isClient}
           initialChannel={initialChannel}

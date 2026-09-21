@@ -122,9 +122,9 @@ function ServerDiskSection({ disk }: { disk: DiskStats }) {
         <div className="flex items-center gap-2">
           <HardDrive className="size-4 text-muted-foreground" />
           <div>
-            <p className="text-xs font-semibold text-foreground">Salud del Servidor (Máquina Virtual)</p>
+            <p className="text-xs font-semibold text-foreground">Estado del Sistema y Servidor</p>
             <p className="text-[11px] text-muted-foreground">
-              Disco de la instancia Linux (Docker, Postgres, SO). No consume cuota de archivos.
+              Espacio de almacenamiento local para la base de datos y operaciones internas. No consume cuota de archivos.
             </p>
           </div>
         </div>
@@ -168,7 +168,7 @@ function StorageErrorCard({ onRetry, isFetching }: { onRetry: () => void; isFetc
             No se pudieron sincronizar las estadísticas de almacenamiento
           </p>
           <p className="text-xs text-muted-foreground">
-            Verifique la conexión con el microservicio de almacenamiento (Media/OCI).
+            Verifique la conexión con el servicio de almacenamiento de archivos.
           </p>
         </div>
         <Button
@@ -195,11 +195,12 @@ export function AdminStorageCard({ accessToken }: Props) {
     return <StorageErrorCard onRetry={() => refetch()} isFetching={isFetching} />
   }
 
+  const fallbackQuota = stats.assets.totalAssetsBytes > 0 ? stats.assets.totalAssetsBytes : 0
   const cloud = stats.cloudStorage ?? {
-    quotaBytes: 10 * 1024 * 1024 * 1024,
+    quotaBytes: fallbackQuota,
     usedBytes: stats.assets.totalAssetsBytes,
-    availableBytes: Math.max(0, 10 * 1024 * 1024 * 1024 - stats.assets.totalAssetsBytes),
-    usedPercentage: Number(((stats.assets.totalAssetsBytes / (10 * 1024 * 1024 * 1024)) * 100).toFixed(2)),
+    availableBytes: 0,
+    usedPercentage: stats.assets.totalAssetsBytes > 0 ? 100 : 0,
     totalFilesCount: stats.assets.totalAssetsCount,
     projectFilesCount: stats.assets.documentsCount,
     projectFilesBytes: stats.assets.documentsBytes,
@@ -219,10 +220,10 @@ export function AdminStorageCard({ accessToken }: Props) {
             </div>
             <div>
               <CardTitle className="text-base font-semibold">
-                Almacenamiento de Archivos (OCI Object Storage)
+                Almacenamiento de Archivos en la Nube
               </CardTitle>
               <CardDescription className="text-xs">
-                Capacidad para proyectos, entregables, briefs y avatares en Oracle Cloud
+                Capacidad para proyectos, entregables, briefs y recursos multimedia
               </CardDescription>
             </div>
           </div>

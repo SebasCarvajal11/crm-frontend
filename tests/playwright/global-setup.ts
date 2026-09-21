@@ -47,9 +47,13 @@ async function ensureDirectories() {
 }
 
 export default async function globalSetup(_config: FullConfig) {
-  console.log('\n🔍 Verificando disponibilidad de servicios...\n')
-
   await ensureDirectories()
+
+  if (process.env.SKIP_SERVICES_CHECK === 'true') {
+    return
+  }
+
+  console.log('\n🔍 Verificando disponibilidad de servicios...\n')
 
   const services = [
     { name: 'Gateway (KrakenD)', url: `${GATEWAY_URL}/api/v1/health` },

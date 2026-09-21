@@ -4,6 +4,7 @@ import type { ProjectContract, ProjectMember, ProjectTask, ProjectTimelineItem }
 import { downloadGatewayFile, previewGatewayFile, triggerBlobDownload } from '@/features/collab/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ContractTimelineCard } from './contract-timeline-card'
 import { TimelinePreviewDialog, type PreviewState } from './timeline-preview-dialog'
@@ -37,6 +38,7 @@ export function ConversationFilesTimeline({
   onError,
 }: Props) {
   const [busyKey, setBusyKey] = useState<string | null>(null)
+  const [previewProgress, setPreviewProgress] = useState<{ fileId: string; percent: number } | null>(null)
   const [imageZoom, setImageZoom] = useState(1)
   const [searchText, setSearchText] = useState('')
   const [kindFilter, setKindFilter] = useState<'all' | ProjectTimelineItem['kind']>('all')
@@ -83,7 +85,10 @@ export function ConversationFilesTimeline({
     const key = `${fileId}:preview`
     try {
       setBusyKey(key)
-      const next = await previewGatewayFile(accessToken, fileId, fileName)
+      setPreviewProgress({ fileId, percent: 0 })
+      const next = await previewGatewayFile(accessToken, fileId, fileName, (percent) => {
+        setPreviewProgress({ fileId, percent })
+      })
       setImageZoom(1)
       setPreview({
         open: true,
@@ -96,6 +101,7 @@ export function ConversationFilesTimeline({
       onError(error instanceof Error ? error.message : 'No se pudo previsualizar el archivo')
     } finally {
       setBusyKey(null)
+      setPreviewProgress(null)
     }
   }
 
@@ -231,17 +237,32 @@ export function ConversationFilesTimeline({
                     <div className="flex shrink-0 items-center self-center">
                       <div className="flex min-w-[122px] flex-col items-stretch gap-1.5">
                         {previewable && (
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="secondary"
-                            className="h-7 w-full justify-center px-2 text-[10px]"
-                            disabled={busyKey !== null}
-                            onClick={() => void openPreview(item.fileId!, item.fileName!)}
-                          >
-                            <Eye className="mr-1 size-3" />
-                            {busyKey === `${item.fileId}:preview` ? 'Abriendo...' : 'Previsualizar'}
-                          </Button>
+                          <div className="w-full space-y-1">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="secondary"
+                              className="h-7 w-full justify-center px-2 text-[10px]"
+                              disabled={busyKey !== null}
+                              onClick={() => void openPreview(item.fileId!, item.fileName!)}
+                            >
+                              <Eye className="mr-1 size-3" />
+                              {busyKey === `${item.fileId}:preview`
+                                ? `Abriendo... ${
+                                    previewProgress?.fileId === item.fileId && previewProgress.percent > 0
+                                      ? `${previewProgress.percent}%`
+                                      : ''
+                                  }`.trim()
+                                : 'Previsualizar'}
+                            </Button>
+                            {busyKey === `${item.fileId}:preview` && (
+                              <Progress
+                                value={previewProgress?.fileId === item.fileId ? previewProgress.percent : 0}
+                                className="h-1 w-full bg-muted overflow-hidden"
+                                indicatorClassName="bg-primary transition-all duration-150"
+                              />
+                            )}
+                          </div>
                         )}
                         <Button
                           type="button"

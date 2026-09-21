@@ -30,6 +30,7 @@ export function FilePurgeDialog({ file, isOpen, onClose, onConfirm }: Props) {
   const [reason, setReason] = useState('Liberación de espacio de almacenamiento')
   const [forceSigned, setForceSigned] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   if (!file) return null
 
@@ -37,16 +38,25 @@ export function FilePurgeDialog({ file, isOpen, onClose, onConfirm }: Props) {
 
   const handleConfirm = async () => {
     setLoading(true)
+    setErrorMessage(null)
     try {
       await onConfirm(reason, forceSigned)
       onClose()
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error al depurar el archivo'
+      setErrorMessage(msg)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) {
+        setErrorMessage(null)
+        onClose()
+      }
+    }}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-rose-600">
@@ -54,7 +64,7 @@ export function FilePurgeDialog({ file, isOpen, onClose, onConfirm }: Props) {
             Depurar Archivo para Liberar Espacio
           </DialogTitle>
           <DialogDescription>
-            Esta acción eliminará el archivo binario en la nube para recuperar espacio en la cuota de 10 GB.
+            Esta acción eliminará el archivo binario en la nube para recuperar espacio en la cuota de almacenamiento.
           </DialogDescription>
         </DialogHeader>
 
@@ -106,6 +116,18 @@ export function FilePurgeDialog({ file, isOpen, onClose, onConfirm }: Props) {
               className="text-xs"
             />
           </div>
+
+          {errorMessage && (
+            <div
+              className={
+                'rounded-lg border border-destructive/40 bg-destructive/10 ' +
+                'p-3 text-xs text-destructive flex items-center gap-2'
+              }
+            >
+              <AlertTriangle className="size-4 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
         </div>
 
         <DialogFooter className="gap-2 sm:gap-0">

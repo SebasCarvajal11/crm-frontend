@@ -67,7 +67,12 @@ export function FileManagerTable({ files, accessToken, onSelectForPurge }: Props
 
   if (files.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground border rounded-lg bg-muted/10">
+      <div
+        className={
+          'flex flex-col items-center justify-center p-8 text-center ' +
+          'text-muted-foreground border rounded-lg bg-muted/10'
+        }
+      >
         <Archive className="size-8 mb-2 opacity-40" />
         <p className="text-sm font-medium">No hay archivos en esta carpeta o filtro</p>
         <p className="text-xs">Los archivos subidos aparecerán organizados aquí.</p>

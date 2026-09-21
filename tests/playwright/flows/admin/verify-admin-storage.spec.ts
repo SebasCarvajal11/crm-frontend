@@ -2,13 +2,13 @@ import { test, expect } from '../../fixtures/auth.fixture'
 import { DashboardPage } from '../../page-objects/dashboard.page'
 
 test.describe('Admin - Tarjeta de Almacenamiento e Instancia', () => {
-  test('1. Estado real en vivo: debe cargar y mostrar las estadisticas de OCI Object Storage y disco', async ({
+  test('1. Estado real en vivo: debe cargar y mostrar las estadisticas de almacenamiento en la nube y disco', async ({
     adminPage,
   }) => {
     const dashboard = new DashboardPage(adminPage)
     await dashboard.navigateToAdmin()
 
-    const storageCardTitle = adminPage.getByText('Almacenamiento de Archivos (OCI Object Storage)')
+    const storageCardTitle = adminPage.getByText('Almacenamiento de Archivos en la Nube')
     await expect(storageCardTitle).toBeVisible({ timeout: 15_000 })
 
     await expect(adminPage.getByText(/Uso en la nube:/i)).toBeVisible()
@@ -17,7 +17,7 @@ test.describe('Admin - Tarjeta de Almacenamiento e Instancia', () => {
     await expect(adminPage.getByText('Cuota Incluida')).toBeVisible()
     await expect(adminPage.getByText(/Archivos de Proyectos:/i)).toBeVisible()
     await expect(adminPage.getByText(/Avatares:/i)).toBeVisible()
-    await expect(adminPage.getByText('Salud del Servidor (Máquina Virtual)')).toBeVisible()
+    await expect(adminPage.getByText('Estado del Sistema y Servidor')).toBeVisible()
 
     await adminPage.screenshot({ path: 'test-results/storage-01-live.png', fullPage: false })
   })
