@@ -52,26 +52,25 @@ export function getQuestionsForContext(ctx: TourContextState): GuidedQuestion[] 
   return ALL_QUESTIONS.filter((q) => {
     if (!q.roles.includes(ctx.role)) return false
     if (q.id.startsWith('global-')) return true
-    if (q.tab === ctx.activeTab) {
-      if (ctx.activeTab === 'collab') {
-        if (q.scope === 'workspace') return Boolean(ctx.projectId)
-        if (q.scope === 'kanban') return !ctx.projectId
-        return true
-      }
-      return true
-    }
-    return false
+    return q.tab === ctx.activeTab
   })
 }
 
 export function searchQuestions(
   query: string,
-  ctx: TourContextState
+  ctx: TourContextState,
+  scopeMode: 'section' | 'all' = 'section'
 ): GuidedQuestion[] {
   const norm = query.trim().toLowerCase()
-  if (!norm) return getQuestionsForContext(ctx)
-  return ALL_QUESTIONS.filter(
+  const baseList =
+    scopeMode === 'all'
+      ? ALL_QUESTIONS.filter((q) => q.roles.includes(ctx.role))
+      : getQuestionsForContext(ctx)
+
+  if (!norm) return baseList
+  return baseList.filter(
     (q) =>
+      (scopeMode === 'all' ? true : q.tab === ctx.activeTab || q.id.startsWith('global-')) &&
       q.roles.includes(ctx.role) &&
       (q.question.toLowerCase().includes(norm) ||
         q.answer.toLowerCase().includes(norm))

@@ -93,4 +93,27 @@ describe('Tour Registry Facade', () => {
       }
     }
   })
+
+  it('el tour unificado de kanban incluye la transicion openProject hacia workspace', () => {
+    const tour = getActiveTourForContext({
+      activeTab: 'collab',
+      role: 'admin',
+    })
+    expect(tour?.id).toBe('tour-collab-kanban')
+    const cardStep = tour?.steps.find((s) => s.element === '[data-tour="collab-card-first"]')
+    expect(cardStep?.onNextAction).toBe('openProject')
+
+    const elements = tour!.steps.map((s) => s.element)
+    expect(elements).toContain('[data-tour="collab-columns-container"]')
+    expect(elements).toContain('[data-tour="workspace-project-header"]')
+    expect(elements).toContain('[data-tour="workspace-tab-board"]')
+  })
+
+  it('searchQuestions en modo all retorna preguntas globales y de otras secciones', () => {
+    const sectionQuestions = searchQuestions('', { activeTab: 'overview', role: 'admin' }, 'section')
+    const allQuestions = searchQuestions('', { activeTab: 'overview', role: 'admin' }, 'all')
+
+    expect(allQuestions.length).toBeGreaterThan(sectionQuestions.length)
+    expect(allQuestions.some((q) => q.tab === 'collab')).toBe(true)
+  })
 })

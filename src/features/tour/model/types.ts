@@ -15,6 +15,7 @@ export type CimaTourStep = {
   showPointer?: boolean
   requiredRole?: TourUserRole[]
   switchWorkspaceTab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
+  onNextAction?: 'openProject' | 'closeProject'
 }
 
 export type CimaTourDefinition = {

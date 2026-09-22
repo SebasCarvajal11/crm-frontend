@@ -273,3 +273,13 @@ path.driver-stage {
     padding: 0.4rem 0.6rem;
   }
 }
+
+/* Estado pausado cuando hay modales o dialogos activos del sistema */
+body.cima-tour-paused .driver-popover,
+body.cima-tour-paused .driver-overlay,
+body.cima-tour-paused svg.driver-overlay-svg,
+body.cima-tour-paused #cima-tour-cursor {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.15s ease-out !important;
+}

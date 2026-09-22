@@ -5,7 +5,6 @@ import {
   Search,
   X,
   Compass,
-  ArrowRight,
   RotateCcw,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,6 +14,7 @@ import { useTourStore } from '../model/tour-store'
 import { useTourContext } from '../hooks/use-tour-context'
 import { useTourRunner } from '../hooks/use-tour-runner'
 import { getActiveTourForContext, searchQuestions } from '../registry'
+import { HelpCenterQuestionItem } from './help-center-question-item'
 import type { GuidedQuestionCategory } from '../model/types'
 
 const ROLE_LABEL: Record<string, string> = {
@@ -50,11 +50,15 @@ export function HelpCenterModal() {
   const ctx = useTourContext()
   const { startTour, highlightTarget } = useTourRunner()
   const [searchQuery, setSearchQuery] = useState('')
+  const [scopeMode, setScopeMode] = useState<'section' | 'all'>('section')
   const [category, setCategory] = useState<'all' | GuidedQuestionCategory>('all')
   const modalRef = useRef<HTMLDivElement>(null)
 
   const activeTour = useMemo(() => getActiveTourForContext(ctx), [ctx])
-  const rawQuestions = useMemo(() => searchQuestions(searchQuery, ctx), [searchQuery, ctx])
+  const rawQuestions = useMemo(
+    () => searchQuestions(searchQuery, ctx, scopeMode),
+    [searchQuery, ctx, scopeMode]
+  )
   const questions = useMemo(() => {
     if (category === 'all') return rawQuestions
     return rawQuestions.filter((q) => q.category === category)
@@ -186,6 +190,32 @@ export function HelpCenterModal() {
               )}
             </div>
 
+            {/* Scope Mode Selector */}
+            <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted/60 p-0.5 text-xs">
+              <button
+                type="button"
+                onClick={() => setScopeMode('section')}
+                className={`rounded-md py-1 text-center font-medium transition-all cursor-pointer text-[11px] ${
+                  scopeMode === 'section'
+                    ? 'bg-card text-foreground shadow-xs font-semibold'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                De esta sección ({TAB_LABEL[ctx.activeTab] ?? ctx.activeTab})
+              </button>
+              <button
+                type="button"
+                onClick={() => setScopeMode('all')}
+                className={`rounded-md py-1 text-center font-medium transition-all cursor-pointer text-[11px] ${
+                  scopeMode === 'all'
+                    ? 'bg-card text-foreground shadow-xs font-semibold'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Todas las guías
+              </button>
+            </div>
+
             {/* Category Filter Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
               {CATEGORIES.map((cat) => {
@@ -221,9 +251,11 @@ export function HelpCenterModal() {
             ) : (
               <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                 {questions.map((q) => (
-                  <button
+                  <HelpCenterQuestionItem
                     key={q.id}
-                    type="button"
+                    question={q}
+                    scopeMode={scopeMode}
+                    tabLabel={TAB_LABEL[q.tab]}
                     onClick={() => {
                       if (q.targetElement) {
                         highlightTarget(
@@ -237,18 +269,7 @@ export function HelpCenterModal() {
                         startTour(activeTour)
                       }
                     }}
-                    className="flex w-full items-start justify-between gap-3 rounded-lg border border-border/60 p-2.5 text-left transition-colors hover:bg-muted/60 hover:border-primary/30 group cursor-pointer"
-                  >
-                    <div className="space-y-1">
-                      <p className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
-                        {q.question}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
-                        {q.answer}
-                      </p>
-                    </div>
-                    <ArrowRight className="mt-0.5 size-3.5 shrink-0 text-muted-foreground/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                  </button>
+                  />
                 ))}
               </div>
             )}
