@@ -21,7 +21,7 @@ function WorkloadWorkerCard({ worker }: { worker: WorkerWorkloadItem }) {
           <p className="text-xs font-bold text-foreground truncate">{worker.workerName}</p>
           <p className="text-[11px] text-muted-foreground truncate">{worker.workerEmail}</p>
         </div>
-        <div className="flex items-center gap-3 text-xs">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className="inline-flex items-center gap-1 font-semibold text-foreground">
             Total: {worker.totalAssigned}
           </span>
@@ -121,17 +121,17 @@ export function OverviewAdminWorkloadSection({ workload, isLoading }: Props) {
 
   return (
     <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <div className="space-y-0.5">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3">
+        <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">
-            <HardHat className="size-4 text-primary" />
+            <HardHat className="size-4 text-primary shrink-0" />
             <CardTitle className="text-base font-bold">Carga de trabajo por trabajador</CardTitle>
           </div>
           <CardDescription className="text-xs">
             Ranking de colaboradores según volumen de tareas asignadas y porcentaje de resolución.
           </CardDescription>
         </div>
-        <Badge variant="outline" className="text-xs font-semibold">
+        <Badge variant="outline" className="text-xs font-semibold shrink-0">
           {workload.length} {workload.length === 1 ? 'colaborador' : 'colaboradores'}
         </Badge>
       </CardHeader>

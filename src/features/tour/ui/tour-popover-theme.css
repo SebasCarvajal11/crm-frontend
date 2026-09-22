@@ -16,8 +16,9 @@
   max-width: min(350px, calc(100vw - 2rem));
   box-sizing: border-box;
   font-family: "Montserrat", system-ui, sans-serif;
-  z-index: 100000;
+  z-index: 100010 !important;
   backdrop-filter: blur(12px);
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
 }
 
 .dark .driver-popover.cima-tour-popover {
@@ -53,6 +54,22 @@
   color: #98989c;
 }
 
+.driver-popover.cima-tour-popover .cima-tour-desc-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.driver-popover.cima-tour-popover .cima-tour-desc-text {
+  font-size: 0.825rem;
+  line-height: 1.45;
+  color: var(--muted-foreground, #626267);
+}
+
+.dark .driver-popover.cima-tour-popover .cima-tour-desc-text {
+  color: #98989c;
+}
+
 .driver-popover.cima-tour-popover .cima-tour-action-hint {
   display: flex;
   align-items: flex-start;
@@ -63,9 +80,9 @@
   color: #86070c;
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
-  margin-bottom: 0.85rem;
   border-left: 3px solid #86070c;
   line-height: 1.35;
+  margin-top: 0.35rem;
 }
 
 .dark .driver-popover.cima-tour-popover .cima-tour-action-hint {
@@ -144,6 +161,11 @@
   color: #86070c;
 }
 
+/* Transición fluida del stage de Driver.js sin saltos bruscos */
+path.driver-stage {
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
 /* ==========================================================================
    Cursor Interactivo Vectorial Tipo Ratón / Mano (Animación de Clic)
    ========================================================================== */
@@ -174,11 +196,18 @@
 .cima-tour-cursor-container {
   position: absolute;
   pointer-events: none;
-  z-index: 100002;
+  z-index: 100005 !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: top 0.2s ease-out, left 0.2s ease-out;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.cima-tour-cursor-container.cima-tour-cursor-visible {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .cima-tour-cursor-ripple {
@@ -195,8 +224,8 @@
 
 .cima-tour-cursor-svg {
   position: relative;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
   animation: cima-cursor-tap 1.4s ease-in-out infinite;
   transform-origin: 30% 20%;
@@ -208,16 +237,25 @@
 
 @media (max-width: 640px) {
   .driver-popover.cima-tour-popover {
+    position: fixed !important;
+    bottom: max(0.85rem, env(safe-area-inset-bottom)) !important;
+    left: 0.75rem !important;
+    right: 0.75rem !important;
+    top: auto !important;
+    transform: none !important;
     width: calc(100vw - 1.5rem) !important;
     max-width: calc(100vw - 1.5rem) !important;
-    padding: 0.9rem;
+    margin: 0 !important;
+    padding: 0.95rem;
     font-size: 0.825rem;
-    margin-bottom: max(0.75rem, env(safe-area-inset-bottom));
-    border-radius: 0.875rem;
+    border-radius: 1rem !important;
+    box-sizing: border-box !important;
+    z-index: 100010 !important;
+    box-shadow: 0 20px 30px -5px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(134, 7, 12, 0.25) !important;
   }
 
   .driver-popover.cima-tour-popover .driver-popover-arrow {
-    display: none;
+    display: none !important;
   }
 
   .driver-popover.cima-tour-popover .driver-popover-title {
@@ -227,6 +265,7 @@
   .driver-popover.cima-tour-popover .driver-popover-description {
     font-size: 0.8rem;
     line-height: 1.4;
+    margin-bottom: 0.65rem;
   }
 
   .driver-popover.cima-tour-popover .cima-tour-action-hint {
@@ -234,4 +273,3 @@
     padding: 0.4rem 0.6rem;
   }
 }
-

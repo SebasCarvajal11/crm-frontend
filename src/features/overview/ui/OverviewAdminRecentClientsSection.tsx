@@ -27,17 +27,17 @@ function getClientDisplayName(client: AdminUserRow) {
 export function OverviewAdminRecentClientsSection({ clients, isLoading }: Props) {
   return (
     <Card className="shadow-sm border border-border/80">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <div className="space-y-0.5">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3">
+        <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">
-            <UserCheck className="size-4 text-primary" />
+            <UserCheck className="size-4 text-primary shrink-0" />
             <CardTitle className="text-base font-bold">Últimos clientes</CardTitle>
           </div>
           <CardDescription className="text-xs">
             Los 5 clientes más recientes registrados en el sistema.
           </CardDescription>
         </div>
-        <Badge variant="outline" className="text-xs font-semibold">
+        <Badge variant="outline" className="text-xs font-semibold shrink-0">
           {clients.length} {clients.length === 1 ? 'cliente' : 'clientes'}
         </Badge>
       </CardHeader>

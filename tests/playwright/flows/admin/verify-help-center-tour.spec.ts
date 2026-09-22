@@ -83,6 +83,41 @@ test.describe('Centro de Asistencia y Tours Guiados CIMA', () => {
     await expect(popover).not.toBeVisible()
   })
 
+  test('ejecuta tour en pantalla móvil iPhone sin solapamiento de cursor ni desbordamiento', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await loginViaUI(page, 'gerente@cima.dev', 'Demo123!')
+
+    const helpTrigger = page.getByTestId('help-widget-trigger')
+    await expect(helpTrigger).toBeVisible()
+    await helpTrigger.click()
+
+    const startTourBtn = page.getByRole('button', { name: /Iniciar Tour|Repetir Tour/i })
+    await expect(startTourBtn).toBeVisible()
+    await startTourBtn.click()
+
+    const popover = page.locator('.cima-tour-popover')
+    await expect(popover).toBeVisible({ timeout: 5000 })
+
+    // Verificar que en móvil no hay desbordamiento horizontal
+    const hasOverflow = await page.evaluate(() => {
+      return document.documentElement.scrollWidth > window.innerWidth
+    })
+    expect(hasOverflow).toBe(false)
+
+    // Avanzar a través de pasos verificando fluidez y legibilidad
+    const nextBtn = popover.locator('.driver-popover-next-btn')
+    for (let i = 0; i < 3; i++) {
+      if (await nextBtn.isVisible()) {
+        await nextBtn.click()
+        await page.waitForTimeout(300)
+        await expect(popover).toBeVisible()
+      }
+    }
+
+    await page.keyboard.press('Escape')
+    await expect(popover).not.toBeVisible()
+  })
+
   test('coexistencia con el widget de zoom sin colisiones visuales', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 })
     await page.goto('/login')

@@ -109,10 +109,10 @@ export function OverviewAdminPendingChangeRequestsSection({
 }: Props) {
   return (
     <Card className="shadow-sm border border-amber-200/60 bg-amber-500/[0.02] dark:border-amber-900/50">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <div className="space-y-0.5">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3">
+        <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">
-            <GitPullRequest className="size-4 text-amber-600 dark:text-amber-400" />
+            <GitPullRequest className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <CardTitle className="text-base font-bold text-foreground">
               Cambios en aprobación
             </CardTitle>
@@ -124,7 +124,7 @@ export function OverviewAdminPendingChangeRequestsSection({
         {items.length > 0 && (
           <Badge
             variant="outline"
-            className="border-amber-300 bg-amber-100/70 text-amber-800 text-xs font-semibold dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
+            className="border-amber-300 bg-amber-100/70 text-amber-800 text-xs font-semibold shrink-0 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
           >
             {items.length} {items.length === 1 ? 'pendiente' : 'pendientes'}
           </Badge>

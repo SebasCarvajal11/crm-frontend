@@ -86,7 +86,7 @@ export function DashboardOverview({
   const recentClientsQ = useOverviewRecentClients(accessToken, isAdmin)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full overflow-x-hidden">
       <div className="space-y-1 animate-fade-up">
         <p className="text-2xl font-medium text-muted-foreground sm:text-3xl">
           Hola <span className="font-black text-primary">{firstName}</span>

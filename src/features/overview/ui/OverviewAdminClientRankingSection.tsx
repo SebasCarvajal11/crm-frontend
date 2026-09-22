@@ -26,17 +26,17 @@ export function OverviewAdminClientRankingSection({ items, isLoading }: Props) {
 
   return (
     <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <div className="space-y-0.5">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3">
+        <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">
-            <Award className="size-4 text-primary" />
+            <Award className="size-4 text-primary shrink-0" />
             <CardTitle className="text-base font-bold">Ranking de Clientes por Proyectos</CardTitle>
           </div>
           <CardDescription className="text-xs">
             Clientes con mayor volumen histórico y proyectos activos en ejecución.
           </CardDescription>
         </div>
-        <Badge variant="outline" className="text-xs font-semibold">
+        <Badge variant="outline" className="text-xs font-semibold shrink-0">
           {items.length} {items.length === 1 ? 'cliente' : 'clientes'}
         </Badge>
       </CardHeader>

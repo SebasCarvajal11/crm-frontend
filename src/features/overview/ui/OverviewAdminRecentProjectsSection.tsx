@@ -45,10 +45,10 @@ export function OverviewAdminRecentProjectsSection({
 }: Props) {
   return (
     <Card className="shadow-sm border border-border/80">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <div className="space-y-0.5">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3">
+        <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">
-            <FolderGit2 className="size-4 text-primary" />
+            <FolderGit2 className="size-4 text-primary shrink-0" />
             <CardTitle className="text-base font-bold">Últimos proyectos</CardTitle>
           </div>
           <CardDescription className="text-xs">

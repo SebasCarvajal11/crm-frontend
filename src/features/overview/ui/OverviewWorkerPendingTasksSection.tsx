@@ -128,10 +128,10 @@ export function OverviewWorkerPendingTasksSection({
 
   return (
     <Card className="shadow-sm border border-border/80">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <div className="space-y-0.5">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3">
+        <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">
-            <ListTodo className="size-4 text-primary" />
+            <ListTodo className="size-4 text-primary shrink-0" />
             <CardTitle className="text-base font-bold">Mis tareas pendientes</CardTitle>
           </div>
           <CardDescription className="text-xs">
@@ -139,7 +139,7 @@ export function OverviewWorkerPendingTasksSection({
           </CardDescription>
         </div>
         {tasks.length > 0 && (
-          <Badge variant="secondary" className="text-xs font-semibold">
+          <Badge variant="secondary" className="text-xs font-semibold shrink-0">
             {tasks.length} {tasks.length === 1 ? 'pendiente' : 'pendientes'}
           </Badge>
         )}
