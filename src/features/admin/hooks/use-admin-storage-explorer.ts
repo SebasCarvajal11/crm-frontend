@@ -100,13 +100,43 @@ export function useAdminStorageExplorer(accessToken: string) {
     )
   }, [activeClient, selectedProjectId])
 
+  const projectAllFiles = useMemo(() => {
+    if (!activeProject) return []
+    return Object.values(activeProject.folders ?? {}).flatMap((f) => f.files)
+  }, [activeProject])
+
+  const projectStats = useMemo(() => {
+    const totalFiles = projectAllFiles.length
+    const activeFilesCount = projectAllFiles.filter((f) => !f.isPurged).length
+    const purgedFilesCount = projectAllFiles.filter((f) => f.isPurged).length
+    const purgedBytes = projectAllFiles
+      .filter((f) => f.isPurged)
+      .reduce((acc, f) => acc + f.sizeBytes, 0)
+    return {
+      totalFiles,
+      activeFilesCount,
+      purgedFilesCount,
+      purgedBytes,
+      activeBytes: activeProject?.totalBytes ?? 0,
+    }
+  }, [projectAllFiles, activeProject])
+
   const activeFiles = useMemo(() => {
     if (!activeProject) return []
-    if (selectedFolder && activeProject.folders?.[selectedFolder]) {
-      return activeProject.folders[selectedFolder].files
-    }
-    return Object.values(activeProject.folders ?? {}).flatMap((f) => f.files)
-  }, [activeProject, selectedFolder])
+    const baseFiles =
+      selectedFolder && activeProject.folders?.[selectedFolder]
+        ? activeProject.folders[selectedFolder].files
+        : projectAllFiles
+
+    const term = searchTerm.trim().toLowerCase()
+    if (!term) return baseFiles
+
+    return baseFiles.filter(
+      (f) =>
+        f.fileName.toLowerCase().includes(term) ||
+        (f.taskTitle && f.taskTitle.toLowerCase().includes(term))
+    )
+  }, [activeProject, selectedFolder, projectAllFiles, searchTerm])
 
   const handlePurgeFile = useCallback(
     async (fileId: string, reason?: string, forcePurgeSigned?: boolean) => {
@@ -158,6 +188,7 @@ export function useAdminStorageExplorer(accessToken: string) {
     activeClient,
     activeProject,
     activeFiles,
+    projectStats,
     refresh: loadTree,
     purgeFile: handlePurgeFile,
     purgeBatch: handlePurgeBatch,
