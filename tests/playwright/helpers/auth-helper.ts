@@ -10,7 +10,7 @@ export async function loginViaUI(
 ): Promise<void> {
   await page.goto('/login')
   await page.getByLabel('Correo').fill(email)
-  await page.getByLabel(/contrase(?:n|ñ)a/i).fill(password)
+  await page.locator('input#password').fill(password)
   await page.getByRole('button', { name: 'Entrar' }).click()
   await page.waitForURL('**/dashboard', { timeout: 15_000 })
   await page.waitForLoadState('networkidle')
