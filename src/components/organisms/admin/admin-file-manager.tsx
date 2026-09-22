@@ -202,7 +202,7 @@ export function AdminFileManager({ accessToken }: Props) {
           />
         </div>
 
-        <div className="rounded-xl border border-border/70 bg-card overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[560px] lg:h-[640px] shadow-2xs">
+        <div className="rounded-xl border border-border/70 bg-card overflow-hidden grid grid-cols-1 lg:grid-cols-12 h-auto min-h-0 lg:h-[640px] shadow-2xs">
           <ClientProjectTree
             clients={filteredClients}
             activeClientSub={activeClient?.clientSub}
@@ -219,7 +219,7 @@ export function AdminFileManager({ accessToken }: Props) {
             formatBytes={formatBytes}
           />
 
-          <div className="lg:col-span-8 flex flex-col h-full min-h-0 p-4 space-y-3 bg-background">
+          <div className="lg:col-span-8 flex flex-col min-h-0 lg:h-full p-4 space-y-3 bg-background">
             {activeProject ? (
               <>
                 <ProjectDetailHeader
@@ -238,7 +238,7 @@ export function AdminFileManager({ accessToken }: Props) {
                   onSelectFolder={setSelectedFolder}
                 />
 
-                <div className="flex-1 min-h-0 flex flex-col">
+                <div className="min-h-0 flex flex-col lg:flex-1">
                   <FileManagerTable
                     files={activeFiles}
                     accessToken={accessToken}
@@ -248,7 +248,7 @@ export function AdminFileManager({ accessToken }: Props) {
                 </div>
               </>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center p-8 text-center text-xs text-muted-foreground border border-dashed rounded-lg bg-muted/5">
+              <div className="min-h-[160px] lg:h-full py-8 px-4 sm:py-12 flex flex-col items-center justify-center text-center text-xs text-muted-foreground border border-dashed rounded-lg bg-muted/5">
                 Selecciona un cliente y proyecto para explorar sus archivos.
               </div>
             )}

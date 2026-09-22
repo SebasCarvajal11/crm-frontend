@@ -19,7 +19,7 @@ export function ClientProjectTree({
   formatBytes,
 }: Props) {
   return (
-    <aside className="lg:col-span-4 flex flex-col h-full min-h-0 border-b lg:border-b-0 lg:border-r border-border/60 bg-muted/10">
+    <aside className="lg:col-span-4 flex flex-col min-h-0 lg:h-full border-b lg:border-b-0 lg:border-r border-border/60 bg-muted/10">
       <div className="p-3 border-b border-border/60 flex items-center justify-between bg-muted/20">
         <span className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-1.5">
           <Building2 className="size-3.5 text-primary" />
@@ -30,7 +30,7 @@ export function ClientProjectTree({
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-[340px] lg:max-h-none">
+      <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-[220px] lg:max-h-none">
         {clients.length === 0 ? (
           <div className="py-8 text-center text-xs text-muted-foreground">
             No se encontraron clientes

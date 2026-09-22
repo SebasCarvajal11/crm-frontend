@@ -102,7 +102,7 @@ const mockTree = {
                     projectName: 'Campaña Sostenibilidad Q4',
                     fileName: 'Acuerdo_Comercial_Firmado.pdf',
                     title: 'Acuerdo Firmado',
-                    folder: 'contracts',
+                    folder: 'briefs',
                     storagePath: 'projects/proj-sostenibilidad/contrato.pdf',
                     mimeType: 'application/pdf',
                     sizeBytes: 2621440,
@@ -118,6 +118,13 @@ const mockTree = {
                     isSignedContract: true,
                   },
                 ],
+              },
+              contracts: {
+                folderKey: 'contracts',
+                folderLabel: 'Contratos y Firmas',
+                totalFiles: 0,
+                totalBytes: 0,
+                files: [],
               },
             },
           },
@@ -174,6 +181,10 @@ async function setupMocks(page: Page) {
 
   await page.route('**/api/**', async (route: Route) => {
     const url = route.request().url()
+
+    if (url.includes('/src/') || url.includes('@') || url.includes('.ts') || url.includes('.js') || url.includes('.tsx') || url.includes('.jsx')) {
+      return route.continue()
+    }
 
     if (url.includes('/auth/login')) {
       return route.fulfill({
@@ -403,6 +414,49 @@ test.describe('Verificación de Correcciones de Responsividad Móvil', () => {
     await page.screenshot({
       path: path.join(outputDir, '10-mobile-admin-user-table-actions.png'),
       fullPage: false,
+    })
+  })
+
+  test('4. Gestor de Archivos en Móvil: Colapso adaptativo inmediato al alternar a carpeta vacía (375x812)', async ({ page }) => {
+    await setupMocks(page)
+    await page.setViewportSize({ width: 375, height: 812 })
+    await page.goto('/dashboard?tab=admin')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(600)
+
+    // Seleccionar cliente
+    const clientItem = page.getByTestId('storage-client-item').first()
+    await expect(clientItem).toBeVisible({ timeout: 15_000 })
+    await clientItem.click()
+    await page.waitForTimeout(500)
+
+    // Validar pestaña de carpeta vacía y hacer clic en ella
+    const emptyFolderTab = page.getByRole('button', { name: /Contratos y Firmas \(0\)/i })
+    await expect(emptyFolderTab).toBeVisible()
+    await emptyFolderTab.click()
+    await page.waitForTimeout(400)
+
+    // Validar mensaje de estado vacío inmediatamente visible
+    const emptyMessage = page.getByText('No hay archivos en esta carpeta o filtro')
+    await expect(emptyMessage).toBeVisible()
+
+    // Validar que el alto del contenedor vacío es adaptativo y compacto (<= 250px en móvil)
+    const emptyBox = await emptyMessage.locator('..').boundingBox()
+    expect(emptyBox).not.toBeNull()
+    if (emptyBox) {
+      expect(emptyBox.height).toBeLessThanOrEqual(250)
+    }
+
+    // Capturar screenshot del gestor colapsado adaptativamente
+    const fileManagerCard = page
+      .locator('.rounded-2xl')
+      .filter({ hasText: 'Gestor y Explorador de Archivos por Cliente' })
+      .first()
+
+    await fileManagerCard.scrollIntoViewIfNeeded()
+    await page.waitForTimeout(300)
+    await fileManagerCard.screenshot({
+      path: path.join(outputDir, '11-mobile-file-manager-empty-collapsed.png'),
     })
   })
 })

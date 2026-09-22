@@ -93,7 +93,7 @@ export function FileManagerTable({
 
   if (files.length === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center text-muted-foreground border rounded-lg bg-muted/10">
+      <div className="w-full py-8 px-4 sm:py-12 flex flex-col items-center justify-center text-center text-muted-foreground border rounded-lg bg-muted/10 min-h-[160px] lg:h-full">
         <Archive className="size-8 mb-2 opacity-40" />
         <p className="text-sm font-medium">No hay archivos en esta carpeta o filtro</p>
         <p className="text-xs">Los archivos subidos aparecerán organizados aquí.</p>
@@ -106,7 +106,7 @@ export function FileManagerTable({
   const selectedBytes = selectedFiles.reduce((acc, f) => acc + f.sizeBytes, 0)
 
   return (
-    <div className="h-full flex flex-col rounded-lg border border-border/60 overflow-hidden bg-background shadow-2xs">
+    <div className="min-h-0 flex flex-col lg:h-full rounded-lg border border-border/60 overflow-hidden bg-background shadow-2xs">
       {selectedIds.size > 0 && (
         <div className="bg-primary/5 border-b border-primary/20 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs animate-in fade-in-50">
           <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ export function FileManagerTable({
         </div>
       )}
 
-      <div className="block sm:hidden flex-1 overflow-y-auto p-2.5 space-y-2.5">
+      <div className="block sm:hidden flex-1 max-h-[480px] lg:max-h-none overflow-y-auto p-2.5 space-y-2.5">
         {files.map((file) => (
           <FileMobileCard
             key={file.id}
