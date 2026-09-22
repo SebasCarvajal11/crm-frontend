@@ -5,6 +5,7 @@ import {
   buildWhatsAppForensicTranscript,
   buildAuditJsonTranscript,
 } from './chat-export.utils'
+import { sha256PureHex } from './sha256-pure'
 import type { ChatExportOptions } from './chat-export.types'
 import type { ProjectChatMessage, ProjectMember } from '../model'
 import type { MeResponse } from '@/shared/types'
@@ -119,6 +120,43 @@ describe('Chat Export Utilities (Evidentiary & WhatsApp Forensic Standard)', () 
     expect(hash1).toBe(hash2)
     expect(hash1).toHaveLength(64)
     expect(hash1).toMatch(/^[0-9A-F]{64}$/)
+  })
+
+  it('matches NIST standard vectors and produces identical results in pure fallback', async () => {
+    // NIST test vector for "abc"
+    const abcHash = sha256PureHex('abc')
+    expect(abcHash).toBe('BA7816BF8F01CFEA414140DE5DAE2223B00361A396177A9CB410FF61F20015AD')
+
+    // NIST test vector for empty string
+    const emptyHash = sha256PureHex('')
+    expect(emptyHash).toBe('E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855')
+
+    const testText = 'CIMA CRM — Registro Probatorio Oficial de Prueba 2026'
+    const nativeHash = await calculateSha256Hex(testText)
+    const pureHash = sha256PureHex(testText)
+    expect(pureHash).toBe(nativeHash)
+  })
+
+  it('falls back to pure SHA-256 when window.crypto.subtle is undefined (HTTP non-secure context)', async () => {
+    const originalSubtle = crypto.subtle
+    try {
+      // Simular contexto HTTP no seguro donde crypto.subtle es undefined
+      Object.defineProperty(crypto, 'subtle', {
+        value: undefined,
+        configurable: true,
+      })
+
+      const testText = 'Verificación forense en contexto no seguro HTTP'
+      const fallbackHash = await calculateSha256Hex(testText)
+      const expectedHash = sha256PureHex(testText)
+      expect(fallbackHash).toBe(expectedHash)
+      expect(fallbackHash).toHaveLength(64)
+    } finally {
+      Object.defineProperty(crypto, 'subtle', {
+        value: originalSubtle,
+        configurable: true,
+      })
+    }
   })
 
   it('builds a complete ChatExportPayload with participants and metadata', () => {

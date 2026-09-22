@@ -85,7 +85,8 @@ export function ChatExportDialog({
       const filename = `conversacion-${sanitizedName}-${selectedChannel}-${dateTag}.${fileExtension}`
 
       triggerFileDownload(filename, fileContent, mimeType)
-    } catch {
+    } catch (err) {
+      console.error('[ChatExportDialog] Error al generar exportación probatoria:', err)
       onError('Ocurrió un error al generar la exportación probatoria de la conversación.')
     } finally {
       setIsExporting(false)
@@ -96,44 +97,51 @@ export function ChatExportDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0 ring-1 ring-primary/20">
               <ShieldCheck className="size-5" />
             </div>
-            <div>
-              <DialogTitle className="text-base font-semibold">
+            <div className="space-y-0.5 min-w-0 pr-8">
+              <DialogTitle className="text-base font-semibold text-foreground">
                 Registro Probatorio de Conversación
               </DialogTitle>
-              <DialogDescription className="text-xs">
+              <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
                 Exportación oficial certificada bajo estándares de mensajes de datos y trazabilidad forense.
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="space-y-4 py-2 text-sm">
-          <div className="rounded-lg border bg-muted/20 p-3 space-y-1.5 text-xs text-muted-foreground">
-            <div className="flex justify-between">
-              <span className="font-medium text-foreground">Proyecto:</span>
-              <span className="truncate max-w-[240px]">{projectName}</span>
+        <div className="space-y-4 px-5 py-4 sm:px-6 text-sm">
+          <div className="rounded-xl border border-border/80 bg-muted/25 p-3.5 space-y-2 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-2 border-b border-border/40">
+              <div className="space-y-0.5 min-w-0">
+                <span className="text-[11px] font-medium text-muted-foreground block">Proyecto</span>
+                <span className="font-semibold text-foreground text-xs break-words block">{projectName}</span>
+              </div>
+              <div className="space-y-0.5 min-w-0">
+                <span className="text-[11px] font-medium text-muted-foreground block">Custodio Emisor</span>
+                <span className="font-semibold text-foreground text-xs break-words block">
+                  {identity.first_name ?? ''} {identity.last_name ?? ''}
+                  <span className="text-muted-foreground font-normal ml-1">({identity.role})</span>
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="font-medium text-foreground">Custodio Emisor:</span>
-              <span>{identity.first_name ?? ''} {identity.last_name ?? ''} ({identity.role})</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium text-foreground">Estándar:</span>
-              <span>Ley 527/1999 • ISO/IEC 27037</span>
+            <div className="flex flex-wrap items-center justify-between gap-1 text-[11px] text-muted-foreground pt-0.5">
+              <span>Marco legal y forense:</span>
+              <span className="font-medium text-foreground bg-background/80 px-2 py-0.5 rounded border border-border/60">
+                Ley 527/1999 • ISO/IEC 27037
+              </span>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="export-channel" className="text-xs font-medium">Canal a exportar</Label>
+            <Label htmlFor="export-channel" className="text-xs font-medium text-foreground">Canal a exportar</Label>
             <Select
               value={selectedChannel}
               onValueChange={(val) => setSelectedChannel(val as ChatExportChannel)}
             >
-              <SelectTrigger id="export-channel" className="text-xs">
+              <SelectTrigger id="export-channel" className="text-xs h-9">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -145,12 +153,12 @@ export function ChatExportDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="export-format" className="text-xs font-medium">Formato de salida</Label>
+            <Label htmlFor="export-format" className="text-xs font-medium text-foreground">Formato de salida</Label>
             <Select
               value={format}
               onValueChange={(val) => setFormat(val as ChatExportFormat)}
             >
-              <SelectTrigger id="export-format" className="text-xs">
+              <SelectTrigger id="export-format" className="text-xs h-9">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -164,57 +172,56 @@ export function ChatExportDialog({
             </Select>
           </div>
 
-          <div className="rounded-md border border-primary/20 bg-primary/5 p-3 flex items-start gap-2.5">
+          <div className="rounded-xl border border-primary/25 bg-primary/5 p-3.5 flex items-start gap-3">
             <Checkbox
               id="custody-agreement"
               checked={custodyAgreed}
               onCheckedChange={(checked) => setCustodyAgreed(Boolean(checked))}
-              className="mt-0.5"
+              className="mt-0.5 shrink-0"
             />
             <Label
               htmlFor="custody-agreement"
               className="text-xs leading-relaxed text-muted-foreground cursor-pointer font-normal"
             >
               Certifico bajo mi rol de Administrador que esta exportación se emite con fines
-              legítimos de respaldo contractual o auditoría probatoria, asegurando la confidencialidad
-              y debida custodia de la información.
+              legítimos de respaldo contractual o auditoría probatoria, asegurando la debida custodia.
             </Label>
           </div>
 
           {lastGeneratedHash && (
-            <div className="rounded border bg-muted/40 p-2 space-y-1">
+            <div className="rounded-xl border bg-muted/40 p-3 space-y-1">
               <p className="text-[11px] font-semibold text-foreground">Sello Criptográfico Generado (SHA-256):</p>
               <p className="font-mono text-[10px] break-all text-muted-foreground">{lastGeneratedHash}</p>
             </div>
           )}
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2">
+        <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
           <Button
             type="button"
             variant="outline"
-            size="sm"
+            size="default"
             onClick={() => onOpenChange(false)}
             disabled={isExporting}
-            className="text-xs"
+            className="w-full sm:w-auto text-xs"
           >
             Cerrar
           </Button>
           <Button
             type="button"
-            size="sm"
+            size="default"
             onClick={handleExport}
             disabled={!custodyAgreed || isExporting}
-            className="gap-1.5 text-xs bg-primary text-primary-foreground hover:bg-primary/90"
+            className="w-full sm:w-auto gap-2 text-xs bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {isExporting ? (
               <>
-                <Loader2 className="size-3.5 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 Generando registro...
               </>
             ) : (
               <>
-                <Download className="size-3.5" />
+                <Download className="size-4" />
                 Descargar Registro Probatorio
               </>
             )}

@@ -65,29 +65,31 @@ export function UnblockTaskDialog({
             </DialogDescription>
           </DialogHeader>
 
-          {blockReason && (
-            <div className="rounded-md border border-border bg-muted/40 p-2.5 text-left text-xs space-y-1">
-              <span className="font-medium text-muted-foreground block">
-                Motivo original del bloqueo ({isClientTimeout ? 'Timeout de Cliente' : 'Impedimento Interno'}):
-              </span>
-              <p className="text-foreground italic">{blockReason}</p>
-            </div>
-          )}
+          <div className="px-5 py-2 sm:px-6 space-y-4">
+            {blockReason && (
+              <div className="rounded-md border border-border bg-muted/40 p-2.5 text-left text-xs space-y-1">
+                <span className="font-medium text-muted-foreground block">
+                  Motivo original del bloqueo ({isClientTimeout ? 'Timeout de Cliente' : 'Impedimento Interno'}):
+                </span>
+                <p className="text-foreground italic">{blockReason}</p>
+              </div>
+            )}
 
-          <div className="space-y-1.5 text-left">
-            <Label htmlFor="unblock-comment" className="text-xs font-medium">
-              Comentario de resolución <span className="text-muted-foreground font-normal">(opcional)</span>
-            </Label>
-            <Textarea
-              id="unblock-comment"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Explica cómo se resolvió el impedimento..."
-              rows={2}
-              maxLength={300}
-              className="text-xs resize-none"
-              disabled={isPending}
-            />
+            <div className="space-y-1.5 text-left">
+              <Label htmlFor="unblock-comment" className="text-xs font-medium">
+                Comentario de resolución <span className="text-muted-foreground font-normal">(opcional)</span>
+              </Label>
+              <Textarea
+                id="unblock-comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Explica cómo se resolvió el impedimento..."
+                rows={2}
+                maxLength={300}
+                className="text-xs resize-none"
+                disabled={isPending}
+              />
+            </div>
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0 pt-2">

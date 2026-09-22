@@ -66,7 +66,7 @@ export function useAdminStorageExplorer(accessToken: string) {
         const matchingProjects = client.projects.filter(
           (p) =>
             p.projectName.toLowerCase().includes(term) ||
-            Object.values(p.folders).some((f) =>
+            Object.values(p.folders ?? {}).some((f) =>
               f.files.some((file) => file.fileName.toLowerCase().includes(term))
             )
         )
@@ -102,10 +102,10 @@ export function useAdminStorageExplorer(accessToken: string) {
 
   const activeFiles = useMemo(() => {
     if (!activeProject) return []
-    if (selectedFolder && activeProject.folders[selectedFolder]) {
+    if (selectedFolder && activeProject.folders?.[selectedFolder]) {
       return activeProject.folders[selectedFolder].files
     }
-    return Object.values(activeProject.folders).flatMap((f) => f.files)
+    return Object.values(activeProject.folders ?? {}).flatMap((f) => f.files)
   }, [activeProject, selectedFolder])
 
   const handlePurgeFile = useCallback(

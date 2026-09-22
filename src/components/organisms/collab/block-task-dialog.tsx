@@ -61,34 +61,36 @@ export function BlockTaskDialog({ open, taskTitle, isPending, onClose, onConfirm
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-1.5 text-left">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="block-reason" className="text-xs font-medium">
-                Motivo del bloqueo <span className="text-rose-500">*</span>
-              </Label>
-              <span className="text-[11px] text-muted-foreground">
-                {trimmed.length}/{MAX_REASON_LENGTH}
-              </span>
+          <div className="px-5 py-2 sm:px-6 space-y-4">
+            <div className="space-y-1.5 text-left">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="block-reason" className="text-xs font-medium">
+                  Motivo del bloqueo <span className="text-rose-500">*</span>
+                </Label>
+                <span className="text-[11px] text-muted-foreground">
+                  {trimmed.length}/{MAX_REASON_LENGTH}
+                </span>
+              </div>
+              <Textarea
+                id="block-reason"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                onBlur={() => setTouched(true)}
+                placeholder="Describe detalladamente el impedimento (mínimo 5 caracteres)..."
+                rows={3}
+                maxLength={MAX_REASON_LENGTH}
+                className={`text-xs resize-none ${
+                  touched && !isValid ? 'border-rose-500 focus-visible:ring-rose-500' : ''
+                }`}
+                disabled={isPending}
+                autoFocus
+              />
+              {touched && trimmed.length < MIN_REASON_LENGTH && (
+                <p className="text-[11px] text-rose-500">
+                  El motivo debe contener al menos {MIN_REASON_LENGTH} caracteres.
+                </p>
+              )}
             </div>
-            <Textarea
-              id="block-reason"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              onBlur={() => setTouched(true)}
-              placeholder="Describe detalladamente el impedimento (mínimo 5 caracteres)..."
-              rows={3}
-              maxLength={MAX_REASON_LENGTH}
-              className={`text-xs resize-none ${
-                touched && !isValid ? 'border-rose-500 focus-visible:ring-rose-500' : ''
-              }`}
-              disabled={isPending}
-              autoFocus
-            />
-            {touched && trimmed.length < MIN_REASON_LENGTH && (
-              <p className="text-[11px] text-rose-500">
-                El motivo debe contener al menos {MIN_REASON_LENGTH} caracteres.
-              </p>
-            )}
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0 pt-2">

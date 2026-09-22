@@ -241,7 +241,7 @@ export function AdminFileManager({ accessToken }: Props) {
                   >
                     Todos ({activeProject.totalFiles})
                   </Button>
-                  {Object.values(activeProject.folders).map((f) => (
+                  {Object.values(activeProject.folders ?? {}).map((f) => (
                     <Button
                       key={f.folderKey}
                       variant={selectedFolder === f.folderKey ? 'default' : 'outline'}

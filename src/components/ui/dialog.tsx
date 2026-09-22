@@ -49,7 +49,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 grid w-[calc(100%-2rem)] max-h-[min(90dvh,calc(100dvh-2rem))] min-w-0 max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-x-hidden overflow-y-auto overscroll-contain rounded-2xl border border-border/80 bg-card/95 p-0 text-card-foreground shadow-2xl shadow-black/25 backdrop-blur-xl duration-200 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-[0.97] data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-[0.97] sm:data-open:slide-in-from-bottom-2 sm:data-closed:slide-out-to-bottom-2 outline-none",
+          "fixed left-1/2 top-1/2 z-50 grid w-[calc(100%-2.5rem)] sm:w-full max-h-[min(90dvh,calc(100dvh-2.5rem))] min-w-0 max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-x-hidden overflow-y-auto overscroll-contain rounded-2xl border border-border/80 bg-card/95 p-0 text-card-foreground shadow-2xl shadow-black/25 backdrop-blur-xl duration-200 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-[0.97] data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-[0.97] sm:data-open:slide-in-from-bottom-2 sm:data-closed:slide-out-to-bottom-2 outline-none",
           className
         )}
         {...props}
@@ -121,6 +121,16 @@ function DialogDescription({
   )
 }
 
+function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-body"
+      className={cn("px-5 py-4 sm:px-6 space-y-4 text-sm", className)}
+      {...props}
+    />
+  )
+}
+
 export {
   Dialog,
   DialogTrigger,
@@ -129,6 +139,7 @@ export {
   DialogOverlay,
   DialogContent,
   DialogHeader,
+  DialogBody,
   DialogFooter,
   DialogTitle,
   DialogDescription,

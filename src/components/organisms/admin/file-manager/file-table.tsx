@@ -44,10 +44,12 @@ function formatDate(iso: string): string {
   }
 }
 
-function getFileIcon(mime: string) {
-  if (mime.includes('pdf')) return <FileText className="size-4 text-rose-500" />
-  if (mime.includes('image')) return <FileCode className="size-4 text-sky-500" />
-  if (mime.includes('spreadsheet') || mime.includes('excel')) {
+function getFileIcon(mime?: string) {
+  if (!mime) return <FileText className="size-4 text-muted-foreground" />
+  const lower = mime.toLowerCase()
+  if (lower.includes('pdf')) return <FileText className="size-4 text-rose-500" />
+  if (lower.includes('image')) return <FileCode className="size-4 text-sky-500" />
+  if (lower.includes('spreadsheet') || lower.includes('excel')) {
     return <FileSpreadsheet className="size-4 text-emerald-500" />
   }
   return <FileText className="size-4 text-muted-foreground" />

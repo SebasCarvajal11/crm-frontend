@@ -57,7 +57,7 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         data-size={size}
         className={cn(
-          "group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2rem)] max-h-[min(90dvh,calc(100dvh-2rem))] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto overscroll-contain rounded-2xl border border-border/80 bg-card/95 p-5 text-card-foreground shadow-2xl shadow-black/25 backdrop-blur-xl duration-200 outline-none data-[size=default]:max-w-md data-[size=sm]:max-w-xs data-open:animate-in data-open:fade-in-0 data-open:zoom-in-[0.97] data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-[0.97] sm:data-open:slide-in-from-bottom-2 sm:data-closed:slide-out-to-bottom-2",
+          "group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2.5rem)] sm:w-full max-h-[min(90dvh,calc(100dvh-2.5rem))] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto overscroll-contain rounded-2xl border border-border/80 bg-card/95 p-5 sm:p-6 text-card-foreground shadow-2xl shadow-black/25 backdrop-blur-xl duration-200 outline-none data-[size=default]:max-w-md data-[size=sm]:max-w-xs data-open:animate-in data-open:fade-in-0 data-open:zoom-in-[0.97] data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-[0.97] sm:data-open:slide-in-from-bottom-2 sm:data-closed:slide-out-to-bottom-2",
           className
         )}
         {...props}
@@ -90,7 +90,7 @@ function AlertDialogFooter({
     <div
       data-slot="alert-dialog-footer"
       className={cn(
-        "-mx-5 -mb-5 mt-3 flex flex-col-reverse gap-2 rounded-b-2xl border-t border-border/50 bg-muted/20 p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end sm:px-5",
+        "-mx-5 -mb-5 sm:-mx-6 sm:-mb-6 mt-3 flex flex-col-reverse gap-2 rounded-b-2xl border-t border-border/50 bg-muted/20 p-4 sm:p-5 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end",
         className
       )}
       {...props}

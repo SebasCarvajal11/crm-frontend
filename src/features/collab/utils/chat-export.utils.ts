@@ -1,3 +1,4 @@
+import { sha256PureHex } from './sha256-pure'
 import { listExternalChatRequest, listInternalChatRequest } from '../api/collab-api.chat'
 import type { ProjectChatMessage, ProjectMember } from '../model'
 import type { ChatExportChannel, ChatExportOptions, ChatExportPayload } from './chat-export.types'
@@ -5,11 +6,18 @@ import type { ChatExportChannel, ChatExportOptions, ChatExportPayload } from './
 const PAGE_SIZE = 100
 
 export async function calculateSha256Hex(content: string): Promise<string> {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(content)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase()
+  try {
+    if (typeof crypto !== 'undefined' && crypto?.subtle?.digest) {
+      const encoder = new TextEncoder()
+      const data = encoder.encode(content)
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+      const hashArray = Array.from(new Uint8Array(hashBuffer))
+      return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase()
+    }
+  } catch {
+    // Entorno no seguro (HTTP) o sin SubtleCrypto: delegar en fallback matemático puro.
+  }
+  return sha256PureHex(content)
 }
 
 export async function fetchFullChatChannelMessages(

@@ -6,6 +6,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import {
@@ -98,23 +99,29 @@ export function LegalTermsDialog({ open, onOpenChange, initialTab = 'terms' }: P
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <div className="flex items-center gap-2 text-primary">
-            <Scale className="size-5" />
-            <DialogTitle className="text-base font-bold">Marco Normativo y Legal CIMA CRM</DialogTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0 ring-1 ring-primary/20">
+              <Scale className="size-5" />
+            </div>
+            <div className="space-y-0.5">
+              <DialogTitle className="text-base font-bold text-foreground">Marco Normativo y Legal CIMA CRM</DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                Versión oficial {TERMS_VERSION} • Actualizado a {TERMS_LAST_UPDATED}
+              </DialogDescription>
+            </div>
           </div>
-          <DialogDescription className="text-xs">
-            Versión oficial {TERMS_VERSION} • Actualizado a {TERMS_LAST_UPDATED}
-          </DialogDescription>
         </DialogHeader>
 
-        <TabNavigation activeTab={activeTab} onSelect={setActiveTab} />
-        <SectionList sections={activeSections} />
+        <div className="px-5 py-4 sm:px-6 space-y-4">
+          <TabNavigation activeTab={activeTab} onSelect={setActiveTab} />
+          <SectionList sections={activeSections} />
+        </div>
 
-        <div className="flex justify-end pt-2">
-          <Button type="button" variant="default" size="sm" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="flex justify-end">
+          <Button type="button" variant="default" size="default" onClick={() => onOpenChange(false)} className="w-full sm:w-auto text-xs">
             Entendido y cerrar
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )
