@@ -258,6 +258,7 @@ export function CollabPanel({
                         <div
                           key={project.id}
                           data-tour={project.id === firstProjectId ? 'collab-card-first' : undefined}
+                          onClick={() => onOpenProject(project.id)}
                         >
                           <ProjectCard
                             project={project}

@@ -93,12 +93,18 @@ function switchTabIfNeeded(targetTab?: string): void {
 async function handleActionTransition(action?: 'openProject' | 'closeProject'): Promise<void> {
   if (action === 'openProject') {
     const cardEl = document.querySelector<HTMLElement>('[data-tour="collab-card-first"]')
-    if (cardEl) cardEl.click()
-    await waitForElement('[data-tour="workspace-project-header"]', 2500)
+    if (cardEl) {
+      const clickTarget = cardEl.querySelector<HTMLElement>('button') ?? cardEl
+      clickTarget.click()
+    }
+    await waitForElement('[data-tour="workspace-project-header"]', 3500)
   } else if (action === 'closeProject') {
     const backBtn = document.querySelector<HTMLElement>('[data-tour="workspace-back-btn"]')
-    if (backBtn) backBtn.click()
-    await waitForElement('[data-tour="collab-columns-container"]', 2500)
+    if (backBtn) {
+      const clickTarget = backBtn.querySelector<HTMLElement>('button') ?? backBtn
+      clickTarget.click()
+    }
+    await waitForElement('[data-tour="collab-columns-container"]', 3500)
   }
 }
 
@@ -188,8 +194,9 @@ export function useTourRunner() {
           scheduleCursor(element)
           const idx = opts.driver.getActiveIndex() ?? 0
           if (filtered[idx]?.onNextAction === 'openProject' && element) {
-            element.addEventListener('click', async () => {
-              await waitForElement('[data-tour="workspace-project-header"]', 2500)
+            const clickTarget = element.querySelector<HTMLElement>('button') ?? element
+            clickTarget.addEventListener('click', async () => {
+              await waitForElement('[data-tour="workspace-project-header"]', 3500)
               if (driverRef.current?.isActive() && driverRef.current.getActiveIndex() === idx) {
                 driverRef.current.moveNext()
               }
