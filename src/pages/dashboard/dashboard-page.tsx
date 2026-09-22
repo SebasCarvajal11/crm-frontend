@@ -13,6 +13,7 @@ import {
 import { useDashboardNavigation } from './use-dashboard-navigation'
 import { warmDashboardChunks } from './dashboard-tab-preload'
 import { useDashboardSidebar } from './use-dashboard-sidebar'
+import { useScrollToTop } from './use-scroll-to-top'
 import { AppShell } from '@/components/templates/app-shell'
 import { useSessionStore } from '@/app/session/session-store'
 import { logoutRequest } from '@/features/auth/api'
@@ -174,6 +175,8 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     setPrevActiveTab(activeTab)
     setVisitedTabs((prev) => (prev.has(activeTab) ? prev : new Set(prev).add(activeTab)))
   }
+
+  useScrollToTop(activeTab)
 
   useEffect(() => {
     if (!identity?.role) return

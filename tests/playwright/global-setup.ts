@@ -49,7 +49,7 @@ async function ensureDirectories() {
 export default async function globalSetup(_config: FullConfig) {
   await ensureDirectories()
 
-  if (process.env.SKIP_SERVICES_CHECK === 'true') {
+  if (process.env.SKIP_SERVICES_CHECK?.trim() === 'true') {
     return
   }
 

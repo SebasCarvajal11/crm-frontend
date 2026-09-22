@@ -18,6 +18,12 @@ export function LoginPage() {
 
   useEffect(() => {
     if (!bootstrapped || !token) return
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
+    }
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    }
     navigate({ to: '/dashboard', replace: true })
   }, [bootstrapped, token, navigate])
 

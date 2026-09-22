@@ -119,15 +119,15 @@ export function AdminUserTable({ accessToken }: Props) {
               ref={parentRef}
               className="max-h-[min(54dvh,38rem)] overflow-auto rounded-xl border border-border/70 bg-card shadow-2xs"
             >
-              <Table className="min-w-[640px] table-fixed">
+              <Table className="min-w-[780px] table-fixed">
                 <caption className="sr-only">Listado de usuarios administrables.</caption>
                 <TableHeader className="sticky top-0 z-10 bg-muted/60 backdrop-blur-md shadow-[0_1px_0_0_rgba(0,0,0,0.06)]">
                   <TableRow className="border-b-0 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                     <TableHead className="w-[190px]">Usuario</TableHead>
                     <TableHead className="w-[200px]">Correo</TableHead>
                     <TableHead className="w-[100px] text-center">Rol</TableHead>
-                    <TableHead className="w-[100px] text-center">Estado</TableHead>
-                    <TableHead className="w-[185px] text-right">Acciones</TableHead>
+                    <TableHead className="w-[100px] min-w-[100px] text-center">Estado</TableHead>
+                    <TableHead className="w-[190px] min-w-[190px] text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

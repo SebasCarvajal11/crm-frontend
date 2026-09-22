@@ -4,23 +4,21 @@ import {
   FileCode,
   FileSpreadsheet,
   Download,
-  Trash2,
   Archive,
 } from 'lucide-react'
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { formatBytes } from '@/shared/lib'
 import { downloadGatewayFile } from '@/features/collab/utils'
-import { getFolderLabel, getFolderBadgeClass } from './file-manager.constants'
+import { FileMobileCard } from './file-mobile-card'
+import { FileTableRow } from './file-table-row'
 import type { StorageFileItem } from '@/features/admin/api/admin-storage-explorer.api'
 
 type Props = {
@@ -142,11 +140,36 @@ export function FileManagerTable({
         </div>
       )}
 
-      <div className="flex-1 overflow-auto">
-        <Table className="table-fixed w-full min-w-[700px]">
+      <div className="block sm:hidden flex-1 overflow-y-auto p-2.5 space-y-2.5">
+        {files.map((file) => (
+          <FileMobileCard
+            key={file.id}
+            file={file}
+            isSelected={selectedIds.has(file.id)}
+            isDownloading={downloadingId === file.id}
+            onToggleSelect={toggleSelectFile}
+            onDownload={handleDownload}
+            onSelectForPurge={onSelectForPurge}
+            getFileIcon={getFileIcon}
+            formatDate={formatDate}
+          />
+        ))}
+      </div>
+
+      <div className="hidden sm:block flex-1 overflow-auto">
+        <Table className="table-fixed w-full min-w-[780px]">
+          <colgroup>
+            <col className="w-[44px]" />
+            <col className="w-[220px]" />
+            <col className="w-[140px]" />
+            <col className="w-[90px]" />
+            <col className="w-[110px]" />
+            <col className="w-[100px]" />
+            <col className="w-[76px]" />
+          </colgroup>
           <TableHeader className="sticky top-0 z-10 bg-muted/85 backdrop-blur-sm shadow-[0_1px_0_0_rgba(0,0,0,0.06)]">
             <TableRow className="border-b border-border/60 text-[11px] font-bold uppercase tracking-wider text-muted-foreground hover:bg-transparent">
-              <TableHead className="w-[40px] min-w-[40px] text-center border-r border-border/40 py-2.5">
+              <TableHead className="w-[44px] text-center border-r border-border/40 py-2.5">
                 <Checkbox
                   checked={allActiveSelected}
                   onCheckedChange={toggleSelectAll}
@@ -154,142 +177,39 @@ export function FileManagerTable({
                   disabled={activeFiles.length === 0}
                 />
               </TableHead>
-              <TableHead className="w-[32%] min-w-[190px] border-r border-border/40 py-2.5">
+              <TableHead className="w-[220px] border-r border-border/40 py-2.5">
                 Archivo
               </TableHead>
-              <TableHead className="w-[18%] min-w-[130px] border-r border-border/40 py-2.5">
+              <TableHead className="w-[140px] border-r border-border/40 py-2.5">
                 Carpeta
               </TableHead>
-              <TableHead className="w-[12%] min-w-[80px] border-r border-border/40 py-2.5">
+              <TableHead className="w-[90px] border-r border-border/40 py-2.5">
                 Tamaño
               </TableHead>
-              <TableHead className="w-[14%] min-w-[100px] border-r border-border/40 py-2.5">
+              <TableHead className="w-[110px] border-r border-border/40 py-2.5">
                 Fecha
               </TableHead>
-              <TableHead className="w-[12%] min-w-[90px] border-r border-border/40 py-2.5">
+              <TableHead className="w-[100px] border-r border-border/40 py-2.5">
                 Estado
               </TableHead>
-              <TableHead className="w-[12%] min-w-[75px] text-right py-2.5">
+              <TableHead className="w-[76px] text-right py-2.5">
                 Acciones
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {files.map((file) => (
-              <TableRow
+              <FileTableRow
                 key={file.id}
-                className={`transition-colors border-b border-border/40 last:border-b-0 hover:bg-muted/30 ${
-                  file.isPurged ? 'opacity-65 bg-muted/10' : ''
-                } ${selectedIds.has(file.id) ? 'bg-primary/5' : ''}`}
-              >
-                <TableCell className="border-r border-border/30 py-2 text-center">
-                  <Checkbox
-                    checked={selectedIds.has(file.id)}
-                    onCheckedChange={() => toggleSelectFile(file.id)}
-                    disabled={file.isPurged}
-                    aria-label={`Seleccionar ${file.fileName}`}
-                  />
-                </TableCell>
-
-                <TableCell className="border-r border-border/30 py-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    {getFileIcon(file.mimeType)}
-                    <div className="min-w-0">
-                      <p
-                        className="text-xs font-medium text-foreground truncate"
-                        title={file.fileName}
-                      >
-                        {file.fileName}
-                      </p>
-                      {file.taskTitle && (
-                        <span
-                          className="text-[10px] text-muted-foreground truncate block"
-                          title={file.taskTitle}
-                        >
-                          Tarea: {file.taskTitle}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </TableCell>
-
-                <TableCell className="border-r border-border/30 py-2">
-                  <Badge
-                    variant="outline"
-                    className={`text-[10px] truncate max-w-full ${getFolderBadgeClass(
-                      file.folder
-                    )}`}
-                  >
-                    {getFolderLabel(file.folder)}
-                  </Badge>
-                </TableCell>
-
-                <TableCell className="border-r border-border/30 py-2 text-xs font-mono">
-                  {formatBytes(file.sizeBytes)}
-                </TableCell>
-
-                <TableCell className="border-r border-border/30 py-2 text-xs text-muted-foreground">
-                  {formatDate(file.createdAt)}
-                </TableCell>
-
-                <TableCell className="border-r border-border/30 py-2">
-                  {file.isPurged ? (
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] border border-rose-500/20 bg-rose-500/10 text-rose-700 dark:text-rose-400"
-                    >
-                      Espacio liberado
-                    </Badge>
-                  ) : file.isSignedContract ? (
-                    <Badge
-                      variant="outline"
-                      className="text-[10px] border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400"
-                    >
-                      Contrato firmado
-                    </Badge>
-                  ) : (
-                    <Badge
-                      variant="outline"
-                      className="text-[10px] border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                    >
-                      Activo
-                    </Badge>
-                  )}
-                </TableCell>
-
-                <TableCell className="text-right space-x-1 py-2">
-                  {!file.isPurged ? (
-                    <>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-7"
-                        onClick={() => handleDownload(file)}
-                        disabled={downloadingId === file.id}
-                        title="Descargar archivo"
-                      >
-                        <Download className="size-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-7 text-rose-600 hover:text-rose-700 hover:bg-rose-500/10"
-                        onClick={() => onSelectForPurge(file)}
-                        title="Depurar para liberar espacio"
-                      >
-                        <Trash2 className="size-3.5" />
-                      </Button>
-                    </>
-                  ) : (
-                    <span
-                      className="text-[10px] text-muted-foreground/60 italic"
-                      title="Archivo purgado - espacio recuperado"
-                    >
-                      Liberado
-                    </span>
-                  )}
-                </TableCell>
-              </TableRow>
+                file={file}
+                isSelected={selectedIds.has(file.id)}
+                isDownloading={downloadingId === file.id}
+                onToggleSelect={toggleSelectFile}
+                onDownload={handleDownload}
+                onSelectForPurge={onSelectForPurge}
+                getFileIcon={getFileIcon}
+                formatDate={formatDate}
+              />
             ))}
           </TableBody>
         </Table>

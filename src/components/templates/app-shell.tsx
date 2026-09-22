@@ -113,7 +113,12 @@ export function AppShell({
           desktopCollapsed ? collapsedSidebarOffset : shellSidebarOffset,
         )}
       >
-        <header className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b bg-card/95 p-3 backdrop-blur md:hidden">
+        <header
+          className={cn(
+            'sticky top-0 z-30 flex items-center justify-between gap-2 border-b',
+            'bg-card/95 px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur md:hidden'
+          )}
+        >
           <Button
             type="button"
             variant="ghost"
@@ -134,7 +139,7 @@ export function AppShell({
         <main
           className={cn(
             'min-w-0 flex-1 overflow-x-hidden overflow-y-auto scroll-smooth',
-            'scrollbar-thin px-4 py-5 sm:px-6 sm:py-6 lg:px-8 view-transition'
+            'scrollbar-thin px-4 pt-6 pb-6 sm:px-6 sm:py-6 lg:px-8 scroll-pt-16 view-transition'
           )}
         >
           {children}

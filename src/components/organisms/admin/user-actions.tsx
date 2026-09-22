@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MoreHorizontal, RotateCcw, ShieldAlert } from 'lucide-react'
+import { MoreHorizontal, RotateCcw, ShieldAlert, UserCheck, UserX, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -79,7 +79,7 @@ export function AdminUserActions({
         type="button"
         variant="outline"
         size="sm"
-        className="h-8 px-2.5 text-xs font-medium"
+        className="hidden sm:inline-flex h-8 px-2.5 text-xs font-medium"
         disabled={busy}
         onClick={() => {
           clearActionMessage()
@@ -95,7 +95,10 @@ export function AdminUserActions({
             type="button"
             variant="ghost"
             size="sm"
-            className="h-8 px-2 text-xs font-medium text-destructive hover:bg-destructive/10 hover:text-destructive"
+            className={
+              'hidden sm:inline-flex h-8 px-2 text-xs font-medium ' +
+              'text-destructive hover:bg-destructive/10 hover:text-destructive'
+            }
             disabled={busy}
           >
             Archivar
@@ -142,8 +145,38 @@ export function AdminUserActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
+          <div className="sm:hidden">
+            <DropdownMenuLabel>Gestión de usuario</DropdownMenuLabel>
+            <DropdownMenuItem
+              onSelect={() => {
+                clearActionMessage()
+                patchStatus.mutate({ subject: row.id, is_active: !row.is_active })
+              }}
+            >
+              {row.is_active ? (
+                <>
+                  <UserX className="size-4 text-amber-500" />
+                  Desactivar usuario
+                </>
+              ) : (
+                <>
+                  <UserCheck className="size-4 text-emerald-500" />
+                  Activar usuario
+                </>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onSelect={() => setArchiveOpen(true)}
+            >
+              <Trash2 className="size-4" />
+              Archivar usuario
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </div>
+
           <DropdownMenuLabel>Seguridad de cuenta</DropdownMenuLabel>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator className="hidden sm:block" />
           <DropdownMenuItem
             onSelect={() => {
               clearActionMessage()
