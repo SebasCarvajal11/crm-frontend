@@ -1,6 +1,6 @@
 import { api } from '@/shared/lib'
 import { bearer } from '@/shared/lib/bearer'
-import { ADMIN_STORAGE_ROUTES } from '@/shared/lib/gateway-routes'
+import { ADMIN_STORAGE_ROUTES, FILE_ROUTES } from '@/shared/lib/gateway-routes'
 
 export interface StorageFileItem {
   id: string
@@ -120,3 +120,16 @@ export async function purgeStorageBatch(
     .json<{ data: PurgeResult }>()
   return res.data
 }
+
+export async function getStorageFileAccess(
+  accessToken: string,
+  fileId: string
+): Promise<{ url: string; expiresInSeconds: number }> {
+  const res = await api
+    .get(FILE_ROUTES.access(fileId), {
+      headers: bearer(accessToken),
+    })
+    .json<{ data: { url: string; expiresInSeconds: number } }>()
+  return res.data
+}
+
