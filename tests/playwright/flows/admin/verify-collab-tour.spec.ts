@@ -101,7 +101,7 @@ test.describe('Módulo de Colaboración — Tours Guiados y Centro de Asistencia
 
   test('verifica que el rol cliente tiene tour adaptado sin acciones de administracion', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 })
-    await loginViaUI(page, 'contacto@restauranteelbuensabor.com', 'Demo123!')
+    await loginViaUI(page, 'marketing@cafesierraalta.com', 'Demo123!')
 
     // Cliente es redirigido o entra a Colaboración
     await page.goto('/dashboard?tab=collab')

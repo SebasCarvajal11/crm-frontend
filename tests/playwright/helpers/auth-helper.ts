@@ -12,7 +12,7 @@ export async function loginViaUI(
   await page.getByLabel('Correo').fill(email)
   await page.locator('input#password').fill(password)
   await page.getByRole('button', { name: 'Entrar' }).click()
-  await page.waitForURL('**/dashboard', { timeout: 15_000 })
+  await page.waitForURL(/\/dashboard/, { timeout: 15_000 })
   await page.waitForLoadState('networkidle')
 }
 
