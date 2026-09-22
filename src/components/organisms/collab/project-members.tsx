@@ -121,7 +121,11 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
   return (
     <div className={`grid gap-4 ${canManageMembers ? 'min-[1280px]:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.8fr)]' : ''}`}>
       {canManageMembers && (
-        <section className={`order-2 flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm min-[1280px]:order-2`} aria-label="Gestionar integrantes">
+        <section
+          data-tour="workspace-members-invite"
+          className={`order-2 flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm min-[1280px]:order-2`}
+          aria-label="Gestionar integrantes"
+        >
           <div className="border-b px-4 py-3">
             <h3 className="text-sm font-semibold">Agregar trabajador</h3>
             <p className="mt-0.5 text-xs text-muted-foreground">Busca y asigna nuevos integrantes al proyecto.</p>
@@ -158,9 +162,9 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
           <div className="border-t p-4">
             <Button
               size="sm"
-              className="w-full"
               onClick={() => addWorker.mutate()}
               disabled={filteredSelection.length === 0 || addWorker.isPending}
+              className="w-full"
             >
               <Plus className="mr-1 size-4" />
               {addWorker.isPending ? 'Agregando...' : 'Agregar trabajador'}
@@ -170,6 +174,7 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
       )}
 
       <section
+        data-tour="workspace-members-list"
         className={`order-1 flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm min-[1280px]:order-1`}
         aria-label="Integrantes del proyecto"
       >

@@ -83,12 +83,13 @@ export function TaskBoard({
         ) : (
           <div
             className="grid gap-3"
+            data-tour="workspace-task-columns"
             style={{
               gridTemplateColumns: `repeat(${columns.length}, minmax(272px, 1fr))`,
               minWidth: `calc(${columns.length} * (272px + 12px))`,
             }}
           >
-            {columns.map((col) => (
+            {columns.map((col, cIdx) => (
               <TaskColumn
                 key={col.id}
                 column={col}
@@ -96,6 +97,7 @@ export function TaskBoard({
                 selectedTaskId={selectedTaskId}
                 canDrag={canOperate}
                 canCreateTask={canOperate}
+                isFirstColumn={cIdx === 0}
                 onSelectTask={(task) => setSelectedTaskId(task.id)}
                 onDropTask={(taskId) => onMoveTask(taskId, col.id)}
                 onCreateTask={() => setCreateColumnId(col.id)}

@@ -25,6 +25,7 @@ type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected'
 function BriefContentView({ brief }: { brief: BriefData }) {
   return (
     <div
+      data-tour="workspace-brief-content"
       className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`}
       role="region"
       aria-label="Brief del proyecto"
@@ -84,6 +85,7 @@ function ChangeRequestsSidebar({
 
   return (
     <div
+      data-tour="workspace-brief-changes"
       className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`}
       role="region"
       aria-label="Historial de cambios formales"

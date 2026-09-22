@@ -111,7 +111,7 @@ export function ProjectWorkspace({
   const searchableTasks = isTruncated ? remoteSearchResults : localSearchResults
 
   return (
-    <div className="flex min-h-0 flex-col gap-5">
+    <div className="flex min-h-0 flex-col gap-5 min-w-0 w-full max-w-full overflow-hidden">
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <Button
@@ -126,7 +126,9 @@ export function ProjectWorkspace({
             Proyectos
           </Button>
         </div>
-        <ProjectHeader project={project} />
+        <div data-tour="workspace-project-header">
+          <ProjectHeader project={project} />
+        </div>
       </div>
 
       {errorMsg && (
@@ -155,13 +157,15 @@ export function ProjectWorkspace({
           className={activeTab === 'board' ? 'tab-pane-transition' : undefined}
           style={{ display: activeTab === 'board' ? 'block' : 'none' }}
         >
-          <TaskSearchBar
-            searchableTasks={searchableTasks}
-            isSearching={isSearching}
-            boardColumns={boardColumns}
-            onDebouncedChange={handleTaskSearchDebounced}
-            onSelectTask={setFocusedTaskId}
-          />
+          <div data-tour="workspace-task-search">
+            <TaskSearchBar
+              searchableTasks={searchableTasks}
+              isSearching={isSearching}
+              boardColumns={boardColumns}
+              onDebouncedChange={handleTaskSearchDebounced}
+              onSelectTask={setFocusedTaskId}
+            />
+          </div>
           {boardData?.board.tasksTruncated ? (
             <Alert className="mb-3 border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
               <AlertDescription>

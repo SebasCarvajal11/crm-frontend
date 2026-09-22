@@ -20,7 +20,7 @@ export function ChatPanelHeader({
   onOpenExport,
 }: Props) {
   return (
-    <div className="shrink-0 border-b bg-muted/20 px-4 py-3">
+    <div className="shrink-0 border-b bg-muted/20 px-4 py-3" data-tour="workspace-chat-channels">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold">

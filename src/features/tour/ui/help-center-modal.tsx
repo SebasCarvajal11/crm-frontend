@@ -230,7 +230,8 @@ export function HelpCenterModal() {
                           q.targetElement,
                           q.question,
                           q.answer,
-                          'Pulsa aquí para realizar esta acción'
+                          'Pulsa aquí para realizar esta acción',
+                          q.workspaceTab
                         )
                       } else if (q.tourId && activeTour) {
                         startTour(activeTour)

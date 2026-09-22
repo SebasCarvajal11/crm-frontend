@@ -14,6 +14,7 @@ export type CimaTourStep = {
   align?: TourAlignment
   showPointer?: boolean
   requiredRole?: TourUserRole[]
+  switchWorkspaceTab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
 }
 
 export type CimaTourDefinition = {
@@ -34,6 +35,7 @@ export type GuidedQuestion = {
   answer: string
   tab: DashboardTab
   workspaceTab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
+  scope?: 'kanban' | 'workspace' | 'all'
   roles: TourUserRole[]
   category: GuidedQuestionCategory
   targetElement?: string

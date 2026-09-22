@@ -66,16 +66,21 @@ export function ContractPanel({
 
   if (!contract) {
     return role === 'admin' ? (
-      <ContractEditor
-        key="new"
-        accessToken={accessToken}
-        project={project}
-        contract={null}
-        members={members}
-        onError={onError}
-      />
+      <div data-tour="workspace-contract-content">
+        <ContractEditor
+          key="new"
+          accessToken={accessToken}
+          project={project}
+          contract={null}
+          members={members}
+          onError={onError}
+        />
+      </div>
     ) : (
-      <div className="rounded-xl border bg-card p-8 text-center text-sm text-muted-foreground">
+      <div
+        data-tour="workspace-contract-content"
+        className="rounded-xl border bg-card p-8 text-center text-sm text-muted-foreground"
+      >
         El administrador aún no ha preparado un contrato para este proyecto.
       </div>
     )
@@ -83,14 +88,16 @@ export function ContractPanel({
 
   if (contract.status === 'draft' && role === 'admin') {
     return (
-      <ContractEditor
-        key={contract.id}
-        accessToken={accessToken}
-        project={project}
-        contract={contract}
-        members={members}
-        onError={onError}
-      />
+      <div data-tour="workspace-contract-content">
+        <ContractEditor
+          key={contract.id}
+          accessToken={accessToken}
+          project={project}
+          contract={contract}
+          members={members}
+          onError={onError}
+        />
+      </div>
     )
   }
 
@@ -99,6 +106,7 @@ export function ContractPanel({
 
   return (
     <section
+      data-tour="workspace-contract-content"
       className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-xs`}
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-muted/10 px-5 py-3.5 shrink-0">

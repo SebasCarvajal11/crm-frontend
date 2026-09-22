@@ -60,8 +60,10 @@ export function ChangeRequestsPanel({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm
-  sm:flex-row sm:items-center sm:justify-between">
+      <div
+        data-tour="workspace-change-requests-action"
+        className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+      >
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h3 className="text-base font-semibold text-foreground">Solicitudes de cambio</h3>
@@ -134,51 +136,53 @@ export function ChangeRequestsPanel({
         </Button>
       </div>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center py-16 text-muted-foreground">
-          <Loader2 className="mr-2 size-5 animate-spin text-primary" />
-          <span className="text-xs">Cargando solicitudes de cambio...</span>
-        </div>
-      ) : filteredRequests.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-14 px-4 text-center">
-          <div className="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground mb-3">
-            <GitPullRequest className="size-5" />
+      <div data-tour="workspace-change-requests-list">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-16 text-muted-foreground">
+            <Loader2 className="mr-2 size-5 animate-spin text-primary" />
+            <span className="text-xs">Cargando solicitudes de cambio...</span>
           </div>
-          <h4 className="text-sm font-semibold">No hay solicitudes de cambio</h4>
-          <p className="mt-1 text-xs text-muted-foreground max-w-sm">
-            {filter !== 'all'
-              ? 'No se encontraron solicitudes con el filtro seleccionado.'
-              : isClient
-                ? 'Si necesitas algún cambio o ajuste en el proyecto, pulsa en "Solicitar cambio" para crearlo.'
-                : 'El cliente aún no ha registrado solicitudes de cambio para este proyecto.'}
-          </p>
-          {isClient && filter === 'all' && (
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => setCreateModalOpen(true)}
-              className="mt-4 gap-1.5 text-xs"
-            >
-              <Plus className="size-3.5" />
-              Solicitar cambio ahora
-            </Button>
-          )}
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filteredRequests.map((req) => (
-            <ChangeRequestCard
-              key={req.id}
-              request={req}
-              isAdmin={isAdmin}
-              members={members}
-              tasks={tasks}
-              onAccept={(r) => setResolveTarget({ request: r, action: 'accept' })}
-              onReject={(r) => setResolveTarget({ request: r, action: 'reject' })}
-            />
-          ))}
-        </div>
-      )}
+        ) : filteredRequests.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-14 px-4 text-center">
+            <div className="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground mb-3">
+              <GitPullRequest className="size-5" />
+            </div>
+            <h4 className="text-sm font-semibold">No hay solicitudes de cambio</h4>
+            <p className="mt-1 text-xs text-muted-foreground max-w-sm">
+              {filter !== 'all'
+                ? 'No se encontraron solicitudes con el filtro seleccionado.'
+                : isClient
+                  ? 'Si necesitas algún cambio o ajuste en el proyecto, pulsa en "Solicitar cambio" para crearlo.'
+                  : 'El cliente aún no ha registrado solicitudes de cambio para este proyecto.'}
+            </p>
+            {isClient && filter === 'all' && (
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => setCreateModalOpen(true)}
+                className="mt-4 gap-1.5 text-xs"
+              >
+                <Plus className="size-3.5" />
+                Solicitar cambio ahora
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filteredRequests.map((req) => (
+              <ChangeRequestCard
+                key={req.id}
+                request={req}
+                isAdmin={isAdmin}
+                members={members}
+                tasks={tasks}
+                onAccept={(r) => setResolveTarget({ request: r, action: 'accept' })}
+                onReject={(r) => setResolveTarget({ request: r, action: 'reject' })}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       {isClient && (
         <CreateChangeRequestModal

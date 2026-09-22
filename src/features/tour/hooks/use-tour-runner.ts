@@ -46,6 +46,14 @@ function resetHorizontalScroll(): void {
   }
 }
 
+function switchTabIfNeeded(targetTab?: string): void {
+  if (!targetTab || typeof document === 'undefined') return
+  const btn = document.querySelector<HTMLButtonElement>(`[data-tour="workspace-tab-${targetTab}"]`)
+  if (btn && btn.getAttribute('aria-selected') !== 'true') {
+    btn.click()
+  }
+}
+
 export function useTourRunner() {
   const driverRef = useRef<Driver | null>(null)
   const cursorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -95,6 +103,9 @@ export function useTourRunner() {
 
       const steps: DriveStep[] = filtered.map((st) => mapTourStepToDriveStep(st, isMobile))
 
+      if (filtered[0]?.switchWorkspaceTab) {
+        switchTabIfNeeded(filtered[0].switchWorkspaceTab)
+      }
       if (filtered[0]?.element) {
         await waitForElement(filtered[0].element, 1000)
       }
@@ -104,6 +115,7 @@ export function useTourRunner() {
         smoothScroll: true,
         duration: 240,
         allowClose: true,
+        waitForElement: 1200,
         overlayColor: '#000000',
         overlayOpacity: 0.65,
         stagePadding: isMobile ? 4 : 8,
@@ -112,10 +124,15 @@ export function useTourRunner() {
         showProgress: true,
         progressText: 'Paso {{current}} de {{total}}',
         steps,
-        onHighlightStarted: () => {
+        onHighlightStarted: (_el, _step, opts) => {
           clearTimer()
           removeTourCursor()
           resetHorizontalScroll()
+          const activeIdx = opts?.state?.activeIndex ?? opts?.index ?? 0
+          const targetTab = filtered[activeIdx]?.switchWorkspaceTab
+          if (targetTab) {
+            switchTabIfNeeded(targetTab)
+          }
         },
         onHighlighted: (element) => {
           resetHorizontalScroll()
@@ -145,10 +162,14 @@ export function useTourRunner() {
       targetSelector: string,
       title: string,
       description: string,
-      actionHint?: string
+      actionHint?: string,
+      targetTab?: string
     ) => {
       stopTour()
       useTourStore.getState().closeHelpCenter()
+      if (targetTab) {
+        switchTabIfNeeded(targetTab)
+      }
       const el = await waitForElement(targetSelector, 1200)
       const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
 

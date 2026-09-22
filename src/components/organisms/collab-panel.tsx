@@ -115,9 +115,10 @@ export function CollabPanel({
   const active = grouped.in_progress.length
   const reviewing = grouped.in_review.length
   const done = grouped.completed.length
+  const firstProjectId = projects[0]?.id
 
   return (
-    <div className="flex flex-col gap-6 min-h-0">
+    <div className="flex flex-col gap-6 min-h-0 min-w-0 w-full max-w-full overflow-hidden">
       <PageHeader
         eyebrow={
           <>
@@ -253,10 +254,10 @@ export function CollabPanel({
                         </div>
                       </div>
                     ) : (
-                      colProjects.map((project, pIdx) => (
+                      colProjects.map((project) => (
                         <div
                           key={project.id}
-                          data-tour={col.key === 'todo' && pIdx === 0 ? 'collab-card-first' : undefined}
+                          data-tour={project.id === firstProjectId ? 'collab-card-first' : undefined}
                         >
                           <ProjectCard
                             project={project}

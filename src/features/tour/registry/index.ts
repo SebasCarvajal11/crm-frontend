@@ -54,9 +54,9 @@ export function getQuestionsForContext(ctx: TourContextState): GuidedQuestion[] 
     if (q.id.startsWith('global-')) return true
     if (q.tab === ctx.activeTab) {
       if (ctx.activeTab === 'collab') {
-        const isWorkspaceQ =
-          q.id === 'collab-q4' || q.id === 'collab-q5' || q.id === 'collab-q6'
-        return ctx.projectId ? isWorkspaceQ : !isWorkspaceQ
+        if (q.scope === 'workspace') return Boolean(ctx.projectId)
+        if (q.scope === 'kanban') return !ctx.projectId
+        return true
       }
       return true
     }

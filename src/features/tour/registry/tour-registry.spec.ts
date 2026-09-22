@@ -60,4 +60,37 @@ describe('Tour Registry Facade', () => {
     expect(results.length).toBeGreaterThan(0)
     expect(results.every((q) => q.roles.includes('client'))).toBe(true)
   })
+
+  it('el tour de workspace incluye todas las subpestañas y acciones clave', () => {
+    const tour = getActiveTourForContext({
+      activeTab: 'collab',
+      role: 'admin',
+      projectId: 'proj-123-uuid',
+    })
+    expect(tour).not.toBeNull()
+    const elements = tour!.steps.map((s) => s.element)
+    expect(elements).toContain('[data-tour="workspace-tab-board"]')
+    expect(elements).toContain('[data-tour="workspace-tab-chat"]')
+    expect(elements).toContain('[data-tour="workspace-files-panel"]')
+    expect(elements).toContain('[data-tour="workspace-tab-brief"]')
+    expect(elements).toContain('[data-tour="workspace-tab-contract"]')
+    expect(elements).toContain('[data-tour="workspace-tab-change-requests"]')
+    expect(elements).toContain('[data-tour="workspace-tab-members"]')
+  })
+
+  it('no contiene emojis en ningun paso ni pregunta guiada', () => {
+    const tour = getActiveTourForContext({
+      activeTab: 'collab',
+      role: 'admin',
+      projectId: 'proj-123-uuid',
+    })
+    const emojiRegex = /\p{Extended_Pictographic}/u
+    for (const step of tour!.steps) {
+      expect(emojiRegex.test(step.title)).toBe(false)
+      expect(emojiRegex.test(step.description)).toBe(false)
+      if (step.actionHint) {
+        expect(emojiRegex.test(step.actionHint)).toBe(false)
+      }
+    }
+  })
 })

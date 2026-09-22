@@ -30,6 +30,7 @@ type ConversationSupportPanelProps = {
   description: string
   children: ReactNode
   contentClassName?: string
+  dataTour?: string
 }
 
 /**
@@ -42,9 +43,11 @@ function ConversationSupportPanel({
   description,
   children,
   contentClassName = 'p-4',
+  dataTour,
 }: ConversationSupportPanelProps) {
   return (
     <section
+      data-tour={dataTour}
       className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`}
     >
       <div className="shrink-0 border-b bg-muted/20 px-4 py-3">
@@ -101,6 +104,7 @@ export function ConversationPanel({
       </div>
 
       <ConversationSupportPanel
+        dataTour="workspace-files-panel"
         title="Archivos"
         description="Sube archivos con información mínima y visibilidad para cliente."
       >
@@ -121,6 +125,7 @@ export function ConversationPanel({
       </ConversationSupportPanel>
 
       <ConversationSupportPanel
+        dataTour="workspace-timeline-panel"
         title="Trazabilidad"
         description="Línea del tiempo de archivos, tareas finalizadas y cambios aceptados."
         contentClassName="px-4 py-3"

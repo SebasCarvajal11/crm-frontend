@@ -12,6 +12,7 @@ type Props = {
   selectedTaskId: string | null
   canDrag: boolean
   canCreateTask: boolean
+  isFirstColumn?: boolean
   onSelectTask: (t: ProjectTask) => void
   onDropTask: (taskId: string) => void
   onCreateTask: () => void
@@ -24,6 +25,7 @@ export function TaskColumn({
   selectedTaskId,
   canDrag,
   canCreateTask,
+  isFirstColumn,
   onSelectTask,
   onDropTask,
   onCreateTask,
@@ -78,6 +80,7 @@ export function TaskColumn({
               type="button"
               size="icon"
               variant="ghost"
+              data-tour={isFirstColumn ? 'workspace-create-task-btn' : undefined}
               className={[
                 'size-7 rounded-full text-muted-foreground transition-all duration-150',
                 'hover:scale-110 hover:bg-primary/10 hover:text-primary',
