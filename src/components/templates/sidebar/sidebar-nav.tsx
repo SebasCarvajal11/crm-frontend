@@ -15,11 +15,12 @@ export function SidebarNav({
   const filteredItems = useMemo(() => visibleItems(items), [items])
 
   return (
-    <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="Navegacion principal">
+    <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="Navegacion principal" data-tour="sidebar-nav">
       {filteredItems.map((item) => (
         <button
           key={item.key}
           type="button"
+          data-tour={`sidebar-tab-${item.key}`}
           onMouseEnter={item.onMouseEnter}
           onFocus={item.onMouseEnter}
           onClick={() => {

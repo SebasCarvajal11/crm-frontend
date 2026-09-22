@@ -100,19 +100,23 @@ export function DashboardOverview({
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2 animate-fade-up stagger-1">
-        <OverviewIdentityCard
-          identity={identity}
-          avatarUrl={avatarUrl}
-          onOpenProfile={onOpenProfile}
-        />
-        <OverviewNotificationsSection
-          notifications={notifications}
-          isLoading={isNotifLoading}
-          onOpen={handleOpen}
-        />
+        <div data-tour="overview-identity">
+          <OverviewIdentityCard
+            identity={identity}
+            avatarUrl={avatarUrl}
+            onOpenProfile={onOpenProfile}
+          />
+        </div>
+        <div data-tour="overview-notifications">
+          <OverviewNotificationsSection
+            notifications={notifications}
+            isLoading={isNotifLoading}
+            onOpen={handleOpen}
+          />
+        </div>
       </div>
 
-      <div className="animate-fade-up stagger-2">
+      <div className="animate-fade-up stagger-2" data-tour="overview-kpis">
         <OverviewMarketingKpisSection
           metrics={metrics}
           isLoading={isMarketingLoading}
@@ -144,11 +148,13 @@ export function DashboardOverview({
           />
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <OverviewAdminRecentProjectsSection
-              projects={adminRecentProjects}
-              isLoading={isCollabLoading}
-              onOpenProject={onOpenProject}
-            />
+            <div data-tour="overview-recent-projects">
+              <OverviewAdminRecentProjectsSection
+                projects={adminRecentProjects}
+                isLoading={isCollabLoading}
+                onOpenProject={onOpenProject}
+              />
+            </div>
             <OverviewAdminRecentClientsSection
               clients={recentClientsQ.data ?? []}
               isLoading={recentClientsQ.isLoading}

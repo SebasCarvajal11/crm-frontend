@@ -1,6 +1,7 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { TransientNoticeHost } from '@/app/providers/transient-notice-host'
 import { AccessibilityZoomWidget } from '@/components/organisms/accessibility/accessibility-zoom-widget'
+import { HelpCenterWidget } from '@/features/tour'
 import { GridPattern } from '@/components/ui/grid-pattern'
 
 /**
@@ -22,6 +23,7 @@ export const Route = createRootRoute({
         <Outlet />
         <TransientNoticeHost />
         <AccessibilityZoomWidget />
+        <HelpCenterWidget />
       </div>
     </div>
   ),

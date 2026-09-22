@@ -29,6 +29,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      driver.js:
+        specifier: ^1.8.0
+        version: 1.8.0
       jszip:
         specifier: ^3.10.2
         version: 3.10.2
@@ -128,7 +131,7 @@ importers:
         version: 8.0.16(@types/node@24.13.1)(jiti@2.7.0)
       vitest:
         specifier: ^4.1.8
-        version: 4.1.8(@types/node@24.13.1)(msw@2.14.6(@types/node@24.13.1)(typescript@6.0.3))(vite@8.0.16(@types/node@24.13.1)(jiti@2.7.0))
+        version: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@24.13.1)(msw@2.14.6(@types/node@24.13.1)(typescript@6.0.3))(vite@8.0.16(@types/node@24.13.1)(jiti@2.7.0))
 
   cima-contracts:
     devDependencies:
@@ -2047,6 +2050,9 @@ packages:
   dotenv@17.4.2:
     resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
     engines: {node: '>=12'}
+
+  driver.js@1.8.0:
+    resolution: {integrity: sha512-+8/IO7h1v14IzWh2GP60N7T3PFZweXwdn5e5POuxRSBoCYUojsBxzqawPeXh3YZIibRy7EehYNEyxe7slwwtdg==}
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -5671,6 +5677,8 @@ snapshots:
 
   dotenv@17.4.2: {}
 
+  driver.js@1.8.0: {}
+
   dunder-proto@1.0.1:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -7218,7 +7226,7 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.7.0
 
-  vitest@4.1.8(@types/node@24.13.1)(msw@2.14.6(@types/node@24.13.1)(typescript@6.0.3))(vite@8.0.16(@types/node@24.13.1)(jiti@2.7.0)):
+  vitest@4.1.8(@opentelemetry/api@1.9.1)(@types/node@24.13.1)(msw@2.14.6(@types/node@24.13.1)(typescript@6.0.3))(vite@8.0.16(@types/node@24.13.1)(jiti@2.7.0)):
     dependencies:
       '@vitest/expect': 4.1.8
       '@vitest/mocker': 4.1.8(msw@2.14.6(@types/node@24.13.1)(typescript@6.0.3))(vite@8.0.16(@types/node@24.13.1)(jiti@2.7.0))
@@ -7241,6 +7249,7 @@ snapshots:
       vite: 8.0.16(@types/node@24.13.1)(jiti@2.7.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
+      '@opentelemetry/api': 1.9.1
       '@types/node': 24.13.1
     transitivePeerDependencies:
       - msw

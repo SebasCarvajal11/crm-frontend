@@ -114,8 +114,14 @@ export function ProjectWorkspace({
     <div className="flex min-h-0 flex-col gap-5">
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={onBack} aria-label="Volver al tablero de proyectos"
-            className="gap-1.5 text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            data-tour="workspace-back-btn"
+            aria-label="Volver al tablero de proyectos"
+            className="gap-1.5 text-muted-foreground hover:text-foreground cursor-pointer"
+          >
             <ArrowLeft className="size-4" />
             Proyectos
           </Button>
@@ -131,13 +137,15 @@ export function ProjectWorkspace({
         </Alert>
       )}
 
-      <SectionTabs
-        items={tabs}
-        value={activeTab}
-        onValueChange={onTabChange}
-        ariaLabel="Secciones del proyecto"
-        getPanelId={(tab) => `tabpanel-${tab}`}
-      />
+      <div data-tour="workspace-tabs">
+        <SectionTabs
+          items={tabs}
+          value={activeTab}
+          onValueChange={onTabChange}
+          ariaLabel="Secciones del proyecto"
+          getPanelId={(tab) => `tabpanel-${tab}`}
+        />
+      </div>
 
       <div className="min-h-0">
         <div

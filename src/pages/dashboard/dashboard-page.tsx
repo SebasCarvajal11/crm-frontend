@@ -24,6 +24,7 @@ import { InAppNotificationToastContainer } from '@/components/molecules/in-app-n
 import { getCurrentAvatarRequestOptional } from '@/shared/api'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 import { getAccessTokenRole } from '@/shared/lib/access-token-role'
+import { useTourStore } from '@/features/tour'
 import type { DashboardTab } from '@/routes/-dashboard.search'
 
 const CollabPanel = lazy(() =>
@@ -144,6 +145,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   })
   const handleOpenProfile = useCallback(() => goTo('account'), [goTo])
   const handleOpenNotifications = useCallback(() => goTo('notifications'), [goTo])
+  const handleOpenHelp = useCallback(() => { useTourStore.getState().openHelpCenter() }, [])
   const handleLogout = useCallback(() => { logoutMutation.mutate() }, [logoutMutation])
   const handleGoToLogin = useCallback(() => {
     clearSession()
@@ -213,6 +215,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
       unreadNotificationsCount={unreadCount}
       onLogout={handleLogout}
       isLoggingOut={logoutMutation.isPending}
+      onOpenHelp={handleOpenHelp}
     >
       <InAppNotificationToastContainer
         toasts={activeToasts}

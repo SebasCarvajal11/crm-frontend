@@ -41,6 +41,7 @@ export function SectionTabs<T extends string>({
           <button
             key={tab.value}
             type="button"
+            data-tour={`workspace-tab-${tab.value}`}
             role={itemRole === 'button' ? undefined : 'tab'}
             aria-selected={itemRole === 'tab' ? isActive : undefined}
             aria-pressed={itemRole === 'button' ? isActive : undefined}

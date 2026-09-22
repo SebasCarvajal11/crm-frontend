@@ -20,6 +20,7 @@ type AppShellProps = {
   onLogout: () => void
   isLoggingOut?: boolean
   headerExtras?: React.ReactNode
+  onOpenHelp?: () => void
   children: React.ReactNode
   className?: string
 }
@@ -48,6 +49,7 @@ export function AppShell({
   onLogout,
   isLoggingOut = false,
   headerExtras,
+  onOpenHelp,
   children,
   className,
 }: AppShellProps) {
@@ -89,6 +91,7 @@ export function AppShell({
         headerExtras={headerExtras}
         collapsed={desktopCollapsed}
         onCollapsedChange={setDesktopCollapsed}
+        onOpenHelp={onOpenHelp}
       />
 
       <MobileSidebar
@@ -105,6 +108,7 @@ export function AppShell({
         onLogout={onLogout}
         isLoggingOut={isLoggingOut}
         headerExtras={headerExtras}
+        onOpenHelp={onOpenHelp}
       />
 
       <div

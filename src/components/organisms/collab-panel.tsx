@@ -137,18 +137,25 @@ export function CollabPanel({
         actions={(
           <div className="flex w-full flex-col gap-2 sm:items-end xl:w-auto">
           {canCreate && (
-            <Button size="sm" className="shrink-0 self-start sm:self-auto" onClick={() => setShowModal(true)}>
+            <Button
+              size="sm"
+              className="shrink-0 self-start sm:self-auto"
+              data-tour="collab-create-btn"
+              onClick={() => setShowModal(true)}
+            >
               <Plus className="size-4 mr-1.5" />
               Nuevo proyecto
             </Button>
           )}
-          <ProjectSearchInput
-            canSearchByClient={canSearchByClient}
-            searchResults={projectSearchQ.data?.data ?? []}
-            isSearching={projectSearchQ.isLoading}
-            onDebouncedChange={handleDebouncedChange}
-            onSelectProject={onOpenProject}
-          />
+          <div data-tour="collab-search" className="w-full sm:w-auto">
+            <ProjectSearchInput
+              canSearchByClient={canSearchByClient}
+              searchResults={projectSearchQ.data?.data ?? []}
+              isSearching={projectSearchQ.isLoading}
+              onDebouncedChange={handleDebouncedChange}
+              onSelectProject={onOpenProject}
+            />
+          </div>
           </div>
         )}
       />
@@ -163,7 +170,9 @@ export function CollabPanel({
       )}
 
       {!projectsQ.isLoading && total > 0 && (
-        <ProjectStatsSummary total={total} active={active} reviewing={reviewing} done={done} />
+        <div data-tour="collab-summary">
+          <ProjectStatsSummary total={total} active={active} reviewing={reviewing} done={done} />
+        </div>
       )}
 
       {projectsQ.isLoading && (
@@ -176,6 +185,7 @@ export function CollabPanel({
         <div className="overflow-x-auto pb-4">
           <div
             className="grid grid-cols-4 gap-4 min-w-[960px]"
+            data-tour="collab-columns-container"
             style={{
               height: total > 0
                 ? 'max(440px, calc(100dvh - 18.25rem))'
@@ -243,12 +253,16 @@ export function CollabPanel({
                         </div>
                       </div>
                     ) : (
-                      colProjects.map((project) => (
-                        <ProjectCard
+                      colProjects.map((project, pIdx) => (
+                        <div
                           key={project.id}
-                          project={project}
-                          onClick={() => onOpenProject(project.id)}
-                        />
+                          data-tour={col.key === 'todo' && pIdx === 0 ? 'collab-card-first' : undefined}
+                        >
+                          <ProjectCard
+                            project={project}
+                            onClick={() => onOpenProject(project.id)}
+                          />
+                        </div>
                       ))
                     )}
                   </div>

@@ -39,6 +39,7 @@ export function AccessibilityZoomWidget() {
       ref={containerRef}
       role="region"
       aria-label="Controles de accesibilidad y zoom visual"
+      data-tour="accessibility-zoom"
       style={{ zoom: 1 }}
       className="fixed bottom-5 right-5 z-50 flex items-center select-none"
     >

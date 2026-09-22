@@ -1,0 +1,161 @@
+@import "driver.js/dist/driver.css";
+
+/* ==========================================================================
+   CIMA CRM — Tema Corporativo para Driver.js
+   Paleta: Crimson CIMA (#86070c / #680609), Montserrat, bordes suaves
+   ========================================================================== */
+
+.driver-popover.cima-tour-popover {
+  background-color: var(--card, #ffffff);
+  color: var(--card-foreground, #282829);
+  border: 1px solid var(--border, #dededf);
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(104, 6, 9, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  padding: 1.25rem;
+  max-width: 380px;
+  font-family: "Montserrat", system-ui, sans-serif;
+  z-index: 100000;
+  backdrop-filter: blur(8px);
+}
+
+.dark .driver-popover.cima-tour-popover {
+  background-color: #1a1a1c;
+  color: #fefefe;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.driver-popover.cima-tour-popover .driver-popover-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--foreground, #282829);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dark .driver-popover.cima-tour-popover .driver-popover-title {
+  color: #fefefe;
+}
+
+.driver-popover.cima-tour-popover .driver-popover-description {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--muted-foreground, #626267);
+  margin-bottom: 0.85rem;
+}
+
+.dark .driver-popover.cima-tour-popover .driver-popover-description {
+  color: #98989c;
+}
+
+.driver-popover.cima-tour-popover .cima-tour-action-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.775rem;
+  font-weight: 600;
+  background-color: rgba(134, 7, 12, 0.08);
+  color: #86070c;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  border-left: 3px solid #86070c;
+}
+
+.dark .driver-popover.cima-tour-popover .cima-tour-action-hint {
+  background-color: rgba(189, 47, 53, 0.15);
+  color: #f3d9da;
+  border-left-color: #bd2f35;
+}
+
+.driver-popover.cima-tour-popover .driver-popover-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border, #eeeeee);
+}
+
+.driver-popover.cima-tour-popover .driver-popover-progress-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted-foreground, #626267);
+}
+
+.driver-popover.cima-tour-popover .driver-popover-navigation-btns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.driver-popover.cima-tour-popover button.driver-popover-next-btn {
+  background-color: #86070c;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.driver-popover.cima-tour-popover button.driver-popover-next-btn:hover {
+  background-color: #a8131a;
+  transform: translateY(-1px);
+}
+
+.driver-popover.cima-tour-popover button.driver-popover-prev-btn {
+  background-color: transparent;
+  color: var(--foreground, #282829);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border, #dededf);
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.driver-popover.cima-tour-popover button.driver-popover-prev-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.driver-popover.cima-tour-popover .driver-popover-close-btn {
+  color: var(--muted-foreground, #98989c);
+  top: 1rem;
+  right: 1rem;
+  transition: color 0.15s ease;
+}
+
+.driver-popover.cima-tour-popover .driver-popover-close-btn:hover {
+  color: #86070c;
+}
+
+/* Indicador de puntero / manito pulsante */
+@keyframes cima-pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(134, 7, 12, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(134, 7, 12, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(134, 7, 12, 0);
+  }
+}
+
+.cima-tour-pointer-beacon {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: cima-pulse-glow 1.8s infinite;
+  border-radius: 9999px;
+}

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Bell, ChevronUp, LogOut, User } from 'lucide-react'
+import { Bell, ChevronUp, HelpCircle, LogOut, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NotificationCounterBadge } from '@/components/atoms/notification-counter-badge'
 import { cn } from '@/shared/lib/utils'
@@ -17,6 +17,7 @@ export function SidebarFooter({
   compact = false,
   menuPlacement = 'inline',
   onCloseSidebar,
+  onOpenHelp,
 }: {
   userEmail: string
   userRole: string
@@ -29,6 +30,7 @@ export function SidebarFooter({
   compact?: boolean
   menuPlacement?: 'inline' | 'side'
   onCloseSidebar?: () => void
+  onOpenHelp?: () => void
 }) {
   const roleLabel = ROLE_LABEL[userRole] ?? userRole
   const [open, setOpen] = useState(false)
@@ -44,7 +46,7 @@ export function SidebarFooter({
   }, [open])
 
   return (
-    <div className="relative border-t border-primary-foreground/10 p-3" ref={rootRef}>
+    <div className="relative border-t border-primary-foreground/10 p-3" ref={rootRef} data-tour="sidebar-footer">
       <div className={cn('rounded-xl bg-primary-foreground/[0.07] p-3', compact && 'p-2')}>
         <button
           type="button"
@@ -125,6 +127,22 @@ export function SidebarFooter({
                 className="ml-auto"
               />
             </Button>
+            {onOpenHelp && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setOpen(false)
+                  onCloseSidebar?.()
+                  onOpenHelp()
+                }}
+                className="h-8 w-full justify-start rounded-md text-primary-foreground/80 hover:bg-primary-foreground/12 hover:text-primary-foreground cursor-pointer"
+              >
+                <HelpCircle className="size-4" />
+                <span>Tutoriales y Ayuda</span>
+              </Button>
+            )}
             <Button
               type="button"
               variant="ghost"

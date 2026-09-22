@@ -22,6 +22,7 @@ export function DesktopSidebar({
   headerExtras,
   collapsed,
   onCollapsedChange,
+  onOpenHelp,
 }: {
   title: string
   items: SidebarItem[]
@@ -36,6 +37,7 @@ export function DesktopSidebar({
   headerExtras?: React.ReactNode
   collapsed: boolean
   onCollapsedChange: (collapsed: boolean) => void
+  onOpenHelp?: () => void
 }) {
   const isTextureLoaded = useTextureLoaded(BRAND_TEXTURES.sidebar)
 
@@ -117,6 +119,7 @@ export function DesktopSidebar({
         isLoggingOut={isLoggingOut}
         compact={collapsed}
         menuPlacement="side"
+        onOpenHelp={onOpenHelp}
       />
       </div>
     </aside>

@@ -21,6 +21,7 @@ export function MobileSidebar({
   onLogout,
   isLoggingOut,
   headerExtras,
+  onOpenHelp,
 }: {
   open: boolean
   setOpen: (open: boolean) => void
@@ -35,6 +36,7 @@ export function MobileSidebar({
   onLogout: () => void
   isLoggingOut: boolean
   headerExtras?: React.ReactNode
+  onOpenHelp?: () => void
 }) {
   const isTextureLoaded = useTextureLoaded(BRAND_TEXTURES.sidebar)
 
@@ -93,6 +95,7 @@ export function MobileSidebar({
           isLoggingOut={isLoggingOut}
           menuPlacement="inline"
           onCloseSidebar={() => setOpen(false)}
+          onOpenHelp={onOpenHelp}
         />
         </div>
       </aside>
