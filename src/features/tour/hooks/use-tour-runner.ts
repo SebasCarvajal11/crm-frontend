@@ -115,6 +115,8 @@ export function useTourRunner() {
   const markTourCompleted = useTourStore((s) => s.markTourCompleted)
   const setActiveTour = useTourStore((s) => s.setActiveTour)
 
+  const isTransitioningRef = useRef(false)
+
   const clearTimer = useCallback(() => {
     if (cursorTimerRef.current) {
       clearTimeout(cursorTimerRef.current)
@@ -124,6 +126,7 @@ export function useTourRunner() {
 
   const stopTour = useCallback(() => {
     clearTimer()
+    isTransitioningRef.current = false
     stopModalSupervisor()
     removeTourCursor()
     resetHorizontalScroll()
@@ -171,7 +174,14 @@ export function useTourRunner() {
         onNextClick: async (_element, _step, opts) => {
           const idx = opts.driver.getActiveIndex() ?? 0
           const action = filtered[idx]?.onNextAction
-          if (action) await handleActionTransition(action)
+          if (action) {
+            isTransitioningRef.current = true
+            try {
+              await handleActionTransition(action)
+            } finally {
+              setTimeout(() => { isTransitioningRef.current = false }, 500)
+            }
+          }
           opts.driver.moveNext()
         },
         onPrevClick: async (_element, _step, opts) => {
@@ -196,6 +206,7 @@ export function useTourRunner() {
           if (filtered[idx]?.onNextAction === 'openProject' && element) {
             const clickTarget = element.querySelector<HTMLElement>('button') ?? element
             clickTarget.addEventListener('click', async () => {
+              if (isTransitioningRef.current) return
               await waitForElement('[data-tour="workspace-project-header"]', 3500)
               if (driverRef.current?.isActive() && driverRef.current.getActiveIndex() === idx) {
                 driverRef.current.moveNext()
