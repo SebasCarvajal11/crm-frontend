@@ -17,7 +17,7 @@ test.describe('Centro de Asistencia y Tours Guiados CIMA', () => {
     await expect(helpModal).toBeVisible()
 
     // 3. Probar búsqueda de preguntas globales (letra / zoom)
-    const searchInput = page.getByPlaceholder(/¿Cómo creo un proyecto/i)
+    const searchInput = page.getByPlaceholder(/Buscar guías/i)
     await searchInput.fill('zoom')
     const questionItem = page.getByText(/tamaño de letra o aumento el zoom/i)
     await expect(questionItem).toBeVisible()
@@ -26,14 +26,21 @@ test.describe('Centro de Asistencia y Tours Guiados CIMA', () => {
     await questionItem.click()
     await expect(helpModal).not.toBeVisible()
 
-    // 5. Verificar que Driver.js resalta el elemento objetivo
+    // 5. Verificar que Driver.js resalta el elemento y muestra el cursor animado
     const popover = page.locator('.cima-tour-popover')
     await expect(popover).toBeVisible({ timeout: 5000 })
     await expect(popover.locator('.driver-popover-title')).toBeVisible()
 
+    // Verificar que no existen emojis y que el cursor interactivo está en pantalla
+    const popoverText = await popover.innerText()
+    expect(popoverText).not.toContain('👉')
+    const cursor = page.locator('#cima-tour-cursor')
+    await expect(cursor).toBeVisible()
+
     // Cerrar con Escape
     await page.keyboard.press('Escape')
     await expect(popover).not.toBeVisible()
+    await expect(cursor).not.toBeVisible()
   })
 
   test('ejecuta el tour guiado completo en el dashboard con rol administrador', async ({ page }) => {

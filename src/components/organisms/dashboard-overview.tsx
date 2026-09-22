@@ -124,7 +124,7 @@ export function DashboardOverview({
       </div>
 
       {isWorker && (
-        <div className="animate-fade-up stagger-3">
+        <div className="animate-fade-up stagger-3" data-tour="overview-worker-tasks">
           <OverviewWorkerPendingTasksSection
             tasks={workerPendingTasks}
             isLoading={isCollabLoading}
@@ -135,17 +135,21 @@ export function DashboardOverview({
 
       {isAdmin && (
         <div className="space-y-6 animate-fade-up stagger-3">
-          <OverviewAdminPendingChangeRequestsSection
-            items={adminPendingChangeRequests}
-            isLoading={isAdminPendingChangeRequestsLoading}
-            onOpenProject={(projectId) => onOpenProject?.(projectId, 'change-requests')}
-          />
+          <div data-tour="overview-admin-changes">
+            <OverviewAdminPendingChangeRequestsSection
+              items={adminPendingChangeRequests}
+              isLoading={isAdminPendingChangeRequestsLoading}
+              onOpenProject={(projectId) => onOpenProject?.(projectId, 'change-requests')}
+            />
+          </div>
 
-          <OverviewAdminBlockedTasksSection
-            tasks={adminBlockedTasks}
-            isLoading={isCollabLoading}
-            onOpenProject={onOpenProject}
-          />
+          <div data-tour="overview-admin-blocked">
+            <OverviewAdminBlockedTasksSection
+              tasks={adminBlockedTasks}
+              isLoading={isCollabLoading}
+              onOpenProject={onOpenProject}
+            />
+          </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
             <div data-tour="overview-recent-projects">
@@ -155,21 +159,27 @@ export function DashboardOverview({
                 onOpenProject={onOpenProject}
               />
             </div>
-            <OverviewAdminRecentClientsSection
-              clients={recentClientsQ.data ?? []}
-              isLoading={recentClientsQ.isLoading}
-            />
+            <div data-tour="overview-admin-clients">
+              <OverviewAdminRecentClientsSection
+                clients={recentClientsQ.data ?? []}
+                isLoading={recentClientsQ.isLoading}
+              />
+            </div>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <OverviewAdminWorkloadSection
-              workload={adminWorkerWorkload}
-              isLoading={isCollabLoading}
-            />
-            <OverviewAdminClientRankingSection
-              items={adminClientRanking}
-              isLoading={isCollabLoading}
-            />
+            <div data-tour="overview-admin-workload">
+              <OverviewAdminWorkloadSection
+                workload={adminWorkerWorkload}
+                isLoading={isCollabLoading}
+              />
+            </div>
+            <div data-tour="overview-admin-ranking">
+              <OverviewAdminClientRankingSection
+                items={adminClientRanking}
+                isLoading={isCollabLoading}
+              />
+            </div>
           </div>
         </div>
       )}
