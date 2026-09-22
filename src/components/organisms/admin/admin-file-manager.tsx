@@ -1,29 +1,23 @@
-import { useState } from 'react'
-import {
-  FolderTree,
-  Search,
-  Briefcase,
-  Trash2,
-  RefreshCw,
-  CheckCircle2,
-  AlertTriangle,
-} from 'lucide-react'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card'
+import { useState, useMemo } from 'react'
+import { FolderTree, Search, RefreshCw, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatBytes } from '@/shared/lib'
 import { useAdminStorageExplorer } from '@/features/admin/hooks/use-admin-storage-explorer'
+import {
+  exportProjectFilesAsZip,
+  type ExportProgress,
+} from '@/features/admin/services/storage-zip-exporter.service'
 import { FileManagerTable } from './file-manager/file-table'
 import { FilePurgeDialog } from './file-manager/purge-dialog'
 import { EmptyProjectFilesDialog } from './file-manager/empty-project-files-dialog'
 import { ClientProjectTree } from './file-manager/client-project-tree'
+import { StorageSummaryCards } from './file-manager/storage-summary-cards'
+import { ProjectDetailHeader } from './file-manager/project-detail-header'
+import { FolderFilterTabs } from './file-manager/folder-filter-tabs'
+import { BulkExportProgressDialog } from './file-manager/bulk-export-progress-dialog'
 import type { StorageFileItem } from '@/features/admin/api/admin-storage-explorer.api'
 
 type Props = {
@@ -56,6 +50,22 @@ export function AdminFileManager({ accessToken }: Props) {
   const [feedback, setFeedback] = useState<string | null>(null)
   const [errorFeedback, setErrorFeedback] = useState<string | null>(null)
 
+  const [exportProgress, setExportProgress] = useState<ExportProgress | null>(null)
+  const [exportDialogOpen, setExportDialogOpen] = useState(false)
+  const [exportTitle, setExportTitle] = useState('Descarga en Paquete')
+  const [exportError, setExportError] = useState<string | null>(null)
+
+  const activeProjectFiles = useMemo(() => {
+    if (!activeProject) return []
+    return Object.values(activeProject.folders ?? {}).flatMap((f) => f.files)
+  }, [activeProject])
+
+  const handleCloseExport = () => {
+    setExportDialogOpen(false)
+    setExportProgress(null)
+    setExportError(null)
+  }
+
   const handlePurgeConfirm = async (reason: string, forcePurgeSigned: boolean) => {
     if (!fileToPurge) return
     try {
@@ -78,16 +88,49 @@ export function AdminFileManager({ accessToken }: Props) {
         reason: 'Vaciado masivo por administración',
         forcePurgeSigned: false,
       })
-      setFeedback(
-        `Se depuraron ${res.purgedCount} archivos (${formatBytes(res.freedBytes)} liberados).`
-      )
+      setFeedback(`Se depuraron ${res.purgedCount} archivos (${formatBytes(res.freedBytes)} liberados).`)
       setTimeout(() => setFeedback(null), 4000)
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : 'Error al vaciar los archivos del proyecto'
+      const msg = err instanceof Error ? err.message : 'Error al vaciar los archivos'
       setErrorFeedback(msg)
       setTimeout(() => setErrorFeedback(null), 5000)
       throw err
+    }
+  }
+
+  const handleExportProjectZip = async () => {
+    if (!activeProject || activeProjectFiles.length === 0) return
+    setExportTitle(`Descargando ${activeProject.projectName} (.zip)`)
+    setExportError(null)
+    setExportDialogOpen(true)
+    try {
+      await exportProjectFilesAsZip({
+        accessToken,
+        clientName: activeClient?.clientName || 'Cliente',
+        projectName: activeProject.projectName,
+        files: activeProjectFiles,
+        onProgress: setExportProgress,
+      })
+    } catch (err) {
+      setExportError(err instanceof Error ? err.message : 'Error al exportar paquete')
+    }
+  }
+
+  const handleExportBatchZip = async (selectedFiles: StorageFileItem[]) => {
+    if (!activeProject || selectedFiles.length === 0) return
+    setExportTitle(`Descargando selección (${selectedFiles.length} archivos)`)
+    setExportError(null)
+    setExportDialogOpen(true)
+    try {
+      await exportProjectFilesAsZip({
+        accessToken,
+        clientName: activeClient?.clientName || 'Cliente',
+        projectName: `${activeProject.projectName}_lote`,
+        files: selectedFiles,
+        onProgress: setExportProgress,
+      })
+    } catch (err) {
+      setExportError(err instanceof Error ? err.message : 'Error al exportar lote')
     }
   }
 
@@ -131,28 +174,7 @@ export function AdminFileManager({ accessToken }: Props) {
           </Button>
         </div>
 
-        {data?.summary && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 text-center text-xs">
-            <div className="rounded-xl border border-border/60 bg-muted/20 p-2.5">
-              <p className="text-[11px] text-muted-foreground">Clientes con Archivos</p>
-              <p className="font-semibold text-foreground text-sm">{data.summary.totalClients}</p>
-            </div>
-            <div className="rounded-xl border border-border/60 bg-muted/20 p-2.5">
-              <p className="text-[11px] text-muted-foreground">Proyectos Registrados</p>
-              <p className="font-semibold text-foreground text-sm">{data.summary.totalProjects}</p>
-            </div>
-            <div className="rounded-xl border border-border/60 bg-muted/20 p-2.5">
-              <p className="text-[11px] text-muted-foreground">Espacio Activo en Nube</p>
-              <p className="font-semibold text-foreground text-sm">{formatBytes(data.summary.totalBytes)}</p>
-            </div>
-            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-2.5">
-              <p className="text-[11px] text-muted-foreground">Espacio Purgado/Liberado</p>
-              <p className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm">
-                {formatBytes(data.summary.purgedBytes)}
-              </p>
-            </div>
-          </div>
-        )}
+        {data?.summary && <StorageSummaryCards summary={data.summary} />}
 
         {feedback && (
           <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-3 py-2 text-xs text-emerald-600">
@@ -197,78 +219,31 @@ export function AdminFileManager({ accessToken }: Props) {
             formatBytes={formatBytes}
           />
 
-          {/* Panel Derecho: Proyecto Seleccionado y Archivos */}
           <div className="lg:col-span-8 flex flex-col h-full min-h-0 p-4 space-y-3 bg-background">
             {activeProject ? (
               <>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
-                  <div>
-                    <h4 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-                      <Briefcase className="size-4 text-primary" />
-                      {activeProject.projectName}
-                    </h4>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Cliente: <span className="font-medium text-foreground">{activeClient?.clientName}</span>
-                      {' • '}
-                      Total: <span className="font-semibold text-foreground">{projectStats.totalFiles}</span> archivos
-                      {' ('}
-                      <span className="text-emerald-700 dark:text-emerald-400 font-medium">
-                        {projectStats.activeFilesCount} en nube: {formatBytes(projectStats.activeBytes)}
-                      </span>
-                      {projectStats.purgedFilesCount > 0 && (
-                        <>
-                          {' • '}
-                          <span className="text-rose-600 dark:text-rose-400">
-                            {projectStats.purgedFilesCount} liberados
-                          </span>
-                        </>
-                      )}
-                      {')'}
-                    </p>
-                  </div>
-                  {projectStats.activeFilesCount > 0 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEmptyDialogOpen(true)}
-                      disabled={isPurging}
-                      className="text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-500/10 gap-1.5 shrink-0"
-                    >
-                      <Trash2 className="size-3.5" />
-                      Vaciar archivos del proyecto
-                    </Button>
-                  )}
-                </div>
+                <ProjectDetailHeader
+                  projectName={activeProject.projectName}
+                  clientName={activeClient?.clientName}
+                  projectStats={projectStats}
+                  isPurging={isPurging}
+                  onExportZip={handleExportProjectZip}
+                  onOpenEmptyDialog={() => setEmptyDialogOpen(true)}
+                />
 
-                {/* Filtro de Categorías */}
-                <div className="flex flex-wrap gap-1.5">
-                  <Button
-                    variant={selectedFolder === null ? 'default' : 'outline'}
-                    size="sm"
-                    className="h-7 text-xs"
-                    onClick={() => setSelectedFolder(null)}
-                  >
-                    Todos ({projectStats.totalFiles})
-                  </Button>
-                  {Object.values(activeProject.folders ?? {}).map((f) => (
-                    <Button
-                      key={f.folderKey}
-                      variant={selectedFolder === f.folderKey ? 'default' : 'outline'}
-                      size="sm"
-                      className="h-7 text-xs"
-                      onClick={() => setSelectedFolder(f.folderKey)}
-                    >
-                      {f.folderLabel} ({f.files.length})
-                    </Button>
-                  ))}
-                </div>
+                <FolderFilterTabs
+                  folders={activeProject.folders ?? {}}
+                  selectedFolder={selectedFolder}
+                  totalFiles={projectStats.totalFiles}
+                  onSelectFolder={setSelectedFolder}
+                />
 
-                {/* Tabla de Archivos con flex-1 para encajar en el layout */}
                 <div className="flex-1 min-h-0 flex flex-col">
                   <FileManagerTable
                     files={activeFiles}
                     accessToken={accessToken}
                     onSelectForPurge={(file) => setFileToPurge(file)}
+                    onDownloadBatch={handleExportBatchZip}
                   />
                 </div>
               </>
@@ -292,12 +267,23 @@ export function AdminFileManager({ accessToken }: Props) {
         <EmptyProjectFilesDialog
           isOpen={emptyDialogOpen}
           projectName={activeProject.projectName}
+          clientName={activeClient?.clientName}
           filesCount={activeProject.totalFiles}
           totalBytes={activeProject.totalBytes}
+          files={activeProjectFiles}
+          accessToken={accessToken}
           onClose={() => setEmptyDialogOpen(false)}
           onConfirm={handleEmptyProjectConfirm}
         />
       )}
+
+      <BulkExportProgressDialog
+        isOpen={exportDialogOpen}
+        title={exportTitle}
+        progress={exportProgress}
+        error={exportError}
+        onClose={handleCloseExport}
+      />
     </Card>
   )
 }

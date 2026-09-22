@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { formatBytes } from '@/shared/lib'
 import { downloadGatewayFile } from '@/features/collab/utils'
 import { getFolderLabel, getFolderBadgeClass } from './file-manager.constants'
@@ -26,6 +27,7 @@ type Props = {
   files: StorageFileItem[]
   accessToken: string
   onSelectForPurge: (file: StorageFileItem) => void
+  onDownloadBatch?: (selectedFiles: StorageFileItem[]) => void
 }
 
 function formatDate(iso: string): string {
@@ -51,8 +53,14 @@ function getFileIcon(mime?: string) {
   return <FileText className="size-4 text-muted-foreground shrink-0" />
 }
 
-export function FileManagerTable({ files, accessToken, onSelectForPurge }: Props) {
+export function FileManagerTable({
+  files,
+  accessToken,
+  onSelectForPurge,
+  onDownloadBatch,
+}: Props) {
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
   const handleDownload = async (file: StorageFileItem) => {
     setDownloadingId(file.id)
@@ -61,6 +69,28 @@ export function FileManagerTable({ files, accessToken, onSelectForPurge }: Props
     } finally {
       setDownloadingId(null)
     }
+  }
+
+  const activeFiles = files.filter((f) => !f.isPurged)
+  const allActiveSelected =
+    activeFiles.length > 0 && activeFiles.every((f) => selectedIds.has(f.id))
+
+  const toggleSelectAll = () => {
+    if (allActiveSelected) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(activeFiles.map((f) => f.id)))
+    }
+  }
+
+  const toggleSelectFile = (id: string) => {
+    const next = new Set(selectedIds)
+    if (next.has(id)) {
+      next.delete(id)
+    } else {
+      next.add(id)
+    }
+    setSelectedIds(next)
   }
 
   if (files.length === 0) {
@@ -73,17 +103,58 @@ export function FileManagerTable({ files, accessToken, onSelectForPurge }: Props
     )
   }
 
-  const activeBytesInView = files
-    .filter((f) => !f.isPurged)
-    .reduce((acc, f) => acc + f.sizeBytes, 0)
+  const activeBytesInView = activeFiles.reduce((acc, f) => acc + f.sizeBytes, 0)
+  const selectedFiles = files.filter((f) => selectedIds.has(f.id))
+  const selectedBytes = selectedFiles.reduce((acc, f) => acc + f.sizeBytes, 0)
 
   return (
     <div className="h-full flex flex-col rounded-lg border border-border/60 overflow-hidden bg-background shadow-2xs">
+      {selectedIds.size > 0 && (
+        <div className="bg-primary/5 border-b border-primary/20 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs animate-in fade-in-50">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-primary">
+              {selectedIds.size} {selectedIds.size === 1 ? 'archivo seleccionado' : 'archivos seleccionados'}
+            </span>
+            <span className="text-muted-foreground font-mono">
+              ({formatBytes(selectedBytes)})
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs"
+              onClick={() => setSelectedIds(new Set())}
+            >
+              Limpiar selección
+            </Button>
+            {onDownloadBatch && (
+              <Button
+                size="sm"
+                className="h-7 text-xs gap-1.5"
+                onClick={() => onDownloadBatch(selectedFiles)}
+              >
+                <Download className="size-3.5" />
+                Descargar lote (.zip)
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 overflow-auto">
-        <Table className="table-fixed w-full min-w-[680px]">
+        <Table className="table-fixed w-full min-w-[700px]">
           <TableHeader className="sticky top-0 z-10 bg-muted/85 backdrop-blur-sm shadow-[0_1px_0_0_rgba(0,0,0,0.06)]">
             <TableRow className="border-b border-border/60 text-[11px] font-bold uppercase tracking-wider text-muted-foreground hover:bg-transparent">
-              <TableHead className="w-[34%] min-w-[200px] border-r border-border/40 py-2.5">
+              <TableHead className="w-[40px] min-w-[40px] text-center border-r border-border/40 py-2.5">
+                <Checkbox
+                  checked={allActiveSelected}
+                  onCheckedChange={toggleSelectAll}
+                  aria-label="Seleccionar todos los archivos activos"
+                  disabled={activeFiles.length === 0}
+                />
+              </TableHead>
+              <TableHead className="w-[32%] min-w-[190px] border-r border-border/40 py-2.5">
                 Archivo
               </TableHead>
               <TableHead className="w-[18%] min-w-[130px] border-r border-border/40 py-2.5">
@@ -98,7 +169,7 @@ export function FileManagerTable({ files, accessToken, onSelectForPurge }: Props
               <TableHead className="w-[12%] min-w-[90px] border-r border-border/40 py-2.5">
                 Estado
               </TableHead>
-              <TableHead className="w-[10%] min-w-[75px] text-right py-2.5">
+              <TableHead className="w-[12%] min-w-[75px] text-right py-2.5">
                 Acciones
               </TableHead>
             </TableRow>
@@ -109,8 +180,17 @@ export function FileManagerTable({ files, accessToken, onSelectForPurge }: Props
                 key={file.id}
                 className={`transition-colors border-b border-border/40 last:border-b-0 hover:bg-muted/30 ${
                   file.isPurged ? 'opacity-65 bg-muted/10' : ''
-                }`}
+                } ${selectedIds.has(file.id) ? 'bg-primary/5' : ''}`}
               >
+                <TableCell className="border-r border-border/30 py-2 text-center">
+                  <Checkbox
+                    checked={selectedIds.has(file.id)}
+                    onCheckedChange={() => toggleSelectFile(file.id)}
+                    disabled={file.isPurged}
+                    aria-label={`Seleccionar ${file.fileName}`}
+                  />
+                </TableCell>
+
                 <TableCell className="border-r border-border/30 py-2">
                   <div className="flex items-center gap-2 min-w-0">
                     {getFileIcon(file.mimeType)}
