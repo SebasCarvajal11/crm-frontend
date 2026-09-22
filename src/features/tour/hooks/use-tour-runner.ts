@@ -40,6 +40,12 @@ function mapTourStepToDriveStep(st: CimaTourStep, isMobile: boolean): DriveStep 
   }
 }
 
+function resetHorizontalScroll(): void {
+  if (typeof window !== 'undefined' && window.scrollX !== 0) {
+    window.scrollTo({ left: 0, top: window.scrollY, behavior: 'instant' })
+  }
+}
+
 export function useTourRunner() {
   const driverRef = useRef<Driver | null>(null)
   const cursorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -57,6 +63,7 @@ export function useTourRunner() {
   const stopTour = useCallback(() => {
     clearTimer()
     removeTourCursor()
+    resetHorizontalScroll()
     if (driverRef.current) {
       driverRef.current.destroy()
       driverRef.current = null
@@ -76,6 +83,7 @@ export function useTourRunner() {
   const startTour = useCallback(
     async (tour: CimaTourDefinition) => {
       stopTour()
+      resetHorizontalScroll()
       useTourStore.getState().closeHelpCenter()
       setActiveTour(tour.id)
 
@@ -98,7 +106,7 @@ export function useTourRunner() {
         allowClose: true,
         overlayColor: '#000000',
         overlayOpacity: 0.65,
-        stagePadding: isMobile ? 6 : 8,
+        stagePadding: isMobile ? 4 : 8,
         stageRadius: 10,
         popoverClass: 'cima-tour-popover',
         showProgress: true,
@@ -107,8 +115,10 @@ export function useTourRunner() {
         onHighlightStarted: () => {
           clearTimer()
           removeTourCursor()
+          resetHorizontalScroll()
         },
         onHighlighted: (element) => {
+          resetHorizontalScroll()
           scheduleCursor(element)
         },
         onDeselected: () => {

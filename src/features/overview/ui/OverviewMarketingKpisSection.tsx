@@ -70,11 +70,11 @@ export function OverviewMarketingKpisSection({ metrics, isLoading }: Props) {
   ]
 
   return (
-    <Card className="shadow-sm border border-border/80">
-      <CardHeader className="pb-3">
+    <Card className="shadow-sm border border-border/80 min-w-0 w-full max-w-full overflow-hidden">
+      <CardHeader className="pb-3 min-w-0 w-full">
         <div className="flex items-center gap-2">
-          <TrendingUp className="size-4 text-primary" />
-          <CardTitle className="text-base font-bold">
+          <TrendingUp className="size-4 text-primary shrink-0" />
+          <CardTitle className="text-base font-bold truncate">
             Métricas Clave de Clientes y Marketing
           </CardTitle>
         </div>
@@ -82,7 +82,7 @@ export function OverviewMarketingKpisSection({ metrics, isLoading }: Props) {
           Indicadores esenciales de captación, campañas y desempeño comercial.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="min-w-0 w-full max-w-full overflow-hidden">
         {isLoading ? (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {Array.from({ length: 6 }).map((_, i) => (

@@ -86,8 +86,8 @@ export function DashboardOverview({
   const recentClientsQ = useOverviewRecentClients(accessToken, isAdmin)
 
   return (
-    <div className="space-y-6 max-w-full overflow-x-hidden">
-      <div className="space-y-1 animate-fade-up">
+    <div className="space-y-6 w-full max-w-full overflow-x-clip min-w-0">
+      <div className="space-y-1 animate-fade-up min-w-0">
         <p className="text-2xl font-medium text-muted-foreground sm:text-3xl">
           Hola <span className="font-black text-primary">{firstName}</span>
         </p>
@@ -99,15 +99,15 @@ export function DashboardOverview({
         </p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2 animate-fade-up stagger-1">
-        <div data-tour="overview-identity">
+      <div className="grid gap-4 lg:grid-cols-2 animate-fade-up stagger-1 min-w-0 w-full max-w-full">
+        <div data-tour="overview-identity" className="min-w-0 w-full max-w-full">
           <OverviewIdentityCard
             identity={identity}
             avatarUrl={avatarUrl}
             onOpenProfile={onOpenProfile}
           />
         </div>
-        <div data-tour="overview-notifications">
+        <div data-tour="overview-notifications" className="min-w-0 w-full max-w-full">
           <OverviewNotificationsSection
             notifications={notifications}
             isLoading={isNotifLoading}
@@ -116,7 +116,7 @@ export function DashboardOverview({
         </div>
       </div>
 
-      <div className="animate-fade-up stagger-2" data-tour="overview-kpis">
+      <div className="animate-fade-up stagger-2 min-w-0 w-full max-w-full" data-tour="overview-kpis">
         <OverviewMarketingKpisSection
           metrics={metrics}
           isLoading={isMarketingLoading}
@@ -124,7 +124,7 @@ export function DashboardOverview({
       </div>
 
       {isWorker && (
-        <div className="animate-fade-up stagger-3" data-tour="overview-worker-tasks">
+        <div className="animate-fade-up stagger-3 min-w-0 w-full max-w-full" data-tour="overview-worker-tasks">
           <OverviewWorkerPendingTasksSection
             tasks={workerPendingTasks}
             isLoading={isCollabLoading}
@@ -134,8 +134,8 @@ export function DashboardOverview({
       )}
 
       {isAdmin && (
-        <div className="space-y-6 animate-fade-up stagger-3">
-          <div data-tour="overview-admin-changes">
+        <div className="space-y-6 animate-fade-up stagger-3 min-w-0 w-full max-w-full">
+          <div data-tour="overview-admin-changes" className="min-w-0 w-full max-w-full">
             <OverviewAdminPendingChangeRequestsSection
               items={adminPendingChangeRequests}
               isLoading={isAdminPendingChangeRequestsLoading}
@@ -143,7 +143,7 @@ export function DashboardOverview({
             />
           </div>
 
-          <div data-tour="overview-admin-blocked">
+          <div data-tour="overview-admin-blocked" className="min-w-0 w-full max-w-full">
             <OverviewAdminBlockedTasksSection
               tasks={adminBlockedTasks}
               isLoading={isCollabLoading}
@@ -151,15 +151,15 @@ export function DashboardOverview({
             />
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div data-tour="overview-recent-projects">
+          <div className="grid gap-4 lg:grid-cols-2 min-w-0 w-full max-w-full">
+            <div data-tour="overview-recent-projects" className="min-w-0 w-full max-w-full">
               <OverviewAdminRecentProjectsSection
                 projects={adminRecentProjects}
                 isLoading={isCollabLoading}
                 onOpenProject={onOpenProject}
               />
             </div>
-            <div data-tour="overview-admin-clients">
+            <div data-tour="overview-admin-clients" className="min-w-0 w-full max-w-full">
               <OverviewAdminRecentClientsSection
                 clients={recentClientsQ.data ?? []}
                 isLoading={recentClientsQ.isLoading}
@@ -167,14 +167,14 @@ export function DashboardOverview({
             </div>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div data-tour="overview-admin-workload">
+          <div className="grid gap-4 lg:grid-cols-2 min-w-0 w-full max-w-full">
+            <div data-tour="overview-admin-workload" className="min-w-0 w-full max-w-full">
               <OverviewAdminWorkloadSection
                 workload={adminWorkerWorkload}
                 isLoading={isCollabLoading}
               />
             </div>
-            <div data-tour="overview-admin-ranking">
+            <div data-tour="overview-admin-ranking" className="min-w-0 w-full max-w-full">
               <OverviewAdminClientRankingSection
                 items={adminClientRanking}
                 isLoading={isCollabLoading}

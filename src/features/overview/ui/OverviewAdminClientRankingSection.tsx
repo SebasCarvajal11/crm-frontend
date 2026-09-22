@@ -25,12 +25,12 @@ export function OverviewAdminClientRankingSection({ items, isLoading }: Props) {
   }, [items, currentPage])
 
   return (
-    <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between">
-      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3">
-        <div className="min-w-0 space-y-0.5">
+    <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between min-w-0 w-full max-w-full overflow-hidden">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
+        <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-2">
             <Award className="size-4 text-primary shrink-0" />
-            <CardTitle className="text-base font-bold">Ranking de Clientes por Proyectos</CardTitle>
+            <CardTitle className="text-base font-bold truncate">Ranking de Clientes por Proyectos</CardTitle>
           </div>
           <CardDescription className="text-xs">
             Clientes con mayor volumen histórico y proyectos activos en ejecución.
@@ -40,15 +40,15 @@ export function OverviewAdminClientRankingSection({ items, isLoading }: Props) {
           {items.length} {items.length === 1 ? 'cliente' : 'clientes'}
         </Badge>
       </CardHeader>
-      <CardContent className="flex flex-col flex-1 justify-between gap-3">
+      <CardContent className="flex flex-col flex-1 justify-between gap-3 min-w-0 w-full max-w-full overflow-hidden">
         {isLoading ? (
-          <div className="space-y-2.5">
+          <div className="space-y-2.5 min-w-0 w-full">
             <Skeleton className="h-12 w-full rounded-lg" />
             <Skeleton className="h-12 w-full rounded-lg" />
             <Skeleton className="h-12 w-full rounded-lg" />
           </div>
         ) : items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-8 text-center">
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-8 text-center min-w-0 w-full">
             <Layers className="size-8 text-muted-foreground/60 mb-2" />
             <p className="text-sm font-medium text-foreground">Sin datos de proyectos</p>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -56,20 +56,20 @@ export function OverviewAdminClientRankingSection({ items, isLoading }: Props) {
             </p>
           </div>
         ) : (
-          <div className="flex flex-col flex-1 justify-between gap-3">
-            <div className="divide-y divide-border/60">
+          <div className="flex flex-col flex-1 justify-between gap-3 min-w-0 w-full max-w-full overflow-hidden">
+            <div className="divide-y divide-border/60 min-w-0 w-full max-w-full overflow-hidden">
               {pagedItems.map((item, idx) => {
                 const rank = (currentPage - 1) * PAGE_SIZE + idx + 1
                 return (
                   <div
                     key={item.clientName}
-                    className="flex items-center justify-between py-2.5 px-2 rounded-md interactive-row"
+                    className="flex items-center justify-between gap-2 py-2.5 px-2 rounded-md interactive-row min-w-0 w-full overflow-hidden"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
                       <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                         {rank}
                       </span>
-                      <p className="truncate text-xs font-bold text-foreground">
+                      <p className="truncate text-xs font-bold text-foreground block min-w-0 w-full">
                         {item.clientName}
                       </p>
                     </div>

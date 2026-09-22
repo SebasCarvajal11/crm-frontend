@@ -144,12 +144,12 @@ export function OverviewIdentityCard({ identity, avatarUrl, onOpenProfile }: Pro
   const displayName = fullName || identity.email.split('@')[0]
 
   return (
-    <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <div className="space-y-0.5">
+    <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between min-w-0 w-full max-w-full overflow-hidden">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
+        <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-2">
-            <UserCircle2 className="size-4 text-primary" />
-            <CardTitle className="text-base font-bold">Tu cuenta</CardTitle>
+            <UserCircle2 className="size-4 text-primary shrink-0" />
+            <CardTitle className="text-base font-bold truncate">Tu cuenta</CardTitle>
           </div>
           <CardDescription className="text-xs">
             Sesión activa y credenciales de acceso a la plataforma.
@@ -157,7 +157,7 @@ export function OverviewIdentityCard({ identity, avatarUrl, onOpenProfile }: Pro
         </div>
         <Badge
           variant="outline"
-          className="text-xs font-semibold border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 gap-1.5"
+          className="text-xs font-semibold border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 gap-1.5 shrink-0"
         >
           <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
           Activa

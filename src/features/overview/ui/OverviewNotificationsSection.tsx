@@ -79,19 +79,19 @@ function NotificationsFooter({ count }: { count: number }) {
 
 export function OverviewNotificationsSection({ notifications, isLoading, onOpen }: Props) {
   return (
-    <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <div className="space-y-0.5">
+    <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between min-w-0 w-full max-w-full overflow-hidden">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
+        <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-2">
-            <Bell className="size-4 text-primary" />
-            <CardTitle className="text-base font-bold">Últimas notificaciones</CardTitle>
+            <Bell className="size-4 text-primary shrink-0" />
+            <CardTitle className="text-base font-bold truncate">Últimas notificaciones</CardTitle>
           </div>
           <CardDescription className="text-xs">
             Novedades y menciones no leídas, ordenadas de más antigua a más reciente.
           </CardDescription>
         </div>
         {notifications.length > 0 && (
-          <Badge variant="destructive" className="text-xs font-semibold">
+          <Badge variant="destructive" className="text-xs font-semibold shrink-0">
             {notifications.length} {notifications.length === 1 ? 'pendiente' : 'pendientes'}
           </Badge>
         )}

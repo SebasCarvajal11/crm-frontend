@@ -108,8 +108,8 @@ export function OverviewAdminPendingChangeRequestsSection({
   onOpenProject,
 }: Props) {
   return (
-    <Card className="shadow-sm border border-amber-200/60 bg-amber-500/[0.02] dark:border-amber-900/50">
-      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3">
+    <Card className="shadow-sm border border-amber-200/60 bg-amber-500/[0.02] dark:border-amber-900/50 min-w-0 w-full max-w-full overflow-hidden">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
         <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">
             <GitPullRequest className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />

@@ -15,11 +15,11 @@ const PAGE_SIZE = 3
 
 function WorkloadWorkerCard({ worker }: { worker: WorkerWorkloadItem }) {
   return (
-    <div className="rounded-lg border bg-card/60 p-3.5 interactive-card hover:bg-muted/40">
-      <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-        <div className="min-w-0">
-          <p className="text-xs font-bold text-foreground truncate">{worker.workerName}</p>
-          <p className="text-[11px] text-muted-foreground truncate">{worker.workerEmail}</p>
+    <div className="rounded-lg border bg-card/60 p-3.5 interactive-card hover:bg-muted/40 min-w-0 w-full max-w-full overflow-hidden">
+      <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center min-w-0 w-full">
+        <div className="min-w-0 flex-1 overflow-hidden">
+          <p className="text-xs font-bold text-foreground truncate block min-w-0 w-full">{worker.workerName}</p>
+          <p className="text-[11px] text-muted-foreground truncate block min-w-0 w-full">{worker.workerEmail}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className="inline-flex items-center gap-1 font-semibold text-foreground">
@@ -120,8 +120,8 @@ export function OverviewAdminWorkloadSection({ workload, isLoading }: Props) {
   }, [workload, currentPage])
 
   return (
-    <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between">
-      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3">
+    <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between min-w-0 w-full max-w-full overflow-hidden">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
         <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">
             <HardHat className="size-4 text-primary shrink-0" />

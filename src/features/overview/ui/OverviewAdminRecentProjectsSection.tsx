@@ -44,26 +44,26 @@ export function OverviewAdminRecentProjectsSection({
   onOpenProject,
 }: Props) {
   return (
-    <Card className="shadow-sm border border-border/80">
-      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3">
-        <div className="min-w-0 space-y-0.5">
+    <Card className="shadow-sm border border-border/80 min-w-0 w-full max-w-full overflow-hidden">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
+        <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-2">
             <FolderGit2 className="size-4 text-primary shrink-0" />
-            <CardTitle className="text-base font-bold">Últimos proyectos</CardTitle>
+            <CardTitle className="text-base font-bold truncate">Últimos proyectos</CardTitle>
           </div>
           <CardDescription className="text-xs">
             Los 3 proyectos creados más recientemente y su estado de avance.
           </CardDescription>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="min-w-0 w-full max-w-full overflow-hidden">
         {isLoading ? (
-          <div className="space-y-3">
+          <div className="space-y-3 min-w-0 w-full">
             <Skeleton className="h-16 w-full rounded-lg" />
             <Skeleton className="h-16 w-full rounded-lg" />
           </div>
         ) : projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-8 text-center">
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-8 text-center min-w-0 w-full">
             <Layers className="size-8 text-muted-foreground/60 mb-2" />
             <p className="text-sm font-medium text-foreground">Sin proyectos creados</p>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -71,18 +71,20 @@ export function OverviewAdminRecentProjectsSection({
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 min-w-0 w-full max-w-full overflow-hidden">
             {projects.map((project) => {
               const progress = Math.min(100, Math.max(0, project.progressPercent ?? 0))
               return (
                 <div
                   key={project.id}
-                  className="group rounded-lg border bg-card/60 p-3.5 interactive-card hover:bg-muted/40"
+                  className="group rounded-lg border bg-card/60 p-3.5 interactive-card hover:bg-muted/40 min-w-0 w-full max-w-full overflow-hidden"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 space-y-0.5">
-                      <p className="text-xs font-bold text-foreground truncate">{project.name}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">
+                  <div className="flex items-start justify-between gap-2 min-w-0 w-full">
+                    <div className="min-w-0 flex-1 space-y-0.5 overflow-hidden">
+                      <p className="text-xs font-bold text-foreground truncate block min-w-0 w-full" title={project.name}>
+                        {project.name}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground truncate block min-w-0 w-full" title={project.clientName}>
                         Cliente: <span className="text-foreground/80">{project.clientName}</span>
                       </p>
                     </div>
@@ -94,7 +96,7 @@ export function OverviewAdminRecentProjectsSection({
                           variant="ghost"
                           size="icon"
                           onClick={() => onOpenProject(project.id)}
-                          className="size-7"
+                          className="size-7 cursor-pointer"
                           aria-label={`Abrir proyecto ${project.name}`}
                         >
                           <ArrowRight className="size-3.5" />
@@ -103,12 +105,12 @@ export function OverviewAdminRecentProjectsSection({
                     </div>
                   </div>
 
-                  <div className="mt-3 space-y-1">
+                  <div className="mt-3 space-y-1 min-w-0 w-full">
                     <div className="flex justify-between text-[11px]">
                       <span className="text-muted-foreground">Progreso</span>
                       <span className="font-semibold text-foreground">{progress}%</span>
                     </div>
-                    <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+                    <div className="h-1.5 w-full max-w-full rounded-full bg-secondary overflow-hidden">
                       <div
                         className="h-full bg-primary transition-all duration-300"
                         style={{ width: `${progress}%` }}

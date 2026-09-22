@@ -127,8 +127,8 @@ export function OverviewWorkerPendingTasksSection({
   const currentTime = useCurrentTime()
 
   return (
-    <Card className="shadow-sm border border-border/80">
-      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3">
+    <Card className="shadow-sm border border-border/80 min-w-0 w-full max-w-full overflow-hidden">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
         <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">
             <ListTodo className="size-4 text-primary shrink-0" />
