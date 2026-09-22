@@ -138,7 +138,7 @@ export function AppShell({
 
         <main
           className={cn(
-            'min-w-0 flex-1 overflow-x-hidden overflow-y-auto scroll-smooth',
+            'min-w-0 flex-1 overflow-x-hidden overflow-y-auto',
             'scrollbar-thin px-4 pt-6 pb-6 sm:px-6 sm:py-6 lg:px-8 scroll-pt-16 view-transition'
           )}
         >

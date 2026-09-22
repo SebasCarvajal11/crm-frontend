@@ -176,7 +176,8 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     setVisitedTabs((prev) => (prev.has(activeTab) ? prev : new Set(prev).add(activeTab)))
   }
 
-  useScrollToTop(activeTab)
+  const isReady = Boolean(identity && !dashboardQuery.isPending)
+  useScrollToTop(`${activeTab}-${isReady}`)
 
   useEffect(() => {
     if (!identity?.role) return

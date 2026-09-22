@@ -88,7 +88,15 @@ export function LoginForm() {
   })
 
   return (
-    <form onSubmit={handleSubmit((v) => mutation.mutate(v))} className="space-y-4">
+    <form
+      onSubmit={handleSubmit((v) => {
+        if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur()
+        }
+        mutation.mutate(v)
+      })}
+      className="space-y-4"
+    >
       <FormField id="email" label="Correo" error={errors.email?.message}>
         <EmailInputSection register={register} />
       </FormField>

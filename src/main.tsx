@@ -10,6 +10,10 @@ import { applyDocumentZoom, getStoredZoom } from './features/accessibility/hooks
 // Aplica el zoom almacenado inmediatamente antes del render para evitar parpadeos visuales (FOUC).
 applyDocumentZoom(getStoredZoom())
 
+if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual'
+}
+
 import { routeTree } from './routeTree.gen'
 import { bootstrapSession, useSessionStore } from './app/session/session-store'
 

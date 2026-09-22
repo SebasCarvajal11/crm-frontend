@@ -173,11 +173,13 @@ const mockUsers = {
   },
 }
 
-async function setupMocks(page: Page) {
-  await page.addInitScript(() => {
-    sessionStorage.setItem('cima_access_token', 'mock-token-admin-cima')
-    sessionStorage.setItem('cima_user_email', 'gerente@cima.dev')
-  })
+async function setupMocks(page: Page, autoLogin = true) {
+  if (autoLogin) {
+    await page.addInitScript(() => {
+      sessionStorage.setItem('cima_access_token', 'mock-token-admin-cima')
+      sessionStorage.setItem('cima_user_email', 'gerente@cima.dev')
+    })
+  }
 
   await page.route('**/api/**', async (route: Route) => {
     const url = route.request().url()
@@ -193,6 +195,7 @@ async function setupMocks(page: Page) {
         body: JSON.stringify({
           data: {
             accessToken: 'mock-token-admin-cima',
+            access_token: 'mock-token-admin-cima',
             user: {
               id: '11111111-1111-4111-8111-111111111111',
               email: 'gerente@cima.dev',
@@ -457,6 +460,59 @@ test.describe('Verificación de Correcciones de Responsividad Móvil', () => {
     await page.waitForTimeout(300)
     await fileManagerCard.screenshot({
       path: path.join(outputDir, '11-mobile-file-manager-empty-collapsed.png'),
+    })
+  })
+
+  test('5. Flujo de Login en Móvil: El saludo no queda cortado tras submit con teclado simulado (393x852)', async ({ page }) => {
+    await setupMocks(page, false)
+    await page.setViewportSize({ width: 393, height: 852 })
+    await page.goto('/login')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(400)
+
+    // Llenar campos de login
+    await page.fill('#email', 'gerente@cima.dev')
+    await page.fill('#password', 'CimaPassword123!')
+
+    // Simular desplazamiento de scroll inducido por el teclado virtual en iOS
+    await page.evaluate(() => window.scrollTo(0, 50))
+
+    // Enviar formulario
+    const submitBtn = page.getByRole('button', { name: /^Entrar/i })
+    await expect(submitBtn).toBeVisible()
+    await submitBtn.click()
+
+    // Esperar llegada al dashboard
+    await page.waitForURL('**/dashboard**')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(600)
+
+    // Validar saludo completamente visible
+    const greeting = page.locator('text=Hola Valeria')
+    await expect(greeting).toBeVisible({ timeout: 15_000 })
+    const welcome = page.locator('text=Bienvenido a')
+    await expect(welcome).toBeVisible()
+
+    // Validar que el scroll de la ventana se haya forzado a 0
+    const scrollY = await page.evaluate(() => window.scrollY)
+    expect(scrollY).toBe(0)
+
+    // Validar que la cabecera sticky esté visible y el saludo esté estrictamente por debajo de ella
+    const header = page.locator('header.sticky').first()
+    await expect(header).toBeVisible()
+    const headerBox = await header.boundingBox()
+    const greetingBox = await greeting.boundingBox()
+
+    expect(headerBox).not.toBeNull()
+    expect(greetingBox).not.toBeNull()
+    if (headerBox && greetingBox) {
+      expect(greetingBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height)
+    }
+
+    // Capturar screenshot del resultado del login móvil limpio
+    await page.screenshot({
+      path: path.join(outputDir, '12-mobile-safari-login-overview-greeting.png'),
+      fullPage: false,
     })
   })
 })

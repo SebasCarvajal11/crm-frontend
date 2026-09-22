@@ -26,6 +26,14 @@ export function useLoginFlow() {
     },
     onSuccess: (data, variables) => {
       queryClient.clear()
+      if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur()
+      }
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+        document.documentElement.scrollTop = 0
+        document.body.scrollTop = 0
+      }
       setSession(data.data.access_token, variables.email)
       navigate({ to: '/dashboard' })
     },
