@@ -285,17 +285,23 @@ test.describe('Validación de Previsualización, Depuración y Gobernanza de Alm
     await expect(page.getByText('Espacio Activo en Nube')).toBeVisible()
     await expect(page.getByText('Espacio Purgado/Liberado')).toBeVisible()
 
-    // Capturar vista general del gestor de archivos en 1080p
-    await page.screenshot({
-      path: path.join(outputDir, '01-admin-storage-manager-1080p.png'),
-      fullPage: false,
-    })
+    // Scroll al gestor de archivos y seleccionar cliente y proyecto
+    await title.scrollIntoViewIfNeeded()
+    await page.waitForTimeout(500)
 
-    // Seleccionar cliente y proyecto
     const clientItem = page.getByTestId('storage-client-item').first()
     await expect(clientItem).toBeVisible()
     await clientItem.click()
     await page.waitForTimeout(500)
+
+    // Capturar vista general del gestor de archivos en 1080p con cliente y tabla seleccionada
+    const fileManagerCard = page
+      .locator('.rounded-2xl')
+      .filter({ hasText: 'Gestor y Explorador de Archivos por Cliente' })
+      .first()
+    await fileManagerCard.screenshot({
+      path: path.join(outputDir, '01-admin-storage-manager-1080p.png'),
+    })
 
     // Validar presencia del botón corporativo "Vaciar archivos del proyecto"
     const emptyBtn = page.getByRole('button', { name: /Vaciar archivos del proyecto/i })
@@ -359,22 +365,27 @@ test.describe('Validación de Previsualización, Depuración y Gobernanza de Alm
 
     for (const vp of viewports) {
       await page.setViewportSize({ width: vp.width, height: vp.height })
-      await page.goto('/dashboard')
+      await page.goto('/dashboard?tab=admin')
       await page.waitForLoadState('networkidle')
+      await page.waitForTimeout(500)
 
-      // En mobile/tablet puede ser necesario abrir el menú lateral si aplica
-      if (vp.width >= 768) {
-        const adminTab = page.locator('aside button').filter({ hasText: 'Administración' }).first()
-        if (await adminTab.isVisible()) {
-          await adminTab.click()
-          await page.waitForTimeout(500)
-        }
+      const fileManagerCard = page
+        .locator('.rounded-2xl')
+        .filter({ hasText: 'Gestor y Explorador de Archivos por Cliente' })
+        .first()
+
+      if (await fileManagerCard.isVisible()) {
+        await fileManagerCard.scrollIntoViewIfNeeded()
+        await page.waitForTimeout(400)
+        await fileManagerCard.screenshot({
+          path: path.join(outputDir, `04-responsive-${vp.name}.png`),
+        })
+      } else {
+        await page.screenshot({
+          path: path.join(outputDir, `04-responsive-${vp.name}.png`),
+          fullPage: false,
+        })
       }
-
-      await page.screenshot({
-        path: path.join(outputDir, `04-responsive-${vp.name}.png`),
-        fullPage: false,
-      })
     }
   })
 })
