@@ -3,7 +3,7 @@ import path from 'path'
 import fs from 'fs'
 
 const outputDir = path.resolve(
-  'C:/Users/27seb/.gemini/antigravity/brain/e2057b0d-12c6-4807-b5cd-ffe30e2c58d5/screenshots'
+  'C:/Users/27seb/.gemini/antigravity/brain/08be4eea-124e-46c0-9b97-1def1d528678/screenshots'
 )
 if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir, { recursive: true })
@@ -388,4 +388,71 @@ test.describe('Validación de Previsualización, Depuración y Gobernanza de Alm
       }
     }
   })
+
+  test('3. Descarga masiva (.zip) estilo Google Drive, selección múltiple de archivos y recomendación preventiva al vaciar', async ({
+    page,
+  }) => {
+    await setupMocks(page)
+    await page.setViewportSize({ width: 1920, height: 1080 })
+    await page.goto('/dashboard?tab=admin')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(500)
+
+    // Seleccionar cliente
+    const clientItem = page.getByTestId('storage-client-item').first()
+    await expect(clientItem).toBeVisible({ timeout: 15_000 })
+    await clientItem.click()
+    await page.waitForTimeout(500)
+
+    // 1. Validar botón de descarga de proyecto completo estilo Google Drive
+    const downloadProjectBtn = page.getByRole('button', { name: /Descargar Proyecto \(\.zip\)/i })
+    await expect(downloadProjectBtn).toBeVisible()
+
+    // 2. Validar casillas de selección múltiple (checkboxes)
+    const headerCheckbox = page.getByRole('checkbox', { name: /Seleccionar todos/i })
+    await expect(headerCheckbox).toBeVisible()
+    await headerCheckbox.click()
+    await page.waitForTimeout(400)
+
+    // Barra de herramientas flotante de selección
+    await expect(page.getByText(/seleccionado/i)).toBeVisible()
+    const downloadBatchBtn = page.getByRole('button', { name: /Descargar lote \(\.zip\)/i })
+    await expect(downloadBatchBtn).toBeVisible()
+
+    // Capturar screenshot de selección múltiple tipo Google Drive
+    const fileManagerCard = page
+      .locator('.rounded-2xl')
+      .filter({ hasText: 'Gestor y Explorador de Archivos por Cliente' })
+      .first()
+    await fileManagerCard.screenshot({
+      path: path.join(outputDir, '06-admin-file-manager-batch-selection.png'),
+    })
+
+    // Limpiar selección
+    await page.getByRole('button', { name: 'Limpiar selección' }).click()
+    await page.waitForTimeout(300)
+    await expect(downloadBatchBtn).not.toBeVisible()
+
+    // 3. Validar diálogo de vaciado con recomendación preventiva tipo Google Drive
+    const emptyBtn = page.getByRole('button', { name: /Vaciar archivos del proyecto/i })
+    await expect(emptyBtn).toBeVisible()
+    await emptyBtn.click()
+
+    // Comprobar elementos del diálogo preventivo
+    await expect(page.getByRole('heading', { name: 'Vaciar Archivos del Proyecto' })).toBeVisible()
+    await expect(page.getByText(/Recomendación de seguridad \(Google Drive\)/i)).toBeVisible()
+    await expect(page.getByText(/Te sugerimos descargar un respaldo comprimido \(\.zip\)/i)).toBeVisible()
+    await expect(page.getByRole('button', { name: /Solo Descargar \(\.zip\)/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Descargar y Vaciar/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Confirmar y Vaciar' })).toBeVisible()
+
+    // Capturar screenshot del diálogo de vaciado con recomendación preventiva
+    const alertDialog = page.locator('[role="alertdialog"]')
+    await alertDialog.screenshot({
+      path: path.join(outputDir, '07-admin-file-manager-preventive-purge-dialog.png'),
+    })
+
+    await page.getByRole('button', { name: 'Cancelar' }).click()
+  })
 })
+
