@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Progress } from '@/components/ui/progress'
+import { formatBytes } from '@/shared/lib'
 import type { StorageFileItem } from '@/features/admin/api/admin-storage-explorer.api'
 
 type Props = {
@@ -19,12 +20,6 @@ type Props = {
   isOpen: boolean
   onClose: () => void
   onConfirm: (reason: string, forcePurgeSigned: boolean) => Promise<void>
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 export function FilePurgeDialog({ file, isOpen, onClose, onConfirm }: Props) {
@@ -91,7 +86,7 @@ export function FilePurgeDialog({ file, isOpen, onClose, onConfirm }: Props) {
                 Depurar Archivo para Liberar Espacio
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
-                Esta acción eliminará el archivo binario en la nube para recuperar espacio en la cuota.
+                Esta acción eliminará el archivo binario en la nube para recuperar espacio en la cuota de almacenamiento.
               </DialogDescription>
             </div>
           </div>

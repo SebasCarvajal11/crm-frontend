@@ -12,6 +12,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 
+import { formatBytes } from '@/shared/lib'
+
 type Props = {
   isOpen: boolean
   projectName: string
@@ -19,13 +21,6 @@ type Props = {
   totalBytes: number
   onClose: () => void
   onConfirm: () => Promise<void>
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`
 }
 
 export function EmptyProjectFilesDialog({
@@ -98,11 +93,13 @@ export function EmptyProjectFilesDialog({
           <div className="rounded-xl border border-border/80 bg-muted/25 p-3.5 space-y-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-2 border-b border-border/40">
               <div className="space-y-0.5 min-w-0">
-                <span className="text-[11px] font-medium text-muted-foreground block">Proyecto afectado</span>
+                <span className="text-[11px] font-medium text-muted-foreground block">Proyecto afectado:</span>
                 <span className="font-semibold text-foreground text-xs break-words block">{projectName}</span>
               </div>
               <div className="space-y-0.5 min-w-0">
-                <span className="text-[11px] font-medium text-muted-foreground block">Archivos a depurar</span>
+                <span className="text-[11px] font-medium text-muted-foreground block">
+                  Total de archivos a depurar: {filesCount}
+                </span>
                 <span className="font-semibold text-foreground text-xs block">{filesCount} documentos</span>
               </div>
             </div>

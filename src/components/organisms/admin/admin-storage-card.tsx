@@ -12,18 +12,11 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAdminStorageStats } from '@/features/admin/hooks'
+import { formatBytes } from '@/shared/lib'
 import type { CloudStorageStats, DiskStats } from '@/features/admin/api'
 
 type Props = {
   accessToken: string
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`
 }
 
 function getProgressColor(percentage: number): string {
@@ -211,7 +204,7 @@ export function AdminStorageCard({ accessToken }: Props) {
   }
 
   return (
-    <Card className="border-border/60 shadow-sm">
+    <Card className="rounded-2xl border-border/70 bg-card shadow-sm">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
