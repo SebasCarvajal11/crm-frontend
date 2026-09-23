@@ -5,14 +5,12 @@ import { useTourStore } from '../model/tour-store'
 import { useTourContext } from './use-tour-context'
 import type { CimaTourDefinition } from '../model/types'
 import { waitForElement } from '../utils/dom-target-finder'
-import { showTourCursor, removeTourCursor } from '../utils/cursor-helper'
 import {
   resetHorizontalScroll,
   centerElementInScrollParents,
   scrollTargetIntoView,
   startScrollSupervisor,
   stopScrollSupervisor,
-  triggerStepAnimation,
 } from '../utils/scroll-helper'
 import {
   mapTourStepToDriveStep,
@@ -63,42 +61,22 @@ async function handleActionTransition(
 
 export function useTourRunner() {
   const driverRef = useRef<Driver | null>(null)
-  const cursorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const navigate = useNavigate()
   const ctx = useTourContext()
   const markTourCompleted = useTourStore((s) => s.markTourCompleted)
   const setActiveTour = useTourStore((s) => s.setActiveTour)
   const isTransitioningRef = useRef(false)
 
-  const clearTimer = useCallback(() => {
-    if (cursorTimerRef.current) {
-      clearTimeout(cursorTimerRef.current)
-      cursorTimerRef.current = null
-    }
-  }, [])
-
   const stopTour = useCallback(() => {
-    clearTimer()
     stopScrollSupervisor()
     isTransitioningRef.current = false
-    removeTourCursor()
     resetHorizontalScroll()
     if (driverRef.current) {
       driverRef.current.destroy()
       driverRef.current = null
     }
     setActiveTour(null)
-  }, [clearTimer, setActiveTour])
-
-  const scheduleCursor = useCallback((element?: Element) => {
-    clearTimer()
-    if (element) {
-      cursorTimerRef.current = setTimeout(() => {
-        if (driverRef.current?.isActive()) driverRef.current.refresh()
-        showTourCursor(element)
-      }, 200)
-    }
-  }, [clearTimer])
+  }, [setActiveTour])
 
   const startTour = useCallback(
     async (tour: CimaTourDefinition) => {
@@ -117,8 +95,8 @@ export function useTourRunner() {
 
       const instance = driver({
         animate: true,
-        smoothScroll: true,
-        duration: 220,
+        smoothScroll: false,
+        duration: 200,
         allowClose: true,
         waitForElement: 1200,
         overlayColor: '#000000',
@@ -181,9 +159,6 @@ export function useTourRunner() {
           opts.driver.movePrevious()
         },
         onHighlightStarted: (el, _step, opts) => {
-          triggerStepAnimation()
-          clearTimer()
-          removeTourCursor()
           resetHorizontalScroll()
           const activeIdx = opts?.state?.activeIndex ?? opts?.index ?? 0
           const targetTab = filtered[activeIdx]?.switchWorkspaceTab
@@ -193,7 +168,6 @@ export function useTourRunner() {
         onHighlighted: (element, _step, opts) => {
           resetHorizontalScroll()
           if (element) centerElementInScrollParents(element)
-          scheduleCursor(element)
           const idx = opts.driver.getActiveIndex() ?? 0
           if (filtered[idx]?.onNextAction === 'openProject' && element) {
             const clickTarget = element.querySelector<HTMLElement>('button') ?? element
@@ -206,14 +180,8 @@ export function useTourRunner() {
             }, { once: true })
           }
         },
-        onDeselected: () => {
-          clearTimer()
-          removeTourCursor()
-        },
         onDestroyed: () => {
-          clearTimer()
           stopScrollSupervisor()
-          removeTourCursor()
           markTourCompleted(tour.id)
           setActiveTour(null)
           driverRef.current = null
@@ -224,7 +192,7 @@ export function useTourRunner() {
       startScrollSupervisor(instance)
       instance.drive()
     },
-    [clearTimer, ctx.role, markTourCompleted, navigate, scheduleCursor, setActiveTour, stopTour]
+    [ctx.role, markTourCompleted, navigate, setActiveTour, stopTour]
   )
 
   const highlightTarget = useCallback(
@@ -247,24 +215,21 @@ export function useTourRunner() {
 
       if (targetTab) switchTabIfNeeded(targetTab)
       const el = await waitForElement(targetSelector, 1500, fallbackSelector)
-      if (el) await scrollTargetIntoView(el, 180)
+      if (el) await scrollTargetIntoView(el, 50)
       const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
 
       const instance = driver({
         animate: true,
-        smoothScroll: true,
-        duration: 220,
+        smoothScroll: false,
+        duration: 200,
         allowClose: true,
         overlayColor: '#000000',
         overlayOpacity: 0.65,
         stagePadding: isMobile ? 6 : 8,
         stageRadius: 10,
         popoverClass: 'cima-tour-popover',
-        onHighlighted: (element) => scheduleCursor(element),
         onDestroyed: () => {
-          clearTimer()
           stopScrollSupervisor()
-          removeTourCursor()
           driverRef.current = null
         },
       })
@@ -283,7 +248,7 @@ export function useTourRunner() {
         },
       })
     },
-    [clearTimer, navigate, scheduleCursor, stopTour]
+    [navigate, stopTour]
   )
 
   return { startTour, highlightTarget, stopTour }

@@ -1,14 +1,13 @@
 /**
- * Utilidad para desplazamiento inteligente de elementos objetivo del Tour.
- * Asegura que elementos dentro de contenedores con scroll horizontal o vertical
- * se centren en la vista y no congelen la pantalla al desplazarse en movil.
+ * Utilidad de desplazamiento inteligente para CIMA Smart Copilot.
+ * Centra elementos en el viewport de <main> y contenedores Kanban
+ * sin colisionar con el header sticky ni con el popover inferior.
  */
 
 type DriverRef = { refresh: () => void; isActive: () => boolean }
 
 let activeDriver: DriverRef | null = null
 let scrollTimeout: ReturnType<typeof setTimeout> | null = null
-let animTimeout: ReturnType<typeof setTimeout> | null = null
 let rAF: number | null = null
 let supervisorActive = false
 
@@ -30,7 +29,7 @@ function handleScrollOrTouch(): void {
   scrollTimeout = setTimeout(() => {
     document.body.classList.remove('cima-tour-scrolling')
     scrollTimeout = null
-  }, 120)
+  }, 100)
 }
 
 export function startScrollSupervisor(driver?: DriverRef | null): void {
@@ -54,28 +53,13 @@ export function stopScrollSupervisor(): void {
     clearTimeout(scrollTimeout)
     scrollTimeout = null
   }
-  if (animTimeout) {
-    clearTimeout(animTimeout)
-    animTimeout = null
-  }
   if (rAF) {
     cancelAnimationFrame(rAF)
     rAF = null
   }
   if (typeof document !== 'undefined') {
     document.body.classList.remove('cima-tour-scrolling')
-    document.body.classList.remove('cima-tour-animating')
   }
-}
-
-export function triggerStepAnimation(durationMs = 240): void {
-  if (typeof document === 'undefined') return
-  document.body.classList.add('cima-tour-animating')
-  if (animTimeout) clearTimeout(animTimeout)
-  animTimeout = setTimeout(() => {
-    document.body.classList.remove('cima-tour-animating')
-    animTimeout = null
-  }, durationMs)
 }
 
 export function resetHorizontalScroll(): void {
@@ -84,9 +68,7 @@ export function resetHorizontalScroll(): void {
   }
 }
 
-export function centerElementInScrollParents(element?: Element | null): void {
-  if (typeof window === 'undefined' || !element) return
-
+function centerElementHorizontally(element: Element): void {
   let parent = element.parentElement
   while (parent && parent !== document.body && parent !== document.documentElement) {
     const style = window.getComputedStyle(parent)
@@ -95,9 +77,9 @@ export function centerElementInScrollParents(element?: Element | null): void {
       parent.scrollWidth > parent.clientWidth
 
     if (canScrollX) {
-      const parentRect = parent.getBoundingClientRect()
+      const pRect = parent.getBoundingClientRect()
       const elRect = element.getBoundingClientRect()
-      const relLeft = elRect.left - parentRect.left + parent.scrollLeft
+      const relLeft = elRect.left - pRect.left + parent.scrollLeft
       const targetScroll = relLeft - (parent.clientWidth - elRect.width) / 2
       const maxScroll = parent.scrollWidth - parent.clientWidth
       parent.scrollTo({
@@ -107,12 +89,32 @@ export function centerElementInScrollParents(element?: Element | null): void {
     }
     parent = parent.parentElement
   }
+}
 
-  element.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'nearest' })
+function centerElementVertically(element: Element): void {
+  const mainEl = document.querySelector('main')
+  if (!mainEl) return
+
+  const elRect = element.getBoundingClientRect()
+  const headerOffset = 68
+  const popoverAllowance = window.innerWidth < 640 ? 240 : 180
+  const availableH = window.innerHeight - headerOffset - popoverAllowance
+  const idealTop = headerOffset + Math.max(12, (availableH - elRect.height) / 2)
+  const deltaY = elRect.top - idealTop
+
+  if (elRect.top < headerOffset + 8 || elRect.bottom > window.innerHeight - popoverAllowance) {
+    mainEl.scrollBy({ top: deltaY, behavior: 'instant' })
+  }
+}
+
+export function centerElementInScrollParents(element?: Element | null): void {
+  if (typeof window === 'undefined' || !element) return
+  centerElementHorizontally(element)
+  centerElementVertically(element)
   resetHorizontalScroll()
 }
 
-export async function scrollTargetIntoView(element: Element, waitMs = 100): Promise<void> {
+export async function scrollTargetIntoView(element: Element, waitMs = 50): Promise<void> {
   centerElementInScrollParents(element)
   if (waitMs > 0) {
     await new Promise((resolve) => setTimeout(resolve, waitMs))

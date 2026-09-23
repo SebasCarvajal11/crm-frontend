@@ -43,6 +43,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
   },
   {
     element: '[data-tour="workspace-create-task-btn"]',
+    fallbackElement: '[data-tour="workspace-task-columns"]',
     title: 'Crear Nueva Tarea',
     description: 'Permite registrar nuevas tareas tecnicas, fijar fechas limite y asignar responsables.',
     actionHint: 'Haz clic en el boton mas de la columna para agregar una actividad.',
@@ -54,6 +55,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
   },
   {
     element: '[data-tour="workspace-tab-chat"]',
+    fallbackElement: '[data-tour="workspace-chat-channels"]',
     title: 'Pestana Conversacion y Archivos',
     description: 'Canal de mensajeria en tiempo real y repositorio de archivos del proyecto.',
     actionHint: 'Haz clic para abrir los canales de comunicacion y la documentacion.',
@@ -94,6 +96,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
   },
   {
     element: '[data-tour="workspace-tab-brief"]',
+    fallbackElement: '[data-tour="workspace-brief-content"]',
     title: 'Pestana Brief del Proyecto',
     description: 'Ficha tecnica con los requerimientos, especificaciones y alcance pactado.',
     actionHint: 'Haz clic para consultar las directrices y entregables acordados.',
@@ -114,6 +117,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
   },
   {
     element: '[data-tour="workspace-tab-contract"]',
+    fallbackElement: '[data-tour="workspace-contract-content"]',
     title: 'Pestana Contratos y Enmiendas',
     description: 'Documento legal formal, terminos economicos y registro de firmas electronicas.',
     actionHint: 'Clientes y administradores pueden firmar aqui de forma segura.',
@@ -136,6 +140,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
   },
   {
     element: '[data-tour="workspace-tab-change-requests"]',
+    fallbackElement: '[data-tour="workspace-change-requests-action"]',
     title: 'Pestana Solicitud de Cambios',
     description: 'Gestion formal de solicitudes de ajuste de alcance, tiempo o presupuesto (Otro si).',
     actionHint: 'Haz clic para revisar o formular solicitudes de cambio.',
@@ -156,6 +161,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
   },
   {
     element: '[data-tour="workspace-tab-members"]',
+    fallbackElement: '[data-tour="workspace-members-list"]',
     title: 'Pestana Integrantes del Proyecto',
     description: 'Lista del equipo de trabajo y representantes del cliente asignados al proyecto.',
     actionHint: 'Haz clic para ver el personal asignado y sus roles.',

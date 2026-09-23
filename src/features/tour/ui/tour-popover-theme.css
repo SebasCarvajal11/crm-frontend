@@ -1,6 +1,10 @@
 @import "driver.js/dist/driver.css";
 
-/* CIMA CRM — Tema Corporativo para Driver.js (Paleta Crimson CIMA #86070c / #680609) */
+/* ==========================================================================
+   CIMA Smart Copilot — Tema Corporativo para Driver.js
+   Paleta: Crimson CIMA (#86070c / #680609), Montserrat, sobrio y fluido
+   ========================================================================== */
+
 .driver-popover.cima-tour-popover {
   background-color: var(--card, #ffffff);
   color: var(--card-foreground, #282829);
@@ -9,12 +13,12 @@
   box-shadow: 0 20px 25px -5px rgba(104, 6, 9, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
   padding: 1.15rem;
   width: calc(100vw - 2rem);
-  max-width: min(350px, calc(100vw - 2rem));
+  max-width: min(360px, calc(100vw - 2rem));
   box-sizing: border-box;
   font-family: "Montserrat", system-ui, sans-serif;
   z-index: 100010 !important;
   backdrop-filter: blur(12px);
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  pointer-events: auto !important;
 }
 
 .dark .driver-popover.cima-tour-popover {
@@ -25,7 +29,7 @@
 }
 
 .driver-popover.cima-tour-popover .driver-popover-title {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--foreground, #282829);
@@ -87,11 +91,6 @@
   border-left-color: #bd2f35;
 }
 
-.driver-popover.cima-tour-popover .cima-tour-action-hint svg {
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
 .driver-popover.cima-tour-popover .driver-popover-footer {
   display: flex;
   align-items: center;
@@ -121,13 +120,12 @@
   border-radius: 0.5rem;
   border: none;
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .driver-popover.cima-tour-popover button.driver-popover-next-btn:hover {
   background-color: #a8131a;
-  transform: translateY(-1px);
 }
 
 .driver-popover.cima-tour-popover button.driver-popover-prev-btn {
@@ -139,44 +137,27 @@
   border-radius: 0.5rem;
   border: 1px solid var(--border, #dededf);
   cursor: pointer;
-  transition: background-color 0.15s ease-in-out;
-}
-
-.driver-popover.cima-tour-popover button.driver-popover-prev-btn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .driver-popover.cima-tour-popover .driver-popover-close-btn {
   color: var(--muted-foreground, #98989c);
   top: 0.85rem;
   right: 0.85rem;
-  transition: color 0.15s ease;
+  cursor: pointer;
 }
 
 .driver-popover.cima-tour-popover .driver-popover-close-btn:hover {
   color: #86070c;
 }
 
-/* Transición del stage en reposo, animación suave entre pasos y desactivación en scroll */
-path.driver-stage {
-  transition: opacity 0.2s ease-out;
+/* El overlay SVG no bloquea interacciones táctiles ni scroll del contenido */
+svg.driver-overlay,
+svg.driver-overlay path {
+  pointer-events: none !important;
 }
 
-body.cima-tour-animating path.driver-stage {
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-body.cima-tour-scrolling path.driver-stage,
-body.cima-tour-scrolling .driver-popover {
-  transition: none !important;
-}
-
-body.cima-tour-scrolling .cima-tour-cursor-container {
-  opacity: 0 !important;
-  transition: opacity 0.1s ease-out !important;
-}
-
-/* Permitir interacción y scroll horizontal fluido en tableros Kanban durante el tour */
+/* Permitir scroll libre vertical y horizontal en contenido bajo Driver.js */
+.driver-active main,
 .driver-active .overflow-x-auto,
 .driver-active [data-tour="collab-columns-container"],
 .driver-active [data-tour^="collab-column-"],
@@ -186,64 +167,39 @@ body.cima-tour-scrolling .cima-tour-cursor-container {
   -webkit-overflow-scrolling: touch !important;
 }
 
-/* Evitar que Driver.js bloquee con overflow:hidden los contenedores con scroll horizontal */
+/* Prevenir bloqueo con overflow:hidden en contenedores */
 .overflow-x-auto.driver-active-element-parent-no-scroll,
 .driver-active-element-parent-no-scroll {
   overflow: auto !important;
 }
 
-/* Cursor Interactivo Vectorial Tipo Ratón / Mano (Animación de Clic) */
-@keyframes cima-cursor-tap {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  35% { transform: translate(3px, 4px) scale(0.92); }
-  65% { transform: translate(-1px, -1px) scale(1.02); }
+/* Resalte sutil y elegante del elemento activo */
+.driver-active-element {
+  outline: 2px solid #86070c !important;
+  outline-offset: 3px !important;
+  animation: cima-active-pulse 2.2s ease-in-out infinite;
 }
 
-@keyframes cima-cursor-ripple {
-  0% { transform: scale(0.35); opacity: 0.85; }
-  100% { transform: scale(2.4); opacity: 0; }
+@keyframes cima-active-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(134, 7, 12, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(134, 7, 12, 0);
+  }
 }
 
+/* Desactivar cursor vectorial redundante para máxima nitidez y rendimiento */
 .cima-tour-cursor-container {
-  position: absolute;
-  pointer-events: none;
-  z-index: 100005 !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transform: scale(0.85);
-  will-change: transform, opacity;
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  display: none !important;
 }
 
-.cima-tour-cursor-container.cima-tour-cursor-visible {
-  opacity: 1;
-  transform: scale(1);
+/* En scroll activo se eliminan transiciones del popover para respuesta inmediata */
+body.cima-tour-scrolling .driver-popover {
+  transition: none !important;
 }
 
-.cima-tour-cursor-ripple {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  width: 28px;
-  height: 28px;
-  border-radius: 9999px;
-  background-color: rgba(134, 7, 12, 0.25);
-  border: 2px solid #86070c;
-  animation: cima-cursor-ripple 1.4s cubic-bezier(0, 0.2, 0.8, 1) infinite;
-}
-
-.cima-tour-cursor-svg {
-  position: relative;
-  width: 32px;
-  height: 32px;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
-  animation: cima-cursor-tap 1.4s ease-in-out infinite;
-  transform-origin: 30% 20%;
-}
-
-/* Ajustes Responsivos Estrictos para Safari en iOS y Móviles */
+/* Ajustes Responsivos para Pantallas Móviles (Bottom-Sheet Popover) */
 @media (max-width: 640px) {
   .driver-popover.cima-tour-popover {
     position: fixed !important;
@@ -286,9 +242,7 @@ body.cima-tour-scrolling .cima-tour-cursor-container {
 /* Estado pausado cuando hay modales o diálogos activos del sistema */
 body.cima-tour-paused .driver-popover,
 body.cima-tour-paused .driver-overlay,
-body.cima-tour-paused svg.driver-overlay-svg,
-body.cima-tour-paused #cima-tour-cursor {
+body.cima-tour-paused svg.driver-overlay-svg {
   opacity: 0 !important;
   pointer-events: none !important;
-  transition: opacity 0.15s ease-out !important;
 }
