@@ -47,30 +47,34 @@ export function MarketingPanel({ accessToken }: Props) {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow={
-          <>
-            Estrategia y <span className="font-black text-primary">Crecimiento</span>
-          </>
-        }
-        title={
-          <>
-            Panel de{' '}
-            <span className="font-black tracking-tight text-foreground">
-              Marketing & Analítica CIMA
-            </span>
-          </>
-        }
-        description="Gestión integral de campañas, flujos de reactivación y métricas de desempeño."
-        icon={Megaphone}
-      />
-      <SectionTabs
-        items={TABS}
-        value={activeTab}
-        onValueChange={handleTabChange}
-        ariaLabel="Secciones de marketing"
-        itemRole="button"
-      />
+      <div data-tour="marketing-header">
+        <PageHeader
+          eyebrow={
+            <>
+              Estrategia y <span className="font-black text-primary">Crecimiento</span>
+            </>
+          }
+          title={
+            <>
+              Panel de{' '}
+              <span className="font-black tracking-tight text-foreground">
+                Marketing & Analítica CIMA
+              </span>
+            </>
+          }
+          description="Gestión integral de campañas, flujos de reactivación y métricas de desempeño."
+          icon={Megaphone}
+        />
+      </div>
+      <div data-tour="marketing-tabs">
+        <SectionTabs
+          items={TABS}
+          value={activeTab}
+          onValueChange={handleTabChange}
+          ariaLabel="Secciones de marketing"
+          itemRole="button"
+        />
+      </div>
 
       <div className="tab-pane-transition">
         {visitedTabs.has('clients') && (

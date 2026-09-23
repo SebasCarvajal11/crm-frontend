@@ -1,6 +1,7 @@
 export async function waitForElement(
   selector: string,
-  timeoutMs = 1200
+  timeoutMs = 1200,
+  fallbackSelector?: string
 ): Promise<Element | null> {
   if (typeof document === 'undefined') return null
   const existing = document.querySelector(selector)
@@ -8,16 +9,24 @@ export async function waitForElement(
 
   return new Promise((resolve) => {
     const start = Date.now()
-    const interval = setInterval(() => {
+    const check = () => {
       const el = document.querySelector(selector)
       if (el) {
-        clearInterval(interval)
         resolve(el)
-      } else if (Date.now() - start >= timeoutMs) {
-        clearInterval(interval)
-        resolve(null)
+        return
       }
-    }, 50)
+      if (Date.now() - start >= timeoutMs) {
+        if (fallbackSelector) {
+          const fallbackEl = document.querySelector(fallbackSelector)
+          resolve(fallbackEl)
+          return
+        }
+        resolve(null)
+        return
+      }
+      setTimeout(check, 30)
+    }
+    check()
   })
 }
 

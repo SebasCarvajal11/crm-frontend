@@ -62,36 +62,44 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
 
   return (
     <section className="space-y-6">
-      <PageHeader
-        eyebrow={
-          <>
-            Centro de <span className="font-black text-primary">Novedades</span>
-          </>
-        }
-        title={
-          <>
-            Bandeja de{' '}
-            <span className="font-black tracking-tight text-foreground">
-              Notificaciones
-            </span>
-          </>
-        }
-        description="Actividad, menciones y actualizaciones pendientes de tus proyectos."
-        icon={Bell}
-        actions={(
-          <Button type="button" variant="outline" size="sm" onClick={() => notificationsQ.refetch()}>
-          <RefreshCw className="mr-2 size-4" />
-          Actualizar
-          </Button>
-        )}
-      />
+      <div data-tour="notifications-header">
+        <PageHeader
+          eyebrow={
+            <>
+              Centro de <span className="font-black text-primary">Novedades</span>
+            </>
+          }
+          title={
+            <>
+              Bandeja de{' '}
+              <span className="font-black tracking-tight text-foreground">
+                Notificaciones
+              </span>
+            </>
+          }
+          description="Actividad, menciones y actualizaciones pendientes de tus proyectos."
+          icon={Bell}
+          actions={(
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              data-tour="notifications-refresh-btn"
+              onClick={() => notificationsQ.refetch()}
+            >
+              <RefreshCw className="mr-2 size-4" />
+              Actualizar
+            </Button>
+          )}
+        />
+      </div>
 
       {notificationsQ.isLoading && <p className="text-sm text-muted-foreground">Cargando notificaciones...</p>}
       {!notificationsQ.isLoading && rows.length === 0 && (
         <p className="text-sm text-muted-foreground">No tienes notificaciones sin leer.</p>
       )}
 
-      <div className="space-y-2 animate-fade-up">
+      <div data-tour="notifications-list" className="space-y-2 animate-fade-up">
         {rows.map((n) => (
           <button
             key={n.id}

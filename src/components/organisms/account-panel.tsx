@@ -14,31 +14,37 @@ type Props = {
 export function AccountPanel({ accessToken, identity }: Props) {
   return (
     <div className="w-full min-w-0 space-y-6 sm:space-y-8">
-      <PageHeader
-        eyebrow={
-          <>
-            Perfil y <span className="font-black text-primary">Seguridad</span>
-          </>
-        }
-        title={
-          <>
-            Ajustes de{' '}
-            <span className="font-black tracking-tight text-foreground">
-              Mi cuenta
-            </span>
-          </>
-        }
-        description="Administra tu perfil personal, dispositivos conectados y la seguridad de acceso."
-        icon={UserCircle2}
-      />
+      <div data-tour="account-header">
+        <PageHeader
+          eyebrow={
+            <>
+              Perfil y <span className="font-black text-primary">Seguridad</span>
+            </>
+          }
+          title={
+            <>
+              Ajustes de{' '}
+              <span className="font-black tracking-tight text-foreground">
+                Mi cuenta
+              </span>
+            </>
+          }
+          description="Administra tu perfil personal, dispositivos conectados y la seguridad de acceso."
+          icon={UserCircle2}
+        />
+      </div>
 
-      <div className="animate-fade-up">
+      <div className="animate-fade-up" data-tour="account-hero">
         <ProfileSection accessToken={accessToken} identity={identity} />
       </div>
 
       <div className="grid gap-6 [&>section]:min-w-0 xl:grid-cols-2 xl:items-stretch animate-fade-up stagger-1">
-        <SessionsSection accessToken={accessToken} />
-        <ChangePasswordSection accessToken={accessToken} />
+        <div data-tour="account-sessions">
+          <SessionsSection accessToken={accessToken} />
+        </div>
+        <div data-tour="account-security">
+          <ChangePasswordSection accessToken={accessToken} />
+        </div>
       </div>
     </div>
   )

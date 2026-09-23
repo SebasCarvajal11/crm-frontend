@@ -242,6 +242,7 @@ export const collabKanbanTour: CimaTourDefinition = {
     },
     {
       element: '[data-tour="collab-card-first"]',
+      fallbackElement: '[data-tour="collab-columns-container"]',
       title: 'Abrir Espacio de Trabajo',
       description: 'Ingresa al espacio de trabajo completo para gestionar tareas, chat, brief y contratos.',
       actionHint: 'Haz clic en la tarjeta o en Siguiente para abrir este proyecto.',

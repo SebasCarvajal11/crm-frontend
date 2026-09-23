@@ -171,4 +171,54 @@ describe('Tour Registry Facade', () => {
       expect(emojiRegex.test(q.answer)).toBe(false)
     }
   })
+
+  it('retorna el tour de marketing para admin y worker con selectores verificados', () => {
+    const tour = getActiveTourForContext({ activeTab: 'marketing', role: 'admin' })
+    expect(tour?.id).toBe('tour-marketing')
+    const elements = tour!.steps.map((s) => s.element)
+    expect(elements).toContain('[data-tour="marketing-header"]')
+    expect(elements).toContain('[data-tour="marketing-tabs"]')
+    expect(elements).toContain('[data-tour="marketing-new-campaign-btn"]')
+
+    const clientTour = getActiveTourForContext({ activeTab: 'marketing', role: 'client' })
+    expect(clientTour).toBeNull()
+  })
+
+  it('retorna el tour de analítica para admin y worker con selectores verificados', () => {
+    const tour = getActiveTourForContext({ activeTab: 'analytics', role: 'admin' })
+    expect(tour?.id).toBe('tour-analytics')
+    const elements = tour!.steps.map((s) => s.element)
+    expect(elements).toContain('[data-tour="analytics-header"]')
+    expect(elements).toContain('[data-tour="analytics-charts"]')
+    expect(elements).toContain('[data-tour="analytics-kpis"]')
+    expect(elements).toContain('[data-tour="analytics-inventory-alerts"]')
+
+    const clientTour = getActiveTourForContext({ activeTab: 'analytics', role: 'client' })
+    expect(clientTour).toBeNull()
+  })
+
+  it('retorna el tour de cuenta para todos los roles con selectores verificados', () => {
+    const roles: ('admin' | 'worker' | 'client')[] = ['admin', 'worker', 'client']
+    for (const role of roles) {
+      const tour = getActiveTourForContext({ activeTab: 'account', role })
+      expect(tour?.id).toBe('tour-account')
+      const elements = tour!.steps.map((s) => s.element)
+      expect(elements).toContain('[data-tour="account-header"]')
+      expect(elements).toContain('[data-tour="account-hero"]')
+      expect(elements).toContain('[data-tour="account-sessions"]')
+      expect(elements).toContain('[data-tour="account-security"]')
+    }
+  })
+
+  it('retorna el tour de notificaciones para todos los roles con selectores verificados', () => {
+    const roles: ('admin' | 'worker' | 'client')[] = ['admin', 'worker', 'client']
+    for (const role of roles) {
+      const tour = getActiveTourForContext({ activeTab: 'notifications', role })
+      expect(tour?.id).toBe('tour-notifications')
+      const elements = tour!.steps.map((s) => s.element)
+      expect(elements).toContain('[data-tour="notifications-header"]')
+      expect(elements).toContain('[data-tour="notifications-refresh-btn"]')
+      expect(elements).toContain('[data-tour="notifications-list"]')
+    }
+  })
 })

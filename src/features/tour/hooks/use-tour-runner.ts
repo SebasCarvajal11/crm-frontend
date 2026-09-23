@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react'
 import { driver, type Driver, type DriveStep } from 'driver.js'
+import { useNavigate } from '@tanstack/react-router'
 import { useTourStore } from '../model/tour-store'
 import { useTourContext } from './use-tour-context'
 import type { CimaTourDefinition } from '../model/types'
@@ -16,43 +17,6 @@ import {
 } from '../utils/popover-helper'
 import '../ui/tour-popover-theme.css'
 
-let modalObserver: MutationObserver | null = null
-
-function checkModalsAndPause(driverInst?: Driver | null): void {
-  if (typeof document === 'undefined') return
-  const modalSelector =
-    '[role="dialog"]:not(.cima-tour-popover):not(.driver-popover), [role="alertdialog"]:not(.cima-tour-popover)'
-  const openModal = document.querySelector(modalSelector)
-  const isPaused = document.body.classList.contains('cima-tour-paused')
-
-  if (openModal && !isPaused) {
-    document.body.classList.add('cima-tour-paused')
-  } else if (!openModal && isPaused) {
-    document.body.classList.remove('cima-tour-paused')
-    if (driverInst?.isActive()) {
-      driverInst.refresh()
-    }
-  }
-}
-
-function startModalSupervisor(driverInst?: Driver | null): void {
-  stopModalSupervisor()
-  if (typeof document === 'undefined') return
-  checkModalsAndPause(driverInst)
-  modalObserver = new MutationObserver(() => checkModalsAndPause(driverInst))
-  modalObserver.observe(document.body, { childList: true, subtree: true })
-}
-
-function stopModalSupervisor(): void {
-  if (modalObserver) {
-    modalObserver.disconnect()
-    modalObserver = null
-  }
-  if (typeof document !== 'undefined') {
-    document.body.classList.remove('cima-tour-paused')
-  }
-}
-
 function switchTabIfNeeded(targetTab?: string): void {
   if (!targetTab || typeof document === 'undefined') return
   const btn = document.querySelector<HTMLButtonElement>(`[data-tour="workspace-tab-${targetTab}"]`)
@@ -62,31 +26,45 @@ function switchTabIfNeeded(targetTab?: string): void {
   }
 }
 
-async function handleActionTransition(action?: 'openProject' | 'closeProject'): Promise<void> {
+async function handleActionTransition(
+  action?: 'openProject' | 'closeProject',
+  navigateFn?: (opts: { to: string; search: (prev: Record<string, unknown>) => Record<string, unknown>; replace: boolean }) => void
+): Promise<void> {
   if (action === 'openProject') {
     const cardEl = document.querySelector<HTMLElement>('[data-tour="collab-card-first"]')
     if (cardEl) {
       const clickTarget = cardEl.querySelector<HTMLElement>('button') ?? cardEl
       clickTarget.click()
+      await waitForElement('[data-tour="workspace-project-header"]', 2000)
     }
-    await waitForElement('[data-tour="workspace-project-header"]', 3500)
   } else if (action === 'closeProject') {
     const backBtn = document.querySelector<HTMLElement>('[data-tour="workspace-back-btn"]')
     if (backBtn) {
       const clickTarget = backBtn.querySelector<HTMLElement>('button') ?? backBtn
       clickTarget.click()
+    } else if (navigateFn) {
+      navigateFn({
+        to: '/dashboard',
+        search: (prev) => ({
+          ...prev,
+          tab: 'collab',
+          project_id: undefined,
+          workspace_tab: undefined,
+        }),
+        replace: true,
+      })
     }
-    await waitForElement('[data-tour="collab-columns-container"]', 3500)
+    await waitForElement('[data-tour="collab-columns-container"]', 2000)
   }
 }
 
 export function useTourRunner() {
   const driverRef = useRef<Driver | null>(null)
   const cursorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const navigate = useNavigate()
   const ctx = useTourContext()
   const markTourCompleted = useTourStore((s) => s.markTourCompleted)
   const setActiveTour = useTourStore((s) => s.setActiveTour)
-
   const isTransitioningRef = useRef(false)
 
   const clearTimer = useCallback(() => {
@@ -99,7 +77,6 @@ export function useTourRunner() {
   const stopTour = useCallback(() => {
     clearTimer()
     isTransitioningRef.current = false
-    stopModalSupervisor()
     removeTourCursor()
     resetHorizontalScroll()
     if (driverRef.current) {
@@ -115,7 +92,7 @@ export function useTourRunner() {
       cursorTimerRef.current = setTimeout(() => {
         if (driverRef.current?.isActive()) driverRef.current.refresh()
         showTourCursor(element)
-      }, 260)
+      }, 200)
     }
   }, [clearTimer])
 
@@ -130,14 +107,16 @@ export function useTourRunner() {
       const steps: DriveStep[] = filtered.map((st) => mapTourStepToDriveStep(st, isMobile))
 
       if (filtered[0]?.switchWorkspaceTab) switchTabIfNeeded(filtered[0].switchWorkspaceTab)
-      if (filtered[0]?.element) await waitForElement(filtered[0].element, 1000)
+      if (filtered[0]?.element) {
+        await waitForElement(filtered[0].element, 1000, filtered[0].fallbackElement)
+      }
 
       const instance = driver({
         animate: true,
         smoothScroll: true,
-        duration: 240,
+        duration: 220,
         allowClose: true,
-        waitForElement: 1500,
+        waitForElement: 1200,
         overlayColor: '#000000',
         overlayOpacity: 0.65,
         stagePadding: isMobile ? 4 : 8,
@@ -147,23 +126,54 @@ export function useTourRunner() {
         progressText: 'Paso {{current}} de {{total}}',
         steps,
         onNextClick: async (_element, _step, opts) => {
-          const idx = opts.driver.getActiveIndex() ?? 0
-          const action = filtered[idx]?.onNextAction
-          if (action) {
+          if (isTransitioningRef.current) return
+          const currentIdx = opts.driver.getActiveIndex() ?? 0
+          const currentStep = filtered[currentIdx]
+          const nextIdx = currentIdx + 1
+          const nextStep = filtered[nextIdx]
+
+          if (currentStep?.onNextAction) {
             isTransitioningRef.current = true
             try {
-              await handleActionTransition(action)
+              await handleActionTransition(currentStep.onNextAction, navigate)
             } finally {
-              setTimeout(() => { isTransitioningRef.current = false }, 500)
+              isTransitioningRef.current = false
             }
           }
+
+          if (nextStep?.switchWorkspaceTab) {
+            switchTabIfNeeded(nextStep.switchWorkspaceTab)
+          }
+
+          if (nextStep?.element) {
+            await waitForElement(nextStep.element, 1200, nextStep.fallbackElement)
+          }
+
           opts.driver.moveNext()
         },
         onPrevClick: async (_element, _step, opts) => {
-          const idx = opts.driver.getActiveIndex() ?? 0
-          if (filtered[idx - 1]?.element === '[data-tour="collab-card-first"]') {
-            await handleActionTransition('closeProject')
+          if (isTransitioningRef.current) return
+          const currentIdx = opts.driver.getActiveIndex() ?? 0
+          const prevIdx = currentIdx - 1
+          const prevStep = filtered[prevIdx]
+
+          if (prevStep?.element === '[data-tour="collab-card-first"]') {
+            isTransitioningRef.current = true
+            try {
+              await handleActionTransition('closeProject', navigate)
+            } finally {
+              isTransitioningRef.current = false
+            }
           }
+
+          if (prevStep?.switchWorkspaceTab) {
+            switchTabIfNeeded(prevStep.switchWorkspaceTab)
+          }
+
+          if (prevStep?.element) {
+            await waitForElement(prevStep.element, 1200, prevStep.fallbackElement)
+          }
+
           opts.driver.movePrevious()
         },
         onHighlightStarted: (el, _step, opts) => {
@@ -184,7 +194,7 @@ export function useTourRunner() {
             const clickTarget = element.querySelector<HTMLElement>('button') ?? element
             clickTarget.addEventListener('click', async () => {
               if (isTransitioningRef.current) return
-              await waitForElement('[data-tour="workspace-project-header"]', 3500)
+              await waitForElement('[data-tour="workspace-project-header"]', 2500)
               if (driverRef.current?.isActive() && driverRef.current.getActiveIndex() === idx) {
                 driverRef.current.moveNext()
               }
@@ -197,7 +207,6 @@ export function useTourRunner() {
         },
         onDestroyed: () => {
           clearTimer()
-          stopModalSupervisor()
           removeTourCursor()
           markTourCompleted(tour.id)
           setActiveTour(null)
@@ -206,10 +215,9 @@ export function useTourRunner() {
       })
 
       driverRef.current = instance
-      startModalSupervisor(instance)
       instance.drive()
     },
-    [clearTimer, ctx.role, markTourCompleted, scheduleCursor, setActiveTour, stopTour]
+    [clearTimer, ctx.role, markTourCompleted, navigate, scheduleCursor, setActiveTour, stopTour]
   )
 
   const highlightTarget = useCallback(
@@ -218,26 +226,27 @@ export function useTourRunner() {
       title: string,
       description: string,
       actionHint?: string,
-      targetTab?: string
+      targetTab?: string,
+      fallbackSelector?: string
     ) => {
       stopTour()
       useTourStore.getState().closeHelpCenter()
 
       if (targetSelector.startsWith('[data-tour="workspace-') && !document.querySelector(targetSelector)) {
-        await handleActionTransition('openProject')
+        await handleActionTransition('openProject', navigate)
       } else if (targetSelector.startsWith('[data-tour="collab-') && !document.querySelector(targetSelector)) {
-        await handleActionTransition('closeProject')
+        await handleActionTransition('closeProject', navigate)
       }
 
       if (targetTab) switchTabIfNeeded(targetTab)
-      const el = await waitForElement(targetSelector, 1500)
+      const el = await waitForElement(targetSelector, 1500, fallbackSelector)
       if (el) await scrollTargetIntoView(el, 180)
       const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
 
       const instance = driver({
         animate: true,
         smoothScroll: true,
-        duration: 240,
+        duration: 220,
         allowClose: true,
         overlayColor: '#000000',
         overlayOpacity: 0.65,
@@ -247,16 +256,14 @@ export function useTourRunner() {
         onHighlighted: (element) => scheduleCursor(element),
         onDestroyed: () => {
           clearTimer()
-          stopModalSupervisor()
           removeTourCursor()
           driverRef.current = null
         },
       })
 
       driverRef.current = instance
-      startModalSupervisor(instance)
       instance.highlight({
-        element: el ? targetSelector : undefined,
+        element: el ? (el as HTMLElement) : undefined,
         popover: {
           title,
           description: buildDescriptionWithHint(description, actionHint),
@@ -267,7 +274,7 @@ export function useTourRunner() {
         },
       })
     },
-    [clearTimer, scheduleCursor, stopTour]
+    [clearTimer, navigate, scheduleCursor, stopTour]
   )
 
   return { startTour, highlightTarget, stopTour }

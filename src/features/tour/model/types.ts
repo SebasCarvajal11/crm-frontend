@@ -5,8 +5,17 @@ export type TourUserRole = 'admin' | 'worker' | 'client'
 export type TourPlacement = 'top' | 'right' | 'bottom' | 'left'
 export type TourAlignment = 'start' | 'center' | 'end'
 
+export type WorkspaceSubTab =
+  | 'board'
+  | 'chat'
+  | 'brief'
+  | 'contract'
+  | 'change-requests'
+  | 'members'
+
 export type CimaTourStep = {
   element: string
+  fallbackElement?: string
   title: string
   description: string
   actionHint?: string
@@ -14,32 +23,39 @@ export type CimaTourStep = {
   align?: TourAlignment
   showPointer?: boolean
   requiredRole?: TourUserRole[]
-  switchWorkspaceTab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
+  navigateTab?: DashboardTab
+  switchWorkspaceTab?: WorkspaceSubTab
+  switchMarketingTab?: string
   onNextAction?: 'openProject' | 'closeProject'
 }
 
 export type CimaTourDefinition = {
   id: string
   tab: DashboardTab
-  workspaceTab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
+  workspaceTab?: WorkspaceSubTab
   title: string
   description: string
   roles: TourUserRole[]
   steps: CimaTourStep[]
 }
 
-export type GuidedQuestionCategory = 'flujo' | 'gestion' | 'comunicacion' | 'configuracion'
+export type GuidedQuestionCategory =
+  | 'flujo'
+  | 'gestion'
+  | 'comunicacion'
+  | 'configuracion'
 
 export type GuidedQuestion = {
   id: string
   question: string
   answer: string
   tab: DashboardTab
-  workspaceTab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
+  workspaceTab?: WorkspaceSubTab
   scope?: 'kanban' | 'workspace' | 'all'
   roles: TourUserRole[]
   category: GuidedQuestionCategory
   targetElement?: string
+  fallbackTargetElement?: string
   tourId?: string
 }
 
@@ -47,5 +63,5 @@ export type TourContextState = {
   activeTab: DashboardTab
   role: TourUserRole
   projectId?: string
-  workspaceTab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
+  workspaceTab?: WorkspaceSubTab
 }

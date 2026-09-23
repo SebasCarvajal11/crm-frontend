@@ -101,31 +101,35 @@ export function DashboardAnalytics({ accessToken }: Props) {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow={
-          <>
-            Métricas y <span className="font-black text-primary">Rendimiento</span>
-          </>
-        }
-        title={
-          <>
-            Consola de{' '}
-            <span className="font-black tracking-tight text-foreground">
-              Analítica
-            </span>
-          </>
-        }
-        description="Vista general de las métricas operativas y comerciales de CIMA."
-        icon={ChartAreaIcon}
-        actions={(
-          <Button type="button" variant="outline" size="sm" onClick={refreshAll} disabled={isRefreshing}>
-            <RefreshCw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Actualizar
-          </Button>
-        )}
-      />
+      <div data-tour="analytics-header">
+        <PageHeader
+          eyebrow={
+            <>
+              Métricas y <span className="font-black text-primary">Rendimiento</span>
+            </>
+          }
+          title={
+            <>
+              Consola de{' '}
+              <span className="font-black tracking-tight text-foreground">
+                Analítica
+              </span>
+            </>
+          }
+          description="Vista general de las métricas operativas y comerciales de CIMA."
+          icon={ChartAreaIcon}
+          actions={(
+            <Button type="button" variant="outline" size="sm" onClick={refreshAll} disabled={isRefreshing}>
+              <RefreshCw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Actualizar
+            </Button>
+          )}
+        />
+      </div>
 
-      <KpiDashboard accessToken={accessToken} />
+      <div data-tour="analytics-charts">
+        <KpiDashboard accessToken={accessToken} />
+      </div>
 
       {summaryQuery.isError && (
         <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
@@ -134,7 +138,7 @@ export function DashboardAnalytics({ accessToken }: Props) {
       )}
 
       {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div data-tour="analytics-kpis" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <KpiCard
           label="Clientes"
           value={summary?.totalClients ?? 0}
@@ -228,14 +232,16 @@ export function DashboardAnalytics({ accessToken }: Props) {
       </div>
 
       {/* Alertas de Stock */}
-      <InventoryAlertsCard
-        data={lowStockQuery.data}
-        isLoading={lowStockQuery.isLoading}
-        isError={lowStockQuery.isError}
-        onExport={(format) => lowStockExport.mutate(format)}
-        isExporting={lowStockExport.isPending}
-        exportFormat={lowStockFormat}
-      />
+      <div data-tour="analytics-inventory-alerts">
+        <InventoryAlertsCard
+          data={lowStockQuery.data}
+          isLoading={lowStockQuery.isLoading}
+          isError={lowStockQuery.isError}
+          onExport={(format) => lowStockExport.mutate(format)}
+          isExporting={lowStockExport.isPending}
+          exportFormat={lowStockFormat}
+        />
+      </div>
     </div>
   )
 }

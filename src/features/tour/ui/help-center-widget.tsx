@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { HelpCircle } from 'lucide-react'
 import { useTourStore } from '../model/tour-store'
 import { HelpCenterModal } from './help-center-modal'
@@ -5,6 +6,24 @@ import { HelpCenterModal } from './help-center-modal'
 export function HelpCenterWidget() {
   const toggleHelpCenter = useTourStore((s) => s.toggleHelpCenter)
   const isHelpCenterOpen = useTourStore((s) => s.isHelpCenterOpen)
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement
+      const isInput =
+        activeEl instanceof HTMLInputElement ||
+        activeEl instanceof HTMLTextAreaElement ||
+        activeEl?.getAttribute('contenteditable') === 'true'
+      if (isInput) return
+
+      if (e.key === '?' || (e.ctrlKey && e.key === '/')) {
+        e.preventDefault()
+        toggleHelpCenter()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [toggleHelpCenter])
 
   return (
     <>
@@ -19,7 +38,7 @@ export function HelpCenterWidget() {
           onClick={toggleHelpCenter}
           aria-expanded={isHelpCenterOpen}
           aria-label="Abrir centro de ayuda y tutoriales guiados"
-          title="Centro de Asistencia: Tutoriales y Guías"
+          title="Centro de Asistencia: Tutoriales y Guías (?)"
           data-testid="help-widget-trigger"
           data-tour="help-center-widget"
           className="relative flex h-11 w-11 items-center justify-center rounded-full

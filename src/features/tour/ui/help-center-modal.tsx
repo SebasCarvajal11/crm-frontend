@@ -263,7 +263,8 @@ export function HelpCenterModal() {
                           q.question,
                           q.answer,
                           'Pulsa aquí para realizar esta acción',
-                          q.workspaceTab
+                          q.workspaceTab,
+                          q.fallbackTargetElement
                         )
                       } else if (q.tourId && activeTour) {
                         startTour(activeTour)

@@ -135,6 +135,7 @@ export function CampaignsManager({
         </div>
 
         <Button
+          data-tour="marketing-new-campaign-btn"
           onClick={() => {
             setFormData(INITIAL_FORM_DATA)
             setIsCreateOpen(true)
