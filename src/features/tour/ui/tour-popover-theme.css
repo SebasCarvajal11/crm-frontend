@@ -22,6 +22,8 @@
   font-family: "Montserrat", system-ui, sans-serif;
   z-index: 100010 !important;
   pointer-events: auto !important;
+  will-change: transform, top, left;
+  transform: translateZ(0);
 }
 
 .dark .driver-popover.cima-tour-popover {
@@ -142,6 +144,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
   margin-top: 0.65rem;
   padding-top: 0.65rem;
   border-top: 1px solid var(--border, #eeeeee);
@@ -151,11 +155,14 @@
   font-size: 0.725rem;
   font-weight: 600;
   color: var(--muted-foreground, #626267);
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
 }
 
 .driver-popover.cima-tour-popover .driver-popover-navigation-btns {
   display: flex;
   gap: 0.45rem;
+  flex-shrink: 0 !important;
 }
 
 .driver-popover.cima-tour-popover button.driver-popover-next-btn {
@@ -203,6 +210,15 @@ svg.driver-overlay path {
   pointer-events: none !important;
 }
 
+/* Prevenir parpadeo e interpolación desincronizada del SVG a 144Hz */
+.driver-overlay,
+.driver-overlay-animated,
+svg.driver-overlay,
+svg.driver-overlay path {
+  transition: none !important;
+  animation: none !important;
+}
+
 /* Permitir scroll libre vertical y horizontal en contenido bajo Driver.js */
 .driver-active main,
 .driver-active .overflow-x-auto,
@@ -220,20 +236,11 @@ svg.driver-overlay path {
   overflow: auto !important;
 }
 
-/* Resalte sutil y elegante del elemento activo */
+/* Resalte nítido y libre de parpadeo del elemento activo (sin repaint a 144Hz) */
 .driver-active-element {
   outline: 2px solid #86070c !important;
   outline-offset: 3px !important;
-  animation: cima-active-pulse 2.2s ease-in-out infinite;
-}
-
-@keyframes cima-active-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(134, 7, 12, 0.35);
-  }
-  50% {
-    box-shadow: 0 0 0 5px rgba(134, 7, 12, 0);
-  }
+  box-shadow: 0 0 0 3px rgba(134, 7, 12, 0.22) !important;
 }
 
 /* Desactivar cursor vectorial redundante para máxima nitidez y rendimiento */
@@ -293,6 +300,32 @@ body.cima-tour-scrolling .driver-popover {
   .driver-popover.cima-tour-popover .cima-tour-action-hint {
     font-size: 0.725rem;
     padding: 0.4rem 0.6rem;
+  }
+
+  .driver-popover.cima-tour-popover .driver-popover-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .driver-popover.cima-tour-popover .driver-popover-progress-text {
+    font-size: 0.725rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  .driver-popover.cima-tour-popover .driver-popover-navigation-btns {
+    display: flex !important;
+    gap: 0.35rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .driver-popover.cima-tour-popover button.driver-popover-next-btn,
+  .driver-popover.cima-tour-popover button.driver-popover-prev-btn {
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.75rem !important;
   }
 }
 

@@ -6,55 +6,12 @@
 
 type DriverRef = { refresh: () => void; isActive: () => boolean }
 
-let activeDriver: DriverRef | null = null
-let scrollDebounceTimer: ReturnType<typeof setTimeout> | null = null
-let isThrottling = false
-let supervisorActive = false
-
-function triggerThrottledRefresh(): void {
-  if (!activeDriver || !activeDriver.isActive() || isThrottling) return
-  isThrottling = true
-  requestAnimationFrame(() => {
-    activeDriver?.refresh()
-    setTimeout(() => {
-      isThrottling = false
-    }, 60)
-  })
-}
-
-function handlePassiveScroll(): void {
-  triggerThrottledRefresh()
-
-  if (scrollDebounceTimer) clearTimeout(scrollDebounceTimer)
-  scrollDebounceTimer = setTimeout(() => {
-    if (activeDriver?.isActive()) {
-      activeDriver.refresh()
-    }
-    scrollDebounceTimer = null
-  }, 100)
-}
-
-export function startScrollSupervisor(driver?: DriverRef | null): void {
-  if (typeof window === 'undefined') return
-  if (driver) activeDriver = driver
-  if (supervisorActive) return
-  supervisorActive = true
-
-  window.addEventListener('scroll', handlePassiveScroll, { passive: true })
+export function startScrollSupervisor(_driver?: DriverRef | null): void {
+  // Driver.js maneja su propio listener de scroll/resize internamente
 }
 
 export function stopScrollSupervisor(): void {
-  if (typeof window === 'undefined') return
-  activeDriver = null
-  if (supervisorActive) {
-    supervisorActive = false
-    window.removeEventListener('scroll', handlePassiveScroll)
-  }
-  if (scrollDebounceTimer) {
-    clearTimeout(scrollDebounceTimer)
-    scrollDebounceTimer = null
-  }
-  isThrottling = false
+  // No-op mantenido por compatibilidad de interfaz con el ciclo de vida del tour
 }
 
 export function resetHorizontalScroll(): void {
@@ -79,7 +36,7 @@ function centerElementHorizontally(element: Element): void {
       const maxScroll = parent.scrollWidth - parent.clientWidth
       parent.scrollTo({
         left: Math.max(0, Math.min(targetScroll, maxScroll)),
-        behavior: 'smooth',
+        behavior: 'auto',
       })
     }
     parent = parent.parentElement
@@ -98,9 +55,9 @@ function centerElementVertically(element: Element): void {
 
   if (elRect.top < headerOffset + 8 || elRect.bottom > window.innerHeight - popoverAllowance) {
     if (mainEl && mainEl.scrollHeight > mainEl.clientHeight) {
-      mainEl.scrollBy({ top: deltaY, behavior: 'smooth' })
+      mainEl.scrollBy({ top: deltaY, behavior: 'auto' })
     } else {
-      window.scrollBy({ top: deltaY, behavior: 'smooth' })
+      window.scrollBy({ top: deltaY, behavior: 'auto' })
     }
   }
 }

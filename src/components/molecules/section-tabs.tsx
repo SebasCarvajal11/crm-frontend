@@ -42,7 +42,7 @@ export function SectionTabs<T extends string>({
       const maxScroll = container.scrollWidth - container.clientWidth
       container.scrollTo({
         left: Math.max(0, Math.min(targetScroll, maxScroll)),
-        behavior: 'smooth',
+        behavior: 'auto',
       })
     }
   }, [value])
@@ -50,7 +50,7 @@ export function SectionTabs<T extends string>({
   return (
     <div
       ref={containerRef}
-      className="flex items-center gap-1 overflow-x-auto rounded-2xl border bg-card p-1 shadow-sm scroll-smooth scrollbar-thin"
+      className="flex items-center gap-1 overflow-x-auto rounded-2xl border bg-card p-1 pr-6 shadow-sm scrollbar-thin"
       role={itemRole === 'button' ? 'toolbar' : 'tablist'}
       aria-label={ariaLabel}
     >

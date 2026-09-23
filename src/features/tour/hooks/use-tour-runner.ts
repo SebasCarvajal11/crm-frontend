@@ -118,18 +118,18 @@ export function useTourRunner() {
       })
 
       const instance = driver({
-        animate: true,
+        animate: false,
         smoothScroll: false,
-        duration: 200,
+        duration: 0,
         allowClose: true,
         waitForElement: 1200,
         overlayColor: '#000000',
         overlayOpacity: 0.65,
-        stagePadding: isMobile ? 4 : 8,
-        stageRadius: 10,
+        stagePadding: isMobile ? 3 : 5,
+        stageRadius: 8,
         popoverClass: 'cima-tour-popover',
         showProgress: true,
-        progressText: 'CIMA Smart Copilot · Paso {{current}} de {{total}}',
+        progressText: 'Paso {{current}} de {{total}}',
         steps,
         onNextClick: async (_element, _step, opts) => {
           if (isTransitioningRef.current) return
@@ -151,7 +151,8 @@ export function useTourRunner() {
           if (nextTab) switchTabIfNeeded(nextTab)
 
           if (nextStep?.element) {
-            await waitForElement(nextStep.element, 1200, nextStep.fallbackElement)
+            const targetEl = await waitForElement(nextStep.element, 1200, nextStep.fallbackElement)
+            if (targetEl) centerElementInScrollParents(targetEl)
           }
 
           opts.driver.moveNext()
@@ -175,7 +176,8 @@ export function useTourRunner() {
           if (prevTab) switchTabIfNeeded(prevTab)
 
           if (prevStep?.element) {
-            await waitForElement(prevStep.element, 1200, prevStep.fallbackElement)
+            const targetEl = await waitForElement(prevStep.element, 1200, prevStep.fallbackElement)
+            if (targetEl) centerElementInScrollParents(targetEl)
           }
 
           opts.driver.movePrevious()
@@ -191,6 +193,7 @@ export function useTourRunner() {
           resetHorizontalScroll()
           if (element) {
             centerElementInScrollParents(element)
+            opts.driver.refresh()
             const idx = opts.driver.getActiveIndex() ?? 0
             const currentStep = filtered[idx]
             if (currentStep) {
@@ -235,14 +238,14 @@ export function useTourRunner() {
       const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
 
       const instance = driver({
-        animate: true,
+        animate: false,
         smoothScroll: false,
-        duration: 200,
+        duration: 0,
         allowClose: true,
         overlayColor: '#000000',
         overlayOpacity: 0.65,
-        stagePadding: isMobile ? 6 : 8,
-        stageRadius: 10,
+        stagePadding: isMobile ? 3 : 5,
+        stageRadius: 8,
         popoverClass: 'cima-tour-popover',
         onDestroyed: () => {
           stopTour()

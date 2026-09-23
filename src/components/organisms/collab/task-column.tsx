@@ -61,12 +61,13 @@ export function TaskColumn({
         if (id) onDropTask(id)
       }}
     >
-      {/* Cabecera fija de la columna */}
-      <div className="flex items-center justify-between gap-2 border-b bg-background/70 px-3 py-2.5 rounded-t-xl shrink-0">
+      <div
+        className="flex items-center justify-between gap-2 border-b bg-background/70 px-3 py-2.5 rounded-t-xl shrink-0"
+      >
         <h3 className="min-w-0 flex-1 truncate text-[13px] font-semibold leading-tight" title={column.title}>
           {column.title}
         </h3>
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-2">
           {column.isClientVisible && (
             <span title="Columna visible para el cliente">
               <Users className="size-3 text-muted-foreground" aria-label="Visible para el cliente" />
