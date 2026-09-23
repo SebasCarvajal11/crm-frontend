@@ -117,6 +117,7 @@ export function AdminUserTable({ accessToken }: Props) {
           ) : (
             <div
               ref={parentRef}
+              data-tour="admin-user-table"
               className="max-h-[min(54dvh,38rem)] overflow-auto rounded-xl border border-border/70 bg-card shadow-2xs"
             >
               <Table className="min-w-[780px] table-fixed">

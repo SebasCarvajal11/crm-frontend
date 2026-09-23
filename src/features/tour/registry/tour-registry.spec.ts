@@ -116,4 +116,59 @@ describe('Tour Registry Facade', () => {
     expect(allQuestions.length).toBeGreaterThan(sectionQuestions.length)
     expect(allQuestions.some((q) => q.tab === 'collab')).toBe(true)
   })
+
+  it('retorna el tour completo de administracion para admin con 17 pasos y cero emojis', () => {
+    const tour = getActiveTourForContext({ activeTab: 'admin', role: 'admin' })
+    expect(tour?.id).toBe('tour-admin')
+    expect(tour?.steps.length).toBe(17)
+
+    const elements = tour!.steps.map((s) => s.element)
+    expect(elements).toContain('[data-tour="admin-header"]')
+    expect(elements).toContain('[data-tour="admin-kpis"]')
+    expect(elements).toContain('[data-tour="admin-storage-overview"]')
+    expect(elements).toContain('[data-tour="admin-storage-server-disk"]')
+    expect(elements).toContain('[data-tour="admin-file-summary"]')
+    expect(elements).toContain('[data-tour="admin-file-search"]')
+    expect(elements).toContain('[data-tour="admin-file-client-tree"]')
+    expect(elements).toContain('[data-tour="admin-file-project-header"]')
+    expect(elements).toContain('[data-tour="admin-file-folder-tabs"]')
+    expect(elements).toContain('[data-tour="admin-file-table"]')
+    expect(elements).toContain('[data-tour="admin-user-toolbar"]')
+    expect(elements).toContain('[data-tour="admin-user-table"]')
+    expect(elements).toContain('[data-tour="admin-user-actions"]')
+    expect(elements).toContain('[data-tour="admin-invites-section"]')
+    expect(elements).toContain('[data-tour="admin-invite-client"]')
+    expect(elements).toContain('[data-tour="admin-invite-worker"]')
+    expect(elements).toContain('[data-tour="admin-invite-admin"]')
+
+    const emojiRegex = /\p{Extended_Pictographic}/u
+    for (const step of tour!.steps) {
+      expect(emojiRegex.test(step.title)).toBe(false)
+      expect(emojiRegex.test(step.description)).toBe(false)
+      if (step.actionHint) {
+        expect(emojiRegex.test(step.actionHint)).toBe(false)
+      }
+    }
+  })
+
+  it('no expone el tour de administracion a clientes ni trabajadores', () => {
+    const clientTour = getActiveTourForContext({ activeTab: 'admin', role: 'client' })
+    expect(clientTour).toBeNull()
+
+    const workerTour = getActiveTourForContext({ activeTab: 'admin', role: 'worker' })
+    expect(workerTour).toBeNull()
+  })
+
+  it('retorna preguntas de administracion para admin con cero emojis', () => {
+    const adminQs = getQuestionsForContext({ activeTab: 'admin', role: 'admin' })
+    expect(adminQs.length).toBeGreaterThanOrEqual(14)
+    expect(adminQs.some((q) => q.id === 'adm-q1')).toBe(true)
+    expect(adminQs.some((q) => q.id === 'adm-q11')).toBe(true)
+
+    const emojiRegex = /\p{Extended_Pictographic}/u
+    for (const q of adminQs) {
+      expect(emojiRegex.test(q.question)).toBe(false)
+      expect(emojiRegex.test(q.answer)).toBe(false)
+    }
+  })
 })

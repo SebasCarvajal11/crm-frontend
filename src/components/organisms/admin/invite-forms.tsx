@@ -47,13 +47,15 @@ export function AdminInviteForms({ accessToken }: Props) {
 
   return (
     <section className="space-y-4">
-      <SectionIntro
-        title="Centro de Incorporación"
-        description="Genera invitaciones y accesos de acuerdo a los privilegios requeridos por cada rol."
-      />
+      <div data-tour="admin-invites-section">
+        <SectionIntro
+          title="Centro de Incorporación"
+          description="Genera invitaciones y accesos de acuerdo a los privilegios requeridos por cada rol."
+        />
+      </div>
       <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2 xl:grid-cols-3">
         {/* Invitar cliente */}
-        <Card className={cardClass}>
+        <Card data-tour="admin-invite-client" className={cardClass}>
           <CardHeader className={cardHeaderClass}>
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
@@ -141,7 +143,7 @@ export function AdminInviteForms({ accessToken }: Props) {
         </Card>
 
         {/* Registrar trabajador */}
-        <Card className={cardClass}>
+        <Card data-tour="admin-invite-worker" className={cardClass}>
           <CardHeader className={cardHeaderClass}>
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
@@ -209,7 +211,7 @@ export function AdminInviteForms({ accessToken }: Props) {
         </Card>
 
         {/* Invitar administrador */}
-        <Card className={cardClass}>
+        <Card data-tour="admin-invite-admin" className={cardClass}>
           <CardHeader className={cardHeaderClass}>
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">

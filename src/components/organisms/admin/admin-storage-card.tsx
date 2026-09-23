@@ -110,7 +110,7 @@ function CloudStorageSection({ cloud }: { cloud: CloudStorageStats }) {
 function ServerDiskSection({ disk }: { disk: DiskStats }) {
   const color = getProgressColor(disk.usedPercentage)
   return (
-    <div className="rounded-lg border bg-muted/10 p-3 space-y-2 mt-4">
+    <div data-tour="admin-storage-server-disk" className="rounded-lg border bg-muted/10 p-3 space-y-2 mt-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <HardDrive className="size-4 text-muted-foreground" />
@@ -204,7 +204,7 @@ export function AdminStorageCard({ accessToken }: Props) {
   }
 
   return (
-    <Card className="rounded-2xl border-border/70 bg-card shadow-sm">
+    <Card data-tour="admin-storage-overview" className="rounded-2xl border-border/70 bg-card shadow-sm">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

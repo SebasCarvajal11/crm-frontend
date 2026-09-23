@@ -14,23 +14,25 @@ type Props = {
 export function AdminConsole({ accessToken }: Props) {
   return (
     <div className="space-y-8">
-      <PageHeader
-        eyebrow={
-          <>
-            Control y <span className="font-black text-primary">Gobernanza</span>
-          </>
-        }
-        title={
-          <>
-            Consola de{' '}
-            <span className="font-black tracking-tight text-foreground">
-              Administración
-            </span>
-          </>
-        }
-        description="Centro ejecutivo para la gobernanza de usuarios, control de roles y ciclo de vida de accesos."
-        icon={ShieldCheck}
-      />
+      <div data-tour="admin-header">
+        <PageHeader
+          eyebrow={
+            <>
+              Control y <span className="font-black text-primary">Gobernanza</span>
+            </>
+          }
+          title={
+            <>
+              Consola de{' '}
+              <span className="font-black tracking-tight text-foreground">
+                Administración
+              </span>
+            </>
+          }
+          description="Centro ejecutivo para la gobernanza de usuarios, control de roles y ciclo de vida de accesos."
+          icon={ShieldCheck}
+        />
+      </div>
       <div className="animate-fade-up">
         <AdminKpiCards accessToken={accessToken} />
       </div>

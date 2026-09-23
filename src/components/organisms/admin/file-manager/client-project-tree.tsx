@@ -19,7 +19,10 @@ export function ClientProjectTree({
   formatBytes,
 }: Props) {
   return (
-    <aside className="lg:col-span-4 flex flex-col min-h-0 lg:h-full border-b lg:border-b-0 lg:border-r border-border/60 bg-muted/10">
+    <aside
+      data-tour="admin-file-client-tree"
+      className="lg:col-span-4 flex flex-col min-h-0 lg:h-full border-b lg:border-b-0 lg:border-r border-border/60 bg-muted/10"
+    >
       <div className="p-3 border-b border-border/60 flex items-center justify-between bg-muted/20">
         <span className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-1.5">
           <Building2 className="size-3.5 text-primary" />

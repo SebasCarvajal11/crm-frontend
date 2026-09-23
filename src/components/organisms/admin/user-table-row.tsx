@@ -127,7 +127,10 @@ export function UserTableRow({
       </TableCell>
       <TableCell className="py-3 text-center">{roleBadge(row.role)}</TableCell>
       <TableCell className="py-3 text-center">{statusBadge(row)}</TableCell>
-      <TableCell className="py-3 text-right align-middle whitespace-nowrap min-w-[90px] sm:min-w-[190px]">
+      <TableCell
+        data-tour={virtualIndex === 0 ? 'admin-user-actions' : undefined}
+        className="py-3 text-right align-middle whitespace-nowrap min-w-[90px] sm:min-w-[190px]"
+      >
         <AdminUserActions
           row={row}
           patchStatus={patchStatus}

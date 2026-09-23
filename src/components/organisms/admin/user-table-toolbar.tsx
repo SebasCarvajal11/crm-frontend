@@ -39,7 +39,10 @@ export function UserTableToolbar({
   setPage,
 }: Props) {
   return (
-    <CardHeader className="flex flex-col gap-4 border-b bg-muted/15 p-4 sm:p-6">
+    <CardHeader
+      data-tour="admin-user-toolbar"
+      className="flex flex-col gap-4 border-b bg-muted/15 p-4 sm:p-6"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <CardTitle className="text-lg font-bold tracking-tight text-foreground">

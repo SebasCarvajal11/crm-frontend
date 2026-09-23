@@ -174,7 +174,11 @@ export function AdminFileManager({ accessToken }: Props) {
           </Button>
         </div>
 
-        {data?.summary && <StorageSummaryCards summary={data.summary} />}
+        {data?.summary && (
+          <div data-tour="admin-file-summary">
+            <StorageSummaryCards summary={data.summary} />
+          </div>
+        )}
 
         {feedback && (
           <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-3 py-2 text-xs text-emerald-600">
@@ -192,7 +196,7 @@ export function AdminFileManager({ accessToken }: Props) {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <div className="relative">
+        <div data-tour="admin-file-search" className="relative">
           <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
           <Input
             value={searchTerm}
@@ -222,23 +226,27 @@ export function AdminFileManager({ accessToken }: Props) {
           <div className="lg:col-span-8 flex flex-col min-h-0 lg:h-full p-4 space-y-3 bg-background">
             {activeProject ? (
               <>
-                <ProjectDetailHeader
-                  projectName={activeProject.projectName}
-                  clientName={activeClient?.clientName}
-                  projectStats={projectStats}
-                  isPurging={isPurging}
-                  onExportZip={handleExportProjectZip}
-                  onOpenEmptyDialog={() => setEmptyDialogOpen(true)}
-                />
+                <div data-tour="admin-file-project-header">
+                  <ProjectDetailHeader
+                    projectName={activeProject.projectName}
+                    clientName={activeClient?.clientName}
+                    projectStats={projectStats}
+                    isPurging={isPurging}
+                    onExportZip={handleExportProjectZip}
+                    onOpenEmptyDialog={() => setEmptyDialogOpen(true)}
+                  />
+                </div>
 
-                <FolderFilterTabs
-                  folders={activeProject.folders ?? {}}
-                  selectedFolder={selectedFolder}
-                  totalFiles={projectStats.totalFiles}
-                  onSelectFolder={setSelectedFolder}
-                />
+                <div data-tour="admin-file-folder-tabs">
+                  <FolderFilterTabs
+                    folders={activeProject.folders ?? {}}
+                    selectedFolder={selectedFolder}
+                    totalFiles={projectStats.totalFiles}
+                    onSelectFolder={setSelectedFolder}
+                  />
+                </div>
 
-                <div className="min-h-0 flex flex-col lg:flex-1">
+                <div data-tour="admin-file-table" className="min-h-0 flex flex-col lg:flex-1">
                   <FileManagerTable
                     files={activeFiles}
                     accessToken={accessToken}
