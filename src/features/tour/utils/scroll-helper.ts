@@ -7,6 +7,7 @@
 type DriverRef = { refresh: () => void; isActive: () => boolean }
 
 export function startScrollSupervisor(_driver?: DriverRef | null): void {
+  void _driver
   // Driver.js maneja su propio listener de scroll/resize internamente
 }
 
