@@ -183,4 +183,63 @@ test.describe('Módulo de Colaboración — Tours Guiados y Centro de Asistencia
       expect(hasOverflow).toBe(false)
     }
   })
+
+  test('auto-scroll centra pestañas desbordadas en movil durante el tour sin desborde ni cursor recortado', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await loginViaUI(page, 'gerente@cima.dev', 'Demo123!')
+
+    await page.goto('/dashboard?tab=collab')
+    await page.waitForLoadState('networkidle')
+
+    const firstCard = page.locator('[data-tour="collab-card-first"]').first()
+    if (await firstCard.isVisible({ timeout: 4000 })) {
+      await firstCard.click()
+    }
+    await page.waitForSelector('[data-tour="workspace-back-btn"]', { timeout: 10000 })
+
+    const helpTrigger = page.getByTestId('help-widget-trigger')
+    await helpTrigger.click()
+
+    const startTourBtn = page.getByRole('button', { name: /Iniciar Tour|Repetir Tour/i })
+    await startTourBtn.click()
+
+    const popover = page.locator('.cima-tour-popover')
+    await expect(popover).toBeVisible({ timeout: 5000 })
+
+    const nextBtn = popover.locator('.driver-popover-next-btn')
+
+    // Avanzar hasta la pestaña de Contratos (que en móvil originalmente quedaba a la derecha fuera de pantalla)
+    for (let step = 0; step < 13; step++) {
+      if (await nextBtn.isVisible()) {
+        await nextBtn.click()
+        await page.waitForTimeout(400)
+      }
+    }
+
+    // Verificar que el botón de la pestaña activa del paso actual está dentro del viewport horizontal
+    const activeTab = page.locator('[data-tour="workspace-tab-change-requests"]')
+    await expect(activeTab).toBeVisible()
+    const box = await activeTab.boundingBox()
+    if (box) {
+      expect(box.x).toBeGreaterThanOrEqual(0)
+      expect(box.x + box.width).toBeLessThanOrEqual(390)
+    }
+
+    // Verificar que el cursor (si existe) esté dentro del viewport
+    const cursor = page.locator('#cima-tour-cursor')
+    if (await cursor.isVisible()) {
+      const cursorBox = await cursor.boundingBox()
+      if (cursorBox) {
+        expect(cursorBox.x).toBeGreaterThanOrEqual(0)
+        expect(cursorBox.x + cursorBox.width).toBeLessThanOrEqual(390)
+      }
+    }
+
+    const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)
+    expect(hasOverflow).toBe(false)
+
+    await page.keyboard.press('Escape')
+  })
 })
