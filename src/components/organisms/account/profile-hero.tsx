@@ -59,6 +59,7 @@ export function ProfileHero({
                   <button
                     type="button"
                     aria-label="Opciones de foto de perfil"
+                    data-tour="account-avatar-btn"
                     className="group relative flex size-28 items-center justify-center rounded-full border-4 border-background bg-card shadow-lg ring-1 ring-black/5 transition-all duration-150 hover:scale-[1.03] active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:size-32"
                   >
                     {avatarUrl ? (

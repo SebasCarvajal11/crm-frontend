@@ -75,6 +75,7 @@ export function ChangePasswordSection({ accessToken }: Props) {
           </div>
 
           <form
+            data-tour="account-password-form"
             className="flex flex-1 flex-col justify-between space-y-4"
             onSubmit={handleSubmit((values) => {
               setPendingPayload(values)

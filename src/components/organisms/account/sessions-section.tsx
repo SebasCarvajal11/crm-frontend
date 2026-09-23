@@ -102,6 +102,7 @@ export function SessionsSection({ accessToken }: Props) {
                       size="sm"
                       className="h-8 shadow-xs sm:w-auto"
                       disabled={revokeAllMutation.isPending || revokeMutation.isPending}
+                      data-tour="account-sessions-revoke-btn"
                     >
                       {revokeAllMutation.isPending
                         ? 'Cerrando sesiones...'

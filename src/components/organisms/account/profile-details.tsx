@@ -68,7 +68,7 @@ export function ProfileDetails({
   const roleName = ROLE_NAMES[identity.role] ?? identity.role
 
   return (
-    <div className="space-y-4">
+    <div data-tour="account-profile-details" className="space-y-4">
       <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
         <DetailCard
           icon={User}

@@ -41,6 +41,7 @@ export const adminTour: CimaTourDefinition = {
     },
     {
       element: '[data-tour="admin-storage-server-disk"]',
+      fallbackElement: '[data-tour="admin-storage-overview"]',
       title: 'Estado del Disco del Servidor',
       description:
         'Monitorea el espacio del disco local donde operan la base de datos y los microservicios internos de la empresa.',
@@ -81,6 +82,7 @@ export const adminTour: CimaTourDefinition = {
     },
     {
       element: '[data-tour="admin-file-project-header"]',
+      fallbackElement: '[data-tour="admin-file-client-tree"]',
       title: 'Gestion Masiva y Descarga ZIP',
       description:
         'Descarga todos los documentos del proyecto en un unico archivo comprimido ZIP o depura el proyecto por completo.',
@@ -91,6 +93,7 @@ export const adminTour: CimaTourDefinition = {
     },
     {
       element: '[data-tour="admin-file-folder-tabs"]',
+      fallbackElement: '[data-tour="admin-file-client-tree"]',
       title: 'Segmentacion por Categorias',
       description:
         'Filtra los archivos segun su carpeta funcional: briefs, contratos legales, solicitudes de cambio o entregables.',
@@ -101,6 +104,7 @@ export const adminTour: CimaTourDefinition = {
     },
     {
       element: '[data-tour="admin-file-table"]',
+      fallbackElement: '[data-tour="admin-file-client-tree"]',
       title: 'Explorador de Archivos y Purga',
       description:
         'Visualiza cada archivo con su peso, formato y fecha. Permite descargarlo individualmente o purgarlo de la nube.',
@@ -131,6 +135,7 @@ export const adminTour: CimaTourDefinition = {
     },
     {
       element: '[data-tour="admin-user-actions"]',
+      fallbackElement: '[data-tour="admin-user-table"]',
       title: 'Acciones de Gobernanza de Acceso',
       description:
         'Activa o desactiva usuarios con un clic, o pulsa el icono de papelera para archivar una cuenta que causo baja.',
@@ -151,6 +156,7 @@ export const adminTour: CimaTourDefinition = {
     },
     {
       element: '[data-tour="admin-invite-client"]',
+      fallbackElement: '[data-tour="admin-invites-section"]',
       title: 'Invitar un Nuevo Cliente',
       description:
         'Envia una invitacion para personas naturales o empresas con acceso al portal de colaboracion y aprobaciones.',
@@ -161,6 +167,7 @@ export const adminTour: CimaTourDefinition = {
     },
     {
       element: '[data-tour="admin-invite-worker"]',
+      fallbackElement: '[data-tour="admin-invites-section"]',
       title: 'Registrar Colaborador Interno',
       description:
         'Crea cuentas operativas asignando la profesion del trabajador para su participacion en tableros Kanban y proyectos.',
@@ -171,6 +178,7 @@ export const adminTour: CimaTourDefinition = {
     },
     {
       element: '[data-tour="admin-invite-admin"]',
+      fallbackElement: '[data-tour="admin-invites-section"]',
       title: 'Otorgar Privilegios de Administrador',
       description:
         'Incorpora administradores ejecutivos con control absoluto sobre la plataforma, cuotas de almacenamiento y usuarios.',

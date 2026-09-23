@@ -220,16 +220,28 @@ describe('Tour Registry Facade', () => {
     expect(clientTour).toBeNull()
   })
 
-  it('retorna el tour de cuenta para todos los roles con selectores verificados', () => {
+  it('retorna el tour de cuenta para todos los roles con selectores verificados y 0 emojis', () => {
     const roles: ('admin' | 'worker' | 'client')[] = ['admin', 'worker', 'client']
+    const emojiRegex = /\p{Extended_Pictographic}/u
     for (const role of roles) {
       const tour = getActiveTourForContext({ activeTab: 'account', role })
       expect(tour?.id).toBe('tour-account')
+      expect(tour?.steps.length).toBe(8)
       const elements = tour!.steps.map((s) => s.element)
       expect(elements).toContain('[data-tour="account-header"]')
       expect(elements).toContain('[data-tour="account-hero"]')
+      expect(elements).toContain('[data-tour="account-avatar-btn"]')
+      expect(elements).toContain('[data-tour="account-profile-details"]')
       expect(elements).toContain('[data-tour="account-sessions"]')
+      expect(elements).toContain('[data-tour="account-sessions-revoke-btn"]')
       expect(elements).toContain('[data-tour="account-security"]')
+      expect(elements).toContain('[data-tour="account-password-form"]')
+
+      for (const step of tour!.steps) {
+        expect(emojiRegex.test(step.title)).toBe(false)
+        expect(emojiRegex.test(step.description)).toBe(false)
+        if (step.actionHint) expect(emojiRegex.test(step.actionHint)).toBe(false)
+      }
     }
   })
 
