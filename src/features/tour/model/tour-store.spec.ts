@@ -66,4 +66,18 @@ describe('useTourStore', () => {
     expect(useTourStore.getState().isTourPaused).toBe(false)
     expect(useTourStore.getState().pauseReason).toBeUndefined()
   })
+
+  it('permite abrir el centro de ayuda con un query preestablecido', () => {
+    const { focusHelpCenterWithQuery, closeHelpCenter } = useTourStore.getState()
+    expect(useTourStore.getState().isHelpCenterOpen).toBe(false)
+    expect(useTourStore.getState().initialSearchQuery).toBeUndefined()
+
+    focusHelpCenterWithQuery('tareas')
+    expect(useTourStore.getState().isHelpCenterOpen).toBe(true)
+    expect(useTourStore.getState().initialSearchQuery).toBe('tareas')
+
+    closeHelpCenter()
+    expect(useTourStore.getState().isHelpCenterOpen).toBe(false)
+    expect(useTourStore.getState().initialSearchQuery).toBeUndefined()
+  })
 })

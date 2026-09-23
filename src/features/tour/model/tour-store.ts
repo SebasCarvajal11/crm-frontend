@@ -43,9 +43,11 @@ export type TourStoreState = {
   firstVisitDismissed: boolean
   isTourPaused: boolean
   pauseReason?: string
+  initialSearchQuery?: string
   openHelpCenter: () => void
   closeHelpCenter: () => void
   toggleHelpCenter: () => void
+  focusHelpCenterWithQuery: (query?: string) => void
   setActiveTour: (tourId: string | null) => void
   markTourCompleted: (tourId: string) => void
   dismissFirstVisit: () => void
@@ -62,10 +64,12 @@ export const useTourStore = create<TourStoreState>((set, get) => ({
   firstVisitDismissed: readStoredFirstVisit(),
   isTourPaused: false,
   pauseReason: undefined,
+  initialSearchQuery: undefined,
 
   openHelpCenter: () => set({ isHelpCenterOpen: true }),
-  closeHelpCenter: () => set({ isHelpCenterOpen: false }),
+  closeHelpCenter: () => set({ isHelpCenterOpen: false, initialSearchQuery: undefined }),
   toggleHelpCenter: () => set((s) => ({ isHelpCenterOpen: !s.isHelpCenterOpen })),
+  focusHelpCenterWithQuery: (query = '') => set({ isHelpCenterOpen: true, initialSearchQuery: query }),
 
   setActiveTour: (tourId) => set({ activeTourId: tourId, isTourPaused: false, pauseReason: undefined }),
 

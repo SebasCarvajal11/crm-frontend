@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import {
   getActiveTourForContext,
+  getMissionsForContext,
+  searchMissions,
   getQuestionsForContext,
   searchQuestions,
 } from './index'
@@ -255,5 +257,21 @@ describe('Tour Registry Facade', () => {
       expect(elements).toContain('[data-tour="notifications-refresh-btn"]')
       expect(elements).toContain('[data-tour="notifications-list"]')
     }
+  })
+
+  it('retorna las 4 micro-misiones modulares para el contexto de colaboracion', () => {
+    const missions = getMissionsForContext({ activeTab: 'collab', role: 'admin' })
+    expect(missions).toHaveLength(4)
+    const missionIds = missions.map((m) => m.id)
+    expect(missionIds).toContain('mission-collab-kanban')
+    expect(missionIds).toContain('mission-collab-tasks')
+    expect(missionIds).toContain('mission-collab-docs')
+    expect(missionIds).toContain('mission-collab-changes')
+  })
+
+  it('permite buscar micro-misiones por termino clave', () => {
+    const matches = searchMissions('tareas', { activeTab: 'collab', role: 'admin' })
+    expect(matches.length).toBeGreaterThan(0)
+    expect(matches.some((m) => m.id === 'mission-collab-tasks')).toBe(true)
   })
 })

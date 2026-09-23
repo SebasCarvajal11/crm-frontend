@@ -47,6 +47,18 @@ export type CimaTourDefinition = {
   description: string
   roles: TourUserRole[]
   steps: CimaTourStep[]
+  category?: 'onboarding' | 'advanced' | 'feature'
+  badgeLabel?: string
+  estimatedMinutes?: number
+}
+
+export type TourBeaconConfig = {
+  id: string
+  missionId: string
+  targetSelector: string
+  title: string
+  description: string
+  placement?: 'top' | 'right' | 'bottom' | 'left'
 }
 
 export type GuidedQuestionCategory =
