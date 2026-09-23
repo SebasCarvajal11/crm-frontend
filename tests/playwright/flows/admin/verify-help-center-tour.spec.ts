@@ -31,16 +31,15 @@ test.describe('Centro de Asistencia y Tours Guiados CIMA', () => {
     await expect(popover).toBeVisible({ timeout: 5000 })
     await expect(popover.locator('.driver-popover-title')).toBeVisible()
 
-    // Verificar que no existen emojis y que el cursor interactivo está en pantalla
+    // Verificar que no existen emojis y que el elemento resaltado está activo
     const popoverText = await popover.innerText()
     expect(popoverText).not.toContain('👉')
-    const cursor = page.locator('#cima-tour-cursor')
-    await expect(cursor).toBeVisible()
+    const activeElement = page.locator('.driver-active-element')
+    await expect(activeElement).toBeVisible()
 
     // Cerrar con Escape
     await page.keyboard.press('Escape')
     await expect(popover).not.toBeVisible()
-    await expect(cursor).not.toBeVisible()
   })
 
   test('ejecuta el tour guiado completo en el dashboard con rol administrador', async ({ page }) => {

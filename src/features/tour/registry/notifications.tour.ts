@@ -24,6 +24,7 @@ export const notificationsTour: CimaTourDefinition = {
       side: 'bottom',
       align: 'end',
       showPointer: true,
+      interactiveAction: 'click',
     },
     {
       element: '[data-tour="notifications-list"]',

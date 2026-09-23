@@ -25,6 +25,7 @@ export const analyticsTour: CimaTourDefinition = {
       side: 'bottom',
       align: 'end',
       showPointer: true,
+      interactiveAction: 'click',
     },
     {
       element: '[data-tour="analytics-charts"]',

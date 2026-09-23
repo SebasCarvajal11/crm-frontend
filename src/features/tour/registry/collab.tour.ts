@@ -20,6 +20,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
     align: 'start',
     showPointer: true,
     switchWorkspaceTab: 'board',
+    interactiveAction: 'tab-change',
   },
   {
     element: '[data-tour="workspace-task-search"]',
@@ -30,6 +31,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
     align: 'start',
     showPointer: true,
     switchWorkspaceTab: 'board',
+    interactiveAction: 'input',
   },
   {
     element: '[data-tour="workspace-task-columns"]',
@@ -52,6 +54,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
     showPointer: true,
     requiredRole: ['admin', 'worker'],
     switchWorkspaceTab: 'board',
+    interactiveAction: 'open-modal',
   },
   {
     element: '[data-tour="workspace-tab-chat"]',
@@ -63,6 +66,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
     align: 'start',
     showPointer: true,
     switchWorkspaceTab: 'chat',
+    interactiveAction: 'tab-change',
   },
   {
     element: '[data-tour="workspace-chat-channels"]',
@@ -104,6 +108,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
     align: 'start',
     showPointer: true,
     switchWorkspaceTab: 'brief',
+    interactiveAction: 'tab-change',
   },
   {
     element: '[data-tour="workspace-brief-content"]',
@@ -126,6 +131,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
     showPointer: true,
     requiredRole: ['admin', 'client'],
     switchWorkspaceTab: 'contract',
+    interactiveAction: 'tab-change',
   },
   {
     element: '[data-tour="workspace-contract-content"]',
@@ -148,6 +154,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
     align: 'start',
     showPointer: true,
     switchWorkspaceTab: 'change-requests',
+    interactiveAction: 'tab-change',
   },
   {
     element: '[data-tour="workspace-change-requests-action"]',
@@ -169,6 +176,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
     align: 'start',
     showPointer: true,
     switchWorkspaceTab: 'members',
+    interactiveAction: 'tab-change',
   },
   {
     element: '[data-tour="workspace-members-list"]',
@@ -190,6 +198,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
     showPointer: true,
     requiredRole: ['admin'],
     switchWorkspaceTab: 'members',
+    interactiveAction: 'open-modal',
   },
   {
     element: '[data-tour="workspace-back-btn"]',
@@ -199,6 +208,7 @@ const WORKSPACE_STEPS: CimaTourStep[] = [
     side: 'bottom',
     align: 'start',
     showPointer: true,
+    interactiveAction: 'click',
   },
 ]
 
@@ -217,6 +227,7 @@ export const collabKanbanTour: CimaTourDefinition = {
       side: 'bottom',
       align: 'start',
       showPointer: true,
+      interactiveAction: 'input',
     },
     {
       element: '[data-tour="collab-summary"]',
@@ -246,6 +257,7 @@ export const collabKanbanTour: CimaTourDefinition = {
       align: 'end',
       showPointer: true,
       requiredRole: ['admin'],
+      interactiveAction: 'open-modal',
     },
     {
       element: '[data-tour="collab-card-first"]',
@@ -257,6 +269,7 @@ export const collabKanbanTour: CimaTourDefinition = {
       align: 'start',
       showPointer: true,
       onNextAction: 'openProject',
+      interactiveAction: 'click',
     },
     ...WORKSPACE_STEPS,
   ],

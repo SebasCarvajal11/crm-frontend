@@ -46,6 +46,7 @@ export const marketingTour: CimaTourDefinition = {
       side: 'bottom',
       align: 'end',
       showPointer: true,
+      interactiveAction: 'click',
     },
     {
       element: '[data-tour="marketing-new-campaign-btn"]',
@@ -57,6 +58,7 @@ export const marketingTour: CimaTourDefinition = {
       side: 'bottom',
       align: 'end',
       showPointer: true,
+      interactiveAction: 'open-modal',
     },
     {
       element: '[data-tour="marketing-campaigns-filters"]',
@@ -68,6 +70,7 @@ export const marketingTour: CimaTourDefinition = {
       side: 'bottom',
       align: 'start',
       showPointer: true,
+      interactiveAction: 'input',
     },
     {
       element: '[data-tour="marketing-new-proposal-btn"]',
@@ -79,6 +82,7 @@ export const marketingTour: CimaTourDefinition = {
       side: 'bottom',
       align: 'end',
       showPointer: true,
+      interactiveAction: 'open-modal',
     },
     {
       element: '[data-tour="marketing-new-workflow-btn"]',
@@ -90,6 +94,7 @@ export const marketingTour: CimaTourDefinition = {
       side: 'bottom',
       align: 'end',
       showPointer: true,
+      interactiveAction: 'open-modal',
     },
   ],
 }

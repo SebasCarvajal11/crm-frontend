@@ -1,34 +1,36 @@
 /**
- * Utilidad de desplazamiento inteligente para CIMA Smart Copilot.
- * Centra elementos en el viewport de <main> y contenedores Kanban
- * sin colisionar con el header sticky ni con el popover inferior.
+ * Utilidad de desplazamiento inteligente de alto rendimiento para CIMA Smart Copilot.
+ * Centra elementos en el viewport sin colisionar con la cabecera sticky ni con el popover.
+ * Optimizado para 60fps constantes en iOS Safari y Android sin layout thrashing.
  */
 
 type DriverRef = { refresh: () => void; isActive: () => boolean }
 
 let activeDriver: DriverRef | null = null
-let scrollTimeout: ReturnType<typeof setTimeout> | null = null
-let rAF: number | null = null
+let scrollDebounceTimer: ReturnType<typeof setTimeout> | null = null
+let isThrottling = false
 let supervisorActive = false
 
-function handleScrollOrTouch(): void {
-  if (typeof document === 'undefined') return
-  if (!document.body.classList.contains('cima-tour-scrolling')) {
-    document.body.classList.add('cima-tour-scrolling')
-  }
+function triggerThrottledRefresh(): void {
+  if (!activeDriver || !activeDriver.isActive() || isThrottling) return
+  isThrottling = true
+  requestAnimationFrame(() => {
+    activeDriver?.refresh()
+    setTimeout(() => {
+      isThrottling = false
+    }, 60)
+  })
+}
 
-  if (activeDriver && activeDriver.isActive()) {
-    if (rAF) cancelAnimationFrame(rAF)
-    rAF = requestAnimationFrame(() => {
-      activeDriver?.refresh()
-      rAF = null
-    })
-  }
+function handlePassiveScroll(): void {
+  triggerThrottledRefresh()
 
-  if (scrollTimeout) clearTimeout(scrollTimeout)
-  scrollTimeout = setTimeout(() => {
-    document.body.classList.remove('cima-tour-scrolling')
-    scrollTimeout = null
+  if (scrollDebounceTimer) clearTimeout(scrollDebounceTimer)
+  scrollDebounceTimer = setTimeout(() => {
+    if (activeDriver?.isActive()) {
+      activeDriver.refresh()
+    }
+    scrollDebounceTimer = null
   }, 100)
 }
 
@@ -37,8 +39,8 @@ export function startScrollSupervisor(driver?: DriverRef | null): void {
   if (driver) activeDriver = driver
   if (supervisorActive) return
   supervisorActive = true
-  window.addEventListener('scroll', handleScrollOrTouch, { passive: true, capture: true })
-  window.addEventListener('touchmove', handleScrollOrTouch, { passive: true, capture: true })
+
+  window.addEventListener('scroll', handlePassiveScroll, { passive: true })
 }
 
 export function stopScrollSupervisor(): void {
@@ -46,20 +48,13 @@ export function stopScrollSupervisor(): void {
   activeDriver = null
   if (supervisorActive) {
     supervisorActive = false
-    window.removeEventListener('scroll', handleScrollOrTouch, true)
-    window.removeEventListener('touchmove', handleScrollOrTouch, true)
+    window.removeEventListener('scroll', handlePassiveScroll)
   }
-  if (scrollTimeout) {
-    clearTimeout(scrollTimeout)
-    scrollTimeout = null
+  if (scrollDebounceTimer) {
+    clearTimeout(scrollDebounceTimer)
+    scrollDebounceTimer = null
   }
-  if (rAF) {
-    cancelAnimationFrame(rAF)
-    rAF = null
-  }
-  if (typeof document !== 'undefined') {
-    document.body.classList.remove('cima-tour-scrolling')
-  }
+  isThrottling = false
 }
 
 export function resetHorizontalScroll(): void {
@@ -84,7 +79,7 @@ function centerElementHorizontally(element: Element): void {
       const maxScroll = parent.scrollWidth - parent.clientWidth
       parent.scrollTo({
         left: Math.max(0, Math.min(targetScroll, maxScroll)),
-        behavior: 'instant',
+        behavior: 'smooth',
       })
     }
     parent = parent.parentElement
@@ -93,17 +88,20 @@ function centerElementHorizontally(element: Element): void {
 
 function centerElementVertically(element: Element): void {
   const mainEl = document.querySelector('main')
-  if (!mainEl) return
-
   const elRect = element.getBoundingClientRect()
-  const headerOffset = 68
-  const popoverAllowance = window.innerWidth < 640 ? 240 : 180
+  const headerOffset = 64
+  const isMobile = window.innerWidth < 640
+  const popoverAllowance = isMobile ? 180 : 140
   const availableH = window.innerHeight - headerOffset - popoverAllowance
-  const idealTop = headerOffset + Math.max(12, (availableH - elRect.height) / 2)
+  const idealTop = headerOffset + Math.max(16, (availableH - elRect.height) / 2)
   const deltaY = elRect.top - idealTop
 
   if (elRect.top < headerOffset + 8 || elRect.bottom > window.innerHeight - popoverAllowance) {
-    mainEl.scrollBy({ top: deltaY, behavior: 'instant' })
+    if (mainEl && mainEl.scrollHeight > mainEl.clientHeight) {
+      mainEl.scrollBy({ top: deltaY, behavior: 'smooth' })
+    } else {
+      window.scrollBy({ top: deltaY, behavior: 'smooth' })
+    }
   }
 }
 

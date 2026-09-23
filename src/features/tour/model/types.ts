@@ -13,6 +13,13 @@ export type WorkspaceSubTab =
   | 'change-requests'
   | 'members'
 
+export type CimaTourInteractiveAction =
+  | 'click'
+  | 'input'
+  | 'tab-change'
+  | 'open-modal'
+  | 'none'
+
 export type CimaTourStep = {
   element: string
   fallbackElement?: string
@@ -21,12 +28,15 @@ export type CimaTourStep = {
   actionHint?: string
   side?: TourPlacement
   align?: TourAlignment
+  mobileSide?: TourPlacement
   showPointer?: boolean
   requiredRole?: TourUserRole[]
   navigateTab?: DashboardTab
   switchWorkspaceTab?: WorkspaceSubTab | (string & {})
   switchMarketingTab?: string
   onNextAction?: 'openProject' | 'closeProject'
+  interactiveAction?: CimaTourInteractiveAction
+  autoAdvanceOnAction?: boolean
 }
 
 export type CimaTourDefinition = {

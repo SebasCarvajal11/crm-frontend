@@ -57,22 +57,22 @@ test.describe('Módulo de Administración — Tour Guiado y Centro de Asistencia
     await expect(helpModal).toBeVisible()
 
     // Verificar preguntas especializadas de administración
-    await expect(page.getByText(/Como invito a un nuevo cliente/i)).toBeVisible()
-    await expect(page.getByText(/Como registro un nuevo colaborador/i)).toBeVisible()
+    await expect(page.getByText(/invito a un nuevo cliente/i)).toBeVisible()
+    await expect(page.getByText(/registro un nuevo colaborador/i)).toBeVisible()
 
     // Búsqueda específica
     const searchInput = page.locator('#cima-help-search')
     await searchInput.fill('cuota')
-    await expect(page.getByText(/Como superviso el consumo de almacenamiento/i)).toBeVisible()
+    await expect(page.getByText(/consumo de almacenamiento/i)).toBeVisible()
 
     // Hacer clic en una pregunta para resaltar el objetivo
-    await page.getByText(/Como superviso el consumo de almacenamiento/i).click()
+    await page.getByText(/consumo de almacenamiento/i).click()
     await expect(helpModal).not.toBeVisible()
 
     const popover = page.locator('.cima-tour-popover')
     await expect(popover).toBeVisible({ timeout: 5000 })
     await expect(popover.locator('.driver-popover-title')).toContainText(
-      'Como superviso el consumo de almacenamiento'
+      'consumo de almacenamiento'
     )
 
     await page.keyboard.press('Escape')

@@ -53,4 +53,17 @@ describe('useTourStore', () => {
     expect(useTourStore.getState().completedTourIds).toHaveLength(0)
     expect(isTourCompleted('tour-overview')).toBe(false)
   })
+
+  it('soporta pausar y reanudar el tour durante interacción con modales', () => {
+    const { pauseTour, resumeTour } = useTourStore.getState()
+    expect(useTourStore.getState().isTourPaused).toBe(false)
+
+    pauseTour('modal')
+    expect(useTourStore.getState().isTourPaused).toBe(true)
+    expect(useTourStore.getState().pauseReason).toBe('modal')
+
+    resumeTour()
+    expect(useTourStore.getState().isTourPaused).toBe(false)
+    expect(useTourStore.getState().pauseReason).toBeUndefined()
+  })
 })

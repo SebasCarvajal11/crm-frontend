@@ -69,6 +69,7 @@ export const adminTour: CimaTourDefinition = {
       side: 'bottom',
       align: 'start',
       showPointer: true,
+      interactiveAction: 'input',
     },
     {
       element: '[data-tour="admin-file-client-tree"]',
@@ -122,6 +123,7 @@ export const adminTour: CimaTourDefinition = {
       side: 'bottom',
       align: 'start',
       showPointer: true,
+      interactiveAction: 'input',
     },
     {
       element: '[data-tour="admin-user-table"]',
@@ -164,6 +166,7 @@ export const adminTour: CimaTourDefinition = {
       side: 'top',
       align: 'start',
       showPointer: true,
+      interactiveAction: 'open-modal',
     },
     {
       element: '[data-tour="admin-invite-worker"]',
@@ -175,6 +178,7 @@ export const adminTour: CimaTourDefinition = {
       side: 'top',
       align: 'start',
       showPointer: true,
+      interactiveAction: 'open-modal',
     },
     {
       element: '[data-tour="admin-invite-admin"]',
@@ -186,6 +190,7 @@ export const adminTour: CimaTourDefinition = {
       side: 'top',
       align: 'start',
       showPointer: true,
+      interactiveAction: 'open-modal',
     },
   ],
 }

@@ -34,6 +34,7 @@ export const accountTour: CimaTourDefinition = {
       side: 'bottom',
       align: 'start',
       showPointer: true,
+      interactiveAction: 'open-modal',
     },
     {
       element: '[data-tour="account-profile-details"]',
@@ -82,6 +83,7 @@ export const accountTour: CimaTourDefinition = {
       side: 'top',
       align: 'start',
       showPointer: true,
+      interactiveAction: 'input',
     },
   ],
 }

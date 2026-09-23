@@ -3,7 +3,7 @@ import { driver, type Driver, type DriveStep } from 'driver.js'
 import { useNavigate } from '@tanstack/react-router'
 import { useTourStore } from '../model/tour-store'
 import { useTourContext } from './use-tour-context'
-import type { CimaTourDefinition } from '../model/types'
+import type { CimaTourDefinition, CimaTourStep } from '../model/types'
 import { waitForElement } from '../utils/dom-target-finder'
 import {
   resetHorizontalScroll,
@@ -16,51 +16,9 @@ import {
   mapTourStepToDriveStep,
   buildDescriptionWithHint,
 } from '../utils/popover-helper'
+import { startModalSupervisor, stopModalSupervisor } from '../utils/modal-supervisor'
+import { switchTabIfNeeded, handleActionTransition } from '../utils/action-transition'
 import '../ui/tour-popover-theme.css'
-
-function switchTabIfNeeded(targetTab?: string): void {
-  if (!targetTab || typeof document === 'undefined') return
-  const btn = document.querySelector<HTMLButtonElement>(`[data-tour="workspace-tab-${targetTab}"]`)
-  if (btn) {
-    const isSelected =
-      btn.getAttribute('aria-selected') === 'true' ||
-      btn.getAttribute('aria-pressed') === 'true'
-    if (!isSelected) btn.click()
-    centerElementInScrollParents(btn)
-  }
-}
-
-async function handleActionTransition(
-  action?: 'openProject' | 'closeProject',
-  navigateFn?: (opts: { to: string; search: (prev: Record<string, unknown>) => Record<string, unknown>; replace: boolean }) => void
-): Promise<void> {
-  if (action === 'openProject') {
-    const cardEl = document.querySelector<HTMLElement>('[data-tour="collab-card-first"]')
-    if (cardEl) {
-      const clickTarget = cardEl.querySelector<HTMLElement>('button') ?? cardEl
-      clickTarget.click()
-      await waitForElement('[data-tour="workspace-project-header"]', 2000)
-    }
-  } else if (action === 'closeProject') {
-    const backBtn = document.querySelector<HTMLElement>('[data-tour="workspace-back-btn"]')
-    if (backBtn) {
-      const clickTarget = backBtn.querySelector<HTMLElement>('button') ?? backBtn
-      clickTarget.click()
-    } else if (navigateFn) {
-      navigateFn({
-        to: '/dashboard',
-        search: (prev) => ({
-          ...prev,
-          tab: 'collab',
-          project_id: undefined,
-          workspace_tab: undefined,
-        }),
-        replace: true,
-      })
-    }
-    await waitForElement('[data-tour="collab-columns-container"]', 2000)
-  }
-}
 
 export function useTourRunner() {
   const driverRef = useRef<Driver | null>(null)
@@ -68,18 +26,72 @@ export function useTourRunner() {
   const ctx = useTourContext()
   const markTourCompleted = useTourStore((s) => s.markTourCompleted)
   const setActiveTour = useTourStore((s) => s.setActiveTour)
+  const pauseTour = useTourStore((s) => s.pauseTour)
+  const resumeTour = useTourStore((s) => s.resumeTour)
   const isTransitioningRef = useRef(false)
+  const activeListenerCleanupRef = useRef<(() => void) | null>(null)
 
   const stopTour = useCallback(() => {
     stopScrollSupervisor()
+    stopModalSupervisor()
+    if (activeListenerCleanupRef.current) {
+      activeListenerCleanupRef.current()
+      activeListenerCleanupRef.current = null
+    }
     isTransitioningRef.current = false
     resetHorizontalScroll()
     if (driverRef.current) {
       driverRef.current.destroy()
       driverRef.current = null
     }
+    resumeTour()
     setActiveTour(null)
-  }, [setActiveTour])
+  }, [resumeTour, setActiveTour])
+
+  const attachStepInteraction = useCallback(
+    (element: Element, step: CimaTourStep, stepIdx: number) => {
+      if (activeListenerCleanupRef.current) {
+        activeListenerCleanupRef.current()
+        activeListenerCleanupRef.current = null
+      }
+
+      const shouldListen =
+        step.interactiveAction && step.interactiveAction !== 'none' ||
+        step.onNextAction === 'openProject'
+
+      if (!shouldListen) return
+
+      const clickTarget =
+        element.querySelector<HTMLElement>('button, a, [role="button"], [role="tab"]') ??
+        (element as HTMLElement)
+
+      const handleUserAction = async () => {
+        if (isTransitioningRef.current) return
+        const inst = driverRef.current
+        if (!inst || !inst.isActive() || inst.getActiveIndex() !== stepIdx) return
+
+        if (step.onNextAction === 'openProject') {
+          isTransitioningRef.current = true
+          await waitForElement('[data-tour="workspace-project-header"]', 2500)
+          isTransitioningRef.current = false
+        }
+
+        if (step.autoAdvanceOnAction !== false) {
+          setTimeout(() => {
+            if (inst.isActive() && inst.getActiveIndex() === stepIdx) {
+              inst.moveNext()
+            }
+          }, 150)
+        }
+      }
+
+      clickTarget.addEventListener('click', handleUserAction, { capture: true })
+      activeListenerCleanupRef.current = () => {
+        clickTarget.removeEventListener('click', handleUserAction, true)
+      }
+    },
+    []
+  )
 
   const startTour = useCallback(
     async (tour: CimaTourDefinition) => {
@@ -96,6 +108,14 @@ export function useTourRunner() {
       if (filtered[0]?.element) {
         await waitForElement(filtered[0].element, 1000, filtered[0].fallbackElement)
       }
+
+      startModalSupervisor({
+        onModalOpen: () => pauseTour('modal'),
+        onModalClose: () => {
+          resumeTour()
+          driverRef.current?.refresh()
+        },
+      })
 
       const instance = driver({
         animate: true,
@@ -128,9 +148,7 @@ export function useTourRunner() {
           }
 
           const nextTab = nextStep?.switchWorkspaceTab ?? nextStep?.switchMarketingTab
-          if (nextTab) {
-            switchTabIfNeeded(nextTab)
-          }
+          if (nextTab) switchTabIfNeeded(nextTab)
 
           if (nextStep?.element) {
             await waitForElement(nextStep.element, 1200, nextStep.fallbackElement)
@@ -154,9 +172,7 @@ export function useTourRunner() {
           }
 
           const prevTab = prevStep?.switchWorkspaceTab ?? prevStep?.switchMarketingTab
-          if (prevTab) {
-            switchTabIfNeeded(prevTab)
-          }
+          if (prevTab) switchTabIfNeeded(prevTab)
 
           if (prevStep?.element) {
             await waitForElement(prevStep.element, 1200, prevStep.fallbackElement)
@@ -173,24 +189,18 @@ export function useTourRunner() {
         },
         onHighlighted: (element, _step, opts) => {
           resetHorizontalScroll()
-          if (element) centerElementInScrollParents(element)
-          const idx = opts.driver.getActiveIndex() ?? 0
-          if (filtered[idx]?.onNextAction === 'openProject' && element) {
-            const clickTarget = element.querySelector<HTMLElement>('button') ?? element
-            clickTarget.addEventListener('click', async () => {
-              if (isTransitioningRef.current) return
-              await waitForElement('[data-tour="workspace-project-header"]', 2500)
-              if (driverRef.current?.isActive() && driverRef.current.getActiveIndex() === idx) {
-                driverRef.current.moveNext()
-              }
-            }, { once: true })
+          if (element) {
+            centerElementInScrollParents(element)
+            const idx = opts.driver.getActiveIndex() ?? 0
+            const currentStep = filtered[idx]
+            if (currentStep) {
+              attachStepInteraction(element, currentStep, idx)
+            }
           }
         },
         onDestroyed: () => {
-          stopScrollSupervisor()
+          stopTour()
           markTourCompleted(tour.id)
-          setActiveTour(null)
-          driverRef.current = null
         },
       })
 
@@ -198,7 +208,7 @@ export function useTourRunner() {
       startScrollSupervisor(instance)
       instance.drive()
     },
-    [ctx.role, markTourCompleted, navigate, setActiveTour, stopTour]
+    [attachStepInteraction, ctx.role, markTourCompleted, navigate, pauseTour, resumeTour, setActiveTour, stopTour]
   )
 
   const highlightTarget = useCallback(
@@ -235,8 +245,7 @@ export function useTourRunner() {
         stageRadius: 10,
         popoverClass: 'cima-tour-popover',
         onDestroyed: () => {
-          stopScrollSupervisor()
-          driverRef.current = null
+          stopTour()
         },
       })
 
@@ -247,7 +256,7 @@ export function useTourRunner() {
         popover: {
           title,
           description: buildDescriptionWithHint(description, actionHint),
-          side: 'bottom',
+          side: isMobile ? 'bottom' : 'bottom',
           align: isMobile ? 'center' : 'start',
           showButtons: ['close'],
           doneBtnText: 'Entendido',

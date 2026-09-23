@@ -41,6 +41,8 @@ export type TourStoreState = {
   activeTourId: string | null
   completedTourIds: string[]
   firstVisitDismissed: boolean
+  isTourPaused: boolean
+  pauseReason?: string
   openHelpCenter: () => void
   closeHelpCenter: () => void
   toggleHelpCenter: () => void
@@ -49,6 +51,8 @@ export type TourStoreState = {
   dismissFirstVisit: () => void
   resetAllTours: () => void
   isTourCompleted: (tourId: string) => boolean
+  pauseTour: (reason?: string) => void
+  resumeTour: () => void
 }
 
 export const useTourStore = create<TourStoreState>((set, get) => ({
@@ -56,19 +60,21 @@ export const useTourStore = create<TourStoreState>((set, get) => ({
   activeTourId: null,
   completedTourIds: readStoredCompleted(),
   firstVisitDismissed: readStoredFirstVisit(),
+  isTourPaused: false,
+  pauseReason: undefined,
 
   openHelpCenter: () => set({ isHelpCenterOpen: true }),
   closeHelpCenter: () => set({ isHelpCenterOpen: false }),
   toggleHelpCenter: () => set((s) => ({ isHelpCenterOpen: !s.isHelpCenterOpen })),
 
-  setActiveTour: (tourId) => set({ activeTourId: tourId }),
+  setActiveTour: (tourId) => set({ activeTourId: tourId, isTourPaused: false, pauseReason: undefined }),
 
   markTourCompleted: (tourId) => {
     const prev = get().completedTourIds
     if (prev.includes(tourId)) return
     const next = [...prev, tourId]
     persistCompleted(next)
-    set({ completedTourIds: next, activeTourId: null })
+    set({ completedTourIds: next, activeTourId: null, isTourPaused: false })
   },
 
   dismissFirstVisit: () => {
@@ -79,8 +85,22 @@ export const useTourStore = create<TourStoreState>((set, get) => ({
   resetAllTours: () => {
     persistCompleted([])
     persistFirstVisit(false)
-    set({ completedTourIds: [], firstVisitDismissed: false, activeTourId: null })
+    set({ completedTourIds: [], firstVisitDismissed: false, activeTourId: null, isTourPaused: false })
   },
 
   isTourCompleted: (tourId) => get().completedTourIds.includes(tourId),
+
+  pauseTour: (reason) => {
+    if (typeof document !== 'undefined') {
+      document.body.classList.add('cima-tour-paused')
+    }
+    set({ isTourPaused: true, pauseReason: reason })
+  },
+
+  resumeTour: () => {
+    if (typeof document !== 'undefined') {
+      document.body.classList.remove('cima-tour-paused')
+    }
+    set({ isTourPaused: false, pauseReason: undefined })
+  },
 }))
