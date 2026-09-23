@@ -44,14 +44,18 @@ export function DesktopSidebar({
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-30 hidden shrink-0 flex-col overflow-hidden bg-primary text-primary-foreground transition-[width] duration-200 ease-out md:flex',
+        'fixed inset-y-0 left-0 z-30 hidden shrink-0 flex-col bg-primary',
+        'text-primary-foreground transition-[width] duration-200 ease-out md:flex',
         collapsed ? 'md:w-20' : shellSidebarWidth
       )}
       aria-label="Barra de navegacion lateral"
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-300 ease-out"
+        className={cn(
+          'pointer-events-none absolute inset-0 z-0 overflow-hidden bg-cover bg-center',
+          'transition-opacity duration-300 ease-out'
+        )}
         style={{
           backgroundImage: `url(${BRAND_TEXTURES.sidebar})`,
           opacity: isTextureLoaded ? 1 : 0,
@@ -118,7 +122,7 @@ export function DesktopSidebar({
         onLogout={onLogout}
         isLoggingOut={isLoggingOut}
         compact={collapsed}
-        menuPlacement="side"
+        menuPlacement={collapsed ? 'side' : 'inline'}
         onOpenHelp={onOpenHelp}
       />
       </div>
