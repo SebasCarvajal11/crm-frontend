@@ -172,26 +172,49 @@ describe('Tour Registry Facade', () => {
     }
   })
 
-  it('retorna el tour de marketing para admin y worker con selectores verificados', () => {
+  it('retorna el tour de marketing para admin y worker con selectores verificados y 0 emojis', () => {
     const tour = getActiveTourForContext({ activeTab: 'marketing', role: 'admin' })
     expect(tour?.id).toBe('tour-marketing')
+    expect(tour?.steps.length).toBe(8)
     const elements = tour!.steps.map((s) => s.element)
     expect(elements).toContain('[data-tour="marketing-header"]')
     expect(elements).toContain('[data-tour="marketing-tabs"]')
+    expect(elements).toContain('[data-tour="marketing-clients-plans-grid"]')
+    expect(elements).toContain('[data-tour="marketing-clients-sync-btn"]')
     expect(elements).toContain('[data-tour="marketing-new-campaign-btn"]')
+    expect(elements).toContain('[data-tour="marketing-campaigns-filters"]')
+    expect(elements).toContain('[data-tour="marketing-new-proposal-btn"]')
+    expect(elements).toContain('[data-tour="marketing-new-workflow-btn"]')
+
+    const emojiRegex = /\p{Extended_Pictographic}/u
+    for (const step of tour!.steps) {
+      expect(emojiRegex.test(step.title)).toBe(false)
+      expect(emojiRegex.test(step.description)).toBe(false)
+      if (step.actionHint) expect(emojiRegex.test(step.actionHint)).toBe(false)
+    }
 
     const clientTour = getActiveTourForContext({ activeTab: 'marketing', role: 'client' })
     expect(clientTour).toBeNull()
   })
 
-  it('retorna el tour de analítica para admin y worker con selectores verificados', () => {
+  it('retorna el tour de analítica para admin y worker con selectores verificados y 0 emojis', () => {
     const tour = getActiveTourForContext({ activeTab: 'analytics', role: 'admin' })
     expect(tour?.id).toBe('tour-analytics')
+    expect(tour?.steps.length).toBe(6)
     const elements = tour!.steps.map((s) => s.element)
     expect(elements).toContain('[data-tour="analytics-header"]')
+    expect(elements).toContain('[data-tour="analytics-refresh-btn"]')
     expect(elements).toContain('[data-tour="analytics-charts"]')
     expect(elements).toContain('[data-tour="analytics-kpis"]')
+    expect(elements).toContain('[data-tour="analytics-campaign-chart"]')
     expect(elements).toContain('[data-tour="analytics-inventory-alerts"]')
+
+    const emojiRegex = /\p{Extended_Pictographic}/u
+    for (const step of tour!.steps) {
+      expect(emojiRegex.test(step.title)).toBe(false)
+      expect(emojiRegex.test(step.description)).toBe(false)
+      if (step.actionHint) expect(emojiRegex.test(step.actionHint)).toBe(false)
+    }
 
     const clientTour = getActiveTourForContext({ activeTab: 'analytics', role: 'client' })
     expect(clientTour).toBeNull()

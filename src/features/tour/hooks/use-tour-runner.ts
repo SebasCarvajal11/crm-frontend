@@ -22,7 +22,10 @@ function switchTabIfNeeded(targetTab?: string): void {
   if (!targetTab || typeof document === 'undefined') return
   const btn = document.querySelector<HTMLButtonElement>(`[data-tour="workspace-tab-${targetTab}"]`)
   if (btn) {
-    if (btn.getAttribute('aria-selected') !== 'true') btn.click()
+    const isSelected =
+      btn.getAttribute('aria-selected') === 'true' ||
+      btn.getAttribute('aria-pressed') === 'true'
+    if (!isSelected) btn.click()
     centerElementInScrollParents(btn)
   }
 }
@@ -88,7 +91,8 @@ export function useTourRunner() {
       const filtered = tour.steps.filter((st) => !st.requiredRole || st.requiredRole.includes(ctx.role))
       const steps: DriveStep[] = filtered.map((st) => mapTourStepToDriveStep(st, isMobile))
 
-      if (filtered[0]?.switchWorkspaceTab) switchTabIfNeeded(filtered[0].switchWorkspaceTab)
+      const initialTab = filtered[0]?.switchWorkspaceTab ?? filtered[0]?.switchMarketingTab
+      if (initialTab) switchTabIfNeeded(initialTab)
       if (filtered[0]?.element) {
         await waitForElement(filtered[0].element, 1000, filtered[0].fallbackElement)
       }
@@ -123,8 +127,9 @@ export function useTourRunner() {
             }
           }
 
-          if (nextStep?.switchWorkspaceTab) {
-            switchTabIfNeeded(nextStep.switchWorkspaceTab)
+          const nextTab = nextStep?.switchWorkspaceTab ?? nextStep?.switchMarketingTab
+          if (nextTab) {
+            switchTabIfNeeded(nextTab)
           }
 
           if (nextStep?.element) {
@@ -148,8 +153,9 @@ export function useTourRunner() {
             }
           }
 
-          if (prevStep?.switchWorkspaceTab) {
-            switchTabIfNeeded(prevStep.switchWorkspaceTab)
+          const prevTab = prevStep?.switchWorkspaceTab ?? prevStep?.switchMarketingTab
+          if (prevTab) {
+            switchTabIfNeeded(prevTab)
           }
 
           if (prevStep?.element) {
@@ -161,7 +167,7 @@ export function useTourRunner() {
         onHighlightStarted: (el, _step, opts) => {
           resetHorizontalScroll()
           const activeIdx = opts?.state?.activeIndex ?? opts?.index ?? 0
-          const targetTab = filtered[activeIdx]?.switchWorkspaceTab
+          const targetTab = filtered[activeIdx]?.switchWorkspaceTab ?? filtered[activeIdx]?.switchMarketingTab
           if (targetTab) switchTabIfNeeded(targetTab)
           if (el) centerElementInScrollParents(el)
         },

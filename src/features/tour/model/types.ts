@@ -24,7 +24,7 @@ export type CimaTourStep = {
   showPointer?: boolean
   requiredRole?: TourUserRole[]
   navigateTab?: DashboardTab
-  switchWorkspaceTab?: WorkspaceSubTab
+  switchWorkspaceTab?: WorkspaceSubTab | (string & {})
   switchMarketingTab?: string
   onNextAction?: 'openProject' | 'closeProject'
 }

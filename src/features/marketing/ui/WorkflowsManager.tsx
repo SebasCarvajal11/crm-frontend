@@ -139,6 +139,7 @@ export function WorkflowsManager({
         </div>
 
         <Button
+          data-tour="marketing-new-workflow-btn"
           onClick={() => {
             setFormData({
               ...INITIAL_FORM_DATA,

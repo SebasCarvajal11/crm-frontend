@@ -147,7 +147,7 @@ export function CampaignsManager({
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div data-tour="marketing-campaigns-filters" className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         <div className="relative sm:col-span-2">
           <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
           <Input
@@ -191,50 +191,52 @@ export function CampaignsManager({
         </div>
       </div>
 
-      {campaignsQuery.isLoading ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-56 w-full rounded-xl" />
-          ))}
-        </div>
-      ) : campaignsQuery.isError ? (
-        <Card className="border-destructive/30 bg-destructive/5 text-center p-6">
-          <p className="text-sm font-semibold text-destructive">
-            Error al sincronizar las campañas publicitarias.
-          </p>
-        </Card>
-      ) : filteredCampaigns.length === 0 ? (
-        <Card className="border-dashed p-10 text-center">
-          <CardContent className="space-y-3">
-            <p className="text-sm font-semibold text-muted-foreground">
-              No se encontraron campañas coincidentes.
+      <div data-tour="marketing-campaigns-grid">
+        {campaignsQuery.isLoading ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-56 w-full rounded-xl" />
+            ))}
+          </div>
+        ) : campaignsQuery.isError ? (
+          <Card className="border-destructive/30 bg-destructive/5 text-center p-6">
+            <p className="text-sm font-semibold text-destructive">
+              Error al sincronizar las campañas publicitarias.
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setFormData(INITIAL_FORM_DATA)
-                setIsCreateOpen(true)
-              }}
-              className="text-xs"
-            >
-              Crear tu primera campaña
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredCampaigns.map((c) => (
-            <CampaignCard
-              key={c.campaignId}
-              campaign={c}
-              onEdit={handleOpenEdit}
-              onDelete={(id) => deleteMutation.mutate(id)}
-              onSelectForWorkflows={onSelectCampaignForWorkflows}
-            />
-          ))}
-        </div>
-      )}
+          </Card>
+        ) : filteredCampaigns.length === 0 ? (
+          <Card className="border-dashed p-10 text-center">
+            <CardContent className="space-y-3">
+              <p className="text-sm font-semibold text-muted-foreground">
+                No se encontraron campañas coincidentes.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setFormData(INITIAL_FORM_DATA)
+                  setIsCreateOpen(true)
+                }}
+                className="text-xs"
+              >
+                Crear tu primera campaña
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredCampaigns.map((c) => (
+              <CampaignCard
+                key={c.campaignId}
+                campaign={c}
+                onEdit={handleOpenEdit}
+                onDelete={(id) => deleteMutation.mutate(id)}
+                onSelectForWorkflows={onSelectCampaignForWorkflows}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       <CampaignFormDialog
         open={isCreateOpen || editingCampaign !== null}

@@ -123,13 +123,14 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
           className="gap-2"
           onClick={() => syncMutation.mutate()}
           disabled={syncMutation.isPending}
+          data-tour="marketing-clients-sync-btn"
         >
           <RefreshCw className={`h-4 w-4 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
           {syncMutation.isPending ? 'Sincronizando…' : 'Sincronizar con el CRM'}
         </Button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div data-tour="marketing-clients-plans-grid" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {PLANS.map((plan) => {
           const Icon = plan.icon
           const total = conteoPorPlan[plan.value] ?? 0

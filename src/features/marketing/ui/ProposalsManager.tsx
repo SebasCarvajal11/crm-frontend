@@ -186,7 +186,11 @@ export function ProposalsManager({ accessToken }: ProposalsManagerProps) {
             Registro, seguimiento y cierre de las propuestas enviadas a clientes
           </p>
         </div>
-        <Button onClick={openCreate} className="gap-2">
+        <Button
+          onClick={openCreate}
+          className="gap-2"
+          data-tour="marketing-new-proposal-btn"
+        >
           <Plus className="h-4 w-4" />
           Nueva Propuesta
         </Button>

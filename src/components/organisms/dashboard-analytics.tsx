@@ -119,7 +119,14 @@ export function DashboardAnalytics({ accessToken }: Props) {
           description="Vista general de las métricas operativas y comerciales de CIMA."
           icon={ChartAreaIcon}
           actions={(
-            <Button type="button" variant="outline" size="sm" onClick={refreshAll} disabled={isRefreshing}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={refreshAll}
+              disabled={isRefreshing}
+              data-tour="analytics-refresh-btn"
+            >
               <RefreshCw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               Actualizar
             </Button>
@@ -211,7 +218,7 @@ export function DashboardAnalytics({ accessToken }: Props) {
       </div>
 
       {/* Gráfico de Estado de Campañas */}
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
+      <div data-tour="analytics-campaign-chart" className="rounded-lg border bg-card p-6 shadow-sm">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h3 className="font-semibold">Estado de Campañas</h3>
           <ExportButtons
