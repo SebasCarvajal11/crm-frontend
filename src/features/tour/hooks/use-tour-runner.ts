@@ -2,9 +2,18 @@ import { useCallback, useRef } from 'react'
 import { driver, type Driver, type DriveStep } from 'driver.js'
 import { useTourStore } from '../model/tour-store'
 import { useTourContext } from './use-tour-context'
-import type { CimaTourDefinition, CimaTourStep } from '../model/types'
+import type { CimaTourDefinition } from '../model/types'
 import { waitForElement } from '../utils/dom-target-finder'
 import { showTourCursor, removeTourCursor } from '../utils/cursor-helper'
+import {
+  resetHorizontalScroll,
+  centerElementInScrollParents,
+  scrollTargetIntoView,
+} from '../utils/scroll-helper'
+import {
+  mapTourStepToDriveStep,
+  buildDescriptionWithHint,
+} from '../utils/popover-helper'
 import '../ui/tour-popover-theme.css'
 
 let modalObserver: MutationObserver | null = null
@@ -44,49 +53,12 @@ function stopModalSupervisor(): void {
   }
 }
 
-const HINT_SVG = `
-<svg class="cima-tour-hint-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="m9 9 5 12 1.8-5.2L21 14Z"/>
-  <path d="M7.2 2.2 8 5.1"/>
-  <path d="m5.1 8-2.9-.8"/>
-  <path d="M14 4.1 12 6"/>
-  <path d="m6 12-1.9 2"/>
-</svg>`
-
-function buildDescriptionWithHint(description: string, actionHint?: string): string {
-  const safeHint = actionHint
-    ? `<div class="cima-tour-action-hint">${HINT_SVG}<span>${actionHint}</span></div>`
-    : ''
-  return `<div class="cima-tour-desc-content"><p class="cima-tour-desc-text">${description}</p>${safeHint}</div>`
-}
-
-function mapTourStepToDriveStep(st: CimaTourStep, isMobile: boolean): DriveStep {
-  return {
-    element: st.element,
-    popover: {
-      title: st.title,
-      description: buildDescriptionWithHint(st.description, st.actionHint),
-      side: isMobile ? 'bottom' : (st.side ?? 'bottom'),
-      align: isMobile ? 'center' : (st.align ?? 'start'),
-      showButtons: ['next', 'previous', 'close'],
-      nextBtnText: 'Siguiente',
-      prevBtnText: 'Anterior',
-      doneBtnText: 'Entendido',
-    },
-  }
-}
-
-function resetHorizontalScroll(): void {
-  if (typeof window !== 'undefined' && window.scrollX !== 0) {
-    window.scrollTo({ left: 0, top: window.scrollY, behavior: 'instant' })
-  }
-}
-
 function switchTabIfNeeded(targetTab?: string): void {
   if (!targetTab || typeof document === 'undefined') return
   const btn = document.querySelector<HTMLButtonElement>(`[data-tour="workspace-tab-${targetTab}"]`)
-  if (btn && btn.getAttribute('aria-selected') !== 'true') {
-    btn.click()
+  if (btn) {
+    if (btn.getAttribute('aria-selected') !== 'true') btn.click()
+    centerElementInScrollParents(btn)
   }
 }
 
@@ -140,7 +112,10 @@ export function useTourRunner() {
   const scheduleCursor = useCallback((element?: Element) => {
     clearTimer()
     if (element) {
-      cursorTimerRef.current = setTimeout(() => showTourCursor(element), 220)
+      cursorTimerRef.current = setTimeout(() => {
+        if (driverRef.current?.isActive()) driverRef.current.refresh()
+        showTourCursor(element)
+      }, 260)
     }
   }, [clearTimer])
 
@@ -191,16 +166,18 @@ export function useTourRunner() {
           }
           opts.driver.movePrevious()
         },
-        onHighlightStarted: (_el, _step, opts) => {
+        onHighlightStarted: (el, _step, opts) => {
           clearTimer()
           removeTourCursor()
           resetHorizontalScroll()
           const activeIdx = opts?.state?.activeIndex ?? opts?.index ?? 0
           const targetTab = filtered[activeIdx]?.switchWorkspaceTab
           if (targetTab) switchTabIfNeeded(targetTab)
+          if (el) centerElementInScrollParents(el)
         },
         onHighlighted: (element, _step, opts) => {
           resetHorizontalScroll()
+          if (element) centerElementInScrollParents(element)
           scheduleCursor(element)
           const idx = opts.driver.getActiveIndex() ?? 0
           if (filtered[idx]?.onNextAction === 'openProject' && element) {
@@ -254,6 +231,7 @@ export function useTourRunner() {
 
       if (targetTab) switchTabIfNeeded(targetTab)
       const el = await waitForElement(targetSelector, 1500)
+      if (el) await scrollTargetIntoView(el, 180)
       const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
 
       const instance = driver({

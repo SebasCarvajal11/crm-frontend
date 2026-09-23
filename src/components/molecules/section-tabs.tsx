@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { type ReactNode, useRef, useEffect } from 'react'
 
 export type SectionTabItem<T extends string> = {
   value: T
@@ -28,8 +28,28 @@ export function SectionTabs<T extends string>({
   getPanelId,
   itemRole = 'tab',
 }: SectionTabsProps<T>) {
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const activeEl = containerRef.current.querySelector<HTMLElement>(`[data-tour="workspace-tab-${value}"]`)
+    if (activeEl) {
+      const container = containerRef.current
+      const cRect = container.getBoundingClientRect()
+      const elRect = activeEl.getBoundingClientRect()
+      const relLeft = elRect.left - cRect.left + container.scrollLeft
+      const targetScroll = relLeft - (container.clientWidth - elRect.width) / 2
+      const maxScroll = container.scrollWidth - container.clientWidth
+      container.scrollTo({
+        left: Math.max(0, Math.min(targetScroll, maxScroll)),
+        behavior: 'smooth',
+      })
+    }
+  }, [value])
+
   return (
     <div
+      ref={containerRef}
       className="flex items-center gap-1 overflow-x-auto rounded-2xl border bg-card p-1 shadow-sm scroll-smooth scrollbar-thin"
       role={itemRole === 'button' ? 'toolbar' : 'tablist'}
       aria-label={ariaLabel}

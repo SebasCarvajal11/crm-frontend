@@ -1,7 +1,7 @@
 /**
  * Helper para renderizar y posicionar el cursor animado interactivo
  * durante los recorridos del Centro de Asistencia de CIMA.
- * Garantiza cero colisión con el popover de lectura y fluidez visual.
+ * Garantiza cero colisión con el texto del objetivo, visibilidad estricta y fluidez.
  */
 
 const CURSOR_ID = 'cima-tour-cursor'
@@ -13,37 +13,35 @@ const CURSOR_SVG = `
   </svg>
 `
 
-function calculateNonOverlappingCoordinates(
-  targetRect: DOMRect,
-  popoverEl: Element | null
-): { top: number; left: number } {
+export function isElementVisibleInViewport(rect: DOMRect): boolean {
+  if (typeof window === 'undefined') return false
+  if (rect.width <= 0 || rect.height <= 0) return false
+  const margin = 10
+  const isHorizontallyIn = rect.right > margin && rect.left < window.innerWidth - margin
+  const isVerticallyIn = rect.bottom > margin && rect.top < window.innerHeight - margin
+  return isHorizontallyIn && isVerticallyIn
+}
+
+function calculateCursorPosition(targetRect: DOMRect): { top: number; left: number } | null {
+  if (!isElementVisibleInViewport(targetRect)) return null
+
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
+  const screenW = typeof window !== 'undefined' ? window.innerWidth : 1024
+  const screenH = typeof window !== 'undefined' ? window.innerHeight : 768
 
-  if (isMobile) {
-    // En móviles el popover se ancla fijo en la parte inferior de la pantalla.
-    // Ubicar el cursor en la zona superior del elemento resaltado.
-    const top = window.scrollY + targetRect.top + Math.max(10, Math.min(targetRect.height * 0.2, 30))
-    const left = window.scrollX + Math.min(window.innerWidth - 56, targetRect.left + 24)
-    return { top, left }
+  // Posicionar el cursor señalando desde abajo del elemento para no tapar el texto
+  let top = window.scrollY + targetRect.bottom + 4
+  let left = window.scrollX + targetRect.left + targetRect.width / 2 - 12
+
+  // Si queda muy cerca de la parte inferior de la ventana, posicionar por encima
+  if (targetRect.bottom + 44 > screenH) {
+    top = window.scrollY + Math.max(8, targetRect.top - 36)
   }
 
-  // En escritorio, verificar si el popover cubre el objetivo
-  const pRect = popoverEl?.getBoundingClientRect()
-  let top = window.scrollY + targetRect.top + Math.max(12, Math.min(targetRect.height * 0.2, 32))
-  let left = window.scrollX + targetRect.left + Math.max(16, Math.min(targetRect.width * 0.2, 40))
-
-  if (pRect) {
-    const overlapsY = top - window.scrollY >= pRect.top - 20 && top - window.scrollY <= pRect.bottom + 20
-    const overlapsX = left - window.scrollX >= pRect.left - 20 && left - window.scrollX <= pRect.right + 20
-
-    if (overlapsY && overlapsX) {
-      // Reposicionar hacia el borde opuesto despejado del elemento
-      top = pRect.top > targetRect.top
-        ? window.scrollY + Math.max(targetRect.top + 8, 10)
-        : window.scrollY + Math.min(targetRect.bottom - 40, pRect.bottom + 12)
-      left = window.scrollX + Math.min(targetRect.right - 44, targetRect.left + 20)
-    }
-  }
+  // Asegurar que no se desborde horizontalmente ni se corte en los bordes
+  const maxLeft = window.scrollX + screenW - 44
+  const minLeft = window.scrollX + (isMobile ? 12 : 16)
+  left = Math.max(minLeft, Math.min(left, maxLeft))
 
   return { top, left }
 }
@@ -52,16 +50,14 @@ export function showTourCursor(target: Element): void {
   removeTourCursor()
 
   const rect = target.getBoundingClientRect()
-  if (rect.width === 0 && rect.height === 0) return
-
-  const popoverEl = document.querySelector('.driver-popover.cima-tour-popover')
-  const { top, left } = calculateNonOverlappingCoordinates(rect, popoverEl)
+  const coords = calculateCursorPosition(rect)
+  if (!coords) return
 
   const cursorEl = document.createElement('div')
   cursorEl.id = CURSOR_ID
   cursorEl.className = 'cima-tour-cursor-container'
-  cursorEl.style.top = `${top}px`
-  cursorEl.style.left = `${left}px`
+  cursorEl.style.top = `${coords.top}px`
+  cursorEl.style.left = `${coords.left}px`
   cursorEl.innerHTML = CURSOR_SVG
 
   document.body.appendChild(cursorEl)
