@@ -41,6 +41,15 @@ function isTabAlreadySelected(tabName?: string): boolean {
   )
 }
 
+function setInputModeClass(enabled: boolean): void {
+  if (typeof document === 'undefined') return
+  if (enabled) {
+    document.body.classList.add('cima-tour-mode-input')
+  } else {
+    document.body.classList.remove('cima-tour-mode-input')
+  }
+}
+
 export function useTourRunner() {
   const driverRef = useRef<Driver | null>(null)
   const navigate = useNavigate()
@@ -56,6 +65,7 @@ export function useTourRunner() {
     stopScrollSupervisor()
     stopModalSupervisor()
     stopViewportSupervisor()
+    setInputModeClass(false)
     if (cleanupListenerRef.current) {
       cleanupListenerRef.current()
       cleanupListenerRef.current = null
@@ -114,11 +124,16 @@ export function useTourRunner() {
         progressText: 'Paso {{current}} de {{total}}',
         steps,
         onPopoverRender: (popover) => {
-          bindMinimapClicks(popover.wrapper, (targetIdx) => {
+          bindMinimapClicks(popover.wrapper, async (targetIdx) => {
             if (isTransitioningRef.current || !instance.isActive()) return
             const currentIdx = instance.getActiveIndex() ?? 0
             if (targetIdx === currentIdx) return
             const targetStep = filtered[targetIdx]
+            if (targetStep?.element.startsWith('[data-tour="workspace-') && !document.querySelector(targetStep.element)) {
+              await handleActionTransition('openProject', navigate)
+            } else if (targetStep?.element.startsWith('[data-tour="collab-') && !document.querySelector(targetStep.element)) {
+              await handleActionTransition('closeProject', navigate)
+            }
             const tab = targetStep?.switchWorkspaceTab ?? targetStep?.switchMarketingTab
             if (tab) switchTabIfNeeded(tab)
             instance.moveTo(targetIdx)
@@ -191,16 +206,18 @@ export function useTourRunner() {
           const currentStep = filtered[idx]
           if (!currentStep) return
 
+          const isInputStep = currentStep.interactiveAction === 'input'
+          setInputModeClass(isInputStep)
+
           if (currentStep.targetPulse) {
             element.classList.add('cima-tour-target-pulse')
             setTimeout(() => element.classList.remove('cima-tour-target-pulse'), 1800)
           }
 
-          if (currentStep.interactiveAction === 'input') {
+          if (isInputStep) {
             autoFocusTargetInput(element)
           }
 
-          // Omisión predictiva si la pestaña ya está activa
           if (
             currentStep.interactiveAction === 'tab-change' &&
             isTabAlreadySelected(currentStep.switchWorkspaceTab) &&

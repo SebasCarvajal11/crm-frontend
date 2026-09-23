@@ -17,13 +17,16 @@ export function autoFocusTargetInput(element: Element): void {
 /**
  * Transiciona el badge interactivo a estado exitoso con micro-animación '✓ ¡Acción detectada!'.
  */
-export function triggerLiveReaction(popoverWrapper?: HTMLElement | null): void {
+export function triggerLiveReaction(
+  popoverWrapper?: HTMLElement | null,
+  text = '¡Acción detectada!'
+): void {
   if (!popoverWrapper) return
   const badge = popoverWrapper.querySelector<HTMLElement>('.cima-tour-interactive-badge')
   if (!badge) return
 
   badge.classList.add('cima-tour-badge-success')
-  badge.innerHTML = '<span class="cima-tour-check">✓</span><span>¡Acción detectada!</span>'
+  badge.innerHTML = `<span class="cima-tour-check">✓</span><span>${text}</span>`
 }
 
 type StepInteractionParams = {
@@ -73,14 +76,43 @@ export function attachInteractiveStep(params: StepInteractionParams): () => void
 
   const inputEl = element.querySelector<HTMLInputElement | HTMLTextAreaElement>('input, textarea')
   if (step.interactiveAction === 'input' && inputEl) {
+    let idleTimer: ReturnType<typeof setTimeout> | null = null
+
     const handleInput = () => {
-      if (inputEl.value.trim().length >= 2) {
-        inputEl.removeEventListener('input', handleInput)
-        void handleAction()
+      const val = inputEl.value.trim()
+      if (val.length >= 1) {
+        triggerLiveReaction(getPopover(), 'Filtrando en tiempo real [Enter ↵]')
+      }
+
+      if (idleTimer) clearTimeout(idleTimer)
+
+      if (val.length >= 2) {
+        idleTimer = setTimeout(() => {
+          if (!fired && isTourActive() && getActiveIndex() === stepIdx) {
+            void handleAction()
+          }
+        }, 2200)
       }
     }
+
+    const handleKeyDown = (e: Event) => {
+      const keyEv = e as KeyboardEvent
+      if (keyEv.key === 'Enter') {
+        if (idleTimer) clearTimeout(idleTimer)
+        if (!fired && isTourActive() && getActiveIndex() === stepIdx) {
+          void handleAction()
+        }
+      }
+    }
+
     inputEl.addEventListener('input', handleInput)
-    return () => inputEl.removeEventListener('input', handleInput)
+    inputEl.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      if (idleTimer) clearTimeout(idleTimer)
+      inputEl.removeEventListener('input', handleInput)
+      inputEl.removeEventListener('keydown', handleKeyDown)
+    }
   }
 
   const clickTarget =
