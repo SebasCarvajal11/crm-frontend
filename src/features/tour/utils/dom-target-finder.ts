@@ -8,25 +8,50 @@ export async function waitForElement(
   if (existing) return existing
 
   return new Promise((resolve) => {
-    const start = Date.now()
-    const check = () => {
-      const el = document.querySelector(selector)
-      if (el) {
-        resolve(el)
-        return
-      }
-      if (Date.now() - start >= timeoutMs) {
-        if (fallbackSelector) {
-          const fallbackEl = document.querySelector(fallbackSelector)
-          resolve(fallbackEl)
-          return
-        }
-        resolve(null)
-        return
-      }
-      setTimeout(check, 30)
+    let resolved = false
+    let timer: ReturnType<typeof setTimeout> | null = null
+    let observer: MutationObserver | null = null
+    let pollInterval: ReturnType<typeof setInterval> | null = null
+
+    const cleanup = () => {
+      if (timer) clearTimeout(timer)
+      if (observer) observer.disconnect()
+      if (pollInterval) clearInterval(pollInterval)
     }
-    check()
+
+    const finish = (el: Element | null) => {
+      if (resolved) return
+      resolved = true
+      cleanup()
+      resolve(el)
+    }
+
+    if (typeof MutationObserver !== 'undefined' && document.body) {
+      observer = new MutationObserver(() => {
+        const el = document.querySelector(selector)
+        if (el) finish(el)
+      })
+      observer.observe(document.body, { childList: true, subtree: true, attributes: true })
+    } else {
+      pollInterval = setInterval(() => {
+        const el = document.querySelector(selector)
+        if (el) finish(el)
+      }, 20)
+    }
+
+    timer = setTimeout(() => {
+      const finalEl = document.querySelector(selector)
+      if (finalEl) {
+        finish(finalEl)
+        return
+      }
+      if (fallbackSelector) {
+        const fallbackEl = document.querySelector(fallbackSelector)
+        finish(fallbackEl)
+        return
+      }
+      finish(null)
+    }, timeoutMs)
   })
 }
 

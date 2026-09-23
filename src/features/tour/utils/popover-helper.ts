@@ -1,5 +1,6 @@
 import type { DriveStep } from 'driver.js'
 import type { CimaTourStep } from '../model/types'
+import { renderMinimapHtml } from './minimap-helper'
 
 const HINT_SVG = `
 <svg class="cima-tour-hint-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -10,10 +11,19 @@ const HINT_SVG = `
   <path d="m6 12-1.9 2"/>
 </svg>`
 
+export function resolveStepDescription(step: CimaTourStep): string {
+  if (typeof document !== 'undefined' && step.fallbackElement && step.emptyStateDescription) {
+    const primaryExists = Boolean(document.querySelector(step.element))
+    if (!primaryExists) return step.emptyStateDescription
+  }
+  return step.description
+}
+
 export function buildDescriptionWithHint(
   description: string,
   actionHint?: string,
-  interactiveAction?: string
+  interactiveAction?: string,
+  minimapHtml?: string
 ): string {
   const safeHint = actionHint
     ? `<div class="cima-tour-action-hint">${HINT_SVG}<span>${actionHint}</span></div>`
@@ -27,32 +37,47 @@ export function buildDescriptionWithHint(
          </div>`
       : ''
 
+  const minimapBlock = minimapHtml || ''
+
   return `<div class="cima-tour-desc-content">
+    ${minimapBlock}
     <p class="cima-tour-desc-text">${description}</p>
     ${safeHint}
     ${interactiveBadge}
   </div>`
 }
 
-export function mapTourStepToDriveStep(st: CimaTourStep, isMobile: boolean): DriveStep {
+export function mapTourStepToDriveStep(
+  st: CimaTourStep,
+  isMobile: boolean,
+  stepIdx = 0,
+  totalSteps = 1
+): DriveStep {
   const chosenSide = isMobile
     ? (st.mobileSide ?? (st.side === 'top' ? 'top' : 'bottom'))
     : (st.side ?? 'bottom')
 
   const sideClass = chosenSide === 'top' ? 'cima-popover-top' : 'cima-popover-bottom'
+  const effectiveDescription = resolveStepDescription(st)
+  const minimapHtml = renderMinimapHtml(stepIdx, totalSteps)
 
   return {
     element: st.element,
     popover: {
       title: st.title,
-      description: buildDescriptionWithHint(st.description, st.actionHint, st.interactiveAction),
+      description: buildDescriptionWithHint(
+        effectiveDescription,
+        st.actionHint,
+        st.interactiveAction,
+        minimapHtml
+      ),
       side: chosenSide,
       align: isMobile ? 'center' : (st.align ?? 'start'),
       popoverClass: `cima-tour-popover ${sideClass}`,
       showButtons: ['next', 'previous', 'close'],
-      nextBtnText: 'Siguiente',
-      prevBtnText: 'Anterior',
-      doneBtnText: 'Entendido',
+      nextBtnText: 'Siguiente <kbd class="cima-tour-kbd">↵</kbd>',
+      prevBtnText: '<kbd class="cima-tour-kbd">←</kbd> Anterior',
+      doneBtnText: 'Entendido <kbd class="cima-tour-kbd">↵</kbd>',
     },
   }
 }

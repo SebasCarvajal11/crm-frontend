@@ -3,7 +3,7 @@ import { driver, type Driver, type DriveStep } from 'driver.js'
 import { useNavigate } from '@tanstack/react-router'
 import { useTourStore } from '../model/tour-store'
 import { useTourContext } from './use-tour-context'
-import type { CimaTourDefinition, CimaTourStep } from '../model/types'
+import type { CimaTourDefinition } from '../model/types'
 import { waitForElement } from '../utils/dom-target-finder'
 import {
   resetHorizontalScroll,
@@ -18,7 +18,28 @@ import {
 } from '../utils/popover-helper'
 import { startModalSupervisor, stopModalSupervisor } from '../utils/modal-supervisor'
 import { switchTabIfNeeded, handleActionTransition } from '../utils/action-transition'
+import {
+  autoFocusTargetInput,
+  attachInteractiveStep,
+} from '../utils/step-interaction-helper'
+import { bindMinimapClicks } from '../utils/minimap-helper'
+import {
+  startViewportSupervisor,
+  stopViewportSupervisor,
+} from '../utils/viewport-supervisor'
 import '../ui/tour-popover-theme.css'
+
+function isTabAlreadySelected(tabName?: string): boolean {
+  if (!tabName || typeof document === 'undefined') return false
+  const btn = document.querySelector<HTMLElement>(`[data-tour="workspace-tab-${tabName}"]`)
+  if (!btn) return false
+  return (
+    btn.getAttribute('aria-selected') === 'true' ||
+    btn.getAttribute('aria-pressed') === 'true' ||
+    btn.getAttribute('data-state') === 'active' ||
+    btn.classList.contains('active')
+  )
+}
 
 export function useTourRunner() {
   const driverRef = useRef<Driver | null>(null)
@@ -29,14 +50,15 @@ export function useTourRunner() {
   const pauseTour = useTourStore((s) => s.pauseTour)
   const resumeTour = useTourStore((s) => s.resumeTour)
   const isTransitioningRef = useRef(false)
-  const activeListenerCleanupRef = useRef<(() => void) | null>(null)
+  const cleanupListenerRef = useRef<(() => void) | null>(null)
 
   const stopTour = useCallback(() => {
     stopScrollSupervisor()
     stopModalSupervisor()
-    if (activeListenerCleanupRef.current) {
-      activeListenerCleanupRef.current()
-      activeListenerCleanupRef.current = null
+    stopViewportSupervisor()
+    if (cleanupListenerRef.current) {
+      cleanupListenerRef.current()
+      cleanupListenerRef.current = null
     }
     isTransitioningRef.current = false
     resetHorizontalScroll()
@@ -48,51 +70,6 @@ export function useTourRunner() {
     setActiveTour(null)
   }, [resumeTour, setActiveTour])
 
-  const attachStepInteraction = useCallback(
-    (element: Element, step: CimaTourStep, stepIdx: number) => {
-      if (activeListenerCleanupRef.current) {
-        activeListenerCleanupRef.current()
-        activeListenerCleanupRef.current = null
-      }
-
-      const shouldListen =
-        step.interactiveAction && step.interactiveAction !== 'none' ||
-        step.onNextAction === 'openProject'
-
-      if (!shouldListen) return
-
-      const clickTarget =
-        element.querySelector<HTMLElement>('button, a, [role="button"], [role="tab"]') ??
-        (element as HTMLElement)
-
-      const handleUserAction = async () => {
-        if (isTransitioningRef.current) return
-        const inst = driverRef.current
-        if (!inst || !inst.isActive() || inst.getActiveIndex() !== stepIdx) return
-
-        if (step.onNextAction === 'openProject') {
-          isTransitioningRef.current = true
-          await waitForElement('[data-tour="workspace-project-header"]', 2500)
-          isTransitioningRef.current = false
-        }
-
-        if (step.autoAdvanceOnAction !== false) {
-          setTimeout(() => {
-            if (inst.isActive() && inst.getActiveIndex() === stepIdx) {
-              inst.moveNext()
-            }
-          }, 150)
-        }
-      }
-
-      clickTarget.addEventListener('click', handleUserAction, { capture: true })
-      activeListenerCleanupRef.current = () => {
-        clickTarget.removeEventListener('click', handleUserAction, true)
-      }
-    },
-    []
-  )
-
   const startTour = useCallback(
     async (tour: CimaTourDefinition) => {
       stopTour()
@@ -101,7 +78,8 @@ export function useTourRunner() {
 
       const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
       const filtered = tour.steps.filter((st) => !st.requiredRole || st.requiredRole.includes(ctx.role))
-      const steps: DriveStep[] = filtered.map((st) => mapTourStepToDriveStep(st, isMobile))
+      const totalSteps = filtered.length
+      const steps: DriveStep[] = filtered.map((st, i) => mapTourStepToDriveStep(st, isMobile, i, totalSteps))
 
       const initialTab = filtered[0]?.switchWorkspaceTab ?? filtered[0]?.switchMarketingTab
       if (initialTab) switchTabIfNeeded(initialTab)
@@ -115,6 +93,10 @@ export function useTourRunner() {
           resumeTour()
           driverRef.current?.refresh()
         },
+      })
+
+      startViewportSupervisor(() => {
+        driverRef.current?.refresh()
       })
 
       const instance = driver({
@@ -131,6 +113,17 @@ export function useTourRunner() {
         showProgress: true,
         progressText: 'Paso {{current}} de {{total}}',
         steps,
+        onPopoverRender: (popover) => {
+          bindMinimapClicks(popover.wrapper, (targetIdx) => {
+            if (isTransitioningRef.current || !instance.isActive()) return
+            const currentIdx = instance.getActiveIndex() ?? 0
+            if (targetIdx === currentIdx) return
+            const targetStep = filtered[targetIdx]
+            const tab = targetStep?.switchWorkspaceTab ?? targetStep?.switchMarketingTab
+            if (tab) switchTabIfNeeded(tab)
+            instance.moveTo(targetIdx)
+          })
+        },
         onNextClick: async (_element, _step, opts) => {
           if (isTransitioningRef.current) return
           const currentIdx = opts.driver.getActiveIndex() ?? 0
@@ -191,15 +184,53 @@ export function useTourRunner() {
         },
         onHighlighted: (element, _step, opts) => {
           resetHorizontalScroll()
-          if (element) {
-            centerElementInScrollParents(element)
-            opts.driver.refresh()
-            const idx = opts.driver.getActiveIndex() ?? 0
-            const currentStep = filtered[idx]
-            if (currentStep) {
-              attachStepInteraction(element, currentStep, idx)
-            }
+          if (!element) return
+          centerElementInScrollParents(element)
+          opts.driver.refresh()
+          const idx = opts.driver.getActiveIndex() ?? 0
+          const currentStep = filtered[idx]
+          if (!currentStep) return
+
+          if (currentStep.targetPulse) {
+            element.classList.add('cima-tour-target-pulse')
+            setTimeout(() => element.classList.remove('cima-tour-target-pulse'), 1800)
           }
+
+          if (currentStep.interactiveAction === 'input') {
+            autoFocusTargetInput(element)
+          }
+
+          // Omisión predictiva si la pestaña ya está activa
+          if (
+            currentStep.interactiveAction === 'tab-change' &&
+            isTabAlreadySelected(currentStep.switchWorkspaceTab) &&
+            opts.driver.hasNextStep()
+          ) {
+            setTimeout(() => {
+              if (opts.driver.isActive() && opts.driver.getActiveIndex() === idx) {
+                opts.driver.moveNext()
+              }
+            }, 80)
+            return
+          }
+
+          if (cleanupListenerRef.current) cleanupListenerRef.current()
+          cleanupListenerRef.current = attachInteractiveStep({
+            element,
+            step: currentStep,
+            stepIdx: idx,
+            getActiveIndex: () => driverRef.current?.getActiveIndex(),
+            isTourActive: () => Boolean(driverRef.current?.isActive()),
+            onAdvance: () => opts.driver.moveNext(),
+            onProjectTransition: async () => {
+              isTransitioningRef.current = true
+              try {
+                await waitForElement('[data-tour="workspace-project-header"]', 2500)
+              } finally {
+                isTransitioningRef.current = false
+              }
+            },
+          })
         },
         onDestroyed: () => {
           stopTour()
@@ -211,7 +242,7 @@ export function useTourRunner() {
       startScrollSupervisor(instance)
       instance.drive()
     },
-    [attachStepInteraction, ctx.role, markTourCompleted, navigate, pauseTour, resumeTour, setActiveTour, stopTour]
+    [ctx.role, markTourCompleted, navigate, pauseTour, resumeTour, setActiveTour, stopTour]
   )
 
   const highlightTarget = useCallback(

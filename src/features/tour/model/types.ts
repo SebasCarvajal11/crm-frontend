@@ -37,6 +37,8 @@ export type CimaTourStep = {
   onNextAction?: 'openProject' | 'closeProject'
   interactiveAction?: CimaTourInteractiveAction
   autoAdvanceOnAction?: boolean
+  emptyStateDescription?: string
+  targetPulse?: boolean
 }
 
 export type CimaTourDefinition = {
