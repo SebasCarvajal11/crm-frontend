@@ -71,7 +71,9 @@ test.describe('Módulo de Administración — Tour Guiado y Centro de Asistencia
 
     const popover = page.locator('.cima-tour-popover')
     await expect(popover).toBeVisible({ timeout: 5000 })
-    await expect(popover.locator('.driver-popover-title')).toContainText('Almacenamiento de Archivos en Nube')
+    await expect(popover.locator('.driver-popover-title')).toContainText(
+      'Como superviso el consumo de almacenamiento'
+    )
 
     await page.keyboard.press('Escape')
   })
