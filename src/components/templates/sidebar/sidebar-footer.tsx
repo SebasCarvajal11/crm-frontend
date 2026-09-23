@@ -140,7 +140,7 @@ export function SidebarFooter({
                 className="h-8 w-full justify-start rounded-md text-primary-foreground/80 hover:bg-primary-foreground/12 hover:text-primary-foreground cursor-pointer"
               >
                 <HelpCircle className="size-4" />
-                <span>Tutoriales y Ayuda</span>
+                <span>CIMA Smart Copilot</span>
               </Button>
             )}
             <Button

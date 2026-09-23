@@ -100,7 +100,7 @@ export function HelpCenterModal() {
             </div>
             <div>
               <h2 id="cima-help-title" className="text-sm sm:text-base font-bold text-foreground">
-                Centro de Asistencia y Guías
+                CIMA Smart Copilot — Centro de Asistencia y Guías
               </h2>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span>{TAB_LABEL[ctx.activeTab] ?? ctx.activeTab}</span>

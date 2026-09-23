@@ -29,7 +29,7 @@ export function HelpCenterWidget() {
     <>
       <aside
         role="region"
-        aria-label="Centro de asistencia y tutoriales"
+        aria-label="CIMA Smart Copilot: Asistencia y Tutoriales"
         style={{ zoom: 1 }}
         className="fixed bottom-[4.75rem] right-5 z-40 flex items-center select-none"
       >
@@ -37,8 +37,8 @@ export function HelpCenterWidget() {
           type="button"
           onClick={toggleHelpCenter}
           aria-expanded={isHelpCenterOpen}
-          aria-label="Abrir centro de ayuda y tutoriales guiados"
-          title="Centro de Asistencia: Tutoriales y Guías (?)"
+          aria-label="Abrir CIMA Smart Copilot y tutoriales guiados"
+          title="CIMA Smart Copilot: Tutoriales y Guías (?)"
           data-testid="help-widget-trigger"
           data-tour="help-center-widget"
           className="relative flex h-11 w-11 items-center justify-center rounded-full

@@ -10,6 +10,9 @@ import {
   resetHorizontalScroll,
   centerElementInScrollParents,
   scrollTargetIntoView,
+  startScrollSupervisor,
+  stopScrollSupervisor,
+  triggerStepAnimation,
 } from '../utils/scroll-helper'
 import {
   mapTourStepToDriveStep,
@@ -76,6 +79,7 @@ export function useTourRunner() {
 
   const stopTour = useCallback(() => {
     clearTimer()
+    stopScrollSupervisor()
     isTransitioningRef.current = false
     removeTourCursor()
     resetHorizontalScroll()
@@ -123,7 +127,7 @@ export function useTourRunner() {
         stageRadius: 10,
         popoverClass: 'cima-tour-popover',
         showProgress: true,
-        progressText: 'Paso {{current}} de {{total}}',
+        progressText: 'CIMA Smart Copilot · Paso {{current}} de {{total}}',
         steps,
         onNextClick: async (_element, _step, opts) => {
           if (isTransitioningRef.current) return
@@ -177,6 +181,7 @@ export function useTourRunner() {
           opts.driver.movePrevious()
         },
         onHighlightStarted: (el, _step, opts) => {
+          triggerStepAnimation()
           clearTimer()
           removeTourCursor()
           resetHorizontalScroll()
@@ -207,6 +212,7 @@ export function useTourRunner() {
         },
         onDestroyed: () => {
           clearTimer()
+          stopScrollSupervisor()
           removeTourCursor()
           markTourCompleted(tour.id)
           setActiveTour(null)
@@ -215,6 +221,7 @@ export function useTourRunner() {
       })
 
       driverRef.current = instance
+      startScrollSupervisor(instance)
       instance.drive()
     },
     [clearTimer, ctx.role, markTourCompleted, navigate, scheduleCursor, setActiveTour, stopTour]
@@ -256,12 +263,14 @@ export function useTourRunner() {
         onHighlighted: (element) => scheduleCursor(element),
         onDestroyed: () => {
           clearTimer()
+          stopScrollSupervisor()
           removeTourCursor()
           driverRef.current = null
         },
       })
 
       driverRef.current = instance
+      startScrollSupervisor(instance)
       instance.highlight({
         element: el ? (el as HTMLElement) : undefined,
         popover: {

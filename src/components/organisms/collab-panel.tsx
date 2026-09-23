@@ -201,6 +201,7 @@ export function CollabPanel({
               return (
                 <section
                   key={col.key}
+                  data-tour={`collab-column-${col.key}`}
                   className={cn(
                     'flex flex-col h-full rounded-2xl border border-border/70 bg-muted/30 shadow-xs overflow-hidden',
                     'border-t-4',

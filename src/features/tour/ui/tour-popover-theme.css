@@ -1,10 +1,6 @@
 @import "driver.js/dist/driver.css";
 
-/* ==========================================================================
-   CIMA CRM — Tema Corporativo para Driver.js
-   Paleta: Crimson CIMA (#86070c / #680609), Montserrat, diseño sobrio sin emojis
-   ========================================================================== */
-
+/* CIMA CRM — Tema Corporativo para Driver.js (Paleta Crimson CIMA #86070c / #680609) */
 .driver-popover.cima-tour-popover {
   background-color: var(--card, #ffffff);
   color: var(--card-foreground, #282829);
@@ -161,36 +157,51 @@
   color: #86070c;
 }
 
-/* Transición fluida del stage de Driver.js sin saltos bruscos */
+/* Transición del stage en reposo, animación suave entre pasos y desactivación en scroll */
 path.driver-stage {
-  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: opacity 0.2s ease-out;
 }
 
-/* ==========================================================================
-   Cursor Interactivo Vectorial Tipo Ratón / Mano (Animación de Clic)
-   ========================================================================== */
+body.cima-tour-animating path.driver-stage {
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
 
+body.cima-tour-scrolling path.driver-stage,
+body.cima-tour-scrolling .driver-popover {
+  transition: none !important;
+}
+
+body.cima-tour-scrolling .cima-tour-cursor-container {
+  opacity: 0 !important;
+  transition: opacity 0.1s ease-out !important;
+}
+
+/* Permitir interacción y scroll horizontal fluido en tableros Kanban durante el tour */
+.driver-active .overflow-x-auto,
+.driver-active [data-tour="collab-columns-container"],
+.driver-active [data-tour^="collab-column-"],
+.driver-active [data-tour="workspace-task-columns"] {
+  pointer-events: auto !important;
+  touch-action: pan-x pan-y !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Evitar que Driver.js bloquee con overflow:hidden los contenedores con scroll horizontal */
+.overflow-x-auto.driver-active-element-parent-no-scroll,
+.driver-active-element-parent-no-scroll {
+  overflow: auto !important;
+}
+
+/* Cursor Interactivo Vectorial Tipo Ratón / Mano (Animación de Clic) */
 @keyframes cima-cursor-tap {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  35% {
-    transform: translate(3px, 4px) scale(0.92);
-  }
-  65% {
-    transform: translate(-1px, -1px) scale(1.02);
-  }
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  35% { transform: translate(3px, 4px) scale(0.92); }
+  65% { transform: translate(-1px, -1px) scale(1.02); }
 }
 
 @keyframes cima-cursor-ripple {
-  0% {
-    transform: scale(0.35);
-    opacity: 0.85;
-  }
-  100% {
-    transform: scale(2.4);
-    opacity: 0;
-  }
+  0% { transform: scale(0.35); opacity: 0.85; }
+  100% { transform: scale(2.4); opacity: 0; }
 }
 
 .cima-tour-cursor-container {
@@ -202,6 +213,7 @@ path.driver-stage {
   justify-content: center;
   opacity: 0;
   transform: scale(0.85);
+  will-change: transform, opacity;
   transition: opacity 0.2s ease-out, transform 0.2s ease-out;
 }
 
@@ -231,10 +243,7 @@ path.driver-stage {
   transform-origin: 30% 20%;
 }
 
-/* ==========================================================================
-   Ajustes Responsivos Estrictos para Safari en iOS y Móviles
-   ========================================================================== */
-
+/* Ajustes Responsivos Estrictos para Safari en iOS y Móviles */
 @media (max-width: 640px) {
   .driver-popover.cima-tour-popover {
     position: fixed !important;
@@ -274,7 +283,7 @@ path.driver-stage {
   }
 }
 
-/* Estado pausado cuando hay modales o dialogos activos del sistema */
+/* Estado pausado cuando hay modales o diálogos activos del sistema */
 body.cima-tour-paused .driver-popover,
 body.cima-tour-paused .driver-overlay,
 body.cima-tour-paused svg.driver-overlay-svg,
