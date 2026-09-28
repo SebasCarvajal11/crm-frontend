@@ -3,6 +3,7 @@ import { TransientNoticeHost } from '@/app/providers/transient-notice-host'
 import { AccessibilityZoomWidget } from '@/components/organisms/accessibility/accessibility-zoom-widget'
 import { HelpCenterWidget } from '@/features/tour'
 import { GridPattern } from '@/components/ui/grid-pattern'
+import { PresenceFeature } from '@/features/presence/ui/presence-feature'
 
 /**
  * Raiz del router. La fuente predeterminada se aplica en index.css via `font-sans`
@@ -24,6 +25,7 @@ export const Route = createRootRoute({
         <TransientNoticeHost />
         <AccessibilityZoomWidget />
         <HelpCenterWidget />
+        <PresenceFeature />
       </div>
     </div>
   ),

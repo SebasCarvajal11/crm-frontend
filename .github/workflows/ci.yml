@@ -38,7 +38,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Instalar motores de navegador
         run: pnpm exec playwright install --with-deps chromium webkit
-      - name: Verificar marca, tutorial híbrido y navegación adaptativa
+      - name: Verificar marca, presencia, tutorial híbrido y navegación adaptativa
         run: pnpm test:ui --shard=${{ matrix.shard }}/3
       - name: Guardar reporte y capturas
         if: always()

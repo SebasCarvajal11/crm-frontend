@@ -31,6 +31,7 @@ export const AUTH_ROUTES = {
 
 // ── Identity (autenticado) — contrato de gateway, no topologia interna ──────
 export const IDENTITY_ROUTES = {
+  presence: `${AUTH_API}/identity/presence`,
   me: `${AUTH_API}/identity/me`,
   logout: `${AUTH_API}/identity/logout`,
   search: `${AUTH_API}/identity/search`,
@@ -46,6 +47,7 @@ export const ACCOUNT_ROUTES = {
 
 // ── Admin (autenticado) — contrato de gateway, no topologia interna ─────────
 export const ADMIN_ROUTES = {
+  presence: `${AUTH_API}/admin/presence`,
   workers: `${AUTH_API}/admin/workers`,
   clientsInvite: `${AUTH_API}/admin/clients/invite`,
   adminsInvite: `${AUTH_API}/admin/admins/invite`,

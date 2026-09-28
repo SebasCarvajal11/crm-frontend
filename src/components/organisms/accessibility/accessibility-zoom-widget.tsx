@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { ZoomIn, ZoomOut, RotateCcw, X, Type } from 'lucide-react'
 import { useAccessibilityZoom } from '@/features/accessibility/hooks/use-accessibility-zoom'
 import { Button } from '@/components/ui/button'
+import { FloatingActionContainer } from '@/components/ui/floating-action-container'
 
 export function AccessibilityZoomWidget() {
   const [isOpen, setIsOpen] = useState(false)
@@ -35,13 +36,12 @@ export function AccessibilityZoomWidget() {
   }, [isOpen])
 
   return (
-    <aside
+    <FloatingActionContainer actionIndex={0}
       ref={containerRef}
       role="region"
       aria-label="Controles de accesibilidad y zoom visual"
       data-tour="accessibility-zoom"
-      style={{ zoom: 1 }}
-      className="fixed bottom-5 right-5 z-50 flex items-center select-none"
+      className="z-50"
     >
       {!isOpen ? (
         <button
@@ -147,6 +147,6 @@ export function AccessibilityZoomWidget() {
           </Button>
         </div>
       )}
-    </aside>
+    </FloatingActionContainer>
   )
 }

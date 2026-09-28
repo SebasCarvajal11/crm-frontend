@@ -22,6 +22,8 @@ export async function setupDashboard(page: Page, role: 'admin' | 'worker' | 'cli
   await page.route('**/api/**', async (route) => {
     const path = new URL(route.request().url()).pathname
     const method = route.request().method()
+    // Background self-presence is independent from the tutorial; it never reads other users.
+    if (path === '/api/v1/identity/presence') return route.fulfill({ json: { data: { heartbeat_interval_seconds: 60 } } })
     if (!['GET', 'HEAD'].includes(method)) {
       mutations.push(`${method} ${path}`)
       // Chat read acknowledgements are an existing application effect, not tutorial writes.

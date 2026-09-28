@@ -7,6 +7,7 @@ import { HelpCenterModal } from './help-center-modal'
 import { TourRuntime } from './tour-runtime'
 import { useSessionStore } from '@/app/session/session-store'
 import { useRouterState } from '@tanstack/react-router'
+import { FloatingActionContainer } from '@/components/ui/floating-action-container'
 
 export function HelpCenterWidget() {
   const toggleHelpCenter = useTourStore((s) => s.toggleHelpCenter)
@@ -56,11 +57,9 @@ export function HelpCenterWidget() {
     <>
       <TourRuntime />
       {available && <>
-      <aside
+      <FloatingActionContainer actionIndex={1}
         role="region"
         aria-label="CIMA Smart Copilot: Asistencia y Tutoriales"
-        style={{ zoom: 1 }}
-        className="fixed bottom-[4.75rem] right-5 z-40 flex items-center select-none"
       >
         <button
           type="button"
@@ -82,7 +81,7 @@ export function HelpCenterWidget() {
             </span>
           )}
         </button>
-      </aside>
+      </FloatingActionContainer>
 
       <HelpCenterModal />
       </>}

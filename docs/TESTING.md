@@ -30,8 +30,10 @@ Este documento describe la pirámide de pruebas, la suite de pruebas End-to-End 
 ### Verificación de marca sobre la compilación de producción
 
 El tutorial híbrido se verifica con `pnpm test:tour`. `pnpm test:ui` reúne
-marca y tutorial en una sola compilación de producción y se ejecuta en GitHub
+marca, tutorial y presencia en una sola compilación de producción y se ejecuta en GitHub
 Actions antes del despliegue. Ver [arquitectura y escenarios del tutorial](GUIDED_TUTORIAL.md).
+El [panel de presencia](PRESENCE.md) añade autorización por rol, búsqueda y paginación,
+errores, pérdida de red, cancelación de polling y una séptima resolución ultrawide.
 Las antiguas suites acopladas al DOM de Driver.js se sustituyen por la cobertura
 del registro completo por roles y las interacciones adaptativas en `tests/playwright/tour/`.
 
