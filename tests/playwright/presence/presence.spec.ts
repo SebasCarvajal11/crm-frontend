@@ -54,6 +54,7 @@ test('segmentar, buscar por nombre, usuario, correo y empresa y paginar sin reco
   await page.goto('/dashboard?tab=collab')
   await expect.poll(() => heartbeat.length).toBe(1)
   expect(requests).toHaveLength(0)
+  await page.clock.install()
   const panel = await openPresence(page)
   await expect(panel).toContainText('1 en línea')
   const worker = panel.getByRole('region', { name: 'Colaboradores', exact: true })
@@ -61,6 +62,9 @@ test('segmentar, buscar por nombre, usuario, correo y empresa y paginar sin reco
   await worker.getByRole('button', { name: 'Siguiente en Colaboradores' }).click()
   await expect(worker).toContainText('Página 2 de 2')
   await expect(worker.getByRole('listitem')).toHaveCount(2)
+  // Opening the panel must never schedule a search reset that undoes a fast page change.
+  await page.clock.fastForward(500)
+  await expect(worker).toContainText('Página 2 de 2')
   await expect(panel.getByRole('region', { name: 'Clientes', exact: true }).getByRole('listitem')).toHaveCount(1)
   const search = panel.getByLabel('Buscar en todos los perfiles')
   for (const [q, expected] of [['artista.0', 'artista.0@hurl.test'], ['Ana María Pérez', 'Ana María Pérez'], ['cliente.0@hurl.test', 'cliente.0@hurl.test'], ['Estudio CIMA', 'Estudio CIMA']]) {

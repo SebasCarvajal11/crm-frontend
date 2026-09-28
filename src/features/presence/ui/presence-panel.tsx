@@ -49,9 +49,10 @@ function PanelContent({ owner }: { owner: string }) {
   const [pages, setPages] = useState<PresencePages>(FIRST_PAGES)
   const scrollRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
+    if (search.trim() === query) return
     const timer = setTimeout(() => { setQuery(search.trim()); setPages(FIRST_PAGES) }, 350)
     return () => clearTimeout(timer)
-  }, [search])
+  }, [search, query])
   const result = usePresence(owner, query, pages)
   const updatingSearch = search.trim() !== query
   const busy = result.isFetching || updatingSearch
@@ -83,7 +84,7 @@ function PanelContent({ owner }: { owner: string }) {
       setPages((previous) => ({ ...previous, [group.role]: page }))
       scrollRef.current?.scrollTo({ top: 0, behavior: 'instant' })
     }} />)}
-    {result.data && <p className="text-xs leading-relaxed text-muted-foreground">La presencia se confirma con señales de la aplicación visible. Un cierre o una pérdida de red puede tardar hasta {result.data.online_for_seconds} segundos en reflejarse. Se muestran hasta {result.data.groups[0].page_size} usuarios por perfil y página.</p>}
+    {result.data && <p className="text-xs leading-relaxed text-muted-foreground">La presencia se confirma con señales de la aplicación visible. Las señales vencen a los {result.data.online_for_seconds} segundos; el estado se refleja en la siguiente actualización. Se muestran hasta {result.data.groups[0].page_size} usuarios por perfil y página.</p>}
   </div>
 }
 
