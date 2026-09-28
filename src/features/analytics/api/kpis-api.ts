@@ -2,28 +2,12 @@ import { api } from '@/shared/lib'
 import { bearer } from '@/shared/lib/bearer'
 import { ANALYTICS_ROUTES } from '@/shared/lib/gateway-routes'
 
+import type { KpiSnapshotDto } from '../model'
+
 /**
- * Forma real que devuelve KpiSnapshotDto del backend.
- *
- * El tipo que habia en analytics.types.ts (kpiId/kpiName/value/trend) no
- * correspondia a ninguna respuesta del servidor; el propio archivo lo advertia
- * en un comentario. Esta interfaz si coincide con las columnas de
- * kpi_snapshots y con los ocho indicadores de la Tabla 7 del informe.
+ * Forma real de KpiSnapshotDto alineada con crm-marketing (ADR-011).
  */
-export interface KpiSnapshot {
-  snapshotsId: number | null
-  period: string
-  calculatedAt: string
-  newClients: number
-  closedProjects: number
-  estimatedRevenue: number
-  activeCampaigns: number
-  clientsContacted: number
-  responseRate: number
-  avgCloseDays: number
-  projectsInProgress: number
-  calculatedBy: string | null
-}
+export type KpiSnapshot = KpiSnapshotDto
 
 export async function getCurrentKpisRequest(
   accessToken: string,

@@ -15,40 +15,26 @@ export function KpiTrendChart({ data, loading }: Props) {
     return <div className="text-center text-sm text-muted-foreground">Sin datos disponibles</div>
   }
 
-  // Agrupar por nombre de KPI para mostrar tendencias
-  const groupedData = data.reduce(
-    (acc, kpi) => {
-      const timestamp = new Date(kpi.timestamp).toLocaleDateString()
-      if (!acc[timestamp]) acc[timestamp] = {}
-      acc[timestamp][kpi.kpiName] = kpi.value
-      return acc
-    },
-    {} as Record<string, Record<string, number>>
-  )
-
-  const chartData = Object.entries(groupedData).map(([timestamp, kpis]) => ({
-    timestamp,
-    ...kpis,
+  const chartData = data.map((kpi) => ({
+    period: kpi.period || (kpi.calculatedAt ? new Date(kpi.calculatedAt).toLocaleDateString() : ''),
+    newClients: kpi.newClients,
+    closedProjects: kpi.closedProjects,
+    projectsInProgress: kpi.projectsInProgress,
+    activeCampaigns: kpi.activeCampaigns,
   }))
 
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="timestamp" />
+        <XAxis dataKey="period" />
         <YAxis />
         <Tooltip />
         <Legend />
-        {Object.keys(chartData[0] || {})
-          .filter((key) => key !== 'timestamp')
-          .map((kpiName, idx) => (
-            <Line
-              key={kpiName}
-              type="monotone"
-              dataKey={kpiName}
-              stroke={['#3b82f6', '#10b981', '#f59e0b'][idx % 3]}
-            />
-          ))}
+        <Line type="monotone" dataKey="newClients" stroke="#3b82f6" name="Nuevos Clientes" />
+        <Line type="monotone" dataKey="closedProjects" stroke="#10b981" name="Proyectos Cerrados" />
+        <Line type="monotone" dataKey="projectsInProgress" stroke="#f59e0b" name="En Progreso" />
+        <Line type="monotone" dataKey="activeCampaigns" stroke="#8b5cf6" name="Campañas Activas" />
       </LineChart>
     </ResponsiveContainer>
   )

@@ -23,7 +23,7 @@ export function PlanDistributionChart({ data, loading }: Props) {
         <Pie
           data={data}
           dataKey="clientCount"
-          nameKey="planName"
+          nameKey="plan"
           cx="50%"
           cy="50%"
           outerRadius={100}
