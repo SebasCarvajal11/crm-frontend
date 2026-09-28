@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { CimaLogo } from '@/components/ui/cima-logo'
 import { cn } from '@/shared/lib/utils'
 import type { SidebarItem } from './sidebar'
 import { DesktopSidebar, MobileSidebar } from './sidebar'
@@ -133,7 +134,7 @@ export function AppShell({
           >
             <Menu className="size-5" />
           </Button>
-          <span className="truncate text-sm font-black uppercase tracking-tight text-primary">{title}</span>
+          <CimaLogo width={100} />
           <div className="flex min-w-0 items-center gap-2">
             {headerExtras}
             <span className="hidden max-w-[120px] truncate text-xs text-muted-foreground sm:inline">{userEmail}</span>

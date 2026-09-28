@@ -36,7 +36,9 @@ export function AuthCardLayout({
         }}
       />
       <div className="relative z-10 w-full max-w-md">
-        <CimaLogo className="mb-5 justify-center" size={34} textColor="text-foreground" subtitle />
+        <div className="mb-5 flex justify-center">
+          <CimaLogo variant="full" />
+        </div>
         <Card className="w-full border-border/80 bg-card/95 backdrop-blur-xs shadow-lg">
         <CardHeader className="space-y-1.5">
           <CardTitle className="text-2xl font-bold tracking-tight">{title}</CardTitle>

@@ -24,7 +24,7 @@ export function SidebarBrand({
         )}
         onClick={closeOnNavigate}
       >
-        <CimaLogo size={28} showText={!compact} textColor="text-white" subtitle={false} />
+        <CimaLogo variant={compact ? 'emblem' : 'cimaxis'} tone="inverse" />
       </Link>
       {!compact && headerExtras ? <div className="ml-auto shrink-0">{headerExtras}</div> : null}
     </div>

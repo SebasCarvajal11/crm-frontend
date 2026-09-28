@@ -27,6 +27,21 @@ Este documento describe la pirámide de pruebas, la suite de pruebas End-to-End 
 - **Herramienta**: `@playwright/test`.
 - **Arquitectura de Page Object Model (POM)**: Clases especializadas (`LoginPage`, `DashboardPage`, `ProjectPage`, `TaskPage`, `ChatPage`) que aíslan la manipulación del DOM de las aserciones de prueba.
 
+### Verificación de marca sobre la compilación de producción
+
+`pnpm test:brand` compila la SPA y ejecuta `tests/playwright/brand.config.ts` contra
+Vite Preview. La suite usa respuestas de API simuladas y una sesión sintética;
+no necesita Docker ni credenciales y no sustituye los E2E contra el gateway real.
+
+Comprueba imágenes cargadas, proporciones originales, transparencia y negativo en modo oscuro,
+favicon PNG, ausencia de overflow, formularios de acceso, navegación a recuperación
+y sidebar expandido/colapsado/móvil. Genera capturas para revisión en
+`tests/test-results/brand/` y reporte HTML en `tests/playwright/reports/brand/`.
+La matriz incluye 4K, 2K, 1080p, iPad (WebKit), iPhone (WebKit) y Pixel (Chromium).
+WebKit y los dispositivos emulados verifican compatibilidad del motor; no son
+pruebas en hardware físico iOS/Android. Instalar motores con
+`pnpm exec playwright install chromium webkit` (en CI, agregar `--with-deps`).
+
 ---
 
 ## 2. Pruebas por Personas / Roles

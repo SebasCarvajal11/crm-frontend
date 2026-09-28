@@ -6,6 +6,28 @@ Este documento define la identidad visual corporativa, la paleta cromática, la 
 
 ## 1. Identidad Gráfica y Paleta de Colores
 
+### Logotipos oficiales
+
+La única implementación de marca es `src/components/ui/cima-logo.tsx`, que consume
+los PNG oficiales de `src/assets/brand/` mediante imports de Vite (URLs con hash en
+producción). No reconstruir la marca con texto ni SVG.
+
+| Variante | Contexto | Ancho habitual de imagen |
+| :--- | :--- | :--- |
+| `full` | Presentación y formularios de autenticación | 220 px |
+| `cimaxis` | Sidebar expandido/móvil y bienvenida del dashboard | 160 / 180 px |
+| `emblem` | Sidebar colapsado | 32 px |
+| `basic` | Cabecera móvil | 100 px |
+
+Todas las variantes conservan dimensiones intrínsecas, proporciones y texto
+alternativo y transparencia, sin recuadros ni fondos añadidos. `tone="inverse"`
+presenta un negativo monocromático blanco del PNG mediante `brightness-0 invert`
+en sidebar y panel institucional. El tono `adaptive` conserva los colores originales
+en tema claro y utiliza el negativo blanco en tema oscuro. No modifica los archivos
+oficiales, su geometría ni su canal alfa. El
+ancho se limita al contenedor; no ampliar el PNG completo como banner 4K.
+El favicon `public/favicon.png` es una copia del isotipo oficial `cima-C.png`.
+
 La línea visual de CIMA CRM está fundamentada en tonalidades carmesí corporativas combinadas con neutros sobrios de alto contraste:
 
 ```text

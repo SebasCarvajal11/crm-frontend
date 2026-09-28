@@ -60,7 +60,7 @@ function HeroBrandPanel({
       <div className="absolute inset-0 z-1 bg-gradient-to-br from-primary/95 via-primary/85 to-[#4d0407]/90 backdrop-blur-[1px]" />
 
       <div className="relative z-10 space-y-4 sm:space-y-6">
-        <CimaLogo size={36} inverted subtitle />
+        <CimaLogo variant="full" tone="inverse" />
         <div className="space-y-1.5 sm:space-y-2 pt-1 sm:pt-2">
           <h2 className="text-xl font-bold tracking-tight text-white sm:text-2xl lg:text-3xl">
             {heroTitle}

@@ -17,3 +17,31 @@ jobs:
       is_frontend: true
       test_command: pnpm test:unit
     secrets: inherit
+
+  brand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.1.1
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+      - name: Instalar motores de navegador
+        run: pnpm exec playwright install --with-deps chromium webkit
+      - name: Verificar identidad visual y navegación
+        run: pnpm test:brand
+      - name: Guardar reporte y capturas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brand-browser-report
+          path: |
+            tests/playwright/reports/brand/
+            tests/test-results/brand/
+          retention-days: 7

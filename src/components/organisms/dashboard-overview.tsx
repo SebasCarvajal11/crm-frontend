@@ -1,4 +1,5 @@
 import type { MeResponse } from '@/features/auth/model'
+import { CimaLogo } from '@/components/ui/cima-logo'
 import type { ProjectListItem } from '@/features/collab/model'
 import type { WorkspaceTab } from '@/pages/dashboard/use-dashboard-navigation'
 import {
@@ -91,11 +92,9 @@ export function DashboardOverview({
         <p className="text-2xl font-medium text-muted-foreground sm:text-3xl">
           Hola <span className="font-black text-primary">{firstName}</span>
         </p>
-        <p className="text-2xl font-medium text-muted-foreground sm:text-3xl">
+        <p className="flex flex-wrap items-center gap-x-3 gap-y-2 text-2xl font-medium text-muted-foreground sm:text-3xl">
           Bienvenido a{' '}
-          <span className="font-black tracking-tight text-foreground">
-            CIMA<span className="text-muted-foreground/70">XIS</span>
-          </span>
+          <CimaLogo variant="cimaxis" width={180} />
         </p>
       </div>
 
