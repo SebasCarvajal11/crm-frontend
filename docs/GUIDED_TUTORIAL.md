@@ -97,6 +97,9 @@ finalización real, almacenamiento corrupto y aislamiento de cuentas.
 `pnpm test:tour` compila producción y ejecuta las integraciones de navegador.
 `pnpm test:ui` ejecuta marca y tutorial sobre una sola compilación y es obligatorio
 en CI antes de CD.
+Cada combinación de guía y rol se valida de forma aislada para evitar acumular
+el tiempo de todos los recorridos en un único caso. CI reparte la matriz completa
+en tres shards, conserva los mismos controles y publica un reporte por shard.
 
 La matriz visual incluye 4K, 2K, 1080p, iPad/WebKit, iPhone/WebKit y Pixel/Chromium.
 La suite recorre todas las guías autorizadas para los tres roles y verifica

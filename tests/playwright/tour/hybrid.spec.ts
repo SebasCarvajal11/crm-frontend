@@ -122,11 +122,11 @@ test('vacíos, reintento, ayuda superpuesta, rotación y modo oscuro', async ({ 
 })
 
 for (const role of ['admin', 'worker', 'client'] as const) {
-  test(`recorrer todas las guías autorizadas y finalizar explícitamente: ${role}`, async ({ page }, info) => {
-    const { errors, mutations } = await setupDashboard(page, role)
-    const unavailable: string[] = []
-    await page.goto('/dashboard?tab=collab')
-    for (const tour of ALL_TOURS.filter((tour) => tour.roles.includes(role))) {
+  for (const tour of ALL_TOURS.filter((tour) => tour.roles.includes(role))) {
+    test(`recorrer guía autorizada y finalizar explícitamente: ${role} / ${tour.id}`, async ({ page }, info) => {
+      const { errors, mutations } = await setupDashboard(page, role)
+      const unavailable: string[] = []
+      await page.goto('/dashboard?tab=collab')
       await startTour(page, tour.title)
       const guide = page.getByTestId('tour-guide')
       const steps = tour.steps.filter((step) => !step.requiredRole || step.requiredRole.includes(role))
@@ -138,17 +138,17 @@ for (const role of ['admin', 'worker', 'client'] as const) {
         await guide.getByRole('button', { name: index === steps.length - 1 ? 'Finalizar' : /Siguiente|Omitir paso/, exact: true }).click()
       }
       await expect(guide).toHaveCount(0)
-    }
-    expect(errors).toEqual([])
-    await info.attach('unavailable-targets', { body: JSON.stringify([...new Set(unavailable)], null, 2), contentType: 'application/json' })
-    const conditionalTargets = [
-      '[data-tour="admin-file-project-header"]', '[data-tour="admin-file-folder-tabs"]',
-      '[data-tour="admin-file-table"]', '[data-tour="admin-user-actions"]',
-      '[data-tour="account-sessions-revoke-btn"]',
-    ]
-    expect([...new Set(unavailable)].filter((selector) => !conditionalTargets.includes(selector))).toEqual([])
-    expect(mutations.filter((request) => !request.endsWith('/read'))).toEqual([])
-  })
+      expect(errors).toEqual([])
+      await info.attach('unavailable-targets', { body: JSON.stringify([...new Set(unavailable)], null, 2), contentType: 'application/json' })
+      const conditionalTargets = [
+        '[data-tour="admin-file-project-header"]', '[data-tour="admin-file-folder-tabs"]',
+        '[data-tour="admin-file-table"]', '[data-tour="admin-user-actions"]',
+        '[data-tour="account-sessions-revoke-btn"]',
+      ]
+      expect([...new Set(unavailable)].filter((selector) => !conditionalTargets.includes(selector))).toEqual([])
+      expect(mutations.filter((request) => !request.endsWith('/read'))).toEqual([])
+    })
+  }
 }
 
 test('zoom, teclado, pantalla reducida y reinicio sin trabajo asíncrono residual', async ({ page }, info) => {

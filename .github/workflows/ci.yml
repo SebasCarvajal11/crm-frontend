@@ -21,6 +21,10 @@ jobs:
   ui:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
@@ -35,12 +39,12 @@ jobs:
       - name: Instalar motores de navegador
         run: pnpm exec playwright install --with-deps chromium webkit
       - name: Verificar marca, tutorial híbrido y navegación adaptativa
-        run: pnpm test:ui
+        run: pnpm test:ui --shard=${{ matrix.shard }}/3
       - name: Guardar reporte y capturas
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ui-browser-report
+          name: ui-browser-report-${{ matrix.shard }}
           path: |
             tests/playwright/reports/ui/
             tests/test-results/ui/
