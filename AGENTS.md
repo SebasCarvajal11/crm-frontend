@@ -18,7 +18,7 @@ Antes de proponer o ejecutar cambios, consulta el documento especializado corres
 | :--- | :--- |
 | Comprender la arquitectura en capas, Atomic Design y módulos de features | [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) |
 | Aplicar la paleta corporativa carmesí, tipografía, Tailwind v4 y tokens | [`docs/DESIGN_SYSTEM.md`](./docs/DESIGN_SYSTEM.md) |
-| Agregar o modificar rutas en `src/routes`, layouts o search params Zod | [`docs/ROUTING_AND_NAVIGATION.md`](./ROUTING_AND_NAVIGATION.md) |
+| Agregar o modificar rutas en `src/routes`, layouts o search params Zod | [`docs/ROUTING_AND_NAVIGATION.md`](./docs/ROUTING_AND_NAVIGATION.md) |
 | Gestionar caché TanStack Query, llamadas con Ky o sesión Zustand | [`docs/STATE_AND_API.md`](./docs/STATE_AND_API.md) |
 | Modificar o auditar rutas de API backend en `gateway-routes.ts` | [`docs/GATEWAY_CONTRACT.md`](./docs/GATEWAY_CONTRACT.md) |
 | Ejecutar o crear pruebas unitarias Vitest o flujos E2E Playwright | [`docs/TESTING.md`](./docs/TESTING.md) |

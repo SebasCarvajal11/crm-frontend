@@ -34,15 +34,15 @@ pnpm audit:gateway-routes
 
 ---
 
-## 3. Generación Automática de Tipos (OpenAPI Codegen)
+## 3. Generación de Tipos y Modelos de Dominio (OpenAPI Codegen)
 
-El frontend mantiene contratos tipados sincronizados con las especificaciones OpenAPI 3.0 de los microservicios mediante `openapi-typescript`:
+El frontend define sus tipos y modelos de datos en `src/features/*/model/` y `src/shared/types/`. Opcionalmente, para regenerar contratos desde especificaciones OpenAPI 3.0 cuando el API Gateway está en ejecución en `http://localhost:28080`:
 
 ```bash
-pnpm codegen:auth      # Genera src/shared/api-types/auth.gen.ts
-pnpm codegen:collab    # Genera src/shared/api-types/collab.gen.ts
-pnpm codegen:media     # Genera src/shared/api-types/media.gen.ts
+pnpm codegen:auth      # Genera contratos desde /api/v1/docs/auth/openapi.yaml
+pnpm codegen:collab    # Genera contratos desde /api/v1/docs/collab/openapi.yaml
+pnpm codegen:media     # Genera contratos desde /api/v1/docs/media/openapi.yaml
 pnpm codegen:all       # Regenera todos los contratos de tipos
 ```
 
-Esto garantiza que las respuestas del API Gateway y los DTOs de petición cuenten con autocompletado y validación estricta de tipos en tiempo de compilación.
+> **Nota:** La ejecución de `codegen:*` requiere que el Gateway KrakenD se encuentre levantado y accesible. En desarrollo diario y CI, el tipado se rige por los contratos e interfaces desacopladas en cada feature.

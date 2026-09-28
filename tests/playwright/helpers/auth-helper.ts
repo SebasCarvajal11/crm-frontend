@@ -29,6 +29,12 @@ export async function loginViaAPI(
 
   await page.evaluate(
     ({ token, userEmail }) => {
+      const store = (window as unknown as {
+        __zustandSessionStore?: { getState: () => { setSession: (t: string, e: string) => void } }
+      }).__zustandSessionStore
+      if (store) {
+        store.getState().setSession(token, userEmail)
+      }
       sessionStorage.setItem('cima_access_token', token)
       sessionStorage.setItem('cima_user_email', userEmail)
     },
@@ -40,6 +46,12 @@ export async function loginViaAPI(
 
 export async function logout(page: Page): Promise<void> {
   await page.evaluate(() => {
+    const store = (window as unknown as {
+      __zustandSessionStore?: { getState: () => { clearSession: () => void } }
+    }).__zustandSessionStore
+    if (store) {
+      store.getState().clearSession()
+    }
     sessionStorage.removeItem('cima_access_token')
     sessionStorage.removeItem('cima_user_email')
   })
@@ -48,7 +60,12 @@ export async function logout(page: Page): Promise<void> {
 }
 
 export async function getToken(page: Page): Promise<string | null> {
-  return page.evaluate(() => sessionStorage.getItem('cima_access_token'))
+  return page.evaluate(() => {
+    const store = (window as unknown as {
+      __zustandSessionStore?: { getState: () => { token: string | null } }
+    }).__zustandSessionStore
+    return store?.getState().token ?? sessionStorage.getItem('cima_access_token')
+  })
 }
 
 export async function isAuthenticated(page: Page): Promise<boolean> {

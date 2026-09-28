@@ -20,7 +20,8 @@ El frontend aplica una estricta separación entre el estado remoto del servidor 
 ┌─────────────────────────────────────────────────────────────┐
 │                     Estado del Cliente                      │
 │                        (Zustand v5)                         │
-│ • Sesión en memoria (Access Token volátil, usuario activo). │
+│ • Sesión de usuario (Access Token en sessionStorage con     │
+│   sincronización multi-pestaña vía BroadcastChannel).       │
 │ • Preferencias de interfaz (sidebar colapsada, tema oscuro).│
 │ • Ajustes de accesibilidad (escala de zoom).                │
 └─────────────────────────────────────────────────────────────┘
@@ -30,7 +31,7 @@ El frontend aplica una estricta separación entre el estado remoto del servidor 
 
 ## 2. Cliente HTTP Centralizado: `ky`
 
-Toda comunicación hacia el backend se realiza mediante la instancia configurada de `ky` en `src/shared/api/api-client.ts`:
+Toda comunicación hacia el backend se realiza mediante la instancia configurada de `ky` en `src/shared/lib/api-client.ts`:
 
 ### A. Interceptor de Peticiones (`beforeRequest`)
 - Inyecta automáticamente el Access Token en la cabecera `Authorization: Bearer <token>` si el usuario está autenticado en memoria.
