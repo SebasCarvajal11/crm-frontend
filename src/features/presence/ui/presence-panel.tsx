@@ -66,7 +66,7 @@ function PanelContent({ owner }: { owner: string }) {
       </div>
       <div className="flex items-center justify-between gap-2">
         <p role="status" aria-live="polite" className="text-xs leading-relaxed text-muted-foreground">
-          {result.stale && result.data ? 'Datos sin actualizar: conexión pendiente.' : result.data ? `${totalOnline} en línea${query ? ' en esta búsqueda' : ''} · actualización cada ${result.data.refresh_after_seconds} s` : 'Consultando presencia…'}
+          {result.revoked ? 'Acceso restringido.' : result.stale && result.data ? 'Datos sin actualizar: conexión pendiente.' : result.data ? `${totalOnline} en línea${query ? ' en esta búsqueda' : ''} · actualización cada ${result.data.refresh_after_seconds} s` : result.isError ? 'Presencia no disponible.' : !result.available ? 'Actualización pausada.' : 'Consultando presencia…'}
         </p>
         <Button variant="outline" size="icon" className="size-11 shrink-0" aria-label="Actualizar presencia" disabled={busy || !result.available || result.revoked} onClick={() => void result.refetch()}><RefreshCw className={`size-4 ${result.isFetching ? 'motion-safe:animate-spin' : ''}`} /></Button>
       </div>
