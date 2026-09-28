@@ -32,7 +32,8 @@ La ventana histórica contiene señales recibidas desde que se publica la funci�
 
 Las tres burbujas comparten `FloatingActionContainer`, que corrige el zoom de la
 aplicación, separación y safe area. El diálogo conserva tokens corporativos,
-modo oscuro, foco inicial en el título, cierre visible, Escape y retorno de foco.
+modo oscuro, superficie opaca para evitar transparencias de texto en WebKit,
+foco inicial en el título, cierre visible, Escape y retorno de foco.
 Un único scroll interior mantiene el encabezado y cierre disponibles; visualViewport
 ajusta los límites con teclado y rotación. El tutorial se suspende durante el panel.
 

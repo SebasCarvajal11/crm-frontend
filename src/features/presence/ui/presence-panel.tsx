@@ -90,7 +90,7 @@ function PanelContent({ owner }: { owner: string }) {
 export function PresencePanel({ owner }: { owner: string }) {
   const viewport = useVisibleViewport()
   const titleRef = useRef<HTMLHeadingElement>(null)
-  return <DialogContent data-testid="presence-panel" showCloseButton={false} className="left-auto right-4 flex -translate-x-0 flex-col gap-0 overflow-hidden" style={{
+  return <DialogContent data-testid="presence-panel" showCloseButton={false} className="left-auto right-4 flex -translate-x-0 flex-col gap-0 overflow-hidden bg-card backdrop-blur-none" style={{
     top: `calc(${viewport.top + viewport.height / 2}px / var(--app-zoom, 1))`,
     width: `min(30rem, calc((${viewport.width}px - 2rem) / var(--app-zoom, 1)))`,
     maxWidth: 'none', maxHeight: `calc((${viewport.height}px - 2rem) / var(--app-zoom, 1))`,
