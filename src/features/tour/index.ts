@@ -1,6 +1,5 @@
 export { HelpCenterWidget } from './ui/help-center-widget'
 export { HelpCenterModal } from './ui/help-center-modal'
-export { TourBeacon } from './ui/tour-beacon'
 export { useTourStore } from './model/tour-store'
 export { useTourRunner } from './hooks/use-tour-runner'
 export { useTourContext } from './hooks/use-tour-context'

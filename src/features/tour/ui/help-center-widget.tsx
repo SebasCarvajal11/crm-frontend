@@ -4,28 +4,35 @@ import { useTourStore } from '../model/tour-store'
 import { useTourContext } from '../hooks/use-tour-context'
 import { getMissionsForContext } from '../registry'
 import { HelpCenterModal } from './help-center-modal'
+import { TourRuntime } from './tour-runtime'
+import { useSessionStore } from '@/app/session/session-store'
+import { useRouterState } from '@tanstack/react-router'
 
 export function HelpCenterWidget() {
   const toggleHelpCenter = useTourStore((s) => s.toggleHelpCenter)
   const focusHelpCenterWithQuery = useTourStore((s) => s.focusHelpCenterWithQuery)
   const isHelpCenterOpen = useTourStore((s) => s.isHelpCenterOpen)
-  const isTourCompleted = useTourStore((s) => s.isTourCompleted)
+  const completed = useTourStore((s) => s.completedTourIds)
+  const token = useSessionStore((state) => state.token)
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const available = !!token && pathname === '/dashboard'
 
   const ctx = useTourContext()
   const missions = useMemo(() => getMissionsForContext(ctx), [ctx])
   const hasIncompleteMissions = useMemo(
-    () => missions.some((m) => !isTourCompleted(m.id)),
-    [missions, isTourCompleted]
+    () => missions.some((m) => !completed.includes(m.id)),
+    [missions, completed]
   )
 
   useEffect(() => {
+    if (!available) return
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeEl = document.activeElement
       const isInput =
         activeEl instanceof HTMLInputElement ||
         activeEl instanceof HTMLTextAreaElement ||
         activeEl?.getAttribute('contenteditable') === 'true'
-      if (isInput) return
+      if (isInput || e.isComposing || document.querySelector('[role="dialog"], [role="alertdialog"]')) return
 
       const isSearchShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'
       const isHelpShortcut = e.key === '?' || ((e.ctrlKey || e.metaKey) && e.key === '/')
@@ -43,10 +50,12 @@ export function HelpCenterWidget() {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [toggleHelpCenter, focusHelpCenterWithQuery])
+  }, [toggleHelpCenter, focusHelpCenterWithQuery, available])
 
   return (
     <>
+      <TourRuntime />
+      {available && <>
       <aside
         role="region"
         aria-label="CIMA Smart Copilot: Asistencia y Tutoriales"
@@ -69,7 +78,6 @@ export function HelpCenterWidget() {
           <HelpCircle className="size-5 text-primary" />
           {hasIncompleteMissions && (
             <span className="absolute -top-0.5 -right-0.5 flex size-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
               <span className="relative inline-flex size-2.5 rounded-full bg-primary" />
             </span>
           )}
@@ -77,6 +85,7 @@ export function HelpCenterWidget() {
       </aside>
 
       <HelpCenterModal />
+      </>}
     </>
   )
 }

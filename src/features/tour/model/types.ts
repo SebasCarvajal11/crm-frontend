@@ -3,7 +3,6 @@ import type { DashboardTab } from '@/routes/-dashboard.search'
 export type TourUserRole = 'admin' | 'worker' | 'client'
 
 export type TourPlacement = 'top' | 'right' | 'bottom' | 'left'
-export type TourAlignment = 'start' | 'center' | 'end'
 
 export type WorkspaceSubTab =
   | 'board'
@@ -13,13 +12,6 @@ export type WorkspaceSubTab =
   | 'change-requests'
   | 'members'
 
-export type CimaTourInteractiveAction =
-  | 'click'
-  | 'input'
-  | 'tab-change'
-  | 'open-modal'
-  | 'none'
-
 export type CimaTourStep = {
   element: string
   fallbackElement?: string
@@ -27,18 +19,13 @@ export type CimaTourStep = {
   description: string
   actionHint?: string
   side?: TourPlacement
-  align?: TourAlignment
-  mobileSide?: TourPlacement
-  showPointer?: boolean
   requiredRole?: TourUserRole[]
   navigateTab?: DashboardTab
-  switchWorkspaceTab?: WorkspaceSubTab | (string & {})
+  scope?: 'kanban' | 'workspace'
+  sidebar?: boolean
+  switchWorkspaceTab?: WorkspaceSubTab
   switchMarketingTab?: string
-  onNextAction?: 'openProject' | 'closeProject'
-  interactiveAction?: CimaTourInteractiveAction
-  autoAdvanceOnAction?: boolean
   emptyStateDescription?: string
-  targetPulse?: boolean
 }
 
 export type CimaTourDefinition = {
@@ -54,15 +41,6 @@ export type CimaTourDefinition = {
   estimatedMinutes?: number
 }
 
-export type TourBeaconConfig = {
-  id: string
-  missionId: string
-  targetSelector: string
-  title: string
-  description: string
-  placement?: 'top' | 'right' | 'bottom' | 'left'
-}
-
 export type GuidedQuestionCategory =
   | 'flujo'
   | 'gestion'
@@ -75,6 +53,7 @@ export type GuidedQuestion = {
   answer: string
   tab: DashboardTab
   workspaceTab?: WorkspaceSubTab
+  marketingTab?: string
   scope?: 'kanban' | 'workspace' | 'all'
   roles: TourUserRole[]
   category: GuidedQuestionCategory

@@ -79,7 +79,7 @@ export function AdminUserTable({ accessToken }: Props) {
           setPage={setPage}
         />
 
-        <CardContent className="space-y-4 p-4 sm:p-6">
+        <CardContent data-tour={usersQ.isLoading || usersQ.isError ? undefined : 'admin-user-table'} className="space-y-4 p-4 sm:p-6">
           {actionsError ? (
             <Alert variant="destructive" className="rounded-xl">
               <AlertTitle>No se pudo completar la acción</AlertTitle>
@@ -117,7 +117,6 @@ export function AdminUserTable({ accessToken }: Props) {
           ) : (
             <div
               ref={parentRef}
-              data-tour="admin-user-table"
               className="max-h-[min(54dvh,38rem)] overflow-auto rounded-xl border border-border/70 bg-card shadow-2xs"
             >
               <Table className="min-w-[780px] table-fixed">

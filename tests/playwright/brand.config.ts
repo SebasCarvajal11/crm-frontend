@@ -13,7 +13,7 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   outputDir: '../test-results/brand',
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'reports/brand' }]],
-  use: { baseURL, locale: 'es-CO', trace: 'retain-on-failure', screenshot: 'only-on-failure' },
+  use: { baseURL, locale: 'es-CO', trace: 'retain-on-failure', screenshot: 'only-on-failure', actionTimeout: 15_000 },
   webServer: {
     cwd: fileURLToPath(new URL('../../', import.meta.url)),
     command: 'pnpm exec vite preview --host 127.0.0.1 --port 4175 --strictPort',

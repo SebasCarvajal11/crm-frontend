@@ -13,8 +13,6 @@ export const notificationsTour: CimaTourDefinition = {
       description: 'Encabezado principal para supervisar la actividad en tiempo real, menciones en chats y cambios.',
       actionHint: 'Mantente al día con todas las comunicaciones pendientes de tus proyectos.',
       side: 'bottom',
-      align: 'start',
-      showPointer: true,
     },
     {
       element: '[data-tour="notifications-refresh-btn"]',
@@ -22,9 +20,6 @@ export const notificationsTour: CimaTourDefinition = {
       description: 'Permite sincronizar de inmediato la bandeja con el servidor sin tener que recargar la página.',
       actionHint: 'Haz clic aquí en cualquier momento para forzar una comprobación de novedades.',
       side: 'bottom',
-      align: 'end',
-      showPointer: true,
-      interactiveAction: 'click',
     },
     {
       element: '[data-tour="notifications-list"]',
@@ -32,8 +27,6 @@ export const notificationsTour: CimaTourDefinition = {
       description: 'Cada tarjeta detalla el proyecto, fecha, título del aviso y si proviene de una mención o evento interno.',
       actionHint: 'Pulsa directamente sobre cualquier notificación para saltar al proyecto correspondiente.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
     },
   ],
 }

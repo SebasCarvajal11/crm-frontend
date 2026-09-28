@@ -73,6 +73,7 @@ export function MarketingPanel({ accessToken }: Props) {
           onValueChange={handleTabChange}
           ariaLabel="Secciones de marketing"
           itemRole="button"
+          dataTourPrefix="marketing-tab"
         />
       </div>
 

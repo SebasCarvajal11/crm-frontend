@@ -102,7 +102,7 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
     return <div className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} items-center justify-center rounded-xl border bg-card shadow-sm`}><div className="h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary" /></div>
   }
   if (resolvedMembers.length === 0) {
-    return <div className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} flex-col items-center justify-center gap-3 rounded-xl border bg-card text-muted-foreground shadow-sm`}><Users className="size-10 opacity-20" /><p className="text-sm">No hay integrantes en este proyecto.</p></div>
+    return <div data-tour="workspace-members-list" className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} flex-col items-center justify-center gap-3 rounded-xl border bg-card text-muted-foreground shadow-sm`}><Users className="size-10 opacity-20" /><p className="text-sm">No hay integrantes en este proyecto.</p></div>
   }
 
   const memberSubs = new Set(resolvedMembers.map((m) => m.userSub))

@@ -5,9 +5,40 @@ import {
   searchMissions,
   getQuestionsForContext,
   searchQuestions,
+  ALL_TOURS,
+  ALL_QUESTIONS,
 } from './index'
 
 describe('Tour Registry Facade', () => {
+  it('conservar IDs únicos y destinos autorizados en toda la ayuda', () => {
+    expect(new Set(ALL_TOURS.map((tour) => tour.id)).size).toBe(ALL_TOURS.length)
+    expect(new Set(ALL_QUESTIONS.map((question) => question.id)).size).toBe(ALL_QUESTIONS.length)
+    for (const tour of ALL_TOURS) {
+      expect(tour.steps.length).toBeGreaterThan(0)
+      for (const step of tour.steps) {
+        expect(step.element).not.toBe('')
+        for (const role of step.requiredRole ?? []) expect(tour.roles).toContain(role)
+        if (step.switchMarketingTab) expect(step.navigateTab ?? tour.tab).toBe('marketing')
+        if (step.scope || step.switchWorkspaceTab) expect(step.navigateTab ?? tour.tab).toBe('collab')
+      }
+    }
+    for (const question of ALL_QUESTIONS) {
+      expect(Boolean(question.targetElement) !== Boolean(question.tourId)).toBe(true)
+      if (question.tourId) {
+        const tour = ALL_TOURS.find((item) => item.id === question.tourId)
+        expect(tour).toBeDefined()
+        for (const role of question.roles) expect(tour?.roles).toContain(role)
+      }
+    }
+  })
+
+  it('normalizar acentos y respetar el contexto kanban/workspace en búsquedas', () => {
+    const ctx = { activeTab: 'collab', role: 'client' } as const
+    expect(searchQuestions('tamaño', ctx)).toEqual(searchQuestions('tamano', ctx))
+    expect(getQuestionsForContext(ctx).some((question) => question.scope === 'workspace')).toBe(false)
+    expect(getQuestionsForContext({ ...ctx, projectId: 'project' }).some((question) => question.scope === 'kanban')).toBe(false)
+    expect(searchMissions('ANALITICA', { activeTab: 'overview', role: 'admin' }).length).toBeGreaterThan(0)
+  })
   it('retorna el tour general de kanban cuando no hay projectId abierto en collab', () => {
     const tour = getActiveTourForContext({
       activeTab: 'collab',
@@ -96,14 +127,15 @@ describe('Tour Registry Facade', () => {
     }
   })
 
-  it('el tour unificado de kanban incluye la transicion openProject hacia workspace', () => {
+  it('declarar el contexto de navegación entre kanban y workspace', () => {
     const tour = getActiveTourForContext({
       activeTab: 'collab',
       role: 'admin',
     })
     expect(tour?.id).toBe('tour-collab-kanban')
     const cardStep = tour?.steps.find((s) => s.element === '[data-tour="collab-card-first"]')
-    expect(cardStep?.onNextAction).toBe('openProject')
+    expect(cardStep?.scope).toBe('kanban')
+    expect(tour?.steps.find((step) => step.element === '[data-tour="workspace-project-header"]')?.scope).toBe('workspace')
 
     const elements = tour!.steps.map((s) => s.element)
     expect(elements).toContain('[data-tour="collab-columns-container"]')

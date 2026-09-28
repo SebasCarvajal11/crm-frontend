@@ -13,8 +13,6 @@ export const accountTour: CimaTourDefinition = {
       description: 'Centro de configuración personal para gestionar tu perfil, dispositivos conectados y credenciales de acceso.',
       actionHint: 'Disponible para todos los miembros de CIMA: administradores, colaboradores y clientes.',
       side: 'bottom',
-      align: 'start',
-      showPointer: true,
     },
     {
       element: '[data-tour="account-hero"]',
@@ -22,8 +20,6 @@ export const accountTour: CimaTourDefinition = {
       description: 'Banner institucional y presentación oficial con tu nombre, correo institucional y credencial de rol.',
       actionHint: 'Verifica tu nivel de acceso asignado en la insignia superior.',
       side: 'bottom',
-      align: 'start',
-      showPointer: true,
     },
     {
       element: '[data-tour="account-avatar-btn"]',
@@ -32,9 +28,6 @@ export const accountTour: CimaTourDefinition = {
       description: 'Carga una fotografía nítida, recórtala con zoom o visualízala en alta definición para tus proyectos.',
       actionHint: 'Haz clic en el icono de cámara para abrir el menú de opciones fotográficas.',
       side: 'bottom',
-      align: 'start',
-      showPointer: true,
-      interactiveAction: 'open-modal',
     },
     {
       element: '[data-tour="account-profile-details"]',
@@ -43,8 +36,6 @@ export const accountTour: CimaTourDefinition = {
       description: 'Presenta tu información según tu rol: profesión para colaboradores, o empresa para clientes, más estado de correo.',
       actionHint: 'Si tu correo no está verificado, puedes solicitar el enlace de confirmación aquí.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
     },
     {
       element: '[data-tour="account-sessions"]',
@@ -52,18 +43,15 @@ export const accountTour: CimaTourDefinition = {
       description: 'Audita los navegadores y equipos con sesiones iniciadas para detectar cualquier acceso inusual o no autorizado.',
       actionHint: 'Consulta la fecha, navegador y estado de conexión de cada sesión.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
     },
     {
       element: '[data-tour="account-sessions-revoke-btn"]',
+      emptyStateDescription: 'No hay sesiones registradas para cerrar. Puedes revisar el panel de sesiones o continuar la guía.',
       fallbackElement: '[data-tour="account-sessions"]',
       title: 'Cierre Remoto Preventivo',
       description: 'Revoca instantáneamente todas las sesiones en otros dispositivos si extraviaste un equipo o sospechas intrusión.',
       actionHint: 'Tu sesión actual permanecerá activa para que no pierdas tu trabajo.',
       side: 'top',
-      align: 'end',
-      showPointer: true,
     },
     {
       element: '[data-tour="account-security"]',
@@ -71,8 +59,6 @@ export const accountTour: CimaTourDefinition = {
       description: 'Protección criptográfica para tu cuenta. Exige mínimo 8 caracteres con mayúsculas, minúsculas, números y símbolos.',
       actionHint: 'Actualizar tu clave cerrará automáticamente las sesiones en otros equipos por seguridad.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
     },
     {
       element: '[data-tour="account-password-form"]',
@@ -81,9 +67,6 @@ export const accountTour: CimaTourDefinition = {
       description: 'Ingresa tu contraseña actual y define la nueva contraseña con su respectiva confirmación para validar el cambio.',
       actionHint: 'Completa los tres campos y presiona Actualizar contraseña.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
-      interactiveAction: 'input',
     },
   ],
 }

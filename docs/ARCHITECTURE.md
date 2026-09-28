@@ -65,7 +65,7 @@ Cada carpeta dentro de `src/features/` encapsula su propia lógica de presentaci
 - **`features/admin`**: Gestión de usuarios, roles de plataforma, suspensión y registros de auditoría.
 - **`features/overview`**: Métricas generales, resumen de actividad y widgets del dashboard principal.
 - **`features/accessibility`**: Control de zoom, alto contraste y preferencias de navegación asistida.
-- **`features/tour`**: Centro de asistencia contextual, preguntas de acción guiada y tours interactivos paso a paso por pestañas y roles (Driver.js).
+- **`features/tour`**: Centro de ayuda contextual y tutorial híbrido no modal por pestañas y roles. Un controlador React prepara navegación y objetivos cancelables; Floating UI posiciona la guía. Ver [contrato y decisión arquitectónica](GUIDED_TUTORIAL.md).
 
 ---
 

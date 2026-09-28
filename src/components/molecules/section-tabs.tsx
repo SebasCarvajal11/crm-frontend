@@ -14,6 +14,7 @@ type SectionTabsProps<T extends string> = {
   ariaLabel: string
   getPanelId?: (value: T) => string
   itemRole?: 'tab' | 'button'
+  dataTourPrefix?: string
 }
 
 /**
@@ -27,12 +28,13 @@ export function SectionTabs<T extends string>({
   ariaLabel,
   getPanelId,
   itemRole = 'tab',
+  dataTourPrefix = 'workspace-tab',
 }: SectionTabsProps<T>) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
-    const activeEl = containerRef.current.querySelector<HTMLElement>(`[data-tour="workspace-tab-${value}"]`)
+    const activeEl = containerRef.current.querySelector<HTMLElement>(`[data-tour="${dataTourPrefix}-${value}"]`)
     if (activeEl) {
       const container = containerRef.current
       const cRect = container.getBoundingClientRect()
@@ -45,7 +47,7 @@ export function SectionTabs<T extends string>({
         behavior: 'auto',
       })
     }
-  }, [value])
+  }, [value, dataTourPrefix])
 
   return (
     <div
@@ -61,7 +63,7 @@ export function SectionTabs<T extends string>({
           <button
             key={tab.value}
             type="button"
-            data-tour={`workspace-tab-${tab.value}`}
+            data-tour={`${dataTourPrefix}-${tab.value}`}
             role={itemRole === 'button' ? undefined : 'tab'}
             aria-selected={itemRole === 'tab' ? isActive : undefined}
             aria-pressed={itemRole === 'button' ? isActive : undefined}

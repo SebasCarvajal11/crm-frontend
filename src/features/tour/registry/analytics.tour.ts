@@ -13,8 +13,6 @@ export const analyticsTour: CimaTourDefinition = {
       description: 'Supervisa métricas de negocio, indicadores clave en tiempo real y el estado del backend analítico.',
       actionHint: 'Pulsa Actualizar para refrescar todos los datos consolidados.',
       side: 'bottom',
-      align: 'start',
-      showPointer: true,
     },
     {
       element: '[data-tour="analytics-refresh-btn"]',
@@ -23,9 +21,6 @@ export const analyticsTour: CimaTourDefinition = {
       description: 'Refresca todos los indicadores, alertas de inventario y estado de campañas con un solo clic.',
       actionHint: 'Pulsa Actualizar si necesitas los datos más recientes.',
       side: 'bottom',
-      align: 'end',
-      showPointer: true,
-      interactiveAction: 'click',
     },
     {
       element: '[data-tour="analytics-charts"]',
@@ -33,8 +28,6 @@ export const analyticsTour: CimaTourDefinition = {
       description: 'Visualiza la evolución temporal de proyectos, cumplimiento de objetivos y métricas históricas calculadas.',
       actionHint: 'Examina las tendencias para identificar áreas de oportunidad operativa.',
       side: 'bottom',
-      align: 'center',
-      showPointer: true,
     },
     {
       element: '[data-tour="analytics-kpis"]',
@@ -42,8 +35,6 @@ export const analyticsTour: CimaTourDefinition = {
       description: 'Métricas detalladas de clientes totales, campañas activas, proyectos en curso e interacciones de marketing.',
       actionHint: 'Comprueba el recuento global y usuarios internos asignados.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
     },
     {
       element: '[data-tour="analytics-campaign-chart"]',
@@ -52,8 +43,6 @@ export const analyticsTour: CimaTourDefinition = {
       description: 'Distribución porcentual de campañas por estado con descarga de datos en formatos ejecutivos.',
       actionHint: 'Exporta los datos para presentaciones y auditoría externa.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
     },
     {
       element: '[data-tour="analytics-inventory-alerts"]',
@@ -61,8 +50,6 @@ export const analyticsTour: CimaTourDefinition = {
       description: 'Monitorea productos con existencias bajas y exporta informes ejecutivos en formatos CSV o Excel.',
       actionHint: 'Permite exportar los datos con un solo clic para auditoría comercial.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
     },
   ],
 }

@@ -14,11 +14,11 @@ export function HelpCenterQuestionItem({ question, scopeMode, tabLabel, onClick 
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-start justify-between gap-3 rounded-lg border border-border/60 p-2.5 text-left transition-colors hover:bg-muted/60 hover:border-primary/30 group cursor-pointer"
+      className="flex min-h-11 w-full items-start justify-between gap-3 rounded-lg border border-border/60 p-3 text-left transition-colors hover:bg-muted/60 hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary group cursor-pointer"
     >
-      <div className="space-y-1">
+      <div className="min-w-0 flex-1 space-y-1">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <p className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
+          <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
             {question.question}
           </p>
           {scopeMode === 'all' && (
@@ -27,7 +27,7 @@ export function HelpCenterQuestionItem({ question, scopeMode, tabLabel, onClick 
             </Badge>
           )}
         </div>
-        <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
+        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
           {question.answer}
         </p>
       </div>

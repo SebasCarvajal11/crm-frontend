@@ -1,110 +1,80 @@
 import { create } from 'zustand'
+import type { CimaTourDefinition, TourUserRole } from './types'
+import { canCompleteSession, createTourSession, moveSession, visitSession, type TourSession } from './tour-session'
 
-const STORAGE_KEY_COMPLETED = 'cima_tour_completed_ids'
-const STORAGE_KEY_FIRST_VISIT = 'cima_tour_first_visit_dismissed'
+export const completionStorageKey = (owner: string) => `cima_tour_v2:${encodeURIComponent(owner.toLocaleLowerCase('es'))}`
 
-function readStoredCompleted(): string[] {
+export function parseCompleted(raw: string | null): string[] {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY_COMPLETED)
-    return raw ? JSON.parse(raw) : []
-  } catch {
-    return []
-  }
+    const value: unknown = JSON.parse(raw ?? '[]')
+    return Array.isArray(value) ? [...new Set(value.filter((id): id is string => typeof id === 'string' && id.length > 0))] : []
+  } catch { return [] }
 }
 
-function persistCompleted(ids: string[]): void {
-  try {
-    window.localStorage.setItem(STORAGE_KEY_COMPLETED, JSON.stringify(ids))
-  } catch {
-    // Silently continue if storage is restricted
-  }
+function readCompleted(owner: string): string[] {
+  try { return parseCompleted(window.localStorage.getItem(completionStorageKey(owner))) } catch { return [] }
 }
 
-function readStoredFirstVisit(): boolean {
-  try {
-    return window.localStorage.getItem(STORAGE_KEY_FIRST_VISIT) === 'true'
-  } catch {
-    return false
-  }
+function persist(owner: string | null, ids: string[]) {
+  if (!owner) return
+  try { window.localStorage.setItem(completionStorageKey(owner), JSON.stringify(ids)) } catch { /* Storage may be restricted. */ }
 }
 
-function persistFirstVisit(val: boolean): void {
-  try {
-    window.localStorage.setItem(STORAGE_KEY_FIRST_VISIT, String(val))
-  } catch {
-    // Silently continue
-  }
-}
-
-export type TourStoreState = {
+type TourStoreState = {
   isHelpCenterOpen: boolean
-  activeTourId: string | null
   completedTourIds: string[]
-  firstVisitDismissed: boolean
-  isTourPaused: boolean
-  pauseReason?: string
   initialSearchQuery?: string
+  session: TourSession | null
+  sequence: number
+  historyOwner: string | null
+  setHistoryOwner: (owner: string | null) => void
   openHelpCenter: () => void
   closeHelpCenter: () => void
   toggleHelpCenter: () => void
   focusHelpCenterWithQuery: (query?: string) => void
-  setActiveTour: (tourId: string | null) => void
-  markTourCompleted: (tourId: string) => void
-  dismissFirstVisit: () => void
+  start: (tour: CimaTourDefinition, role: TourUserRole) => void
+  stop: () => void
+  move: (index: number) => void
+  retry: () => void
+  visit: (revision: number) => void
+  minimize: (minimized: boolean) => void
+  finish: () => void
   resetAllTours: () => void
-  isTourCompleted: (tourId: string) => boolean
-  pauseTour: (reason?: string) => void
-  resumeTour: () => void
 }
 
 export const useTourStore = create<TourStoreState>((set, get) => ({
-  isHelpCenterOpen: false,
-  activeTourId: null,
-  completedTourIds: readStoredCompleted(),
-  firstVisitDismissed: readStoredFirstVisit(),
-  isTourPaused: false,
-  pauseReason: undefined,
-  initialSearchQuery: undefined,
-
-  openHelpCenter: () => set({ isHelpCenterOpen: true }),
+  isHelpCenterOpen: false, completedTourIds: [], initialSearchQuery: undefined,
+  session: null, sequence: 0, historyOwner: null,
+  setHistoryOwner: (owner) => {
+    if (owner === get().historyOwner) return
+    set({ historyOwner: owner, completedTourIds: owner ? readCompleted(owner) : [], session: null, isHelpCenterOpen: false })
+  },
+  openHelpCenter: () => set({ isHelpCenterOpen: true, initialSearchQuery: undefined }),
   closeHelpCenter: () => set({ isHelpCenterOpen: false, initialSearchQuery: undefined }),
-  toggleHelpCenter: () => set((s) => ({ isHelpCenterOpen: !s.isHelpCenterOpen })),
+  toggleHelpCenter: () => set((state) => ({ isHelpCenterOpen: !state.isHelpCenterOpen, initialSearchQuery: undefined })),
   focusHelpCenterWithQuery: (query = '') => set({ isHelpCenterOpen: true, initialSearchQuery: query }),
-
-  setActiveTour: (tourId) => set({ activeTourId: tourId, isTourPaused: false, pauseReason: undefined }),
-
-  markTourCompleted: (tourId) => {
-    const prev = get().completedTourIds
-    if (prev.includes(tourId)) return
-    const next = [...prev, tourId]
-    persistCompleted(next)
-    set({ completedTourIds: next, activeTourId: null, isTourPaused: false })
+  start: (tour, role) => {
+    const sequence = get().sequence + 1
+    set({ session: createTourSession(tour, role, sequence), sequence, isHelpCenterOpen: false, initialSearchQuery: undefined })
   },
-
-  dismissFirstVisit: () => {
-    persistFirstVisit(true)
-    set({ firstVisitDismissed: true })
+  stop: () => set((state) => ({ session: null, sequence: state.sequence + 1 })),
+  move: (index) => set((state) => {
+    if (!state.session) return state
+    const session = moveSession(state.session, index)
+    return { session, sequence: Math.max(state.sequence, session.revision) }
+  }),
+  retry: () => set((state) => state.session
+    ? { session: { ...state.session, revision: state.sequence + 1 }, sequence: state.sequence + 1 }
+    : state),
+  visit: (revision) => set((state) => state.session ? { session: visitSession(state.session, revision) } : state),
+  minimize: (minimized) => set((state) => state.session ? { session: { ...state.session, minimized } } : state),
+  finish: () => {
+    const { session, completedTourIds } = get()
+    if (!session) return
+    const ids = canCompleteSession(session) && !session.tour.id.startsWith('question:')
+      ? [...new Set([...completedTourIds, session.tour.id])] : completedTourIds
+    persist(get().historyOwner, ids)
+    set({ completedTourIds: ids, session: null })
   },
-
-  resetAllTours: () => {
-    persistCompleted([])
-    persistFirstVisit(false)
-    set({ completedTourIds: [], firstVisitDismissed: false, activeTourId: null, isTourPaused: false })
-  },
-
-  isTourCompleted: (tourId) => get().completedTourIds.includes(tourId),
-
-  pauseTour: (reason) => {
-    if (typeof document !== 'undefined') {
-      document.body.classList.add('cima-tour-paused')
-    }
-    set({ isTourPaused: true, pauseReason: reason })
-  },
-
-  resumeTour: () => {
-    if (typeof document !== 'undefined') {
-      document.body.classList.remove('cima-tour-paused')
-    }
-    set({ isTourPaused: false, pauseReason: undefined })
-  },
+  resetAllTours: () => { persist(get().historyOwner, []); set({ completedTourIds: [], session: null }) },
 }))

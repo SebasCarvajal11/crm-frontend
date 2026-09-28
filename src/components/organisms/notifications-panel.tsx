@@ -94,12 +94,11 @@ export function NotificationsPanel({ accessToken, onOpenNotification }: Props) {
         />
       </div>
 
-      {notificationsQ.isLoading && <p className="text-sm text-muted-foreground">Cargando notificaciones...</p>}
-      {!notificationsQ.isLoading && rows.length === 0 && (
-        <p className="text-sm text-muted-foreground">No tienes notificaciones sin leer.</p>
-      )}
-
       <div data-tour="notifications-list" className="space-y-2 animate-fade-up">
+        {notificationsQ.isLoading && <p className="text-sm text-muted-foreground">Cargando notificaciones...</p>}
+        {!notificationsQ.isLoading && rows.length === 0 && (
+          <p className="text-sm text-muted-foreground">No tienes notificaciones sin leer.</p>
+        )}
         {rows.map((n) => (
           <button
             key={n.id}

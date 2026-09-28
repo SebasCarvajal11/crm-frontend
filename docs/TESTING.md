@@ -29,6 +29,12 @@ Este documento describe la pirámide de pruebas, la suite de pruebas End-to-End 
 
 ### Verificación de marca sobre la compilación de producción
 
+El tutorial híbrido se verifica con `pnpm test:tour`. `pnpm test:ui` reúne
+marca y tutorial en una sola compilación de producción y se ejecuta en GitHub
+Actions antes del despliegue. Ver [arquitectura y escenarios del tutorial](GUIDED_TUTORIAL.md).
+Las antiguas suites acopladas al DOM de Driver.js se sustituyen por la cobertura
+del registro completo por roles y las interacciones adaptativas en `tests/playwright/tour/`.
+
 `pnpm test:brand` compila la SPA y ejecuta `tests/playwright/brand.config.ts` contra
 Vite Preview. La suite usa respuestas de API simuladas y una sesión sintética;
 no necesita Docker ni credenciales y no sustituye los E2E contra el gateway real.

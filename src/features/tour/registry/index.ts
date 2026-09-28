@@ -47,6 +47,10 @@ export const ALL_QUESTIONS: GuidedQuestion[] = [
   ...commonQuestions,
 ]
 
+function normalizeSearch(value: string): string {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLocaleLowerCase('es')
+}
+
 export function getActiveTourForContext(ctx: TourContextState): CimaTourDefinition | null {
   if (ctx.activeTab === 'collab') {
     return ctx.projectId ? collabWorkspaceTour : collabKanbanTour
@@ -67,14 +71,14 @@ export function getMissionsForContext(ctx: TourContextState): CimaTourDefinition
 }
 
 export function searchMissions(query: string, ctx: TourContextState): CimaTourDefinition[] {
-  const norm = query.trim().toLowerCase()
+  const norm = normalizeSearch(query)
   if (!norm) return []
   return ALL_TOURS.filter(
     (t) =>
       t.roles.includes(ctx.role) &&
-      (t.title.toLowerCase().includes(norm) ||
-        t.description.toLowerCase().includes(norm) ||
-        (t.badgeLabel && t.badgeLabel.toLowerCase().includes(norm)))
+      (normalizeSearch(t.title).includes(norm) ||
+        normalizeSearch(t.description).includes(norm) ||
+        (t.badgeLabel && normalizeSearch(t.badgeLabel).includes(norm)))
   )
 }
 
@@ -82,6 +86,9 @@ export function getQuestionsForContext(ctx: TourContextState): GuidedQuestion[] 
   return ALL_QUESTIONS.filter((q) => {
     if (!q.roles.includes(ctx.role)) return false
     if (q.id.startsWith('global-')) return true
+    if (q.tab === 'collab' && q.scope && q.scope !== 'all') {
+      if (q.scope !== (ctx.projectId ? 'workspace' : 'kanban')) return false
+    }
     return q.tab === ctx.activeTab
   })
 }
@@ -91,7 +98,7 @@ export function searchQuestions(
   ctx: TourContextState,
   scopeMode: 'section' | 'all' = 'section'
 ): GuidedQuestion[] {
-  const norm = query.trim().toLowerCase()
+  const norm = normalizeSearch(query)
   const baseList =
     scopeMode === 'all'
       ? ALL_QUESTIONS.filter((q) => q.roles.includes(ctx.role))
@@ -102,7 +109,7 @@ export function searchQuestions(
     (q) =>
       (scopeMode === 'all' ? true : q.tab === ctx.activeTab || q.id.startsWith('global-')) &&
       q.roles.includes(ctx.role) &&
-      (q.question.toLowerCase().includes(norm) ||
-        q.answer.toLowerCase().includes(norm))
+      (normalizeSearch(q.question).includes(norm) ||
+        normalizeSearch(q.answer).includes(norm))
   )
 }

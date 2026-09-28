@@ -130,6 +130,7 @@ export function AppShell({
             size="icon-sm"
             onClick={() => setMobileOpen(true)}
             aria-label="Abrir menu"
+            data-tour="mobile-navigation-trigger"
             className="text-muted-foreground hover:text-foreground"
           >
             <Menu className="size-5" />

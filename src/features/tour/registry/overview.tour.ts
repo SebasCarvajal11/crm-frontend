@@ -13,8 +13,6 @@ export const overviewTour: CimaTourDefinition = {
       description: 'Muestra tu información de usuario, correo corporativo, rol activo y la fecha de la jornada.',
       actionHint: 'Verifica que tu sesión y rol correspondan con tus actividades de trabajo.',
       side: 'bottom',
-      align: 'start',
-      showPointer: true,
     },
     {
       element: '[data-tour="overview-notifications"]',
@@ -22,8 +20,6 @@ export const overviewTour: CimaTourDefinition = {
       description: 'Alertas prioritarias, menciones y actualizaciones importantes sobre proyectos y tareas.',
       actionHint: 'Pulsa sobre cualquier notificación para consultar su detalle inmediato.',
       side: 'bottom',
-      align: 'center',
-      showPointer: true,
     },
     {
       element: '[data-tour="overview-kpis"]',
@@ -31,8 +27,6 @@ export const overviewTour: CimaTourDefinition = {
       description: 'Métricas consolidadas de proyectos activos, avance de metas y actividad global.',
       actionHint: 'Revisa estos números para evaluar el ritmo operativo y cumplimiento general.',
       side: 'bottom',
-      align: 'center',
-      showPointer: true,
     },
     {
       element: '[data-tour="overview-worker-tasks"]',
@@ -40,8 +34,6 @@ export const overviewTour: CimaTourDefinition = {
       description: 'Listado de tareas asignadas a tu cuenta que requieren entrega o están en progreso.',
       actionHint: 'Pulsa en la tarea o en el acceso al proyecto para abrir el tablero de trabajo.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
       requiredRole: ['worker'],
     },
     {
@@ -50,8 +42,6 @@ export const overviewTour: CimaTourDefinition = {
       description: 'Peticiones de ajuste o alcance solicitadas por los clientes que esperan tu revisión.',
       actionHint: 'Pulsa sobre una solicitud para analizar su impacto y gestionarla de inmediato.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
       requiredRole: ['admin'],
     },
     {
@@ -60,8 +50,6 @@ export const overviewTour: CimaTourDefinition = {
       description: 'Tareas con impedimentos técnicos, cuellos de botella o dependencias pendientes.',
       actionHint: 'Examina el bloqueo para coordinar su resolución con el equipo responsable.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
       requiredRole: ['admin'],
     },
     {
@@ -70,8 +58,6 @@ export const overviewTour: CimaTourDefinition = {
       description: 'Acceso directo a los proyectos con actualizaciones recientes y su porcentaje de avance.',
       actionHint: 'Haz clic en cualquier proyecto para abrir directamente su espacio de trabajo.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
       requiredRole: ['admin'],
     },
     {
@@ -80,8 +66,6 @@ export const overviewTour: CimaTourDefinition = {
       description: 'Nuevas cuentas de clientes registradas en el CRM listas para seguimiento comercial.',
       actionHint: 'Consulta el estado de cada cliente para coordinar el contacto inicial.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
       requiredRole: ['admin'],
     },
     {
@@ -90,8 +74,6 @@ export const overviewTour: CimaTourDefinition = {
       description: 'Monitoreo del volumen de tareas asignadas por colaborador para balancear el esfuerzo.',
       actionHint: 'Identifica colaboradores con disponibilidad para equilibrar nuevas asignaciones.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
       requiredRole: ['admin'],
     },
     {
@@ -100,8 +82,6 @@ export const overviewTour: CimaTourDefinition = {
       description: 'Clasificación de cuentas según su volumen de proyectos y participación en el CRM.',
       actionHint: 'Usa esta métrica para priorizar la atención a las cuentas más estratégicas.',
       side: 'top',
-      align: 'start',
-      showPointer: true,
       requiredRole: ['admin'],
     },
   ],
