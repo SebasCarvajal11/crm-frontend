@@ -58,11 +58,11 @@ export function MarketingPanel({ accessToken }: Props) {
             <>
               Panel de{' '}
               <span className="font-black tracking-tight text-foreground">
-                Marketing & Analítica CIMA
+                Marketing CIMA
               </span>
             </>
           }
-          description="Gestión integral de campañas, flujos de reactivación y métricas de desempeño."
+          description="Clientes por plan, campañas, propuestas, automatizaciones, segmentos e interacciones."
           icon={Megaphone}
         />
       </div>

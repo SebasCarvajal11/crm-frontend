@@ -12,10 +12,11 @@ export function KpiTrendChart({ data, loading }: Props) {
   }
 
   if (!data || data.length === 0) {
-    return <div className="text-center text-sm text-muted-foreground">Sin datos disponibles</div>
+    return <div className="py-10 text-center text-sm text-muted-foreground">Aún no hay períodos consolidados. Use «Consolidar período» en los indicadores del mes.</div>
   }
 
-  const chartData = data.map((kpi) => ({
+  const ordenados = [...data].sort((a, b) => (a.period ?? '').localeCompare(b.period ?? ''))
+  const chartData = ordenados.map((kpi) => ({
     period: kpi.period || (kpi.calculatedAt ? new Date(kpi.calculatedAt).toLocaleDateString() : ''),
     newClients: kpi.newClients,
     closedProjects: kpi.closedProjects,
@@ -28,7 +29,7 @@ export function KpiTrendChart({ data, loading }: Props) {
       <LineChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="period" />
-        <YAxis />
+        <YAxis allowDecimals={false} />
         <Tooltip />
         <Legend />
         <Line type="monotone" dataKey="newClients" stroke="#3b82f6" name="Nuevos Clientes" />

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Megaphone, Plus, Search } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,7 +14,7 @@ import {
   type CreateCampaignInput,
 } from '../api/marketing-api'
 import { listClientsRequest } from '../api/clients-api'
-import { CAMPAIGN_STATUSES, CAMPAIGN_TYPES } from './campaign.constants'
+import { CAMPAIGN_STATUSES, CAMPAIGN_TYPES, clientLabel } from './campaign.constants'
 import { CampaignCard } from './campaign-card'
 import { CampaignFormDialog } from './campaign-form-dialog'
 
@@ -110,7 +110,11 @@ export function CampaignsManager({
   }
 
   const campaigns = campaignsQuery.data || []
-  const clients = clientsQuery.data || []
+  const clients = useMemo(() => clientsQuery.data ?? [], [clientsQuery.data])
+  const clientNames = useMemo(
+    () => new Map(clients.map((cl) => [cl.clientId, clientLabel(cl)])),
+    [clients],
+  )
 
   const filteredCampaigns = campaigns.filter((c) => {
     const matchesSearch =
@@ -229,8 +233,13 @@ export function CampaignsManager({
               <CampaignCard
                 key={c.campaignId}
                 campaign={c}
+                clientName={clientNames.get(c.clientId)}
                 onEdit={handleOpenEdit}
-                onDelete={(id) => deleteMutation.mutate(id)}
+                onDelete={(id) => {
+                  if (confirm(`¿Eliminar la campaña "${c.campaignName}"?`)) {
+                    deleteMutation.mutate(id)
+                  }
+                }}
                 onSelectForWorkflows={onSelectCampaignForWorkflows}
               />
             ))}

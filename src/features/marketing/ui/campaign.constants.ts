@@ -22,5 +22,6 @@ export const CAMPAIGN_STATUSES: {
 ]
 
 export function clientLabel(client: MarketingClient): string {
-  return client.contactInfo || client.additionalInfo || client.clientId
+  // additionalInfo = nombre sincronizado del CRM; contactInfo = correo
+  return client.additionalInfo || client.contactInfo || client.clientId
 }

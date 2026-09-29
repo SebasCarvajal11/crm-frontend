@@ -16,12 +16,18 @@ import {
   getAnalyticsSummaryRequest,
   getCampaignStatusReportRequest,
   getLowStockAlertsRequest,
+  getKpiSnapshotsRequest,
+  getClientPlanDistributionRequest,
   exportCampaignsRequest,
   exportLowStockRequest,
   exportKpisRequest,
   type ExportFormat,
 } from '@/features/analytics/api'
-import { CampaignStatusChart } from '@/features/analytics/ui/charts'
+import {
+  CampaignStatusChart,
+  KpiTrendChart,
+  PlanDistributionChart,
+} from '@/features/analytics/ui/charts'
 import { analyticsKeys } from '@/features/analytics/model'
 import { KpiDashboard } from '@/features/analytics/ui/KpiDashboard'
 import { KpiCard } from './analytics-kpi-card'
@@ -53,14 +59,32 @@ export function DashboardAnalytics({ accessToken }: Props) {
     staleTime: 60_000,
   })
 
+  const snapshotsQuery = useQuery({
+    queryKey: [...analyticsKeys.all, 'snapshots'],
+    queryFn: () => getKpiSnapshotsRequest(accessToken),
+    staleTime: 60_000,
+  })
+
+  const planQuery = useQuery({
+    queryKey: analyticsKeys.planDistribution(),
+    queryFn: () => getClientPlanDistributionRequest(accessToken),
+    staleTime: 60_000,
+  })
+
   const summary = summaryQuery.data
   const isRefreshing =
-    summaryQuery.isFetching || campaignStatusQuery.isFetching || lowStockQuery.isFetching
+    summaryQuery.isFetching ||
+    campaignStatusQuery.isFetching ||
+    lowStockQuery.isFetching ||
+    snapshotsQuery.isFetching ||
+    planQuery.isFetching
 
   function refreshAll() {
     summaryQuery.refetch()
     campaignStatusQuery.refetch()
     lowStockQuery.refetch()
+    snapshotsQuery.refetch()
+    planQuery.refetch()
   }
 
   // ── Exportaciones ──────────────────────────────────────────────────────
@@ -196,46 +220,68 @@ export function DashboardAnalytics({ accessToken }: Props) {
         />
       </div>
 
-      {/* Exportar historial de KPIs (no hay gráfico todavía, solo descarga) */}
-      <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`rounded-lg ${ACCENT_STYLES.indigo.iconBg} p-2.5 ${ACCENT_STYLES.indigo.iconText}`}>
-            <Activity className="size-5" />
+      {/* Historial de KPIs: tendencia de los períodos consolidados */}
+      <div className="rounded-lg border bg-card p-6 shadow-sm">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`rounded-lg ${ACCENT_STYLES.indigo.iconBg} p-2.5 ${ACCENT_STYLES.indigo.iconText}`}>
+              <Activity className="size-5" />
+            </div>
+            <div>
+              <p className="font-semibold">Historial de KPIs</p>
+              <p className="text-xs text-muted-foreground">
+                Evolución mensual de los períodos consolidados ({summary?.totalKpiSnapshots ?? 0})
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-semibold">Historial de KPIs</p>
-            <p className="text-xs text-muted-foreground">
-              {summary?.totalKpiSnapshots ?? 0} snapshot(s) calculados
-            </p>
-          </div>
+          <ExportButtons
+            label="KPIs"
+            onExport={(format) => kpisExport.mutate(format)}
+            isPending={kpisExport.isPending}
+            pendingFormat={kpisFormat}
+          />
         </div>
-        <ExportButtons
-          label="KPIs"
-          onExport={(format) => kpisExport.mutate(format)}
-          isPending={kpisExport.isPending}
-          pendingFormat={kpisFormat}
-        />
+        {snapshotsQuery.isError ? (
+          <p className="text-sm text-destructive">Error al cargar el historial de KPIs.</p>
+        ) : (
+          <KpiTrendChart data={snapshotsQuery.data ?? []} loading={snapshotsQuery.isLoading} />
+        )}
       </div>
 
-      {/* Gráfico de Estado de Campañas */}
-      <div data-tour="analytics-campaign-chart" className="rounded-lg border bg-card p-6 shadow-sm">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <h3 className="font-semibold">Estado de Campañas</h3>
-          <ExportButtons
-            label="campañas"
-            onExport={(format) => campaignsExport.mutate(format)}
-            isPending={campaignsExport.isPending}
-            pendingFormat={campaignsFormat}
-          />
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Gráfico de Estado de Campañas */}
+        <div data-tour="analytics-campaign-chart" className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-semibold">Estado de Campañas</h3>
+            <ExportButtons
+              label="campañas"
+              onExport={(format) => campaignsExport.mutate(format)}
+              isPending={campaignsExport.isPending}
+              pendingFormat={campaignsFormat}
+            />
+          </div>
+          {campaignStatusQuery.isError ? (
+            <p className="text-sm text-destructive">Error al cargar el estado de campañas.</p>
+          ) : (
+            <CampaignStatusChart
+              data={campaignStatusQuery.data ?? []}
+              loading={campaignStatusQuery.isLoading}
+            />
+          )}
         </div>
-        {campaignStatusQuery.isError ? (
-          <p className="text-sm text-destructive">Error al cargar el estado de campañas.</p>
-        ) : (
-          <CampaignStatusChart
-            data={campaignStatusQuery.data ?? []}
-            loading={campaignStatusQuery.isLoading}
-          />
-        )}
+
+        {/* Distribución de clientes por plan comercial */}
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="mb-4">
+            <h3 className="font-semibold">Clientes por plan</h3>
+            <p className="text-xs text-muted-foreground">Platinum, Oro y Diamante</p>
+          </div>
+          {planQuery.isError ? (
+            <p className="text-sm text-destructive">Error al cargar la distribución por plan.</p>
+          ) : (
+            <PlanDistributionChart data={planQuery.data ?? []} loading={planQuery.isLoading} />
+          )}
+        </div>
       </div>
 
       {/* Alertas de Stock */}

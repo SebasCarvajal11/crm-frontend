@@ -6,7 +6,13 @@ interface Props {
   loading?: boolean
 }
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
+// Colores por plan comercial de CIMA; el resto (p. ej. sin plan) en gris.
+const PLAN_COLORS: Record<string, string> = {
+  Platinum: '#64748b',
+  Oro: '#f59e0b',
+  Diamante: '#0ea5e9',
+}
+const COLORS = ['#3b82f6', '#10b981', '#8b5cf6', '#ef4444']
 
 export function PlanDistributionChart({ data, loading }: Props) {
   if (loading) {
@@ -14,7 +20,7 @@ export function PlanDistributionChart({ data, loading }: Props) {
   }
 
   if (!data || data.length === 0) {
-    return <div className="text-center text-sm text-muted-foreground">Sin datos disponibles</div>
+    return <div className="py-10 text-center text-sm text-muted-foreground">Aún no hay clientes con plan. Asígnelos en Marketing → Clientes.</div>
   }
 
   return (
@@ -29,8 +35,8 @@ export function PlanDistributionChart({ data, loading }: Props) {
           outerRadius={100}
           label
         >
-          {data.map((_, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          {data.map((d, index) => (
+            <Cell key={`cell-${index}`} fill={PLAN_COLORS[d.plan] ?? (d.plan ? COLORS[index % COLORS.length] : '#cbd5e1')} />
           ))}
         </Pie>
         <Tooltip formatter={(value) => `${value} clientes`} />

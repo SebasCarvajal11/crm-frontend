@@ -8,6 +8,7 @@ interface SegmentSchedulerCardProps {
   isPending: boolean
   activeWorkflowsCount: number
   onRunScheduler: () => void
+  clientName?: (clientId: string) => string
 }
 
 export function SegmentSchedulerCard({
@@ -15,6 +16,7 @@ export function SegmentSchedulerCard({
   isPending,
   activeWorkflowsCount,
   onRunScheduler,
+  clientName,
 }: SegmentSchedulerCardProps) {
   return (
     <Card className="border-l-4 border-l-primary">
@@ -72,13 +74,13 @@ export function SegmentSchedulerCard({
                       >
                         <div className="flex items-center gap-2 font-medium">
                           <Mail className="h-3.5 w-3.5 text-primary" />
-                          Cliente {ex.clientId?.slice(0, 13)}…
+                          {ex.clientId ? (clientName?.(ex.clientId) ?? 'Cliente') : 'Cliente'}
                           <span
                             className={
                               ex.result === 'success' ? 'text-emerald-700' : 'text-destructive'
                             }
                           >
-                            · {ex.result}
+                            · {ex.result === 'success' ? 'Enviado' : 'Fallido'}
                           </span>
                         </div>
                         {ex.sentMessage && (

@@ -16,6 +16,13 @@ const STATUS_COLORS: Record<string, string> = {
   Cancelled: '#ef4444',
 }
 const DEFAULT_COLOR = '#3b82f6'
+const STATUS_LABELS: Record<string, string> = {
+  Draft: 'Borrador',
+  Active: 'Activa',
+  Paused: 'Pausada',
+  Completed: 'Completada',
+  Cancelled: 'Cancelada',
+}
 
 export function CampaignStatusChart({ data, loading }: Props) {
   if (loading) {
@@ -26,11 +33,13 @@ export function CampaignStatusChart({ data, loading }: Props) {
     return <div className="text-center text-sm text-muted-foreground">Sin datos disponibles</div>
   }
 
+  const rows = data.map((d) => ({ ...d, label: STATUS_LABELS[d.status] ?? d.status }))
+
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={data}>
+      <BarChart data={rows}>
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
-        <XAxis dataKey="status" />
+        <XAxis dataKey="label" />
         <YAxis allowDecimals={false} />
         <Tooltip
           formatter={(value): [string, string] => {
@@ -41,7 +50,7 @@ export function CampaignStatusChart({ data, loading }: Props) {
         />
         <Legend />
         <Bar dataKey="campaignCount" name="Campañas" radius={[4, 4, 0, 0]}>
-          {data.map((entry) => (
+          {rows.map((entry) => (
             <Cell key={entry.status} fill={STATUS_COLORS[entry.status] ?? DEFAULT_COLOR} />
           ))}
         </Bar>

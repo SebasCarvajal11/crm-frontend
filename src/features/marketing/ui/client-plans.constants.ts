@@ -27,5 +27,6 @@ export function planMeta(plan?: string | null) {
 }
 
 export function clientLabel(client: MarketingClient) {
-  return client.contactInfo || client.additionalInfo || client.clientId
+  // additionalInfo = nombre sincronizado del CRM; contactInfo = correo
+  return client.additionalInfo || client.contactInfo || client.clientId
 }

@@ -17,10 +17,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { Campaign } from '../api/marketing-api'
-import { CAMPAIGN_STATUSES } from './campaign.constants'
+import { CAMPAIGN_STATUSES, CAMPAIGN_TYPES } from './campaign.constants'
+
+function fechaCorta(iso?: string | null): string {
+  if (!iso) return ''
+  const [y, m, d] = iso.split('T')[0].split('-').map(Number)
+  if (!y || !m || !d) return iso
+  return new Date(y, m - 1, d).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })
+}
 
 interface CampaignCardProps {
   campaign: Campaign
+  clientName?: string
   onEdit: (c: Campaign) => void
   onDelete: (id: number) => void
   onSelectForWorkflows?: (campaignId: number) => void
@@ -28,11 +36,13 @@ interface CampaignCardProps {
 
 export function CampaignCard({
   campaign: c,
+  clientName,
   onEdit,
   onDelete,
   onSelectForWorkflows,
 }: CampaignCardProps) {
   const statusMeta = CAMPAIGN_STATUSES.find((s) => s.value === c.status)
+  const typeLabel = CAMPAIGN_TYPES.find((t) => t.value === c.campaignType)?.label ?? c.campaignType
 
   return (
     <Card className="flex flex-col justify-between overflow-hidden interactive-card">
@@ -69,14 +79,14 @@ export function CampaignCard({
           </div>
 
           <CardDescription className="text-xs">
-            Cliente: {c.clientId ? c.clientId.slice(0, 12) + '…' : 'General'}
+            Cliente: {c.clientId ? (clientName ?? 'Cliente del CRM') : 'General'}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-2.5 text-xs">
           <div className="flex items-center gap-1.5 text-muted-foreground">
             <Tag className="size-3 text-primary shrink-0" />
-            <span>Tipo: {c.campaignType}</span>
+            <span>Tipo: {typeLabel}</span>
           </div>
 
           {c.objective && (
@@ -97,7 +107,7 @@ export function CampaignCard({
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Calendar className="size-3 text-zinc-500 shrink-0" />
               <span>
-                {c.startDate} {c.endDate ? `hasta ${c.endDate}` : '(En curso)'}
+                {fechaCorta(c.startDate)} {c.endDate ? `hasta ${fechaCorta(c.endDate)}` : '(En curso)'}
               </span>
             </div>
           </div>
@@ -105,7 +115,7 @@ export function CampaignCard({
       </div>
 
       <div className="border-t bg-muted/10 p-3 px-4 flex items-center justify-between">
-        <span className="text-[10px] text-muted-foreground">ID #{c.campaignId}</span>
+        <span className="text-[10px] text-muted-foreground">Campaña #{c.campaignId}</span>
         {onSelectForWorkflows && (
           <Button
             variant="ghost"

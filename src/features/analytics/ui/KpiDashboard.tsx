@@ -21,7 +21,7 @@ export function KpiDashboard({ accessToken }: KpiDashboardProps) {
   const queryClient = useQueryClient()
   const periodos = useMemo(() => ultimosPeriodos(12), [])
 
-  const [period, setPeriod] = useState<string>('')
+  const [period, setPeriod] = useState<string>(() => ultimosPeriodos(1)[0]?.value ?? '')
   const [aviso, setAviso] = useState<string | null>(null)
 
   const kpisQuery = useQuery({

@@ -17,6 +17,7 @@ interface WorkflowExecutionsDialogProps {
   executions: WorkflowExecution[]
   isLoading: boolean
   onClose: () => void
+  clientName?: (clientId: string) => string
 }
 
 export function WorkflowExecutionsDialog({
@@ -24,6 +25,7 @@ export function WorkflowExecutionsDialog({
   executions,
   isLoading,
   onClose,
+  clientName,
 }: WorkflowExecutionsDialogProps) {
   return (
     <Dialog open={workflow !== null} onOpenChange={(open) => !open && onClose()}>
@@ -54,13 +56,13 @@ export function WorkflowExecutionsDialog({
                 <div key={ex.executionId} className="py-2.5 space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-foreground">
-                      Cliente ID: {ex.clientId || 'Global'}
+                      {ex.clientId ? (clientName?.(ex.clientId) ?? 'Cliente') : 'Todos los clientes'}
                     </span>
                     <Badge
                       variant={ex.result === 'success' ? 'default' : 'destructive'}
                       className="text-[10px] uppercase font-bold"
                     >
-                      {ex.result}
+                      {ex.result === 'success' ? 'Enviado' : 'Fallido'}
                     </Badge>
                   </div>
                   {ex.sentMessage && (
@@ -70,7 +72,7 @@ export function WorkflowExecutionsDialog({
                   )}
                   <p className="text-[10px] text-muted-foreground flex items-center gap-1">
                     <Clock className="size-2.5" />
-                    {new Date(ex.executedAt).toLocaleString()}
+                    {new Date(ex.executedAt).toLocaleString('es-CO')}
                   </p>
                 </div>
               ))}

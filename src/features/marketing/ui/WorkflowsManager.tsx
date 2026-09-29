@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AlertCircle, CheckCircle2, Layers, Plus, Zap } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -16,6 +16,8 @@ import {
   type Workflow,
   type CreateWorkflowInput,
 } from '../api/marketing-api'
+import { listClientsRequest } from '../api/clients-api'
+import { clientLabel } from './client-plans.constants'
 import { WorkflowCard } from './workflow-card'
 import { WorkflowFormDialog } from './workflow-form-dialog'
 import { WorkflowExecutionsDialog } from './workflow-executions-dialog'
@@ -62,6 +64,15 @@ export function WorkflowsManager({
     queryKey: ['marketing', 'campaigns', accessToken],
     queryFn: () => listCampaignsRequest(accessToken),
   })
+
+  const clientsQuery = useQuery({
+    queryKey: ['marketing', 'clients', accessToken],
+    queryFn: () => listClientsRequest(accessToken),
+  })
+  const clientNames = useMemo(
+    () => new Map((clientsQuery.data ?? []).map((c) => [c.clientId, clientLabel(c)])),
+    [clientsQuery.data],
+  )
 
   const executionsQuery = useQuery({
     queryKey: ['marketing', 'executions', executionHistoryWorkflow?.workflowId],
@@ -123,7 +134,16 @@ export function WorkflowsManager({
   }
 
   const workflows = workflowsQuery.data || []
-  const campaigns = campaignsQuery.data || []
+  const campaigns = useMemo(() => campaignsQuery.data ?? [], [campaignsQuery.data])
+  const sinCampanas = !campaignsQuery.isLoading && campaigns.length === 0
+
+  // "Automatizar" desde una campaña abre directamente el formulario con esa campaña.
+  const [lastPreselected, setLastPreselected] = useState<number | null | undefined>(null)
+  if (preselectedCampaignId && preselectedCampaignId !== lastPreselected) {
+    setLastPreselected(preselectedCampaignId)
+    setFormData({ ...INITIAL_FORM_DATA, campaignId: preselectedCampaignId })
+    setIsCreateOpen(true)
+  }
 
   return (
     <div className="space-y-6">
@@ -147,6 +167,8 @@ export function WorkflowsManager({
             })
             setIsCreateOpen(true)
           }}
+          disabled={sinCampanas}
+          title={sinCampanas ? 'Cree primero una campaña' : undefined}
           className="gap-2 font-semibold shadow-sm"
         >
           <Plus className="size-4" />
@@ -190,7 +212,9 @@ export function WorkflowsManager({
           <CardContent className="space-y-3">
             <Layers className="mx-auto size-8 text-muted-foreground/40" />
             <p className="text-sm font-semibold text-muted-foreground">
-              No tienes flujos de marketing configurados.
+              {sinCampanas
+                ? 'Cree primero una campaña: cada automatización pertenece a una campaña.'
+                : 'No tienes flujos de marketing configurados.'}
             </p>
             <Button
               variant="outline"
@@ -202,6 +226,7 @@ export function WorkflowsManager({
                 })
                 setIsCreateOpen(true)
               }}
+              disabled={sinCampanas}
               className="gap-1.5 text-xs"
             >
               <Plus className="size-3.5" />
@@ -249,6 +274,7 @@ export function WorkflowsManager({
         executions={executionsQuery.data || []}
         isLoading={executionsQuery.isLoading}
         onClose={() => setExecutionHistoryWorkflow(null)}
+        clientName={(id) => clientNames.get(id) ?? 'Cliente'}
       />
     </div>
   )
