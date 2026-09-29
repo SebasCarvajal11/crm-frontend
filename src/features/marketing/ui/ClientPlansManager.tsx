@@ -77,7 +77,7 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
   const sinPlan = useMemo(() => clients.filter((c) => !c.plan), [clients])
 
   const conteoPorPlan = useMemo(() => {
-    const mapa: Record<string, number> = { Oro: 0, Esmeralda: 0, Premium: 0 }
+    const mapa = Object.fromEntries(PLANS.map((p) => [p.value, 0])) as Record<string, number>
     clients.forEach((c) => {
       if (c.plan && mapa[c.plan] !== undefined) mapa[c.plan] += 1
     })

@@ -3,7 +3,8 @@ import { bearer } from '@/shared/lib/bearer'
 import { MARKETING_ROUTES } from '@/shared/lib/gateway-routes'
 import type { MarketingClient } from './proposals-api'
 
-export type ClientPlan = 'Oro' | 'Esmeralda' | 'Premium'
+export const CLIENT_PLANS = ['Platinum', 'Oro', 'Diamante'] as const
+export type ClientPlan = (typeof CLIENT_PLANS)[number]
 
 export type { MarketingClient }
 

@@ -26,7 +26,7 @@ export const marketingTour: CimaTourDefinition = {
       switchMarketingTab: 'clients',
       fallbackElement: '[data-tour="marketing-tabs"]',
       title: 'Clasificación de Clientes y Planes',
-      description: 'Supervisa la cartera clasificada en planes Oro, Esmeralda y Premium para priorizar la atención.',
+      description: 'Supervisa la cartera clasificada en planes Platinum, Oro y Diamante para priorizar la atención.',
       actionHint: 'Examina la distribución y el porcentaje de clientes en cada plan.',
       side: 'bottom',
     },
@@ -122,7 +122,7 @@ export const marketingQuestions: GuidedQuestion[] = [
   {
     id: 'mkt-q5',
     question: '¿Dónde consulto la distribución de planes de mi cartera?',
-    answer: 'En la sección Clientes encontrarás las tarjetas resumen de planes Oro, Esmeralda, Premium y los pendientes de clasificar.',
+    answer: 'En la sección Clientes encontrarás las tarjetas resumen de planes Platinum, Oro, Diamante y los pendientes de clasificar.',
     tab: 'marketing',
     roles: ['admin', 'worker'],
     category: 'gestion',
