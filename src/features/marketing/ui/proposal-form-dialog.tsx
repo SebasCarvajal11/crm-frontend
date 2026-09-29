@@ -51,7 +51,7 @@ export function ProposalFormDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
+        <div className="space-y-4 px-5 py-4 sm:px-6">
           <div className="space-y-2">
             <Label htmlFor="clientId">Cliente</Label>
             <select

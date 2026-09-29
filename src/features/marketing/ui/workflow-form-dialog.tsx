@@ -52,7 +52,7 @@ export function WorkflowFormDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3 text-xs">
+          <div className="space-y-3 px-5 py-4 text-xs sm:px-6">
             <div>
               <Label htmlFor="wfName" className="text-xs font-semibold">
                 Nombre del Flujo *

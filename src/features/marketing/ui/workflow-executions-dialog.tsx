@@ -40,7 +40,7 @@ export function WorkflowExecutionsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3 pt-2">
+        <div className="space-y-3 px-5 py-4 sm:px-6">
           {isLoading ? (
             <div className="space-y-2">
               <Skeleton className="h-14 w-full" />

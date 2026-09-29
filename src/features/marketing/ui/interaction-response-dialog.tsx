@@ -32,7 +32,7 @@ function FormFields({
   formError,
 }: FormFieldsProps) {
   return (
-    <div className="space-y-4 py-2">
+    <div className="space-y-4 px-5 py-4 sm:px-6">
       <div className="rounded-md bg-muted/50 p-3 text-sm">
         <p className="font-medium">{clientLabel}</p>
         <p className="text-xs text-muted-foreground">
