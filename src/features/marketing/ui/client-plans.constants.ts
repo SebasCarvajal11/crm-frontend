@@ -3,22 +3,22 @@ import type { ClientPlan, MarketingClient } from '../api/clients-api'
 
 export const PLANS: { value: ClientPlan; label: string; icon: typeof Crown; chip: string }[] = [
   {
+    value: 'Platinum',
+    label: 'Platinum',
+    icon: Gem,
+    chip: 'bg-slate-50 text-slate-800 border-slate-300',
+  },
+  {
     value: 'Oro',
     label: 'Oro',
     icon: Crown,
     chip: 'bg-amber-50 text-amber-800 border-amber-300',
   },
   {
-    value: 'Esmeralda',
-    label: 'Esmeralda',
-    icon: Gem,
-    chip: 'bg-emerald-50 text-emerald-800 border-emerald-300',
-  },
-  {
-    value: 'Premium',
-    label: 'Premium',
+    value: 'Diamante',
+    label: 'Diamante',
     icon: Sparkles,
-    chip: 'bg-violet-50 text-violet-800 border-violet-300',
+    chip: 'bg-sky-50 text-sky-800 border-sky-300',
   },
 ]
 

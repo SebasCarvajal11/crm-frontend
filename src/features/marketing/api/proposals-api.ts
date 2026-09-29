@@ -1,6 +1,7 @@
 import { api } from '@/shared/lib'
 import { bearer } from '@/shared/lib/bearer'
 import { MARKETING_ROUTES } from '@/shared/lib/gateway-routes'
+import type { ClientPlan } from './clients-api'
 
 export type ProposalStatus =
   | 'In_diagnosis'
@@ -39,7 +40,7 @@ export interface MarketingClient {
   contactInfo?: string | null
   address?: string | null
   additionalInfo?: string | null
-  plan?: 'Oro' | 'Esmeralda' | 'Premium' | null
+  plan?: ClientPlan | null
   createdAt?: string
   updatedAt?: string
 }

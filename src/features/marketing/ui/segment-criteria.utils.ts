@@ -1,6 +1,6 @@
 import type { SegmentCriteria } from '../api/segments-api'
 
-export const PLANES = ['Oro', 'Esmeralda', 'Premium'] as const
+export { CLIENT_PLANS as PLANES } from '../api/clients-api'
 
 export const ESTADOS_PROPUESTA = [
   { value: 'Sent', label: 'Enviada' },
