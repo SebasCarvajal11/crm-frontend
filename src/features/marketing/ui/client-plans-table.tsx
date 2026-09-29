@@ -17,7 +17,7 @@ export function ClientPlansTable({ clients, isBusy, onAssignPlan }: ClientPlansT
             <thead className="border-b bg-muted/40">
               <tr className="text-left">
                 <th className="px-4 py-3 font-semibold">Cliente</th>
-                <th className="px-4 py-3 font-semibold">Identificador</th>
+                <th className="px-4 py-3 font-semibold">Correo</th>
                 <th className="px-4 py-3 font-semibold">Plan actual</th>
                 <th className="px-4 py-3 text-right font-semibold">Asignar plan</th>
               </tr>
@@ -32,8 +32,8 @@ export function ClientPlansTable({ clients, isBusy, onAssignPlan }: ClientPlansT
                     className="border-b last:border-0 hover:bg-muted/30"
                   >
                     <td className="px-4 py-3 font-medium">{clientLabel(client)}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                      {client.clientId.slice(0, 13)}…
+                    <td className="px-4 py-3 text-xs text-muted-foreground">
+                      {client.contactInfo || '—'}
                     </td>
                     <td className="px-4 py-3">
                       {meta && Icon ? (

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Filter, XCircle } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,6 +15,8 @@ import {
   type SchedulerRunResult,
 } from '../api/segments-api'
 import { listWorkflowsRequest } from '../api/marketing-api'
+import { listClientsRequest } from '../api/clients-api'
+import { clientLabel } from './client-plans.constants'
 import { SegmentSchedulerCard } from './segment-scheduler-card'
 import { SegmentPreviewCard } from './segment-preview-card'
 import { TriEstado } from './tri-estado'
@@ -37,6 +39,15 @@ export function SegmentsManager({ accessToken }: SegmentsManagerProps) {
   const [selectedWorkflow, setSelectedWorkflow] = useState<string>('')
   const [schedulerResult, setSchedulerResult] = useState<SchedulerRunResult | null>(null)
   const [mensaje, setMensaje] = useState<string | null>(null)
+
+  const clientsQuery = useQuery({
+    queryKey: ['marketing', 'clients', accessToken],
+    queryFn: () => listClientsRequest(accessToken),
+  })
+  const clientNames = useMemo(
+    () => new Map((clientsQuery.data ?? []).map((c) => [c.clientId, clientLabel(c)])),
+    [clientsQuery.data],
+  )
 
   const workflowsQuery = useQuery({
     queryKey: ['marketing', 'workflows'],
@@ -111,6 +122,7 @@ export function SegmentsManager({ accessToken }: SegmentsManagerProps) {
         isPending={schedulerMutation.isPending}
         activeWorkflowsCount={activos.length}
         onRunScheduler={() => schedulerMutation.mutate()}
+        clientName={(id) => clientNames.get(id) ?? 'Cliente'}
       />
 
       <div className="grid gap-6 lg:grid-cols-3">

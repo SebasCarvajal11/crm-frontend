@@ -62,7 +62,7 @@ export function InteractionsManager({ accessToken }: InteractionsManagerProps) {
   const clientLabel = useMemo(() => {
     const mapa = new Map<string, string>()
     clients.forEach((c) =>
-      mapa.set(c.clientId, c.contactInfo || c.additionalInfo || `${c.clientId.slice(0, 8)}…`)
+      mapa.set(c.clientId, c.additionalInfo || c.contactInfo || `${c.clientId.slice(0, 8)}…`)
     )
     return (clientId: string) => mapa.get(clientId) ?? `${clientId.slice(0, 8)}…`
   }, [clients])
