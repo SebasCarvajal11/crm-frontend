@@ -92,7 +92,7 @@ function AccountContextStats({ role }: { role: string }) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-      <div className="rounded-lg border bg-card/40 p-2.5 transition-colors">
+      <div className="border-l-2 border-primary/40 px-3 py-1">
         <div className="flex items-center gap-1.5">
           <KeyRound className="size-3.5 text-primary shrink-0" />
           <p className="text-[11px] font-semibold text-foreground">Nivel de Acceso</p>
@@ -101,7 +101,7 @@ function AccountContextStats({ role }: { role: string }) {
         <p className="text-[11px] text-muted-foreground truncate">{roleDesc}</p>
       </div>
 
-      <div className="rounded-lg border bg-card/40 p-2.5 transition-colors">
+      <div className="border-l-2 border-primary/40 px-3 py-1">
         <div className="flex items-center gap-1.5">
           <Lock className="size-3.5 text-emerald-500 shrink-0" />
           <p className="text-[11px] font-semibold text-foreground">Seguridad de Sesión</p>
@@ -144,7 +144,7 @@ export function OverviewIdentityCard({ identity, avatarUrl, onOpenProfile }: Pro
   const displayName = fullName || identity.email.split('@')[0]
 
   return (
-    <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between min-w-0 w-full max-w-full overflow-hidden">
+    <Card className="overview-panel overview-panel-identity h-full flex flex-col justify-between min-w-0 w-full max-w-full overflow-hidden">
       <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
         <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-2">
@@ -164,7 +164,7 @@ export function OverviewIdentityCard({ identity, avatarUrl, onOpenProfile }: Pro
         </Badge>
       </CardHeader>
       <CardContent className="flex flex-col flex-1 justify-between gap-3 pt-1">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg border bg-card/60 p-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/70 pb-4">
           <div className="flex items-center gap-3.5 min-w-0">
             <UserAvatar avatarUrl={avatarUrl} onOpenProfile={onOpenProfile} />
             <div className="min-w-0 space-y-1">

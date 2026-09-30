@@ -44,7 +44,7 @@ export function OverviewAdminRecentProjectsSection({
   onOpenProject,
 }: Props) {
   return (
-    <Card className="shadow-sm border border-border/80 min-w-0 w-full max-w-full overflow-hidden">
+    <Card className="overview-panel min-w-0 w-full max-w-full overflow-hidden">
       <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
         <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-2">
@@ -77,7 +77,7 @@ export function OverviewAdminRecentProjectsSection({
               return (
                 <div
                   key={project.id}
-                  className="group rounded-lg border bg-card/60 p-3.5 interactive-card hover:bg-muted/40 min-w-0 w-full max-w-full overflow-hidden"
+                  className="overview-row group p-3.5 min-w-0 w-full max-w-full overflow-hidden"
                 >
                   <div className="flex items-start justify-between gap-2 min-w-0 w-full">
                     <div className="min-w-0 flex-1 space-y-0.5 overflow-hidden">

@@ -2,6 +2,7 @@ import type { MeResponse } from '@/features/auth/model'
 import { CimaLogo } from '@/components/ui/cima-logo'
 import type { ProjectListItem } from '@/features/collab/model'
 import type { WorkspaceTab } from '@/pages/dashboard/use-dashboard-navigation'
+import '@/features/overview/ui/overview.css'
 import {
   useOverviewCollab,
   useOverviewMarketing,
@@ -87,7 +88,7 @@ export function DashboardOverview({
   const recentClientsQ = useOverviewRecentClients(accessToken, isAdmin)
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-x-clip min-w-0">
+    <div className="overview-stage space-y-8 w-full max-w-full overflow-x-clip min-w-0">
       <div className="space-y-1 animate-fade-up min-w-0">
         <p className="text-2xl font-medium text-muted-foreground sm:text-3xl">
           Hola <span className="font-black text-primary">{firstName}</span>
@@ -98,7 +99,7 @@ export function DashboardOverview({
         </p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2 animate-fade-up stagger-1 min-w-0 w-full max-w-full">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] animate-fade-up stagger-1 min-w-0 w-full max-w-full">
         <div data-tour="overview-identity" className="min-w-0 w-full max-w-full">
           <OverviewIdentityCard
             identity={identity}
@@ -133,7 +134,7 @@ export function DashboardOverview({
       )}
 
       {isAdmin && (
-        <div className="space-y-6 animate-fade-up stagger-3 min-w-0 w-full max-w-full">
+        <div className="space-y-8 animate-fade-up stagger-3 min-w-0 w-full max-w-full">
           <div data-tour="overview-admin-changes" className="min-w-0 w-full max-w-full">
             <OverviewAdminPendingChangeRequestsSection
               items={adminPendingChangeRequests}
@@ -150,7 +151,7 @@ export function DashboardOverview({
             />
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2 min-w-0 w-full max-w-full">
+          <div className="grid gap-6 xl:grid-cols-2 min-w-0 w-full max-w-full">
             <div data-tour="overview-recent-projects" className="min-w-0 w-full max-w-full">
               <OverviewAdminRecentProjectsSection
                 projects={adminRecentProjects}
@@ -166,7 +167,7 @@ export function DashboardOverview({
             </div>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2 min-w-0 w-full max-w-full">
+          <div className="grid gap-6 xl:grid-cols-2 min-w-0 w-full max-w-full">
             <div data-tour="overview-admin-workload" className="min-w-0 w-full max-w-full">
               <OverviewAdminWorkloadSection
                 workload={adminWorkerWorkload}

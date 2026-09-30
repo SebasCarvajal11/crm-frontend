@@ -25,7 +25,7 @@ export function OverviewAdminClientRankingSection({ items, isLoading }: Props) {
   }, [items, currentPage])
 
   return (
-    <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between min-w-0 w-full max-w-full overflow-hidden">
+    <Card className="overview-panel h-full flex flex-col justify-between min-w-0 w-full max-w-full overflow-hidden">
       <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
         <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-2">

@@ -1,11 +1,4 @@
-import {
-  Activity,
-  Briefcase,
-  Megaphone,
-  TrendingUp,
-  UserPlus,
-  Users,
-} from 'lucide-react'
+import { Activity, Briefcase, Megaphone, TrendingUp, UserPlus, Users } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { OverviewMarketingMetrics } from '../model/overview.types'
@@ -20,7 +13,6 @@ type KpiCardConfig = {
   value: string | number
   subtext?: string
   icon: typeof Users
-  accentColor: string
 }
 
 export function OverviewMarketingKpisSection({ metrics, isLoading }: Props) {
@@ -30,47 +22,41 @@ export function OverviewMarketingKpisSection({ metrics, isLoading }: Props) {
       value: metrics.totalClients,
       subtext: 'Registrados en la plataforma',
       icon: Users,
-      accentColor: 'text-blue-500 bg-blue-500/10',
     },
     {
       label: 'Nuevos Clientes',
       value: metrics.newClients,
       subtext: 'Último ciclo comercial',
       icon: UserPlus,
-      accentColor: 'text-emerald-500 bg-emerald-500/10',
     },
     {
       label: 'Campañas Activas',
       value: metrics.activeCampaigns,
       subtext: 'Estrategias en ejecución',
       icon: Megaphone,
-      accentColor: 'text-violet-500 bg-violet-500/10',
     },
     {
       label: 'Proyectos Activos',
       value: metrics.projectsInProgress,
       subtext: `De ${metrics.totalProjects} proyectos totales`,
       icon: Briefcase,
-      accentColor: 'text-amber-500 bg-amber-500/10',
     },
     {
       label: 'Interacciones',
       value: metrics.totalInteractions,
       subtext: 'Contactos y seguimiento',
       icon: Activity,
-      accentColor: 'text-cyan-500 bg-cyan-500/10',
     },
     {
       label: 'Tasa de Respuesta',
       value: `${metrics.responseRate}%`,
       subtext: 'Efectividad en clientes',
       icon: TrendingUp,
-      accentColor: 'text-rose-500 bg-rose-500/10',
     },
   ]
 
   return (
-    <Card className="shadow-sm border border-border/80 min-w-0 w-full max-w-full overflow-hidden">
+    <Card className="overview-panel overview-panel-kpis min-w-0 w-full max-w-full overflow-hidden">
       <CardHeader className="pb-3 min-w-0 w-full">
         <div className="flex items-center gap-2">
           <TrendingUp className="size-4 text-primary shrink-0" />
@@ -84,34 +70,34 @@ export function OverviewMarketingKpisSection({ metrics, isLoading }: Props) {
       </CardHeader>
       <CardContent className="min-w-0 w-full max-w-full overflow-hidden">
         {isLoading ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="overview-kpi-grid">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-24 w-full rounded-lg" />
+              <Skeleton key={i} className="h-28 w-full rounded-md" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="overview-kpi-grid">
             {items.map((item) => {
               const Icon = item.icon
               return (
                 <div
                   key={item.label}
-                  className="flex flex-col justify-between rounded-lg border bg-card/60 p-3 shadow-xs interactive-card hover:bg-muted/40"
+                  className="overview-kpi flex min-w-0 flex-col justify-between gap-5 p-4 sm:p-5"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-medium text-muted-foreground truncate">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-xs font-semibold leading-snug text-muted-foreground">
                       {item.label}
                     </span>
-                    <div className={`flex size-6 items-center justify-center rounded-md ${item.accentColor}`}>
-                      <Icon className="size-3.5" />
+                    <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <Icon className="size-4" aria-hidden="true" />
                     </div>
                   </div>
-                  <div className="mt-2">
-                    <p className="text-xl font-bold tracking-tight text-foreground">
+                  <div>
+                    <p className="text-3xl font-bold tracking-tight text-foreground tabular-nums">
                       {item.value}
                     </p>
                     {item.subtext && (
-                      <p className="mt-0.5 text-[10px] text-muted-foreground truncate">
+                      <p className="mt-1 text-xs leading-snug text-muted-foreground">
                         {item.subtext}
                       </p>
                     )}

@@ -55,8 +55,7 @@ function PendingChangeCard({
   return (
     <div
       className={[
-        'flex flex-col justify-between gap-3 rounded-lg border border-amber-200/50',
-        'bg-card/90 p-3.5 interactive-card hover:border-amber-300 hover:bg-muted/30',
+        'overview-row flex flex-col justify-between gap-3 p-3.5',
         'sm:flex-row sm:items-center',
       ].join(' ')}
     >
@@ -108,7 +107,7 @@ export function OverviewAdminPendingChangeRequestsSection({
   onOpenProject,
 }: Props) {
   return (
-    <Card className="shadow-sm border border-amber-200/60 bg-amber-500/[0.02] dark:border-amber-900/50 min-w-0 w-full max-w-full overflow-hidden">
+    <Card className="overview-panel overview-panel-attention min-w-0 w-full max-w-full overflow-hidden">
       <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
         <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">

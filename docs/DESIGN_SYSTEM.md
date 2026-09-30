@@ -85,3 +85,22 @@ Los componentes nunca deben utilizar colores hexadecimales fijos (*hardcoded*). 
 2. **Zoom y Accesibilidad (`--app-zoom`)**: El hook `useAccessibilityZoom` ajusta la variable `--app-zoom` a nivel de raíz, permitiendo a usuarios con dificultades visuales escalar la interfaz sin romper la maquetación.
 3. **Soporte de Modo Oscuro**: Declarado con `@custom-variant dark (&:is(.dark *))`, intercambiando automáticamente los tokens semánticos a gamas oscuras de bajo brillo.
 4. **Iconografía**: Conjunto estandarizado de iconos vectoriales mediante **Lucide React**, respetando tamaños consistentes de `16px` (inputs/botones compactos) y `20px` (navegación y encabezados).
+
+---
+
+## 5. Composición de la pestaña Resumen
+
+El Resumen de administradores y trabajadores usa una jerarquía editorial propia en
+`src/features/overview/ui/overview.css`, limitada por `.overview-stage`. Se conserva
+el encabezado de bienvenida y la información existente. Los seis indicadores
+comerciales forman una franja visible completa: dos columnas en móvil, tres en
+tableta y seis en pantallas amplias. Las secciones operativas usan una regla
+superior, listas con separadores y una señal lateral sutil en foco o hover. Cuenta
+y notificaciones se distinguen mediante fondos derivados de los tokens del tema.
+
+Se evitó un carrusel para los indicadores porque ocultaría información y exigiría
+navegación para comparar cifras. Las acciones actuales de perfil, avisos, tareas
+y proyectos permanecen en su lugar. `data-tour` se ancla a las secciones y no
+a posiciones de la cuadrícula, por lo que funciona con cualquier rol o ancho.
+Los estados de carga y vacío conservan el mismo orden. Las transiciones se
+desactivan con `prefers-reduced-motion`.

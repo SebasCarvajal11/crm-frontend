@@ -24,8 +24,8 @@ export const overviewTour: CimaTourDefinition = {
     {
       element: '[data-tour="overview-kpis"]',
       title: 'Indicadores Clave de Desempeño',
-      description: 'Métricas consolidadas de proyectos activos, avance de metas y actividad global.',
-      actionHint: 'Revisa estos números para evaluar el ritmo operativo y cumplimiento general.',
+      description: 'La franja de indicadores reúne clientes, campañas, proyectos, interacciones y tasa de respuesta.',
+      actionHint: 'Recorre los seis indicadores para leer el pulso comercial sin cambiar de sección.',
       side: 'bottom',
     },
     {
@@ -56,7 +56,7 @@ export const overviewTour: CimaTourDefinition = {
       element: '[data-tour="overview-recent-projects"]',
       title: 'Proyectos con Actividad Reciente',
       description: 'Acceso directo a los proyectos con actualizaciones recientes y su porcentaje de avance.',
-      actionHint: 'Haz clic en cualquier proyecto para abrir directamente su espacio de trabajo.',
+      actionHint: 'Usa la flecha de cada proyecto para abrir directamente su espacio de trabajo.',
       side: 'top',
       requiredRole: ['admin'],
     },
@@ -118,7 +118,7 @@ export const overviewQuestions: GuidedQuestion[] = [
   {
     id: 'ov-q-kpis',
     question: '¿Cómo interpreto los indicadores clave de desempeño?',
-    answer: 'Las tarjetas de KPIs sintetizan los proyectos activos, nivel de avance y actividad comercial.',
+    answer: 'La franja de indicadores muestra clientes, campañas, proyectos, interacciones y tasa de respuesta.',
     tab: 'overview',
     roles: ['admin', 'worker'],
     category: 'flujo',
@@ -154,7 +154,7 @@ export const overviewQuestions: GuidedQuestion[] = [
   {
     id: 'ov-q-recent-projects',
     question: '¿Cómo accedo directamente a un proyecto reciente?',
-    answer: 'En Proyectos Recientes haz clic en la tarjeta del proyecto para abrir directamente su espacio colaborativo.',
+    answer: 'En Últimos proyectos usa la flecha de la fila para abrir su espacio colaborativo.',
     tab: 'overview',
     roles: ['admin'],
     category: 'flujo',

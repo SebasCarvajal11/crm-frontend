@@ -40,6 +40,9 @@ del registro completo por roles y las interacciones adaptativas en `tests/playwr
 `pnpm test:brand` compila la SPA y ejecuta `tests/playwright/brand.config.ts` contra
 Vite Preview. La suite usa respuestas de API simuladas y una sesión sintética;
 no necesita Docker ni credenciales y no sustituye los E2E contra el gateway real.
+`tests/playwright/brand/overview.spec.ts` verifica para administrador y trabajador
+los seis indicadores, las secciones permitidas, ausencia de desbordamiento horizontal
+y navegación a un proyecto desde Resumen en toda la matriz responsive.
 
 Comprueba imágenes cargadas, proporciones originales, transparencia y negativo en modo oscuro,
 favicon PNG, ausencia de overflow, formularios de acceso, navegación a recuperación

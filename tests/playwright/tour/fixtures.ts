@@ -42,7 +42,7 @@ export async function setupDashboard(page: Page, role: 'admin' | 'worker' | 'cli
     else if (path.endsWith('/notifications/unread/count')) json = { data: { unread_count: 0 } }
     else if (path.includes('/chat/')) json = { data: pageOf([]) }
     else if (path.endsWith('/brief') || path.endsWith('/contract')) json = { data: null }
-    else if (path.endsWith('/members') || path.endsWith('/change-requests') || path.endsWith('/timeline') || path.endsWith('/files') || path.endsWith('/notifications/unread')) json = { data: [] }
+    else if (path.endsWith('/members') || path.endsWith('/change-requests') || path.endsWith('/change-requests/pending') || path.endsWith('/timeline') || path.endsWith('/files') || path.endsWith('/notifications/unread')) json = { data: [] }
     else if (path.endsWith('/account/sessions')) json = { data: [] }
     else if (path.endsWith('/admin/users')) json = { data: pageOf([]) }
     else if (path.endsWith('/admin/storage/tree')) json = { data: { summary: { totalClients: 0, totalProjects: 0, totalFiles: 0, totalBytes: 0, purgedFilesCount: 0, purgedBytes: 0 }, clients: [] } }

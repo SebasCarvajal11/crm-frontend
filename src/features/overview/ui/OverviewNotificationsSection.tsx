@@ -45,7 +45,7 @@ function NotificationItem({
     <button
       type="button"
       onClick={() => onOpen(item)}
-      className="group relative flex w-full flex-col items-start rounded-lg border bg-card/60 p-3 text-left transition-all duration-200 cursor-pointer active:scale-[0.99] hover:border-primary/40 hover:bg-muted/60 hover:shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+      className="overview-row group relative flex w-full flex-col items-start p-3 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
     >
       <div className="flex w-full items-center justify-between gap-2 text-xs">
         <span className="font-semibold text-primary truncate max-w-[200px]">
@@ -79,7 +79,7 @@ function NotificationsFooter({ count }: { count: number }) {
 
 export function OverviewNotificationsSection({ notifications, isLoading, onOpen }: Props) {
   return (
-    <Card className="shadow-sm border border-border/80 h-full flex flex-col justify-between min-w-0 w-full max-w-full overflow-hidden">
+    <Card className="overview-panel overview-panel-news h-full flex flex-col justify-between min-w-0 w-full max-w-full overflow-hidden">
       <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
         <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-2">

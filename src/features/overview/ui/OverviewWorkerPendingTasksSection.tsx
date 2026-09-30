@@ -74,7 +74,7 @@ function TaskRow({
   const isOverdue = task.deadline && new Date(task.deadline).getTime() < currentTime
 
   return (
-    <div className="flex flex-col justify-between gap-3 rounded-lg border bg-card/60 p-3.5 interactive-card hover:bg-muted/40 sm:flex-row sm:items-center">
+    <div className="overview-row flex flex-col justify-between gap-3 p-3.5 sm:flex-row sm:items-center">
       <div className="min-w-0 space-y-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold text-primary">{task.projectName}</span>
@@ -127,7 +127,7 @@ export function OverviewWorkerPendingTasksSection({
   const currentTime = useCurrentTime()
 
   return (
-    <Card className="shadow-sm border border-border/80 min-w-0 w-full max-w-full overflow-hidden">
+    <Card className="overview-panel min-w-0 w-full max-w-full overflow-hidden">
       <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
         <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">
