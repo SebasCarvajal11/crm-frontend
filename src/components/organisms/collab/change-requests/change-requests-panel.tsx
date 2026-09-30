@@ -59,7 +59,7 @@ export function ChangeRequestsPanel({
   }, [changeRequests, filter])
 
   return (
-    <div className="space-y-4">
+    <div className="max-w-5xl mx-auto space-y-4">
       <div
         data-tour="workspace-change-requests-action"
         className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"

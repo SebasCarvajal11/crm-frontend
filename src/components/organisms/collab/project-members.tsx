@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Briefcase, CheckSquare2, Clock3, Crown, Mail, Plus, User, Users } from 'lucide-react'
+import { Briefcase, CheckSquare2, Clock3, Crown, Mail, Plus, ShieldCheck, User, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { UserSearch } from '@/components/molecules/user-search'
 import { UserChip } from '@/components/molecules/user-chip'
@@ -9,6 +9,12 @@ import type { ClientSearchResult } from '@/shared/types'
 import type { MeResponse } from '@/shared/types'
 import { getAvatarColor } from './avatar-color'
 import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
+import {
+  getMemberDisplayName as getDisplayName,
+  getMemberInitials as getInitials,
+  formatMemberDateLabel as formatDateLabel,
+  getMemberRelativeActivity as getRelativeActivityLabel,
+} from '@/features/collab/lib/member-display'
 
 type Props = {
   members: ProjectMember[]
@@ -41,50 +47,12 @@ const ROLE_CONFIG: Record<ProjectMemberRole, { label: string; icon: React.ReactN
   },
 }
 
-
-function getDisplayName(member: ProjectMember) {
-  const full = `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim()
-  if (full) return full
-  if (member.role === 'client' && member.client_kind === 'juridical' && member.company_name) return member.company_name
-  return member.email || 'Sin nombre registrado'
-}
-
-function getInitials(member: ProjectMember) {
-  const full = `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim()
-  if (full) {
-    const parts = full.split(/\s+/).filter(Boolean)
-    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-    return parts[0].slice(0, 2).toUpperCase()
-  }
-  return member.email ? member.email.slice(0, 2).toUpperCase() : '?'
-}
-
 function getRoleDetail(member: ProjectMember) {
   if (member.role === 'worker') return member.profession?.trim() || 'Profesion no registrada'
   if (member.role === 'client' && member.client_kind === 'juridical') return 'Cliente juridico'
   return ROLE_CONFIG[member.role].label
 }
 
-function formatDateLabel(iso: string | null) {
-  if (!iso) return 'Sin registro'
-  return new Date(iso).toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' })
-}
-
-function getRelativeActivityLabel(iso: string | null) {
-  if (!iso) return 'Sin registro'
-  const now = new Date()
-  const then = new Date(iso)
-  const startNow = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
-  const startThen = new Date(then.getFullYear(), then.getMonth(), then.getDate()).getTime()
-  const days = Math.floor((startNow - startThen) / 86_400_000)
-  if (days <= 0) return 'Hoy'
-  if (days === 1) return 'Ayer'
-  if (days < 7) return `Hace ${days} días`
-  if (days < 30) return `Hace ${Math.floor(days / 7)} semana${Math.floor(days / 7) === 1 ? '' : 's'}`
-  if (days < 365) return `Hace ${Math.floor(days / 30)} mes${Math.floor(days / 30) === 1 ? '' : 'es'}`
-  const years = Math.floor(days / 365)
-  return `Hace ${years} año${years === 1 ? '' : 's'}`
-}
 
 export function ProjectMembers({ members, isLoading, accessToken, projectId, identity, canManageMembers, onError }: Props) {
   const [selectedWorkers, setSelectedWorkers] = useState<ClientSearchResult[]>([])
@@ -158,16 +126,44 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
                 ))}
               </div>
             )}
+
+            <div className="rounded-xl border bg-muted/20 p-3.5 space-y-3 mt-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                  <ShieldCheck className="size-3.5 text-primary" />
+                  Métricas de equipo
+                </span>
+                <span className="text-[11px] text-muted-foreground">{members.length} miembros</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-lg border bg-card p-2.5 shadow-2xs">
+                  <p className="text-[10px] text-muted-foreground">Trabajadores</p>
+                  <p className="text-sm font-bold text-foreground">{byRole.worker.length} activos</p>
+                </div>
+                <div className="rounded-lg border bg-card p-2.5 shadow-2xs">
+                  <p className="text-[10px] text-muted-foreground">Tareas asignadas</p>
+                  <p className="text-sm font-bold text-foreground">
+                    {members.reduce((sum, m) => sum + (m.taskCount ?? 0), 0)}
+                  </p>
+                </div>
+              </div>
+              <div className="rounded-lg bg-card/70 border border-border/60 p-2.5 text-[11px] text-muted-foreground space-y-1">
+                <p className="font-semibold text-foreground text-[11px]">Permisos por rol:</p>
+                <p>• <strong>Administrador:</strong> Contratos, miembros y tablero.</p>
+                <p>• <strong>Trabajador:</strong> Tareas asignadas, chat y entregables.</p>
+                <p>• <strong>Cliente:</strong> Supervisión, chat y solicitudes.</p>
+              </div>
+            </div>
           </div>
-          <div className="border-t p-4">
+          <div className="border-t p-4 bg-muted/10">
             <Button
               size="sm"
               onClick={() => addWorker.mutate()}
               disabled={filteredSelection.length === 0 || addWorker.isPending}
-              className="w-full"
+              className="w-full gap-1.5"
             >
-              <Plus className="mr-1 size-4" />
-              {addWorker.isPending ? 'Agregando...' : 'Agregar trabajador'}
+              <Plus className="size-4" />
+              {addWorker.isPending ? 'Asignando...' : 'Asignar al proyecto'}
             </Button>
           </div>
         </section>

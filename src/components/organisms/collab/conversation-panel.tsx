@@ -1,13 +1,15 @@
+import { useState, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { FolderArchive, History, MessageSquare } from 'lucide-react'
 import { useProjectTimeline } from '@/features/collab/hooks'
 import { collabKeys } from '@/features/collab/model'
 import { getProjectContractRequest } from '@/features/collab/api'
+import { cn } from '@/shared/lib/utils'
 import { ChatPanel } from './chat-panel'
 import { ConversationFilesTimeline } from './conversation-files-timeline'
 import { ConversationUploadForm } from './conversation-upload-form'
 import { ProjectFileRepositoryLink } from './project-file-repository-link'
 import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
-import type { ReactNode } from 'react'
 import type { MeResponse } from '@/shared/types'
 import type { Project, ProjectMember, ProjectTask } from '@/features/collab/model'
 
@@ -83,68 +85,118 @@ export function ConversationPanel({
     enabled: Boolean(projectId && accessToken),
     staleTime: 30_000,
   })
+  const [mobileView, setMobileView] = useState<'chat' | 'files' | 'timeline'>('chat')
   const contract = contractQ.data?.data ?? null
 
   return (
-    <div className="grid grid-cols-1 gap-4 min-[1280px]:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.9fr)_minmax(15rem,1fr)]">
-      <div className="min-w-0">
-        <ChatPanel
-          key={`${initialChannel ?? 'external'}:${initialMessageId ?? ''}`}
-          accessToken={accessToken}
-          projectId={projectId}
-          projectName={project?.name}
-          identity={identity}
-          isClient={isClient}
-          initialChannel={initialChannel}
-          initialMessageId={initialMessageId}
-          members={members}
-          onError={onError}
-          isVisible={isVisible}
-        />
+    <div className="space-y-3">
+      {/* Selector responsivo para pantallas menores a 1280px (Tablet y Móvil) */}
+      <div className="flex items-center gap-1 rounded-xl border bg-muted/40 p-1 min-[1280px]:hidden">
+        <button
+          type="button"
+          onClick={() => setMobileView('chat')}
+          className={cn(
+            'flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium rounded-lg transition-all',
+            mobileView === 'chat'
+              ? 'bg-background text-foreground shadow-xs'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          <MessageSquare className="size-3.5" />
+          <span>Chat</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileView('files')}
+          className={cn(
+            'flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium rounded-lg transition-all',
+            mobileView === 'files'
+              ? 'bg-background text-foreground shadow-xs'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          <FolderArchive className="size-3.5" />
+          <span>Archivos</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileView('timeline')}
+          className={cn(
+            'flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium rounded-lg transition-all',
+            mobileView === 'timeline'
+              ? 'bg-background text-foreground shadow-xs'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          <History className="size-3.5" />
+          <span>Trazabilidad</span>
+        </button>
       </div>
 
-      <ConversationSupportPanel
-        dataTour="workspace-files-panel"
-        title="Archivos"
-        description="Sube archivos con información mínima y visibilidad para cliente."
-      >
-        {project && (
-          <ProjectFileRepositoryLink
+      <div className="grid grid-cols-1 gap-4 min-[1280px]:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.9fr)_minmax(15rem,1fr)]">
+        <div className={cn('min-w-0', mobileView !== 'chat' && 'hidden min-[1280px]:block')}>
+          <ChatPanel
+            key={`${initialChannel ?? 'external'}:${initialMessageId ?? ''}`}
             accessToken={accessToken}
             projectId={projectId}
-            initialUrl={project.fileRepositoryUrl}
-            canManage={identity.role === 'admin'}
-            onError={onError}
-          />
-        )}
-        {canManageFiles ? (
-          <ConversationUploadForm accessToken={accessToken} projectId={projectId} onError={onError} />
-        ) : (
-          <p className="text-sm text-muted-foreground">Solo administradores y trabajadores pueden subir archivos.</p>
-        )}
-      </ConversationSupportPanel>
-
-      <ConversationSupportPanel
-        dataTour="workspace-timeline-panel"
-        title="Trazabilidad"
-        description="Línea del tiempo de archivos, tareas finalizadas y cambios aceptados."
-        contentClassName="px-4 py-3"
-      >
-        {timelineQ.isLoading && <p className="text-sm text-muted-foreground">Cargando trazabilidad...</p>}
-        {!timelineQ.isLoading && (
-          <ConversationFilesTimeline
-            accessToken={accessToken}
-            projectId={projectId}
-            projectName={project?.name ?? ''}
-            contract={contract}
-            timeline={timeline}
-            tasks={tasks}
+            projectName={project?.name}
+            identity={identity}
+            isClient={isClient}
+            initialChannel={initialChannel}
+            initialMessageId={initialMessageId}
             members={members}
-            canManage={canManageFiles}
             onError={onError}
+            isVisible={isVisible}
           />
-        )}
-      </ConversationSupportPanel>
+        </div>
+
+        <div className={cn(mobileView !== 'files' && 'hidden min-[1280px]:block')}>
+          <ConversationSupportPanel
+            dataTour="workspace-files-panel"
+            title="Archivos"
+            description="Sube archivos con información mínima y visibilidad para cliente."
+          >
+            {project && (
+              <ProjectFileRepositoryLink
+                accessToken={accessToken}
+                projectId={projectId}
+                initialUrl={project.fileRepositoryUrl}
+                canManage={identity.role === 'admin'}
+                onError={onError}
+              />
+            )}
+            {canManageFiles ? (
+              <ConversationUploadForm accessToken={accessToken} projectId={projectId} onError={onError} />
+            ) : (
+              <p className="text-sm text-muted-foreground">Solo administradores y trabajadores pueden subir archivos.</p>
+            )}
+          </ConversationSupportPanel>
+        </div>
+
+        <div className={cn(mobileView !== 'timeline' && 'hidden min-[1280px]:block')}>
+          <ConversationSupportPanel
+            dataTour="workspace-timeline-panel"
+            title="Trazabilidad"
+            description="Línea del tiempo de archivos, tareas finalizadas y cambios aceptados."
+            contentClassName="px-4 py-3"
+          >
+            {timelineQ.isLoading && <p className="text-sm text-muted-foreground">Cargando trazabilidad...</p>}
+            {!timelineQ.isLoading && (
+              <ConversationFilesTimeline
+                accessToken={accessToken}
+                projectId={projectId}
+                projectName={project?.name ?? ''}
+                contract={contract}
+                timeline={timeline}
+                tasks={tasks}
+                members={members}
+                canManage={canManageFiles}
+                onError={onError}
+              />
+            )}
+          </ConversationSupportPanel>
+        </div>
+      </div>
     </div>
   )
 }

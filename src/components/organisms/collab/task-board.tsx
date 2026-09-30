@@ -71,9 +71,27 @@ export function TaskBoard({
         className="overflow-x-auto scroll-smooth scrollbar-thin -mx-1 px-1 pb-2"
       >
         {columns.length > 1 ? (
-          <p className="mb-2 text-xs text-muted-foreground md:hidden">
-            Desliza horizontalmente para ver todas las columnas.
-          </p>
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-2 mb-2 lg:hidden">
+            {columns.map((col) => {
+              const count = tasksByColumn[col.id]?.length ?? 0
+              return (
+                <button
+                  key={col.id}
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById(`kanban-col-${col.id}`)
+                    el?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+                  }}
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground transition-all cursor-pointer shadow-2xs"
+                >
+                  <span className="truncate max-w-[120px]">{col.title}</span>
+                  <span className="flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-foreground">
+                    {count}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         ) : null}
         {columns.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 px-8 gap-3 rounded-xl border border-dashed text-muted-foreground">

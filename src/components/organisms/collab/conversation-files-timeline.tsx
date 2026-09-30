@@ -134,18 +134,18 @@ export function ConversationFilesTimeline({
   return (
     <>
       <div className="space-y-3">
-        <div className="flex flex-col gap-2 rounded-lg border bg-card p-3 shadow-xs md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-2 rounded-lg border bg-card p-3 shadow-xs">
           <Input
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Buscar en timeline (título, archivo, usuario)..."
-            className="h-8 max-w-sm text-xs"
+            placeholder="Buscar por título, archivo, usuario..."
+            className="h-8 w-full text-xs"
           />
           <Select
             value={kindFilter}
             onValueChange={(value) => setKindFilter(value as 'all' | ProjectTimelineItem['kind'])}
           >
-            <SelectTrigger className="h-8 w-[190px] text-xs">
+            <SelectTrigger className="h-8 w-full text-xs">
               <SelectValue placeholder="Filtrar por tipo" />
             </SelectTrigger>
             <SelectContent>

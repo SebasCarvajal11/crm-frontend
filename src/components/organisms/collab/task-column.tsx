@@ -42,6 +42,7 @@ export function TaskColumn({
 
   return (
     <section
+      id={`kanban-col-${column.id}`}
       aria-label={`Columna ${column.title}, ${tasks.length} tarea${tasks.length !== 1 ? 's' : ''}`}
       className={`flex flex-col rounded-xl border transition-colors duration-150 ${
         isDragOver ? 'border-primary bg-primary/5 shadow-md' : 'bg-muted/30 border-border'

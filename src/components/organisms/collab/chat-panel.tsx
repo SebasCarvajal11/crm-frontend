@@ -180,7 +180,7 @@ export function ChatPanel({
 
       <div className="shrink-0 border-t bg-background/80 p-3">
         <ChatTypingIndicator typers={activeTypers} />
-        <div className="relative flex items-end gap-2">
+        <div className="relative flex items-end gap-2 max-md:pr-14">
           <div className="min-w-0 flex-1">
             <Textarea
               ref={textareaRef}

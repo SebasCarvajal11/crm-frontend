@@ -73,7 +73,7 @@ export function ChangeRequestCard({ request, isAdmin, members, tasks, onAccept, 
   const priorityMeta = priorityConfig[request.priority ?? 'medium'] ?? priorityConfig.medium
 
   return (
-    <article className="rounded-xl border bg-card p-4 shadow-sm transition-shadow hover:shadow">
+    <article className="rounded-xl border bg-card p-4 shadow-xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1.5 min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { AlertCircle, CheckCircle2, Upload } from 'lucide-react'
+import { AlertCircle, CheckCircle2, FileText, FileUp, Upload, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -11,6 +11,13 @@ import { uploadProjectFileWithMetadataRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
 import type { DataResponse, ProjectFileEnriched, ProjectTimelineItem } from '@/features/collab/model'
 import { isBlockedByExtension, SAFE_FILE_ACCEPT } from '@/shared/lib'
+import { cn } from '@/shared/lib/utils'
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
 
 type Props = {
   accessToken: string
@@ -29,11 +36,40 @@ export function ConversationUploadForm({ accessToken, projectId, onError }: Prop
   const [clientVisible, setClientVisible] = useState(true)
   const [progress, setProgress] = useState(0)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
 
   const resetSelectedFile = () => {
     setSelectedFile(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = () => {
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files?.[0] ?? null
+    if (!file) return
+    if (isBlockedByExtension(file.name)) {
+      onError('Tipo de archivo bloqueado por seguridad')
+      return
+    }
+    if (file.size > MAX_FILE_BYTES) {
+      onError('El archivo supera el limite de 25 MB')
+      return
+    }
+    setSelectedFile(file)
+    if (!title) {
+      setTitle(file.name.replace(/\.[^/.]+$/, ''))
     }
   }
 
@@ -116,11 +152,12 @@ export function ConversationUploadForm({ accessToken, projectId, onError }: Prop
         }}
         placeholder="Descripcion opcional del archivo"
       />
-      <div className="space-y-1">
-        <Input
+      <div className="space-y-1.5">
+        <input
           ref={fileInputRef}
           type="file"
           accept={SAFE_FILE_ACCEPT}
+          className="hidden"
           onChange={(e) => {
             if (isSuccess) setIsSuccess(false)
             upload.reset()
@@ -131,9 +168,59 @@ export function ConversationUploadForm({ accessToken, projectId, onError }: Prop
               return
             }
             setSelectedFile(file)
+            if (file && !title) {
+              setTitle(file.name.replace(/\.[^/.]+$/, ''))
+            }
           }}
         />
-        <p className="text-[11px] text-muted-foreground">Tamano maximo permitido: 25 MB.</p>
+
+        {!selectedFile ? (
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={cn(
+              'flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-200 text-center select-none',
+              isDragging
+                ? 'border-primary bg-primary/10 scale-[1.01]'
+                : 'border-border/80 hover:border-primary/50 hover:bg-muted/40 bg-background/50',
+            )}
+            role="button"
+            tabIndex={0}
+            aria-label="Subir archivo: arrastra o haz clic aquí"
+          >
+            <FileUp className="size-6 text-muted-foreground/80 mb-1.5" />
+            <p className="text-xs font-medium text-foreground">
+              Arrastra un archivo aquí o <span className="text-primary underline">explora</span>
+            </p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Máximo 25 MB (PDF, imágenes, docs)</p>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between p-2.5 rounded-lg border bg-background shadow-xs">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex size-7 shrink-0 items-center justify-center rounded bg-primary/10 text-primary">
+                <FileText className="size-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-medium text-xs text-foreground truncate max-w-[200px]" title={selectedFile.name}>
+                  {selectedFile.name}
+                </p>
+                <p className="text-[10px] text-muted-foreground">{formatFileSize(selectedFile.size)}</p>
+              </div>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              onClick={resetSelectedFile}
+              aria-label="Quitar archivo seleccionado"
+            >
+              <X className="size-3.5" />
+            </Button>
+          </div>
+        )}
       </div>
       <div className="flex flex-wrap items-center gap-4">
         <label className="flex items-center gap-2 text-xs text-muted-foreground">
