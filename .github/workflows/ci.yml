@@ -20,7 +20,9 @@ jobs:
 
   ui:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Playwright instala Chromium y WebKit en cada shard; la descarga puede variar
+    # sin que la suite haya fallado. Reservar margen para completar las pruebas.
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
