@@ -1,4 +1,5 @@
 import { getProjectFileAccessRequest } from '@/features/collab/api/collab-api.files'
+import { parseApiError, triggerBlobDownload } from '@/shared/lib'
 
 export function formatFileSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`
@@ -6,7 +7,6 @@ export function formatFileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-import { triggerBlobDownload } from '@/shared/lib'
 export { triggerBlobDownload }
 
 async function fetchBlobWithProgress(
@@ -56,9 +56,14 @@ export async function downloadGatewayFile(
   fileName: string,
   onProgress?: (percent: number) => void
 ) {
-  const accessRes = await getProjectFileAccessRequest(accessToken, fileId, false)
-  const { blob } = await fetchBlobWithProgress(accessRes.data.url, onProgress)
-  triggerBlobDownload(blob, fileName)
+  try {
+    const accessRes = await getProjectFileAccessRequest(accessToken, fileId, false)
+    const { blob } = await fetchBlobWithProgress(accessRes.data.url, onProgress)
+    triggerBlobDownload(blob, fileName)
+  } catch (error) {
+    const message = await parseApiError(error)
+    throw new Error(message, { cause: error })
+  }
 }
 
 export async function previewGatewayFile(
@@ -67,12 +72,17 @@ export async function previewGatewayFile(
   fileName: string,
   onProgress?: (percent: number) => void
 ): Promise<{ blob: Blob; objectUrl: string; mime: string; fileName: string }> {
-  const accessRes = await getProjectFileAccessRequest(accessToken, fileId, true)
-  const { blob, mime } = await fetchBlobWithProgress(accessRes.data.url, onProgress)
-  return {
-    blob,
-    objectUrl: URL.createObjectURL(blob),
-    mime: blob.type || mime || 'application/octet-stream',
-    fileName,
+  try {
+    const accessRes = await getProjectFileAccessRequest(accessToken, fileId, true)
+    const { blob, mime } = await fetchBlobWithProgress(accessRes.data.url, onProgress)
+    return {
+      blob,
+      objectUrl: URL.createObjectURL(blob),
+      mime: blob.type || mime || 'application/octet-stream',
+      fileName,
+    }
+  } catch (error) {
+    const message = await parseApiError(error)
+    throw new Error(message, { cause: error })
   }
 }

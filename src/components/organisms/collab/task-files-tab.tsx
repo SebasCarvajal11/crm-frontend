@@ -138,9 +138,21 @@ export function TaskFilesTab({ accessToken, projectId, taskId, canUpload, onErro
       ) : (
         <div className="space-y-2">
           {files.map((f) => (
-            <div key={f.id} className="flex items-start justify-between gap-2 rounded-lg border bg-card px-3 py-2.5">
+            <div
+              key={f.id}
+              className={`flex items-start justify-between gap-2 rounded-lg border px-3 py-2.5 ${
+                f.isPurged ? 'opacity-75 bg-muted/20 border-dashed' : 'bg-card'
+              }`}
+            >
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{f.title ?? f.fileName}</p>
+                <div className="flex items-center gap-2">
+                  <p className="truncate text-sm font-medium">{f.title ?? f.fileName}</p>
+                  {f.isPurged && (
+                    <span className="inline-flex items-center rounded-full border border-rose-500/20 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-medium text-rose-700 dark:text-rose-400">
+                      Espacio liberado
+                    </span>
+                  )}
+                </div>
                 {f.description && <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{f.description}</p>}
                 <div className="mt-1 flex flex-wrap items-center gap-2">
                   <span className="text-[10px] text-muted-foreground">{formatFileSize(f.sizeBytes)}</span>
@@ -150,16 +162,28 @@ export function TaskFilesTab({ accessToken, projectId, taskId, canUpload, onErro
                   {f.createdByEmail && (
                     <span className="truncate text-[10px] text-muted-foreground">{f.createdByEmail}</span>
                   )}
+                  {f.isPurged && f.purgedReason && (
+                    <span className="text-[10px] text-muted-foreground italic">Motivo: {f.purgedReason}</span>
+                  )}
                 </div>
               </div>
-              <IconButton
-                label={`Descargar ${f.fileName}`}
-                className="size-7 shrink-0"
-                disabled={busyDownloadId !== null}
-                onClick={() => void openDownload(f.id, f.fileName)}
-              >
-                <Download className="size-3.5 text-muted-foreground" aria-hidden="true" />
-              </IconButton>
+              {f.isPurged ? (
+                <div
+                  className="flex items-center self-center px-2 text-right"
+                  title={f.purgedReason ? `Motivo: ${f.purgedReason}` : 'Depurado por administración'}
+                >
+                  <span className="text-[10px] font-medium text-muted-foreground/70">Depurado</span>
+                </div>
+              ) : (
+                <IconButton
+                  label={`Descargar ${f.fileName}`}
+                  className="size-7 shrink-0"
+                  disabled={busyDownloadId !== null}
+                  onClick={() => void openDownload(f.id, f.fileName)}
+                >
+                  <Download className="size-3.5 text-muted-foreground" aria-hidden="true" />
+                </IconButton>
+              )}
             </div>
           ))}
         </div>

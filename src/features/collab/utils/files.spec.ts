@@ -28,16 +28,21 @@ describe('files utility and progress streaming', () => {
         data: { url: mockAccessUrl, expiresInSeconds: 600, disposition: 'inline' },
       } as never)
 
-      const chunk1 = new Uint8Array([1, 2, 3, 4, 5])
-      const chunk2 = new Uint8Array([6, 7, 8, 9, 10])
-      const totalBytes = 10
+      const chunk1 = new TextEncoder().encode('Hello ')
+      const chunk2 = new TextEncoder().encode('World')
+      const totalBytes = chunk1.length + chunk2.length
 
-      let readCount = 0
+      let step = 0
       const mockReader = {
         read: vi.fn().mockImplementation(async () => {
-          readCount++
-          if (readCount === 1) return { done: false, value: chunk1 }
-          if (readCount === 2) return { done: false, value: chunk2 }
+          if (step === 0) {
+            step++
+            return { done: false, value: chunk1 }
+          }
+          if (step === 1) {
+            step++
+            return { done: false, value: chunk2 }
+          }
           return { done: true, value: undefined }
         }),
       }
@@ -56,27 +61,52 @@ describe('files utility and progress streaming', () => {
 
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockResponse))
       vi.stubGlobal('URL', {
-        createObjectURL: vi.fn().mockReturnValue('blob:http://localhost:5173/mock-blob-uuid'),
+        createObjectURL: vi.fn().mockReturnValue('blob:mock-url'),
         revokeObjectURL: vi.fn(),
       })
 
-      const progressSnapshots: number[] = []
+      const progressValues: number[] = []
       const result = await previewGatewayFile(
         'mock-token',
         'file-123',
-        'report.pdf',
-        (percent) => progressSnapshots.push(percent)
+        'document.pdf',
+        (pct) => progressValues.push(pct)
       )
 
       expect(collabFilesApi.getProjectFileAccessRequest).toHaveBeenCalledWith('mock-token', 'file-123', true)
-      expect(result.fileName).toBe('report.pdf')
+      expect(result.objectUrl).toBe('blob:mock-url')
       expect(result.mime).toBe('application/pdf')
-      expect(result.objectUrl).toBe('blob:http://localhost:5173/mock-blob-uuid')
-      expect(progressSnapshots).toContain(50)
-      expect(progressSnapshots).toContain(100)
+      expect(result.fileName).toBe('document.pdf')
+      expect(progressValues[progressValues.length - 1]).toBe(100)
     })
 
-    it('throws descriptive error if storage fetch fails', async () => {
+    it('falls back to res.blob() when body reader is unavailable', async () => {
+      vi.spyOn(collabFilesApi, 'getProjectFileAccessRequest').mockResolvedValue({
+        data: { url: 'https://objectstorage.oci.oraclecloud.com/p/fallback', expiresInSeconds: 600, disposition: 'inline' },
+      } as never)
+
+      const mockBlob = new Blob(['data'], { type: 'image/png' })
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'content-type': 'image/png' }),
+          body: null,
+          blob: async () => mockBlob,
+        })
+      )
+      vi.stubGlobal('URL', {
+        createObjectURL: vi.fn().mockReturnValue('blob:fallback-url'),
+        revokeObjectURL: vi.fn(),
+      })
+
+      const result = await previewGatewayFile('mock-token', 'file-img', 'image.png')
+      expect(result.objectUrl).toBe('blob:fallback-url')
+      expect(result.mime).toBe('image/png')
+    })
+
+    it('throws error when transfer response is not ok', async () => {
       vi.spyOn(collabFilesApi, 'getProjectFileAccessRequest').mockResolvedValue({
         data: { url: 'https://broken-url.com', expiresInSeconds: 600, disposition: 'inline' },
       } as never)
@@ -93,6 +123,16 @@ describe('files utility and progress streaming', () => {
       await expect(
         previewGatewayFile('mock-token', 'missing-id', 'doc.pdf')
       ).rejects.toThrow('Error al transferir el archivo (404)')
+    })
+
+    it('throws parsed API error message if access request fails due to purged file', async () => {
+      vi.spyOn(collabFilesApi, 'getProjectFileAccessRequest').mockRejectedValue(
+        new Error('El archivo ha sido depurado por administración para liberar espacio de almacenamiento')
+      )
+
+      await expect(
+        previewGatewayFile('mock-token', 'purged-id', 'doc.pdf')
+      ).rejects.toThrow('El archivo ha sido depurado por administración para liberar espacio de almacenamiento')
     })
   })
 
@@ -142,6 +182,16 @@ describe('files utility and progress streaming', () => {
         false
       )
       expect(clickSpy).toHaveBeenCalled()
+    })
+
+    it('throws parsed API error message if download access request fails', async () => {
+      vi.spyOn(collabFilesApi, 'getProjectFileAccessRequest').mockRejectedValue(
+        new Error('El archivo ha sido depurado por administración para liberar espacio de almacenamiento')
+      )
+
+      await expect(
+        downloadGatewayFile('mock-token', 'purged-id', 'doc.pdf')
+      ).rejects.toThrow('El archivo ha sido depurado por administración para liberar espacio de almacenamiento')
     })
   })
 })

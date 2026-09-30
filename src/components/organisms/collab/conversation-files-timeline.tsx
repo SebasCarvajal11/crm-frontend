@@ -1,19 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CalendarClock, CheckCircle2, Download, Eye, UserRound } from 'lucide-react'
 import type { ProjectContract, ProjectMember, ProjectTask, ProjectTimelineItem } from '@/features/collab/model'
 import { downloadGatewayFile, previewGatewayFile, triggerBlobDownload } from '@/features/collab/utils'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Progress } from '@/components/ui/progress'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ContractTimelineCard } from './contract-timeline-card'
+import { TimelineItemCard } from './timeline-item-card'
 import { TimelinePreviewDialog, type PreviewState } from './timeline-preview-dialog'
-import {
-  itemIcon,
-  supportsPreview,
-  formatBogotaDate,
-  badgeClassByKind,
-} from './timeline-utils'
 
 type Props = {
   accessToken: string
@@ -26,7 +18,6 @@ type Props = {
   canManage: boolean
   onError: (msg: string) => void
 }
-
 
 export function ConversationFilesTimeline({
   accessToken,
@@ -49,6 +40,7 @@ export function ConversationFilesTimeline({
     mime: '',
     fileName: '',
   })
+
   useEffect(() => {
     const url = preview.url
     if (!url) return
@@ -58,11 +50,12 @@ export function ConversationFilesTimeline({
   }, [preview.url])
 
   const emailBySub = useMemo(
-    () => new Map(
-      members
-        .map((m) => [m.userSub, m.email] as const)
-        .filter((entry): entry is readonly [string, string] => Boolean(entry[1]))
-    ),
+    () =>
+      new Map(
+        members
+          .map((m) => [m.userSub, m.email] as const)
+          .filter((entry): entry is readonly [string, string] => Boolean(entry[1]))
+      ),
     [members]
   )
   const taskById = useMemo(() => new Map(tasks.map((task) => [task.id, task] as const)), [tasks])
@@ -114,8 +107,6 @@ export function ConversationFilesTimeline({
   const openPreviewInNewTab = () => {
     if (!preview.blob) return
     const tabUrl = URL.createObjectURL(preview.blob)
-    // La URL se abre en una pestaña externa: NO la revocamos aquí.
-    // El navegador la libera automáticamente cuando esa pestaña se cierra.
     const opened = window.open(tabUrl, '_blank', 'noopener,noreferrer')
     if (!opened) {
       URL.revokeObjectURL(tabUrl)
@@ -143,24 +134,26 @@ export function ConversationFilesTimeline({
   return (
     <>
       <div className="space-y-3">
-        <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_170px]">
+        <div className="flex flex-col gap-2 rounded-lg border bg-card p-3 shadow-xs md:flex-row md:items-center md:justify-between">
           <Input
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Buscar por nombre o usuario"
-            aria-label="Buscar en trazabilidad"
-            className="h-8 text-xs"
+            placeholder="Buscar en timeline (título, archivo, usuario)..."
+            className="h-8 max-w-sm text-xs"
           />
-          <Select value={kindFilter} onValueChange={(value) => setKindFilter(value as 'all' | ProjectTimelineItem['kind'])}>
-            <SelectTrigger className="h-8 text-xs">
+          <Select
+            value={kindFilter}
+            onValueChange={(value) => setKindFilter(value as 'all' | ProjectTimelineItem['kind'])}
+          >
+            <SelectTrigger className="h-8 w-[190px] text-xs">
               <SelectValue placeholder="Filtrar por tipo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="file">Archivo</SelectItem>
-              <SelectItem value="change_accepted">Cambio aceptado</SelectItem>
-              <SelectItem value="change_rejected">Cambio rechazado</SelectItem>
-              <SelectItem value="task_completed">Tarea finalizada</SelectItem>
+              <SelectItem value="all">Todos los eventos</SelectItem>
+              <SelectItem value="file">Archivos subidos</SelectItem>
+              <SelectItem value="task_completed">Tareas finalizadas</SelectItem>
+              <SelectItem value="change_accepted">Cambios aceptados</SelectItem>
+              <SelectItem value="change_rejected">Cambios rechazados</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -176,112 +169,20 @@ export function ConversationFilesTimeline({
         {filteredTimeline.length === 0 && (
           <p className="text-sm text-muted-foreground">No hay eventos que coincidan con la búsqueda o el filtro.</p>
         )}
-        {filteredTimeline.map((item, index) => {
-          const Icon = itemIcon(item)
-          const isFile = item.kind === 'file' && !!item.fileId && !!item.fileName && !!item.mimeType
-          const previewable = isFile ? supportsPreview(item.mimeType!) : false
-          const linkedTask = item.taskId ? taskById.get(item.taskId) : null
-          const actorEmail = item.createdByEmail ?? (item.createdBySub ? emailBySub.get(item.createdBySub) : null)
-          const isLast = index === filteredTimeline.length - 1
-          return (
-            <article key={`${item.kind}:${item.id}`} className="relative pl-9">
-              {!isLast && <span className="absolute left-[13px] top-8 bottom-[-0.85rem] w-px bg-border" aria-hidden="true" />}
-              <span className="absolute left-0 top-1 inline-flex size-7 items-center justify-center rounded-full border bg-muted/40 text-primary shadow-sm">
-                <Icon className="size-3.5" />
-              </span>
-              <div className="rounded-md border bg-background px-3 py-2.5 shadow-sm">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-1.5">
-                      <span className={`inline-flex rounded-full border px-1.5 py-0.5 text-[10px] font-medium leading-none ${badgeClassByKind[item.kind]}`}>
-                        {item.label}
-                      </span>
-                    </div>
-                    <p className="line-clamp-2 text-[13px] font-semibold leading-snug">{item.title}</p>
-                    {isFile && <p className="mt-0.5 line-clamp-1 text-[11px] text-muted-foreground">{item.fileName}</p>}
-                    {item.kind === 'task_completed' && linkedTask && (
-                      <p className="mt-0.5 text-[11px] text-muted-foreground">Progreso final: {linkedTask.checklistProgress}%</p>
-                    )}
-                    {item.resolutionComment && (
-                      <div className={`mt-2 rounded-md border p-2 text-[11px] ${item.kind === 'change_rejected' ? 'border-rose-200 bg-rose-50/60 text-rose-900 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-200' : 'border-emerald-200 bg-emerald-50/60 text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-200'}`}>
-                        <p className="font-semibold">{item.kind === 'change_rejected' ? 'Motivo del rechazo:' : 'Nota de resolución:'}</p>
-                        <p className="mt-0.5 leading-relaxed">{item.resolutionComment}</p>
-                      </div>
-                    )}
-                    <div className="mt-2.5 grid gap-1 text-[10px] text-muted-foreground">
-                      <p className="inline-flex items-center gap-1.5 leading-none">
-                        <CalendarClock className="size-3" />
-                        {formatBogotaDate(item.occurredAt)}
-                      </p>
-                      {item.requestedBySub && emailBySub.get(item.requestedBySub) && (
-                        <p className="inline-flex items-center gap-1.5 leading-none">
-                          <UserRound className="size-3" />
-                          Solicitante: {emailBySub.get(item.requestedBySub)}
-                        </p>
-                      )}
-                      {actorEmail && !item.requestedBySub && (
-                        <p className="inline-flex items-center gap-1.5 leading-none">
-                          <UserRound className="size-3" />
-                          {actorEmail}
-                        </p>
-                      )}
-                      {item.resolvedBySub && emailBySub.get(item.resolvedBySub) && (
-                        <p className="inline-flex items-center gap-1.5 leading-none font-medium text-foreground/80">
-                          <CheckCircle2 className="size-3 text-primary" />
-                          {item.kind === 'change_rejected' ? 'Rechazado por: ' : 'Aceptado por: '}{emailBySub.get(item.resolvedBySub)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  {isFile && item.fileId && item.fileName && item.mimeType && (
-                    <div className="flex shrink-0 items-center self-center">
-                      <div className="flex min-w-[122px] flex-col items-stretch gap-1.5">
-                        {previewable && (
-                          <div className="w-full space-y-1">
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="secondary"
-                              className="h-7 w-full justify-center px-2 text-[10px]"
-                              disabled={busyKey !== null}
-                              onClick={() => void openPreview(item.fileId!, item.fileName!)}
-                            >
-                              <Eye className="mr-1 size-3" />
-                              {busyKey === `${item.fileId}:preview`
-                                ? `Abriendo... ${
-                                    previewProgress?.fileId === item.fileId && previewProgress.percent > 0
-                                      ? `${previewProgress.percent}%`
-                                      : ''
-                                  }`.trim()
-                                : 'Previsualizar'}
-                            </Button>
-                            {busyKey === `${item.fileId}:preview` && (
-                              <Progress
-                                value={previewProgress?.fileId === item.fileId ? previewProgress.percent : 0}
-                                className="h-1 w-full bg-muted overflow-hidden"
-                                indicatorClassName="bg-primary transition-all duration-150"
-                              />
-                            )}
-                          </div>
-                        )}
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="h-7 w-full justify-center px-2 text-[10px]"
-                          disabled={busyKey !== null}
-                          onClick={() => void downloadFile(item.fileId!, item.fileName!)}
-                        >
-                          <Download className="mr-1 size-3" />
-                          {busyKey === `${item.fileId}:download` ? 'Descargando...' : 'Descargar'}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </article>
-          )
-        })}
+        {filteredTimeline.map((item, index) => (
+          <TimelineItemCard
+            key={`${item.kind}:${item.id}`}
+            item={item}
+            isLast={index === filteredTimeline.length - 1}
+            linkedTask={item.taskId ? taskById.get(item.taskId) : null}
+            actorEmail={item.createdByEmail ?? (item.createdBySub ? emailBySub.get(item.createdBySub) : null)}
+            emailBySub={emailBySub}
+            busyKey={busyKey}
+            previewProgress={previewProgress}
+            onOpenPreview={(fileId, fileName) => void openPreview(fileId, fileName)}
+            onDownloadFile={(fileId, fileName) => void downloadFile(fileId, fileName)}
+          />
+        ))}
       </div>
 
       <TimelinePreviewDialog
@@ -296,4 +197,3 @@ export function ConversationFilesTimeline({
     </>
   )
 }
-

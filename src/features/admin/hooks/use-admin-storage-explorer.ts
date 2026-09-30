@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   fetchStorageTree,
   purgeStorageFile,
@@ -8,7 +9,10 @@ import {
   type PurgeResult,
 } from '../api/admin-storage-explorer.api'
 
+const COLLAB_QUERY_KEY = ['collab'] as const
+
 export function useAdminStorageExplorer(accessToken: string) {
+  const queryClient = useQueryClient()
   const [data, setData] = useState<StorageTreeResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -149,12 +153,13 @@ export function useAdminStorageExplorer(accessToken: string) {
           forcePurgeSigned
         )
         await loadTree()
+        await queryClient.invalidateQueries({ queryKey: COLLAB_QUERY_KEY })
         return res
       } finally {
         setIsPurging(false)
       }
     },
-    [accessToken, loadTree]
+    [accessToken, loadTree, queryClient]
   )
 
   const handlePurgeBatch = useCallback(
@@ -163,12 +168,13 @@ export function useAdminStorageExplorer(accessToken: string) {
       try {
         const res = await purgeStorageBatch(accessToken, input)
         await loadTree()
+        await queryClient.invalidateQueries({ queryKey: COLLAB_QUERY_KEY })
         return res
       } finally {
         setIsPurging(false)
       }
     },
-    [accessToken, loadTree]
+    [accessToken, loadTree, queryClient]
   )
 
   return {

@@ -239,6 +239,9 @@ export type ProjectFile = {
   createdBySub: string
   createdByEmail: string | null
   createdAt: string
+  isPurged?: boolean
+  purgedAt?: string | null
+  purgedReason?: string | null
 }
 
 export type ProjectFileEnriched = ProjectFile & {
@@ -263,6 +266,9 @@ export type ProjectTimelineItem = {
   resolvedBySub?: string | null
   resolutionComment?: string | null
   isClientVisible: boolean
+  isPurged?: boolean
+  purgedAt?: string | null
+  purgedReason?: string | null
 }
 
 export type ProjectTaskAssignee = {
