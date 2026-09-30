@@ -94,7 +94,10 @@ export function ConversationPanel({
       <div className="flex items-center gap-1 rounded-xl border bg-muted/40 p-1 min-[1280px]:hidden">
         <button
           type="button"
-          onClick={() => setMobileView('chat')}
+          onClick={() => {
+            setMobileView('chat')
+            document.getElementById('workspace-chat-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }}
           className={cn(
             'flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium rounded-lg transition-all',
             mobileView === 'chat'
@@ -107,7 +110,10 @@ export function ConversationPanel({
         </button>
         <button
           type="button"
-          onClick={() => setMobileView('files')}
+          onClick={() => {
+            setMobileView('files')
+            document.getElementById('workspace-files-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }}
           className={cn(
             'flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium rounded-lg transition-all',
             mobileView === 'files'
@@ -120,7 +126,10 @@ export function ConversationPanel({
         </button>
         <button
           type="button"
-          onClick={() => setMobileView('timeline')}
+          onClick={() => {
+            setMobileView('timeline')
+            document.getElementById('workspace-timeline-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }}
           className={cn(
             'flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium rounded-lg transition-all',
             mobileView === 'timeline'
@@ -134,7 +143,7 @@ export function ConversationPanel({
       </div>
 
       <div className="grid grid-cols-1 gap-4 min-[1280px]:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.9fr)_minmax(15rem,1fr)]">
-        <div className={cn('min-w-0', mobileView !== 'chat' && 'hidden min-[1280px]:block')}>
+        <div id="workspace-chat-section" className="min-w-0">
           <ChatPanel
             key={`${initialChannel ?? 'external'}:${initialMessageId ?? ''}`}
             accessToken={accessToken}
@@ -150,7 +159,7 @@ export function ConversationPanel({
           />
         </div>
 
-        <div className={cn(mobileView !== 'files' && 'hidden min-[1280px]:block')}>
+        <div id="workspace-files-section">
           <ConversationSupportPanel
             dataTour="workspace-files-panel"
             title="Archivos"
@@ -173,7 +182,7 @@ export function ConversationPanel({
           </ConversationSupportPanel>
         </div>
 
-        <div className={cn(mobileView !== 'timeline' && 'hidden min-[1280px]:block')}>
+        <div id="workspace-timeline-section">
           <ConversationSupportPanel
             dataTour="workspace-timeline-panel"
             title="Trazabilidad"
