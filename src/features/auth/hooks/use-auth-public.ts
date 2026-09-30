@@ -10,6 +10,7 @@ import {
 } from '@/features/auth/api'
 import { parseApiError } from '@/features/auth/utils'
 import { useSessionStore } from '@/app/session/session-store'
+import type { LoginRequestValues } from '@/features/auth/model'
 
 export function useLoginFlow() {
   const navigate = useNavigate({ from: '/login' })
@@ -17,9 +18,9 @@ export function useLoginFlow() {
   const setSession = useSessionStore((s) => s.setSession)
 
   return useMutation({
-    mutationFn: async (body: { email: string; password: string }) => {
+    mutationFn: async (body: LoginRequestValues) => {
       try {
-        return await loginRequest(body.email, body.password)
+        return await loginRequest(body.email, body.password, body.rememberMe)
       } catch (e) {
         throw new Error(await parseApiError(e), { cause: e })
       }

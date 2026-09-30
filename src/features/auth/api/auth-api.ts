@@ -26,11 +26,12 @@ import type { ClientSearchResult } from '@/shared/types'
 
 export async function loginRequest(
   email: string,
-  password: string
+  password: string,
+  rememberMe = false
 ): Promise<LoginResponse> {
   return api
     .post(AUTH_ROUTES.login, {
-      json: { email, password },
+      json: { email, password, rememberMe, remember_me: rememberMe },
       timeout: 15_000,
     })
     .json<LoginResponse>()

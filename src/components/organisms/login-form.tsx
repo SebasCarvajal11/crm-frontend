@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { FormField } from '@/components/molecules/form-field'
 import { useLoginFlow } from '@/features/auth/hooks'
@@ -81,10 +82,16 @@ export function LoginForm() {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginRequestSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
   })
 
   return (
@@ -123,6 +130,29 @@ export function LoginForm() {
             {errors.password.message}
           </p>
         ) : null}
+      </div>
+
+      <div className="flex items-center justify-between py-0.5">
+        <Controller
+          control={control}
+          name="rememberMe"
+          render={({ field }) => (
+            <label
+              htmlFor="rememberMe"
+              className="flex items-center gap-2.5 cursor-pointer select-none group"
+            >
+              <Checkbox
+                id="rememberMe"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                className="transition-transform group-hover:scale-105"
+              />
+              <span className="text-xs sm:text-sm font-medium text-foreground/80 group-hover:text-foreground transition-colors">
+                Recordarme en este equipo
+              </span>
+            </label>
+          )}
+        />
       </div>
 
       {mutation.isError ? (

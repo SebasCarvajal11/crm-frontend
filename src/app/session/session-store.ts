@@ -109,14 +109,21 @@ export function getApiBaseUrl(): string {
   return base.replace(/\/$/, '')
 }
 
-export function canUseSecureRefreshFlow(): boolean {
+export function canUseSecureRefreshFlow(isDev: boolean = import.meta.env.DEV): boolean {
   if (typeof window === 'undefined') return true
 
   const { protocol, hostname } = window.location
   if (protocol === 'https:') return true
-  if (import.meta.env.DEV) return true
+  if (isDev) return true
+  if (import.meta.env.VITE_ALLOW_HTTP_REFRESH === 'true') return true
 
-  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1'
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1') return true
+
+  // Soporte para despliegues por IP directa previos a la delegación de dominio HTTPS
+  const isIpv4 = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/.test(hostname)
+  if (isIpv4) return true
+
+  return false
 }
 
 /**

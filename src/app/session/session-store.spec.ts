@@ -30,6 +30,13 @@ if (typeof globalThis.sessionStorage === 'undefined') {
 if (typeof globalThis.window === 'undefined') {
   globalThis.window = globalThis as unknown as Window & typeof globalThis
 }
+if (!globalThis.window.location) {
+  Object.defineProperty(globalThis.window, 'location', {
+    value: { protocol: 'http:', hostname: 'localhost' },
+    writable: true,
+    configurable: true,
+  })
+}
 
 describe('useSessionStore (ADR-008: Memory-only volatile session)', () => {
   beforeEach(() => {
@@ -68,5 +75,35 @@ describe('useSessionStore (ADR-008: Memory-only volatile session)', () => {
     }
     expect(globalObj.__zustandSessionStore).toBeDefined()
     expect(globalObj.__zustandSessionStore).toBe(useSessionStore)
+  })
+
+  describe('canUseSecureRefreshFlow', () => {
+    it('allows https protocol', async () => {
+      const { canUseSecureRefreshFlow } = await import('./session-store')
+      window.location.protocol = 'https:'
+      window.location.hostname = 'crm.cima.com'
+      expect(canUseSecureRefreshFlow(false)).toBe(true)
+    })
+
+    it('allows direct IPv4 address over http during pre-domain staging', async () => {
+      const { canUseSecureRefreshFlow } = await import('./session-store')
+      window.location.protocol = 'http:'
+      window.location.hostname = '155.248.207.47'
+      expect(canUseSecureRefreshFlow(false)).toBe(true)
+    })
+
+    it('allows localhost over http', async () => {
+      const { canUseSecureRefreshFlow } = await import('./session-store')
+      window.location.protocol = 'http:'
+      window.location.hostname = 'localhost'
+      expect(canUseSecureRefreshFlow(false)).toBe(true)
+    })
+
+    it('rejects plain http for custom domain names', async () => {
+      const { canUseSecureRefreshFlow } = await import('./session-store')
+      window.location.protocol = 'http:'
+      window.location.hostname = 'crm.cima.com'
+      expect(canUseSecureRefreshFlow(false)).toBe(false)
+    })
   })
 })
