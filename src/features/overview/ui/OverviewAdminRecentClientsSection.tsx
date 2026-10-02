@@ -1,7 +1,11 @@
+import { useMemo } from 'react'
 import { Calendar, UserCheck, Users } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { UserAvatar } from '@/components/atoms/user-avatar'
+import { useSessionStore } from '@/app/session/session-store'
+import { useUserAvatars } from '@/shared/hooks'
 import type { AdminUserRow } from '@/features/admin/model'
 
 type Props = {
@@ -25,6 +29,10 @@ function getClientDisplayName(client: AdminUserRow) {
 }
 
 export function OverviewAdminRecentClientsSection({ clients, isLoading }: Props) {
+  const token = useSessionStore((state) => state.token)
+  const clientIds = useMemo(() => clients.slice(0, 5).map((c) => c.id), [clients])
+  const { getAvatarUrl } = useUserAvatars(token, clientIds)
+
   return (
     <Card className="overview-panel min-w-0 w-full max-w-full overflow-hidden">
       <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
@@ -63,11 +71,20 @@ export function OverviewAdminRecentClientsSection({ clients, isLoading }: Props)
               return (
                 <div
                   key={client.id}
-                  className="flex items-center justify-between gap-2 py-2.5 px-2 rounded-md interactive-row min-w-0 w-full overflow-hidden"
+                  className="flex items-center justify-between gap-2.5 py-2.5 px-2 rounded-md interactive-row min-w-0 w-full overflow-hidden"
                 >
-                  <div className="min-w-0 flex-1 space-y-0.5 overflow-hidden">
-                    <p className="truncate text-xs font-bold text-foreground block min-w-0 w-full">{name}</p>
-                    <p className="truncate text-[11px] text-muted-foreground block min-w-0 w-full">{client.email}</p>
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
+                    <UserAvatar
+                      src={getAvatarUrl(client.id)}
+                      name={name}
+                      userId={client.id}
+                      size="sm"
+                      className="size-8 shrink-0"
+                    />
+                    <div className="min-w-0 flex-1 space-y-0.5 overflow-hidden">
+                      <p className="truncate text-xs font-bold text-foreground block min-w-0 w-full">{name}</p>
+                      <p className="truncate text-[11px] text-muted-foreground block min-w-0 w-full">{client.email}</p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
                     <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-muted-foreground">

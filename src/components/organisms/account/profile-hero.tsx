@@ -1,6 +1,7 @@
 import type { RefObject } from 'react'
-import { Camera, CheckCircle2, Clock, Loader2, Mail, Shield, UserCircle2 } from 'lucide-react'
+import { Camera, CheckCircle2, Clock, Loader2, Mail, Shield } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { UserAvatar } from '@/components/atoms/user-avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,17 +63,13 @@ export function ProfileHero({
                     data-tour="account-avatar-btn"
                     className="group relative flex size-28 items-center justify-center rounded-full border-4 border-background bg-card shadow-lg ring-1 ring-black/5 transition-all duration-150 hover:scale-[1.03] active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:size-32"
                   >
-                    {avatarUrl ? (
-                      <img
-                        src={avatarUrl}
-                        alt="Avatar del usuario"
-                        className="size-full rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex size-full items-center justify-center rounded-full bg-gradient-to-br from-primary/10 via-primary/5 to-muted text-primary">
-                        <UserCircle2 className="size-16 opacity-80" />
-                      </div>
-                    )}
+                    <UserAvatar
+                      src={avatarUrl}
+                      name={displayName}
+                      userId={identity.id}
+                      size="2xl"
+                      className="size-full shadow-none border-0"
+                    />
                     <span className="absolute bottom-0 right-0 flex size-8 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-md transition-transform group-hover:scale-110">
                       <Camera className="size-3.5" />
                     </span>

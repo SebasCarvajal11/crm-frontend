@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   UserCircle2,
 } from 'lucide-react'
+import { UserAvatar as AtomUserAvatar } from '@/components/atoms/user-avatar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -47,24 +48,24 @@ function RoleBadge({ role }: { role: string }) {
 
 function UserAvatar({
   avatarUrl,
+  name,
+  userId,
   onOpenProfile,
 }: {
   avatarUrl?: string | null
+  name?: string | null
+  userId?: string | null
   onOpenProfile?: () => void
 }) {
   return (
     <div className="relative shrink-0">
-      {avatarUrl ? (
-        <img
-          src={avatarUrl}
-          alt="Avatar del usuario"
-          className="size-14 rounded-full border object-cover shadow-sm ring-2 ring-primary/20"
-        />
-      ) : (
-        <div className="flex size-14 items-center justify-center rounded-full border bg-muted ring-2 ring-primary/20">
-          <UserCircle2 className="size-8 text-muted-foreground" />
-        </div>
-      )}
+      <AtomUserAvatar
+        src={avatarUrl}
+        name={name}
+        userId={userId}
+        size="xl"
+        className="size-14 ring-2 ring-primary/20"
+      />
       {onOpenProfile && (
         <button
           type="button"
@@ -166,7 +167,12 @@ export function OverviewIdentityCard({ identity, avatarUrl, onOpenProfile }: Pro
       <CardContent className="flex flex-col flex-1 justify-between gap-3 pt-1">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/70 pb-4">
           <div className="flex items-center gap-3.5 min-w-0">
-            <UserAvatar avatarUrl={avatarUrl} onOpenProfile={onOpenProfile} />
+            <UserAvatar
+              avatarUrl={avatarUrl}
+              name={displayName}
+              userId={identity.id}
+              onOpenProfile={onOpenProfile}
+            />
             <div className="min-w-0 space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="text-sm font-bold text-foreground truncate">{displayName}</p>

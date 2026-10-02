@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableRow } from '@/components/ui/table'
+import { UserAvatar } from '@/components/atoms/user-avatar'
 import { AdminUserActions } from './user-actions'
 import { userDisplayName, userSecondaryName } from '@/features/admin/hooks'
 import type { AdminUserRow, UserRole } from '@/features/admin/model'
@@ -7,20 +8,13 @@ import type { AdminUserRow, UserRole } from '@/features/admin/model'
 type Props = {
   row: AdminUserRow
   virtualIndex: number
+  avatarUrl?: string | null
   measureElement?: (el: HTMLElement | null) => void
   patchStatus: { mutate: (arg: { subject: string; is_active: boolean }) => void; isPending: boolean }
   patchFlags: { mutate: (arg: { subject: string; force_password_change: boolean }) => void; isPending: boolean }
   softDelete: { mutate: (arg: string) => void; isPending: boolean }
   restore: { mutate: (arg: string) => void; isPending: boolean }
   clearActionMessage: () => void
-}
-
-function userInitials(name: string): string {
-  const parts = name.trim().split(/\s+/)
-  if (parts.length >= 2 && parts[0] && parts[1]) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-  }
-  return (name[0] ?? 'U').toUpperCase()
 }
 
 function roleBadge(role: UserRole) {
@@ -76,16 +70,11 @@ function statusBadge(row: AdminUserRow) {
   )
 }
 
-function roleAvatarColor(role: UserRole): string {
-  if (role === 'admin') return 'bg-primary/10 text-primary border-primary/20'
-  if (role === 'worker') return 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/20'
-  return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20'
-}
-
 /** Componente molecular: fila individual estandarizada para la tabla de usuarios. */
 export function UserTableRow({
   row,
   virtualIndex,
+  avatarUrl,
   measureElement,
   patchStatus,
   patchFlags,
@@ -105,11 +94,13 @@ export function UserTableRow({
     >
       <TableCell className="py-3">
         <div className="flex items-center gap-3">
-          <div
-            className={`flex size-9 shrink-0 items-center justify-center rounded-full border text-xs font-bold tracking-tight shadow-2xs ${roleAvatarColor(row.role)}`}
-          >
-            {userInitials(displayName)}
-          </div>
+          <UserAvatar
+            src={avatarUrl}
+            name={displayName}
+            userId={row.id}
+            size="md"
+            className="shrink-0"
+          />
           <div className="flex min-w-0 flex-col">
             <span className="truncate text-sm font-semibold tracking-tight text-foreground">
               {displayName}

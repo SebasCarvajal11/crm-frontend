@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent } from '@/components/ui/card'
@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useUserAvatars } from '@/shared/hooks'
 import { UserTableToolbar } from './user-table-toolbar'
 import { UserTableRow } from './user-table-row'
 import { UserCarousel } from './user-carousel'
@@ -49,6 +50,9 @@ export function AdminUserTable({ accessToken }: Props) {
     totalPages,
     usersQ,
   } = useAdminUsersTable(accessToken)
+
+  const userIds = useMemo(() => items.map((u) => u.id), [items])
+  const { getAvatarUrl } = useUserAvatars(accessToken, userIds)
 
   const parentRef = useRef<HTMLDivElement>(null)
 
@@ -121,6 +125,7 @@ export function AdminUserTable({ accessToken }: Props) {
           ) : viewMode === 'carousel' ? (
             <UserCarousel
               items={items}
+              getAvatarUrl={getAvatarUrl}
               patchStatus={patchStatus}
               patchFlags={patchFlags}
               softDelete={softDelete}
@@ -156,6 +161,7 @@ export function AdminUserTable({ accessToken }: Props) {
                         key={row.id}
                         row={row}
                         virtualIndex={virtualRow.index}
+                        avatarUrl={getAvatarUrl(row.id)}
                         measureElement={virtualizer.measureElement}
                         patchStatus={patchStatus}
                         patchFlags={patchFlags}

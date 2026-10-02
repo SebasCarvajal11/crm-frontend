@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
+import { UserAvatar } from '@/components/atoms/user-avatar'
+import { useUserAvatars } from '@/shared/hooks'
 import { useTaskComments } from '@/features/collab/hooks'
 
 type Props = {
@@ -26,6 +28,9 @@ export function TaskComments({ accessToken, projectId, taskId, onError }: Props)
     onError,
   })
 
+  const authorSubs = useMemo(() => comments.map((c) => c.authorSub), [comments])
+  const { getAvatarUrl } = useUserAvatars(accessToken, authorSubs)
+
   useEffect(() => {
     const el = containerRef.current
     if (el) el.scrollTop = el.scrollHeight
@@ -44,9 +49,18 @@ export function TaskComments({ accessToken, projectId, taskId, onError }: Props)
           </p>
         ) : (
           comments.map((c) => (
-            <div key={c.id} className="rounded-lg border bg-muted/30 px-3 py-2.5 space-y-1">
+            <div key={c.id} className="rounded-lg border bg-muted/30 px-3 py-2.5 space-y-1.5">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-semibold truncate">{c.authorEmail}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <UserAvatar
+                    src={getAvatarUrl(c.authorSub)}
+                    name={c.authorEmail}
+                    userId={c.authorSub}
+                    size="xs"
+                    className="size-5 shrink-0"
+                  />
+                  <span className="text-xs font-semibold truncate">{c.authorEmail}</span>
+                </div>
                 <time
                   dateTime={c.createdAt}
                   className="text-[10px] text-muted-foreground shrink-0"
@@ -54,7 +68,7 @@ export function TaskComments({ accessToken, projectId, taskId, onError }: Props)
                   {new Date(c.createdAt).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
                 </time>
               </div>
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">{c.content}</p>
+              <p className="text-sm leading-relaxed whitespace-pre-wrap pl-7">{c.content}</p>
             </div>
           ))
         )}

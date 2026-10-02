@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 import type { ChatMessageReadReceipt, ProjectChatMessage, ProjectMember } from '@/features/collab/model'
 import type { UserAvatarsResponse } from '@/shared/types'
-import { getAvatarColor } from './avatar-color'
+import { UserAvatar } from '@/components/atoms/user-avatar'
 
 type Props = {
   open: boolean
@@ -51,23 +51,6 @@ function getMemberRoleText(member?: ProjectMember, receipt?: ChatMessageReadRece
   if (role === 'client') return 'Cliente'
   if (role === 'admin') return 'Administrador'
   return 'Miembro'
-}
-
-function getMemberInitials(
-  member?: ProjectMember,
-  fallback?: string,
-  receipt?: ChatMessageReadReceipt
-): string {
-  const firstName = member?.first_name ?? receipt?.firstName ?? ''
-  const lastName = member?.last_name ?? receipt?.lastName ?? ''
-  const full = `${firstName} ${lastName}`.trim()
-  if (full) {
-    const parts = full.split(/\s+/).filter(Boolean)
-    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-    return parts[0].slice(0, 2).toUpperCase()
-  }
-  if (member?.email) return member.email.slice(0, 2).toUpperCase()
-  return fallback?.slice(0, 2).toUpperCase() || '?'
 }
 
 export function ChatMessageInfoDialog({ open, onOpenChange, message, members, avatarBySub }: Props) {
@@ -127,18 +110,17 @@ export function ChatMessageInfoDialog({ open, onOpenChange, message, members, av
                   const name = getMemberDisplayName(member, sub, receipt)
                   const roleText = getMemberRoleText(member, receipt)
                   const avatarUrl = pickAvatarUrl(avatarBySub[sub]?.urls, '64')
-                  const initials = getMemberInitials(member, sub, receipt)
 
                   return (
                     <div key={sub} className="flex items-center justify-between rounded-lg p-2 transition-colors hover:bg-muted/40">
                       <div className="flex items-center gap-3 min-w-0">
-                        {avatarUrl ? (
-                          <img src={avatarUrl} alt={name} className="size-9 rounded-full object-cover ring-1 ring-border/50 shrink-0" />
-                        ) : (
-                          <div className={`flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white shadow-xs ${getAvatarColor(sub)}`}>
-                            {initials}
-                          </div>
-                        )}
+                        <UserAvatar
+                          src={avatarUrl}
+                          name={name}
+                          userId={sub}
+                          size="md"
+                          className="shrink-0"
+                        />
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium leading-none text-foreground">{name}</p>
                           <p className="mt-1 truncate text-xs text-muted-foreground">{roleText}</p>
@@ -173,18 +155,17 @@ export function ChatMessageInfoDialog({ open, onOpenChange, message, members, av
                   const name = getMemberDisplayName(member, sub)
                   const roleText = getMemberRoleText(member)
                   const avatarUrl = pickAvatarUrl(avatarBySub[sub]?.urls, '64')
-                  const initials = getMemberInitials(member, sub)
 
                   return (
                     <div key={sub} className="flex items-center justify-between rounded-lg p-2 transition-colors hover:bg-muted/40">
                       <div className="flex items-center gap-3 min-w-0">
-                        {avatarUrl ? (
-                          <img src={avatarUrl} alt={name} className="size-9 rounded-full object-cover ring-1 ring-border/50 shrink-0" />
-                        ) : (
-                          <div className={`flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white shadow-xs ${getAvatarColor(sub)}`}>
-                            {initials}
-                          </div>
-                        )}
+                        <UserAvatar
+                          src={avatarUrl}
+                          name={name}
+                          userId={sub}
+                          size="md"
+                          className="shrink-0"
+                        />
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium leading-none text-foreground">{name}</p>
                           <p className="mt-1 truncate text-xs text-muted-foreground">{roleText}</p>

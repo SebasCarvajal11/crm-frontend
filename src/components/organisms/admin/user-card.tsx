@@ -1,9 +1,9 @@
 import { Briefcase, Building2, Crown, Mail, ShieldAlert, User } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import { UserAvatar } from '@/components/atoms/user-avatar'
 import { AdminUserActions } from './user-actions'
 import { userDisplayName, userSecondaryName } from '@/features/admin/hooks'
-import { getAvatarColor } from '@/shared/lib/avatar-color'
 import type { AdminUserRow, UserRole } from '@/features/admin/model'
 
 type MutationHandle<T> = {
@@ -14,19 +14,12 @@ type MutationHandle<T> = {
 type Props = {
   row: AdminUserRow
   index: number
+  avatarUrl?: string | null
   patchStatus: MutationHandle<{ subject: string; is_active: boolean }>
   patchFlags: MutationHandle<{ subject: string; force_password_change: boolean }>
   softDelete: MutationHandle<string>
   restore: MutationHandle<string>
   clearActionMessage: () => void
-}
-
-function userInitials(name: string): string {
-  const parts = name.trim().split(/\s+/)
-  if (parts.length >= 2 && parts[0] && parts[1]) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-  }
-  return (name[0] ?? 'U').toUpperCase()
 }
 
 function roleBadge(role: UserRole) {
@@ -83,6 +76,7 @@ function roleAccentBorder(role: UserRole): string {
 export function AdminUserCard({
   row,
   index,
+  avatarUrl,
   patchStatus,
   patchFlags,
   softDelete,
@@ -91,7 +85,6 @@ export function AdminUserCard({
 }: Props) {
   const displayName = userDisplayName(row)
   const secondaryName = userSecondaryName(row)
-  const avatarBg = getAvatarColor(row.id)
 
   return (
     <Card
@@ -101,18 +94,14 @@ export function AdminUserCard({
       <div className="space-y-3.5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className={`relative flex size-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white shadow-xs ${avatarBg}`}>
-              {userInitials(displayName)}
-              <span
-                className={`absolute bottom-0 right-0 size-2.5 rounded-full ring-2 ring-card ${
-                  row.deleted_at
-                    ? 'bg-destructive'
-                    : row.is_active
-                      ? 'bg-emerald-500'
-                      : 'bg-muted-foreground'
-                }`}
-              />
-            </div>
+            <UserAvatar
+              src={avatarUrl}
+              name={displayName}
+              userId={row.id}
+              size="lg"
+              presenceStatus={row.deleted_at ? undefined : row.is_active ? 'online' : 'offline'}
+              className="size-11 shrink-0 text-sm"
+            />
             <div className="min-w-0 flex-1">
               <h4 className="truncate text-sm font-bold tracking-tight text-foreground" title={displayName}>
                 {displayName}

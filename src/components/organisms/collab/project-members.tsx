@@ -1,17 +1,16 @@
 import { useState } from 'react'
 import { Briefcase, CheckSquare2, Clock3, Crown, Mail, Plus, ShieldCheck, User, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { UserAvatar } from '@/components/atoms/user-avatar'
 import { UserSearch } from '@/components/molecules/user-search'
 import { UserChip } from '@/components/molecules/user-chip'
 import { useProjectMembers } from '@/features/collab/hooks'
 import type { ProjectMember, ProjectMemberRole } from '@/features/collab/model'
 import type { ClientSearchResult } from '@/shared/types'
 import type { MeResponse } from '@/shared/types'
-import { getAvatarColor } from './avatar-color'
 import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 import {
   getMemberDisplayName as getDisplayName,
-  getMemberInitials as getInitials,
   formatMemberDateLabel as formatDateLabel,
   getMemberRelativeActivity as getRelativeActivityLabel,
 } from '@/features/collab/lib/member-display'
@@ -222,13 +221,13 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
                 return (
                   <article key={member.userSub} className={`rounded-xl border border-l-4 bg-card p-4 shadow-sm interactive-card ${cfg.cardClass}`}>
                     <div className="flex items-start gap-3">
-                      <div className={`${getAvatarColor(member.userSub)} flex size-10 shrink-0 select-none items-center justify-center overflow-hidden rounded-full text-sm font-bold text-white`}>
-                        {avatarUrl ? (
-                          <img src={avatarUrl} alt={`Avatar de ${displayName}`} className="size-10 object-cover" />
-                        ) : (
-                          getInitials(member)
-                        )}
-                      </div>
+                      <UserAvatar
+                        src={avatarUrl}
+                        name={displayName}
+                        userId={member.userSub}
+                        size="lg"
+                        className="shrink-0"
+                      />
                       <div className="min-w-0 flex-1 space-y-1">
                         <p className="truncate text-sm font-semibold" title={displayName}>{displayName}</p>
                         <p className="truncate text-xs text-muted-foreground">{cfg.label} · {getRoleDetail(member)}</p>

@@ -4,7 +4,7 @@ import type { MeResponse } from '@/shared/types'
 import type { ProjectChatMessage, ProjectMember } from '@/features/collab/model'
 import type { UserAvatarsResponse } from '@/shared/types'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
-import { getAvatarColor } from './avatar-color'
+import { UserAvatar } from '@/components/atoms/user-avatar'
 import { ChatMessageInfoDialog } from './chat-message-info-dialog'
 
 type Props = {
@@ -16,18 +16,6 @@ type Props = {
   members?: ProjectMember[]
 }
 
-
-const getInitials = (message: ProjectChatMessage): string => {
-  const fullName = `${message.authorFirstName ?? ''} ${message.authorLastName ?? ''}`.trim()
-  if (fullName) {
-    const parts = fullName.split(/\s+/).filter(Boolean)
-    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
-    return parts[0].slice(0, 2).toUpperCase()
-  }
-
-  if (!message.authorEmail) return '?'
-  return message.authorEmail.slice(0, 2).toUpperCase()
-}
 
 const formatMessageTime = (iso: string): string =>
   new Date(iso).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false })
@@ -188,17 +176,13 @@ export const ChatMessageList = memo(function ChatMessageList({
           {!isOwn && (
             <div className="flex w-7 shrink-0 items-end">
               {!sameAuthorAsNext && (
-                <div className={`size-7 select-none overflow-hidden rounded-full text-[10px] font-bold text-white ${getAvatarColor(message.authorSub)}`} title={message.authorEmail ?? undefined}>
-                  {message.authorSub && pickAvatarUrl(avatarBySub[message.authorSub]?.urls, '64') ? (
-                    <img
-                      src={pickAvatarUrl(avatarBySub[message.authorSub]?.urls, '64')!}
-                      alt={`Avatar de ${getDisplayName(message)}`}
-                      className="size-7 object-cover"
-                    />
-                  ) : (
-                    <div className="flex size-7 items-center justify-center">{getInitials(message)}</div>
-                  )}
-                </div>
+                <UserAvatar
+                  src={message.authorSub ? pickAvatarUrl(avatarBySub[message.authorSub]?.urls, '64') : null}
+                  name={getDisplayName(message)}
+                  userId={message.authorSub}
+                  size="sm"
+                  alt={`Avatar de ${getDisplayName(message)}`}
+                />
               )}
             </div>
           )}

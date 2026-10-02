@@ -1,8 +1,10 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Search, User } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { UserAvatar } from '@/components/atoms/user-avatar'
+import { useUserAvatars } from '@/shared/hooks'
 import { searchClientsRequest } from '@/features/auth/api'
 import type { ClientSearchResult } from '@/shared/types'
 import type { UserRole } from '@/shared/types'
@@ -53,6 +55,12 @@ export function UserSearch({ accessToken, role, selected, excludedSubjects = [],
   const suggestions = (searchQ.data?.data ?? []).filter(
     (user) => !excludedSubjectSet.has(user.subject),
   )
+
+  const suggestionSubjects = useMemo(
+    () => suggestions.map((user) => user.subject),
+    [suggestions],
+  )
+  const { getAvatarUrl } = useUserAvatars(accessToken, suggestionSubjects)
 
   const listOpen = show && query.length >= 2
   const resolvedActiveIndex =
@@ -176,7 +184,13 @@ export function UserSearch({ accessToken, role, selected, excludedSubjects = [],
                   onMouseEnter={() => setActiveIndex(index)}
                   onClick={() => selectUser(u)}
                 >
-                  <User className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <UserAvatar
+                    src={getAvatarUrl(u.subject)}
+                    name={u.email}
+                    userId={u.subject}
+                    size="xs"
+                    className="size-5 shrink-0"
+                  />
                   <span className="truncate flex-1">{u.email}</span>
                   <Badge variant="outline" className="text-[10px] shrink-0">{u.role}</Badge>
                 </button>

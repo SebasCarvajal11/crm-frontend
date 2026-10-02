@@ -11,6 +11,7 @@ type MutationHandle<T> = {
 
 type Props = {
   items: AdminUserRow[]
+  getAvatarUrl?: (id?: string | null) => string | null
   patchStatus: MutationHandle<{ subject: string; is_active: boolean }>
   patchFlags: MutationHandle<{ subject: string; force_password_change: boolean }>
   softDelete: MutationHandle<string>
@@ -21,6 +22,7 @@ type Props = {
 /** Componente molecular/organismo: carrusel interactivo fluido de tarjetas de usuario. */
 export function UserCarousel({
   items,
+  getAvatarUrl,
   patchStatus,
   patchFlags,
   softDelete,
@@ -155,6 +157,7 @@ export function UserCarousel({
             <AdminUserCard
               row={row}
               index={index}
+              avatarUrl={getAvatarUrl?.(row.id)}
               patchStatus={patchStatus}
               patchFlags={patchFlags}
               softDelete={softDelete}

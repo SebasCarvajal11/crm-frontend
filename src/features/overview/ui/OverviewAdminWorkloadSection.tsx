@@ -4,6 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { UserAvatar } from '@/components/atoms/user-avatar'
+import { useSessionStore } from '@/app/session/session-store'
+import { useUserAvatars } from '@/shared/hooks'
 import type { WorkerWorkloadItem } from '../model/overview.types'
 
 type Props = {
@@ -13,13 +16,22 @@ type Props = {
 
 const PAGE_SIZE = 3
 
-function WorkloadWorkerCard({ worker }: { worker: WorkerWorkloadItem }) {
+function WorkloadWorkerCard({ worker, avatarUrl }: { worker: WorkerWorkloadItem; avatarUrl?: string | null }) {
   return (
     <div className="overview-row p-3.5 min-w-0 w-full max-w-full overflow-hidden">
       <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center min-w-0 w-full">
-        <div className="min-w-0 flex-1 overflow-hidden">
-          <p className="text-xs font-bold text-foreground truncate block min-w-0 w-full">{worker.workerName}</p>
-          <p className="text-[11px] text-muted-foreground truncate block min-w-0 w-full">{worker.workerEmail}</p>
+        <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
+          <UserAvatar
+            src={avatarUrl}
+            name={worker.workerName}
+            userId={worker.workerSub}
+            size="sm"
+            className="size-8 shrink-0"
+          />
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <p className="text-xs font-bold text-foreground truncate block min-w-0 w-full">{worker.workerName}</p>
+            <p className="text-[11px] text-muted-foreground truncate block min-w-0 w-full">{worker.workerEmail}</p>
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className="inline-flex items-center gap-1 font-semibold text-foreground">
@@ -110,6 +122,7 @@ function WorkloadPagination({
 
 export function OverviewAdminWorkloadSection({ workload, isLoading }: Props) {
   const [page, setPage] = useState(1)
+  const token = useSessionStore((state) => state.token)
 
   const totalPages = Math.max(1, Math.ceil(workload.length / PAGE_SIZE))
   const currentPage = Math.min(page, totalPages)
@@ -118,6 +131,9 @@ export function OverviewAdminWorkloadSection({ workload, isLoading }: Props) {
     const start = (currentPage - 1) * PAGE_SIZE
     return workload.slice(start, start + PAGE_SIZE)
   }, [workload, currentPage])
+
+  const workerSubs = useMemo(() => pagedWorkload.map((w) => w.workerSub), [pagedWorkload])
+  const { getAvatarUrl } = useUserAvatars(token, workerSubs)
 
   return (
     <Card className="overview-panel h-full flex flex-col justify-between min-w-0 w-full max-w-full overflow-hidden">
@@ -147,7 +163,11 @@ export function OverviewAdminWorkloadSection({ workload, isLoading }: Props) {
           <div className="flex flex-col flex-1 justify-between gap-3">
             <div className="space-y-3">
               {pagedWorkload.map((worker) => (
-                <WorkloadWorkerCard key={worker.workerSub} worker={worker} />
+                <WorkloadWorkerCard
+                  key={worker.workerSub}
+                  worker={worker}
+                  avatarUrl={getAvatarUrl(worker.workerSub)}
+                />
               ))}
             </div>
 

@@ -2,8 +2,9 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Bell, ChevronUp, HelpCircle, LogOut, User, type LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NotificationCounterBadge } from '@/components/atoms/notification-counter-badge'
+import { UserAvatar } from '@/components/atoms/user-avatar'
 import { cn } from '@/shared/lib/utils'
-import { ROLE_LABEL, roleInitial } from './utils'
+import { ROLE_LABEL } from './utils'
 
 function useOutsideClick(
   ref: React.RefObject<HTMLElement | null>,
@@ -22,40 +23,6 @@ function useOutsideClick(
       document.removeEventListener('touchstart', onDismiss)
     }
   }, [active, ref, onClose])
-}
-
-function UserAvatar({
-  userAvatarUrl,
-  userRole,
-  unreadCount,
-  compact,
-}: {
-  userAvatarUrl?: string | null
-  userRole: string
-  unreadCount: number
-  compact: boolean
-}) {
-  return (
-    <div
-      className={cn(
-        'relative flex size-8 shrink-0 items-center justify-center',
-        'rounded-full bg-primary-foreground/20 text-xs font-semibold text-primary-foreground'
-      )}
-    >
-      {userAvatarUrl ? (
-        <img src={userAvatarUrl} alt="Foto de perfil" className="size-8 rounded-full object-cover" />
-      ) : (
-        roleInitial(userRole)
-      )}
-      {unreadCount > 0 && compact && (
-        <NotificationCounterBadge
-          variant="dot"
-          count={unreadCount}
-          className="absolute -top-0.5 -right-0.5"
-        />
-      )}
-    </div>
-  )
 }
 
 function UserProfileTrigger({
@@ -92,12 +59,21 @@ function UserProfileTrigger({
         compact && 'justify-center px-0'
       )}
     >
-      <UserAvatar
-        userAvatarUrl={userAvatarUrl}
-        userRole={userRole}
-        unreadCount={unreadCount}
-        compact={compact}
-      />
+      <div className="relative shrink-0">
+        <UserAvatar
+          src={userAvatarUrl}
+          name={userEmail}
+          size="sm"
+          className="size-8"
+        />
+        {unreadCount > 0 && compact && (
+          <NotificationCounterBadge
+            variant="dot"
+            count={unreadCount}
+            className="absolute -top-0.5 -right-0.5"
+          />
+        )}
+      </div>
       {!compact && (
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs text-primary-foreground/70">{userEmail}</p>

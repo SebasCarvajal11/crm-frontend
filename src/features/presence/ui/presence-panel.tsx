@@ -1,15 +1,32 @@
-import { useEffect, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight, RefreshCw, Search, Users, UserRound, WifiOff, X } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { ChevronLeft, ChevronRight, RefreshCw, Search, Users, WifiOff, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog'
+import { UserAvatar } from '@/components/atoms/user-avatar'
+import { useSessionStore } from '@/app/session/session-store'
+import { useUserAvatars } from '@/shared/hooks'
 import { usePresence } from '../hooks/use-presence'
 import { useVisibleViewport } from '../hooks/use-visible-viewport'
 import { FIRST_PAGES, activityAge, presenceName, type PresenceGroup, type PresencePages, type PresenceRole } from '../model/presence'
 
 const LABELS: Record<PresenceRole, string> = { worker: 'Colaboradores', client: 'Clientes', admin: 'Otros administradores' }
 
-function Group({ group, now, stale, busy, onPage }: { group: PresenceGroup; now: number; stale: boolean; busy: boolean; onPage: (page: number) => void }) {
+function Group({
+  group,
+  now,
+  stale,
+  busy,
+  getAvatarUrl,
+  onPage,
+}: {
+  group: PresenceGroup
+  now: number
+  stale: boolean
+  busy: boolean
+  getAvatarUrl: (sub?: string | null) => string | null
+  onPage: (page: number) => void
+}) {
   const pages = Math.max(1, Math.ceil(group.total / group.page_size))
   return <section aria-label={LABELS[group.role]} className="overflow-hidden rounded-xl border bg-card">
     <header className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/40 px-4 py-3">
@@ -19,7 +36,14 @@ function Group({ group, now, stale, busy, onPage }: { group: PresenceGroup; now:
     {!group.users.length ? <p className="px-4 py-5 text-sm text-muted-foreground">Sin actividad reciente para este perfil.</p> :
       <ul className="divide-y" aria-label={`Usuarios de ${LABELS[group.role]}`}>
         {group.users.map((user) => <li key={user.subject} className="flex items-start gap-3 px-4 py-3">
-          <span aria-hidden="true" className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/5 text-primary"><UserRound className="size-4" /></span>
+          <UserAvatar
+            src={getAvatarUrl(user.subject)}
+            name={presenceName(user)}
+            userId={user.subject}
+            size="md"
+            presenceStatus={user.is_online && !stale ? 'online' : 'offline'}
+            className="mt-0.5 shrink-0"
+          />
           <div className="min-w-0 flex-1 space-y-1">
             <p className="break-words text-sm font-semibold leading-relaxed">{presenceName(user)}</p>
             <p className="break-all text-xs leading-relaxed text-muted-foreground">{user.email}</p>
@@ -53,10 +77,17 @@ function PanelContent({ owner }: { owner: string }) {
     const timer = setTimeout(() => { setQuery(search.trim()); setPages(FIRST_PAGES) }, 350)
     return () => clearTimeout(timer)
   }, [search, query])
+  const token = useSessionStore((state) => state.token)
   const result = usePresence(owner, query, pages)
+  const groups = result.data?.groups
+  const allVisibleSubjects = useMemo(() => {
+    if (!groups) return []
+    return groups.flatMap((g) => g.users.map((u) => u.subject))
+  }, [groups])
+  const { getAvatarUrl } = useUserAvatars(token, allVisibleSubjects)
   const updatingSearch = search.trim() !== query
   const busy = result.isFetching || updatingSearch
-  const totalOnline = result.data?.groups.reduce((sum, group) => sum + group.online, 0) ?? 0
+  const totalOnline = groups?.reduce((sum, group) => sum + group.online, 0) ?? 0
   return <div ref={scrollRef} className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5" aria-busy={busy}>
     <div className="space-y-3">
       <label htmlFor="cima-presence-search" className="text-xs font-medium">Buscar en todos los perfiles</label>
@@ -80,7 +111,7 @@ function PanelContent({ owner }: { owner: string }) {
       <p className="text-sm font-semibold">{query ? 'Sin coincidencias' : 'Sin otros usuarios recientes'}</p>
       <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{query ? 'Prueba otro nombre, alias de correo o empresa.' : `Aquí aparecerán las conexiones registradas durante los últimos ${result.data.history_days} días.`}</p>
     </div>}
-    {result.data && result.data.groups.map((group) => <Group key={group.role} group={group} now={result.now} stale={result.stale} busy={busy || !result.available} onPage={(page) => {
+    {result.data && result.data.groups.map((group) => <Group key={group.role} group={group} now={result.now} stale={result.stale} busy={busy || !result.available} getAvatarUrl={getAvatarUrl} onPage={(page) => {
       setPages((previous) => ({ ...previous, [group.role]: page }))
       scrollRef.current?.scrollTo({ top: 0, behavior: 'instant' })
     }} />)}
