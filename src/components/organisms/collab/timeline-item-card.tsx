@@ -39,50 +39,72 @@ export function TimelineItemCard({
   return (
     <article key={`${item.kind}:${item.id}`} className="relative pl-9">
       {!isLast && (
-        <span className="absolute left-[13px] top-8 bottom-[-0.85rem] w-px bg-border" aria-hidden="true" />
+        <span className="absolute left-[13px] top-8 bottom-[-0.85rem] w-px bg-border/70" aria-hidden="true" />
       )}
-      <span className="absolute left-0 top-1 inline-flex size-7 items-center justify-center rounded-full border bg-muted/40 text-primary shadow-sm">
+      <span
+        className={[
+          'absolute left-0 top-1 inline-flex size-7 items-center justify-center',
+          'rounded-full border border-primary/20 bg-primary/10 text-primary shadow-2xs',
+        ].join(' ')}
+      >
         {createElement(itemIcon(item), { className: 'size-3.5' })}
       </span>
       <div
-        className={`rounded-md border bg-background px-3 py-2.5 shadow-sm ${
-          item.isPurged ? 'opacity-75 bg-muted/20 border-dashed' : ''
-        }`}
+        className={[
+          'rounded-xl border border-border/70 bg-card px-3.5 py-3 shadow-2xs',
+          'transition-all hover:border-primary/30 hover:shadow-xs',
+          item.isPurged ? 'opacity-75 bg-muted/20 border-dashed' : '',
+        ].join(' ')}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="mb-1.5">
               <span
-                className={`inline-flex rounded-full border px-1.5 py-0.5 text-[10px] font-medium leading-none ${badgeClassByKind[item.kind]}`}
+                className={[
+                  'inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold leading-none',
+                  badgeClassByKind[item.kind],
+                ].join(' ')}
               >
                 {item.label}
               </span>
             </div>
-            <p className="line-clamp-2 text-sm font-semibold leading-snug">{item.title}</p>
+            <p className="line-clamp-2 text-xs font-bold leading-snug text-foreground">{item.title}</p>
             {isFile && (
-              <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+              <div className="mt-1 flex flex-wrap items-center gap-1.5">
                 <p className="line-clamp-1 text-[11px] text-muted-foreground">{item.fileName}</p>
                 {item.isPurged && (
-                  <span className="inline-flex items-center rounded-full border border-rose-500/20 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-medium text-rose-700 dark:text-rose-400">
+                  <span
+                    className={[
+                      'inline-flex items-center rounded-full border border-rose-500/20 bg-rose-500/10',
+                      'px-1.5 py-0.5 text-[10px] font-medium text-rose-700 dark:text-rose-400',
+                    ].join(' ')}
+                  >
                     Espacio liberado
                   </span>
                 )}
               </div>
             )}
             {item.kind === 'task_completed' && linkedTask && (
-              <p className="mt-0.5 text-[11px] text-muted-foreground">
-                Progreso final: <span className="tabular-nums">{linkedTask.checklistProgress}%</span>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Progreso final:{' '}
+                <span className="tabular-nums font-semibold text-foreground">{linkedTask.checklistProgress}%</span>
               </p>
             )}
             {item.resolutionComment && (
               <div
-                className={`mt-2 rounded-md border p-2 text-[11px] ${
+                className={`mt-2.5 rounded-lg border p-2.5 text-[11px] ${
                   item.kind === 'change_rejected'
-                    ? 'border-rose-200 bg-rose-50/60 text-rose-900 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-200'
-                    : 'border-emerald-200 bg-emerald-50/60 text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-200'
+                    ? [
+                        'border-rose-200 bg-rose-50/60 text-rose-900',
+                        'dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-200',
+                      ].join(' ')
+                    : [
+                        'border-emerald-200 bg-emerald-50/60 text-emerald-900',
+                        'dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-200',
+                      ].join(' ')
                 }`}
               >
-                <p className="font-semibold">
+                <p className="font-bold">
                   {item.kind === 'change_rejected' ? 'Motivo del rechazo:' : 'Nota de resolución:'}
                 </p>
                 <p className="mt-0.5 leading-relaxed">{item.resolutionComment}</p>
@@ -90,18 +112,18 @@ export function TimelineItemCard({
             )}
             <div className="mt-2.5 grid gap-1 text-[10px] text-muted-foreground">
               <p className="inline-flex items-center gap-1.5 leading-none">
-                <CalendarClock className="size-3" />
+                <CalendarClock className="size-3 text-muted-foreground/80" />
                 {formatBogotaDate(item.occurredAt)}
               </p>
               {item.requestedBySub && emailBySub.get(item.requestedBySub) && (
                 <p className="inline-flex items-center gap-1.5 leading-none">
-                  <UserRound className="size-3" />
+                  <UserRound className="size-3 text-muted-foreground/80" />
                   Solicitante: {emailBySub.get(item.requestedBySub)}
                 </p>
               )}
               {actorEmail && !item.requestedBySub && (
                 <p className="inline-flex items-center gap-1.5 leading-none">
-                  <UserRound className="size-3" />
+                  <UserRound className="size-3 text-muted-foreground/80" />
                   {actorEmail}
                 </p>
               )}
@@ -133,11 +155,14 @@ export function TimelineItemCard({
                         type="button"
                         size="sm"
                         variant="secondary"
-                        className="h-7 w-full justify-center px-2 text-[10px]"
+                        className={[
+                          'h-7.5 w-full justify-center rounded-lg px-2 text-[11px] font-medium shadow-2xs',
+                          'hover:bg-primary hover:text-white transition-colors',
+                        ].join(' ')}
                         disabled={busyKey !== null}
                         onClick={() => onOpenPreview(item.fileId!, item.fileName!)}
                       >
-                        <Eye className="mr-1 size-3" />
+                        <Eye className="mr-1.5 size-3" />
                         {busyKey === `${item.fileId}:preview`
                           ? `Abriendo... ${
                               previewProgress?.fileId === item.fileId && previewProgress.percent > 0
@@ -158,11 +183,15 @@ export function TimelineItemCard({
                   <Button
                     type="button"
                     size="sm"
-                    className="h-7 w-full justify-center px-2 text-[10px]"
+                    variant="outline"
+                    className={[
+                      'h-7.5 w-full justify-center rounded-lg border-border/70 px-2 text-[11px] font-medium',
+                      'shadow-2xs hover:bg-muted/40 transition-colors',
+                    ].join(' ')}
                     disabled={busyKey !== null}
                     onClick={() => onDownloadFile(item.fileId!, item.fileName!)}
                   >
-                    <Download className="mr-1 size-3" />
+                    <Download className="mr-1.5 size-3" />
                     {busyKey === `${item.fileId}:download` ? 'Descargando...' : 'Descargar'}
                   </Button>
                 </div>

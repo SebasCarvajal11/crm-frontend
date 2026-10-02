@@ -134,26 +134,33 @@ export function ConversationFilesTimeline({
   return (
     <>
       <div className="space-y-3">
-        <div className="flex flex-col gap-2 rounded-lg border bg-card p-3 shadow-xs">
-          <Input
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Buscar por título, archivo, usuario..."
-            className="h-8 w-full text-xs"
-          />
+        <div
+          className={[
+            'flex flex-col gap-2 rounded-xl border border-border/70 bg-card p-3 shadow-2xs',
+            'sm:flex-row sm:items-center',
+          ].join(' ')}
+        >
+          <div className="relative flex-1">
+            <Input
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Buscar por título, archivo, usuario..."
+              className="h-8.5 w-full rounded-lg border-border/70 text-xs focus-visible:ring-primary/20"
+            />
+          </div>
           <Select
             value={kindFilter}
             onValueChange={(value) => setKindFilter(value as 'all' | ProjectTimelineItem['kind'])}
           >
-            <SelectTrigger className="h-8 w-full text-xs">
+            <SelectTrigger className="h-8.5 sm:w-48 shrink-0 rounded-lg border-border/70 text-xs">
               <SelectValue placeholder="Filtrar por tipo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos los eventos</SelectItem>
-              <SelectItem value="file">Archivos subidos</SelectItem>
-              <SelectItem value="task_completed">Tareas finalizadas</SelectItem>
-              <SelectItem value="change_accepted">Cambios aceptados</SelectItem>
-              <SelectItem value="change_rejected">Cambios rechazados</SelectItem>
+              <SelectItem value="all" className="text-xs">Todos los eventos</SelectItem>
+              <SelectItem value="file" className="text-xs">Archivos subidos</SelectItem>
+              <SelectItem value="task_completed" className="text-xs">Tareas finalizadas</SelectItem>
+              <SelectItem value="change_accepted" className="text-xs">Cambios aceptados</SelectItem>
+              <SelectItem value="change_rejected" className="text-xs">Cambios rechazados</SelectItem>
             </SelectContent>
           </Select>
         </div>

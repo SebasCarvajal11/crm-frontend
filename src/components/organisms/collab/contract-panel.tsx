@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { CheckCircle2, FileSignature, Layers } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { FileSignature, Layers } from 'lucide-react'
 import {
   collabKeys,
   type Project,
@@ -9,13 +8,13 @@ import {
   type ProjectMember,
 } from '@/features/collab/model'
 import { listProjectContractAmendmentsRequest } from '@/features/collab/api'
-import { downloadSignedContractPdf } from '@/features/collab/lib/contract-pdf-downloader'
 import { generateContractPreviewText } from '@/features/collab/lib/contract-parser'
 import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 import { ContractClientSignature } from './contract-client-signature'
 import { ContractDocumentReader } from './contract-document-reader'
 import { ContractEditor } from './contract-editor'
 import { ContractAmendmentsList } from './contract-amendments-list'
+import { ContractLegalTraceability } from './contract-legal-traceability'
 import { formatMoney } from './contract-editor-constants'
 
 type Props = {
@@ -28,12 +27,24 @@ type Props = {
 }
 
 const statusCopy: Record<ProjectContract['status'], { label: string; className: string }> = {
-  draft: { label: 'Borrador', className: 'bg-amber-100 text-amber-800 border-amber-200' },
+  draft: {
+    label: 'Borrador',
+    className:
+      'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 ' +
+      'dark:text-amber-300 dark:border-amber-800',
+  },
   pending_signature: {
     label: 'Pendiente de firma',
-    className: 'bg-sky-100 text-sky-800 border-sky-200',
+    className:
+      'bg-sky-50 text-sky-800 border-sky-200 dark:bg-sky-950/40 ' +
+      'dark:text-sky-300 dark:border-sky-800',
   },
-  signed: { label: 'Firmado', className: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+  signed: {
+    label: 'Firmado',
+    className:
+      'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 ' +
+      'dark:text-emerald-300 dark:border-emerald-800',
+  },
 }
 
 export function ContractPanel({
@@ -107,11 +118,19 @@ export function ContractPanel({
   return (
     <section
       data-tour="workspace-contract-content"
-      className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-xs`}
+      className={
+        `flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden ` +
+        'rounded-xl border border-border/70 bg-card shadow-2xs'
+      }
     >
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-muted/10 px-5 py-3.5 shrink-0">
+      <div
+        className={[
+          'flex flex-wrap items-center justify-between gap-3 border-b border-border/60',
+          'bg-muted/20 px-5 py-3.5 shrink-0',
+        ].join(' ')}
+      >
         <div>
-          <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+          <h3 className="flex items-center gap-2 text-sm font-bold text-foreground tracking-tight">
             <FileSignature className="size-4 text-primary" />
             Contrato del proyecto
           </h3>
@@ -122,14 +141,15 @@ export function ContractPanel({
 
         <div className="flex items-center gap-3">
           {contract.status === 'signed' && (
-            <div className="flex items-center rounded-lg bg-muted p-1 text-xs">
+            <div className="flex items-center rounded-xl bg-muted/70 p-1 border border-border/50 text-xs">
               <button
                 type="button"
-                className={`flex items-center gap-1.5 rounded-md px-3 py-1 font-medium transition-colors cursor-pointer ${
+                className={[
+                  'flex items-center gap-1.5 rounded-lg px-3 py-1 font-medium transition-colors cursor-pointer',
                   activeTab === 'contract'
                     ? 'bg-card text-foreground shadow-2xs font-semibold'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                    : 'text-muted-foreground hover:text-foreground',
+                ].join(' ')}
                 onClick={() => setActiveTab('contract')}
               >
                 <FileSignature className="size-3.5" />
@@ -137,17 +157,18 @@ export function ContractPanel({
               </button>
               <button
                 type="button"
-                className={`flex items-center gap-1.5 rounded-md px-3 py-1 font-medium transition-colors cursor-pointer ${
+                className={[
+                  'flex items-center gap-1.5 rounded-lg px-3 py-1 font-medium transition-colors cursor-pointer',
                   activeTab === 'amendments'
                     ? 'bg-card text-foreground shadow-2xs font-semibold'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                    : 'text-muted-foreground hover:text-foreground',
+                ].join(' ')}
                 onClick={() => setActiveTab('amendments')}
               >
                 <Layers className="size-3.5" />
                 Otrosíes y Adiciones
                 {amendments.length > 0 && (
-                  <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.2 text-[10px] font-bold text-primary">
+                  <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
                     {amendments.length}
                   </span>
                 )}
@@ -155,7 +176,7 @@ export function ContractPanel({
             </div>
           )}
 
-          <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${badge.className}`}>
+          <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold shadow-2xs ${badge.className}`}>
             {badge.label}
           </span>
         </div>
@@ -173,7 +194,12 @@ export function ContractPanel({
           />
         </div>
       ) : (
-        <div className="min-h-0 flex-1 grid gap-4 p-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(20rem,24rem)] overflow-y-auto lg:overflow-hidden">
+        <div
+          className={[
+            'min-h-0 flex-1 grid gap-4 p-4 overflow-y-auto lg:overflow-hidden',
+            'lg:grid-cols-[minmax(0,1.3fr)_minmax(20rem,24rem)]',
+          ].join(' ')}
+        >
           <div className="h-[24rem] lg:h-full min-h-0 overflow-y-auto pr-1">
             <ContractDocumentReader
               content={
@@ -191,54 +217,11 @@ export function ContractPanel({
               onError={onError}
             />
           ) : (
-            <aside className="flex flex-col rounded-xl border bg-card p-4 text-sm shadow-xs overflow-y-auto space-y-3">
-              <p className="font-semibold text-foreground">Trazabilidad legal</p>
-              <p className="text-xs text-muted-foreground">
-                Preparado: {new Date(contract.createdAt).toLocaleString('es-CO')}
-              </p>
-              {contract.requestedSignatureAt && (
-                <p className="text-xs text-muted-foreground">
-                  Habilitado para firma: {new Date(contract.requestedSignatureAt).toLocaleString('es-CO')}
-                </p>
-              )}
-              {contract.signedAt && (
-                <>
-                  <p className="text-xs text-muted-foreground">
-                    Firmado: {new Date(contract.signedAt).toLocaleString('es-CO')}
-                  </p>
-                  <p className="text-xs font-medium text-foreground">Firmante: {contract.signerName}</p>
-                  {contract.signatureDataUrl && (
-                    <div className="rounded border bg-white p-2">
-                      <img
-                        src={contract.signatureDataUrl}
-                        alt="Firma registrada"
-                        className="h-16 w-full object-contain"
-                      />
-                    </div>
-                  )}
-                  {contract.contentHash && (
-                    <p className="break-all text-[10px] text-muted-foreground font-mono bg-muted/40 p-2 rounded border">
-                      SHA-256: {contract.contentHash}
-                    </p>
-                  )}
-                </>
-              )}
-
-              {contract.status === 'signed' && (
-                <Button
-                  className="w-full gap-2 text-xs font-semibold mt-auto"
-                  variant="outline"
-                  onClick={() =>
-                    void downloadSignedContractPdf(contract, project.name).catch((error) =>
-                      onError(error instanceof Error ? error.message : 'No se pudo generar el PDF'),
-                    )
-                  }
-                >
-                  <CheckCircle2 className="size-4 text-emerald-600" />
-                  Descargar PDF firmado
-                </Button>
-              )}
-            </aside>
+            <ContractLegalTraceability
+              contract={contract}
+              projectName={project.name}
+              onError={onError}
+            />
           )}
         </div>
       )}

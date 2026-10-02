@@ -40,25 +40,36 @@ export function ContractTimelineCard({ contract, projectName, onError }: Props) 
 
   return (
     <div
-      className={`rounded-xl border p-3.5 shadow-xs transition-all ${
+      className={`rounded-xl border border-l-4 p-3.5 shadow-2xs transition-all ${
         isSigned
-          ? 'border-emerald-200 bg-emerald-50/40 dark:border-emerald-900/60 dark:bg-emerald-950/20'
-          : 'border-sky-200 bg-sky-50/40 dark:border-sky-900/60 dark:bg-sky-950/20'
+          ? 'border-emerald-200 border-l-emerald-600 bg-emerald-50/40 dark:border-emerald-900/60 dark:bg-emerald-950/20'
+          : 'border-sky-200 border-l-sky-600 bg-sky-50/40 dark:border-sky-900/60 dark:bg-sky-950/20'
       }`}
     >
       <div className="flex items-center justify-between gap-2 border-b border-border/60 pb-2">
         <div className="flex items-center gap-2">
-          <FileSignature className={`size-4 ${isSigned ? 'text-emerald-700' : 'text-sky-700'}`} />
+          <FileSignature
+            className={`size-4 ${
+              isSigned ? 'text-emerald-700 dark:text-emerald-400' : 'text-sky-700 dark:text-sky-400'
+            }`}
+          />
           <span className="text-xs font-bold text-foreground">
             {isSigned ? 'Contrato digital firmado' : 'Contrato en proceso de firma'}
           </span>
         </div>
         <span
-          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold border ${
+          className={[
+            'rounded-full px-2 py-0.5 text-[10px] font-semibold border',
             isSigned
-              ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-              : 'bg-sky-100 text-sky-800 border-sky-300'
-          }`}
+              ? [
+                  'bg-emerald-100 text-emerald-800 border-emerald-300',
+                  'dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
+                ].join(' ')
+              : [
+                  'bg-sky-100 text-sky-800 border-sky-300',
+                  'dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800',
+                ].join(' '),
+          ].join(' ')}
         >
           {isSigned ? 'Firmado' : 'Pendiente de firma'}
         </span>
@@ -66,15 +77,15 @@ export function ContractTimelineCard({ contract, projectName, onError }: Props) 
 
       <div className="space-y-2 pt-2.5 text-xs">
         <div className="flex items-baseline justify-between gap-2">
-          <span className="font-semibold text-foreground">{contract.planName}</span>
-          <span className="text-muted-foreground">
+          <span className="font-bold text-foreground">{contract.planName}</span>
+          <span className="text-muted-foreground text-[11px]">
             {formatMoney(contract.monthlyFee)} / mes · {contract.termMonths} meses
           </span>
         </div>
 
         {isSigned && (
           <>
-            <div className="space-y-1 text-muted-foreground">
+            <div className="space-y-1 text-muted-foreground text-[11px]">
               <p>
                 <strong className="text-foreground">Firmante:</strong> {contract.signerName}
               </p>
@@ -87,7 +98,7 @@ export function ContractTimelineCard({ contract, projectName, onError }: Props) 
             </div>
 
             {contract.signatureDataUrl && (
-              <div className="rounded-lg border bg-white p-1.5 dark:bg-zinc-900">
+              <div className="rounded-lg border border-border/70 bg-white p-2 dark:bg-zinc-900 shadow-2xs">
                 <img
                   src={contract.signatureDataUrl}
                   alt="Firma electrónica registrada"
@@ -97,8 +108,13 @@ export function ContractTimelineCard({ contract, projectName, onError }: Props) 
             )}
 
             {contract.contentHash && (
-              <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-mono truncate">
-                <ShieldCheck className="size-3 shrink-0 text-emerald-700" />
+              <div
+                className={
+                  'flex items-center gap-1.5 text-[10px] text-muted-foreground font-mono ' +
+                  'truncate rounded-lg bg-muted/30 border border-border/50 p-1.5'
+                }
+              >
+                <ShieldCheck className="size-3 shrink-0 text-emerald-700 dark:text-emerald-400" />
                 <span className="truncate">SHA: {contract.contentHash}</span>
               </div>
             )}
@@ -106,14 +122,18 @@ export function ContractTimelineCard({ contract, projectName, onError }: Props) 
             <Button
               size="sm"
               variant="outline"
-              className="mt-1 w-full gap-1.5 text-xs border-emerald-300 hover:bg-emerald-100/50"
+              className={
+                'mt-1 w-full gap-1.5 text-xs font-semibold rounded-lg border-emerald-300 ' +
+                'text-emerald-800 hover:bg-emerald-100/50 dark:border-emerald-800 dark:text-emerald-300 ' +
+                'dark:hover:bg-emerald-950/40 shadow-2xs transition-colors'
+              }
               onClick={() =>
                 void downloadSignedContractPdf(contract, projectName).catch((err) =>
                   onError(err instanceof Error ? err.message : 'Error al descargar PDF'),
                 )
               }
             >
-              <Download className="size-3.5 text-emerald-700" />
+              <Download className="size-3.5 text-emerald-700 dark:text-emerald-400" />
               Descargar PDF firmado
             </Button>
           </>

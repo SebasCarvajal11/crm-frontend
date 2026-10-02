@@ -65,37 +65,53 @@ export function TaskSheetDetailView({
         onOpenUnblock={onOpenUnblock ?? (() => {})}
       />
 
-      <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Descripción</p>
-        {task.description
-          ? <p className="text-sm leading-relaxed">{task.description}</p>
-          : <p className="text-sm italic text-muted-foreground">Sin descripción.</p>}
+      <div className="rounded-xl border border-border/60 bg-muted/20 p-3.5 shadow-2xs">
+        <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Descripción</p>
+        {task.description ? (
+          <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed font-normal">{task.description}</p>
+        ) : (
+          <p className="text-xs italic text-muted-foreground">Sin descripción registrada.</p>
+        )}
       </div>
 
-      <Separator />
-
-      <dl className="grid grid-cols-1 gap-x-4 gap-y-4 text-sm sm:grid-cols-2">
-        <div>
-          <dt className="mb-1 text-xs text-muted-foreground">Prioridad</dt>
-          <dd><span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${priorityConfig.bg} ${priorityConfig.text}`}>{priorityConfig.label}</span></dd>
+      <dl className="grid grid-cols-2 gap-2 text-xs">
+        <div className="rounded-xl border border-border/50 bg-muted/15 p-2.5">
+          <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Prioridad</dt>
+          <dd>
+            <span
+              className={
+                `inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-bold shadow-2xs ` +
+                `${priorityConfig.bg} ${priorityConfig.text}`
+              }
+            >
+              {priorityConfig.label}
+            </span>
+          </dd>
         </div>
-        <div>
-          <dt className="mb-1 text-xs text-muted-foreground">Visible al cliente</dt>
-          <dd className="font-medium">{task.isClientVisible ? 'Si' : 'No'}</dd>
+        <div className="rounded-xl border border-border/50 bg-muted/15 p-2.5">
+          <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+            Visible al cliente
+          </dt>
+          <dd className="font-bold text-foreground text-xs">{task.isClientVisible ? 'Sí' : 'No'}</dd>
         </div>
-        <div>
-          <dt className="mb-1 text-xs text-muted-foreground">Creada</dt>
-          <dd className="text-xs text-muted-foreground" suppressHydrationWarning>{createdAtLabel}</dd>
+        <div className="rounded-xl border border-border/50 bg-muted/15 p-2.5">
+          <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Creada</dt>
+          <dd className="text-[11px] text-muted-foreground font-medium" suppressHydrationWarning>{createdAtLabel}</dd>
         </div>
-        <div>
-          <dt className="mb-1 text-xs text-muted-foreground">Actualizada</dt>
-          <dd className="text-xs text-muted-foreground" suppressHydrationWarning>{updatedAtLabel}</dd>
+        <div className="rounded-xl border border-border/50 bg-muted/15 p-2.5">
+          <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Actualizada</dt>
+          <dd className="text-[11px] text-muted-foreground font-medium" suppressHydrationWarning>{updatedAtLabel}</dd>
         </div>
         {task.deadline && (
-          <div className="sm:col-span-2">
-            <dt className="mb-1 text-xs text-muted-foreground">Fecha limite</dt>
-            <dd className="flex items-center gap-1.5" suppressHydrationWarning>
-              <Calendar className="size-3.5 text-muted-foreground" aria-hidden="true" />
+          <div
+            className={[
+              'col-span-2 rounded-xl border border-border/50 bg-muted/15 p-2.5',
+              'flex items-center justify-between',
+            ].join(' ')}
+          >
+            <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Fecha límite</dt>
+            <dd className="flex items-center gap-1.5 text-xs font-bold text-foreground" suppressHydrationWarning>
+              <Calendar className="size-3.5 text-primary" aria-hidden="true" />
               {deadlineLabel}
             </dd>
           </div>
@@ -126,7 +142,7 @@ export function TaskSheetDetailView({
           <div className="flex flex-col gap-2">
             {canUnblock && task.blockType && (
               <Button
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-xs"
                 disabled={isUnblocking}
                 onClick={onOpenUnblock}
               >
@@ -136,7 +152,7 @@ export function TaskSheetDetailView({
             )}
 
             {canEdit && (
-              <Button className="w-full" variant="outline" onClick={onStartEditing}>
+              <Button className="w-full rounded-xl font-semibold shadow-2xs" variant="outline" onClick={onStartEditing}>
                 <Pencil className="mr-2 size-4" />
                 Editar tarea
               </Button>
@@ -144,7 +160,10 @@ export function TaskSheetDetailView({
 
             {canBlock && !task.blockType && (
               <Button
-                className="w-full border-rose-200 text-rose-700 hover:bg-rose-50 dark:border-rose-900/50 dark:text-rose-300 dark:hover:bg-rose-950/40"
+                className={
+                  'w-full rounded-xl border-rose-200 text-rose-700 hover:bg-rose-50 ' +
+                  'dark:border-rose-900/50 dark:text-rose-300 dark:hover:bg-rose-950/40 font-semibold'
+                }
                 variant="outline"
                 onClick={onOpenBlock}
               >

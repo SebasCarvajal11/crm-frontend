@@ -49,26 +49,28 @@ export function TaskComments({ accessToken, projectId, taskId, onError }: Props)
           </p>
         ) : (
           comments.map((c) => (
-            <div key={c.id} className="rounded-lg border bg-muted/30 px-3 py-2.5 space-y-1.5">
+            <div key={c.id} className="rounded-xl border border-border/70 bg-card p-3 shadow-2xs space-y-1.5">
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <UserAvatar
                     src={getAvatarUrl(c.authorSub)}
                     name={c.authorEmail}
                     userId={c.authorSub}
                     size="xs"
-                    className="size-5 shrink-0"
+                    className="size-6 shrink-0"
                   />
-                  <span className="text-xs font-semibold truncate">{c.authorEmail}</span>
+                  <span className="text-xs font-bold text-foreground truncate">{c.authorEmail}</span>
                 </div>
                 <time
                   dateTime={c.createdAt}
-                  className="text-[10px] text-muted-foreground shrink-0"
+                  className="text-[10px] font-medium text-muted-foreground shrink-0 tabular-nums"
                 >
                   {new Date(c.createdAt).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
                 </time>
               </div>
-              <p className="text-sm leading-relaxed whitespace-pre-wrap pl-7">{c.content}</p>
+              <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap pl-8 text-foreground/90 font-normal">
+                {c.content}
+              </p>
             </div>
           ))
         )}
@@ -81,7 +83,7 @@ export function TaskComments({ accessToken, projectId, taskId, onError }: Props)
           placeholder="Escribe un comentario… (Ctrl+Enter para enviar)"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="min-h-[80px] resize-none"
+          className="min-h-[80px] resize-none text-xs sm:text-sm rounded-xl border-border/80"
           aria-label="Escribe un comentario"
           onKeyDown={(e) => {
             if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && content.trim()) {
@@ -89,8 +91,13 @@ export function TaskComments({ accessToken, projectId, taskId, onError }: Props)
             }
           }}
         />
-        <Button size="sm" disabled={!content.trim() || send.isPending} onClick={() => send.mutate()}>
-          <Send className="size-3.5 mr-1.5" />
+        <Button
+          size="sm"
+          disabled={!content.trim() || send.isPending}
+          onClick={() => send.mutate()}
+          className="h-9 rounded-xl font-bold shadow-xs self-end px-4 gap-1.5"
+        >
+          <Send className="size-3.5" />
           {send.isPending ? 'Enviando…' : 'Comentar'}
         </Button>
       </div>

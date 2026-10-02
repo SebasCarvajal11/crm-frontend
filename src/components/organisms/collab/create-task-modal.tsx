@@ -34,16 +34,8 @@ type Props = {
 }
 
 export function CreateTaskModal({
-  accessToken,
-  projectId,
-  column,
-  tasksByColumn,
-  identity,
-  members,
-  open,
-  onClose,
-  onCreated,
-  onError,
+  accessToken, projectId, column, tasksByColumn, identity,
+  members, open, onClose, onCreated, onError,
 }: Props) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -58,34 +50,15 @@ export function CreateTaskModal({
   const canAssign = identity.role === 'admin' || identity.role === 'worker'
 
   const handleClose = () => {
-    setTitle('')
-    setDescription('')
-    setPriority('medium')
-    setDeadline('')
-    setClientVis(false)
-    setSelectedWorkerSubs([])
-    setSubtasks([])
-    setNewSubtask('')
-    setNewSubtaskAssignee('none')
-    onClose()
+    setTitle(''); setDescription(''); setPriority('medium'); setDeadline('')
+    setClientVis(false); setSelectedWorkerSubs([]); setSubtasks([]); setNewSubtask('')
+    setNewSubtaskAssignee('none'); onClose()
   }
 
   const { createTask, workerMembers, selectedWorkers, columnId, getProjectMemberLabel } = useCreateTask({
-    accessToken,
-    projectId,
-    column,
-    tasksByColumn,
-    members,
-    selectedWorkerSubs,
-    title,
-    description,
-    priority,
-    deadline,
-    clientVis,
-    subtasks,
-    onCreated,
-    onError,
-    handleClose,
+    accessToken, projectId, column, tasksByColumn, members,
+    selectedWorkerSubs, title, description, priority, deadline,
+    clientVis, subtasks, onCreated, onError, handleClose,
   })
 
   const canSubmit = title.trim().length >= 2 && !!columnId
@@ -107,16 +80,23 @@ export function CreateTaskModal({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => { if (!nextOpen) handleClose() }}>
-      <DialogContent className="max-w-xl">
-        <DialogHeader>
+      <DialogContent className="max-w-xl p-0 overflow-hidden border-border/60 shadow-xl">
+        <DialogHeader className="px-5 pt-5 pb-4 border-b border-border/50 bg-muted/20">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0 ring-1 ring-primary/20">
+            <div
+              className={
+                'flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary ' +
+                'shrink-0 ring-1 ring-primary/20 shadow-2xs'
+              }
+            >
               <ListTodo className="size-5" />
             </div>
             <div>
-              <DialogTitle>Nueva tarea</DialogTitle>
-              <DialogDescription>
-                {column ? `Completa los datos para crear la tarea en ${column.title}.` : 'Completa los datos para crear la tarea en el tablero.'}
+              <DialogTitle className="text-base font-bold text-foreground tracking-tight">Nueva tarea</DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                {column
+                  ? `Completa los datos para crear la tarea en ${column.title}.`
+                  : 'Completa los datos para crear la tarea en el tablero.'}
               </DialogDescription>
             </div>
           </div>
@@ -124,55 +104,77 @@ export function CreateTaskModal({
 
         <form
           id="create-task-form"
-          className="space-y-4 px-5 py-4 sm:px-6"
+          className="space-y-4 px-5 py-4 sm:px-6 max-h-[75vh] overflow-y-auto"
           onSubmit={(event) => {
             event.preventDefault()
             createTask.mutate()
           }}
         >
           <div className="space-y-1.5">
-            <Label htmlFor="ct-title">Titulo <span className="text-destructive">*</span></Label>
-            <Input id="ct-title" placeholder="Describe brevemente la tarea" value={title} onChange={(e) => setTitle(e.target.value)} />
+            <Label htmlFor="ct-title" className="text-xs font-semibold text-foreground/90">
+              Título <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="ct-title"
+              placeholder="Describe brevemente la tarea"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="h-9 rounded-lg border-border/70 focus-visible:ring-primary/20"
+            />
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label>Columna</Label>
-              <div className="rounded-lg border bg-muted/40 px-3 py-2 text-sm">
+              <Label className="text-xs font-semibold text-foreground/90">Columna de destino</Label>
+              <div
+                className="rounded-lg border border-border/70 bg-muted/30 px-3 py-2 text-xs font-medium text-foreground"
+              >
                 {column?.title ?? 'Sin columna'}
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="ct-pri">Prioridad</Label>
+              <Label htmlFor="ct-pri" className="text-xs font-semibold text-foreground/90">Prioridad</Label>
               <Select value={priority} onValueChange={(value) => setPriority(value as ProjectTask['priority'])}>
-                <SelectTrigger id="ct-pri"><SelectValue /></SelectTrigger>
+                <SelectTrigger id="ct-pri" className="h-9 rounded-lg border-border/70 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Baja</SelectItem>
-                  <SelectItem value="medium">Media</SelectItem>
-                  <SelectItem value="high">Alta</SelectItem>
-                  <SelectItem value="urgent">Urgente</SelectItem>
+                  <SelectItem value="low" className="text-xs">Baja</SelectItem>
+                  <SelectItem value="medium" className="text-xs">Media</SelectItem>
+                  <SelectItem value="high" className="text-xs">Alta</SelectItem>
+                  <SelectItem value="urgent" className="text-xs font-semibold text-rose-600">Urgente</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="ct-desc">Descripcion</Label>
-            <Textarea id="ct-desc" placeholder="Detalla que hay que hacer..." value={description} onChange={(e) => setDescription(e.target.value)} className="min-h-[80px] resize-none" />
+            <Label htmlFor="ct-desc" className="text-xs font-semibold text-foreground/90">Descripción</Label>
+            <Textarea
+              id="ct-desc"
+              placeholder="Detalla qué hay que hacer, requisitos y contexto..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="min-h-[80px] rounded-lg border-border/70 text-xs resize-none focus-visible:ring-primary/20"
+            />
           </div>
 
           {canAssign && (
             <div className="space-y-1.5">
-              <Label>Trabajadores asignados</Label>
+              <Label className="text-xs font-semibold text-foreground/90">Trabajadores asignados</Label>
               {selectedWorkers.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-1">
+                <div className="flex flex-wrap gap-1.5 mb-1.5">
                   {selectedWorkers.map((worker) => (
                     <UserChip
                       key={worker.userSub}
                       email={getProjectMemberLabel(worker)}
                       onRemove={() => {
                         setSelectedWorkerSubs((prev) => prev.filter((sub) => sub !== worker.userSub))
-                        setSubtasks((prev) => prev.map((subtask) => subtask.assignee_sub === worker.userSub ? { ...subtask, assignee_sub: null } : subtask))
+                        setSubtasks((prev) =>
+                          prev.map((subtask) =>
+                            subtask.assignee_sub === worker.userSub ? { ...subtask, assignee_sub: null } : subtask,
+                          ),
+                        )
                       }}
                     />
                   ))}
@@ -180,24 +182,34 @@ export function CreateTaskModal({
               )}
 
               {workerMembers.length === 0 ? (
-                <div className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-2.5 text-xs text-muted-foreground">
+                <div
+                  className={
+                    'flex items-center gap-2 rounded-lg border border-dashed border-border/70 ' +
+                    'px-3 py-2.5 text-xs text-muted-foreground bg-muted/20'
+                  }
+                >
                   <Lock className="size-3.5 shrink-0" />
                   <span>Este proyecto no tiene trabajadores disponibles.</span>
                 </div>
               ) : (
-                <Select value="none" onValueChange={(value) => {
-                  if (value === 'none') return
-                  setSelectedWorkerSubs((prev) => (prev.includes(value) ? prev : [...prev, value]))
-                }}>
-                  <SelectTrigger>
+                <Select
+                  value="none"
+                  onValueChange={(value) => {
+                    if (value === 'none') return
+                    setSelectedWorkerSubs((prev) => (prev.includes(value) ? prev : [...prev, value]))
+                  }}
+                >
+                  <SelectTrigger className="h-9 rounded-lg border-border/70 text-xs">
                     <SelectValue placeholder="Selecciona un trabajador del proyecto..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Seleccionar...</SelectItem>
+                    <SelectItem value="none" className="text-xs">Seleccionar...</SelectItem>
                     {workerMembers
                       .filter((worker) => !selectedWorkerSubs.includes(worker.userSub))
                       .map((worker) => (
-                        <SelectItem key={worker.userSub} value={worker.userSub}>{getProjectMemberLabel(worker)}</SelectItem>
+                        <SelectItem key={worker.userSub} value={worker.userSub} className="text-xs">
+                          {getProjectMemberLabel(worker)}
+                        </SelectItem>
                       ))}
                   </SelectContent>
                 </Select>
@@ -207,12 +219,28 @@ export function CreateTaskModal({
 
           <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="ct-dead">Fecha limite</Label>
-              <Input id="ct-dead" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+              <Label htmlFor="ct-dead" className="text-xs font-semibold text-foreground/90">Fecha límite</Label>
+              <Input
+                id="ct-dead"
+                type="date"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                className="h-9 rounded-lg border-border/70 text-xs"
+              />
             </div>
-            <label className="flex items-center gap-2 cursor-pointer select-none p-2.5 rounded-lg border hover:bg-muted/50 transition-colors">
-              <input type="checkbox" className="rounded accent-primary size-4" checked={clientVis} onChange={(e) => setClientVis(e.target.checked)} />
-              <p className="text-xs font-medium">Visible al cliente</p>
+            <label
+              className={
+                'flex items-center gap-2.5 cursor-pointer select-none px-3 py-2 rounded-lg ' +
+                'border border-border/70 hover:bg-muted/40 transition-colors bg-muted/10 h-9'
+              }
+            >
+              <input
+                type="checkbox"
+                className="rounded accent-primary size-4"
+                checked={clientVis}
+                onChange={(e) => setClientVis(e.target.checked)}
+              />
+              <span className="text-xs font-medium text-foreground">Visible para el cliente</span>
             </label>
           </div>
 
@@ -230,9 +258,26 @@ export function CreateTaskModal({
           />
         </form>
 
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={handleClose} disabled={createTask.isPending}>Cancelar</Button>
-          <Button type="submit" form="create-task-form" disabled={!canSubmit || createTask.isPending}>
+        <DialogFooter
+          className="px-5 py-3.5 sm:px-6 border-t border-border/50 bg-muted/15 flex items-center justify-end gap-2.5"
+        >
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleClose}
+            disabled={createTask.isPending}
+            className="rounded-lg text-xs"
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            size="sm"
+            form="create-task-form"
+            disabled={!canSubmit || createTask.isPending}
+            className="rounded-lg text-xs shadow-xs"
+          >
             {createTask.isPending ? 'Creando...' : 'Crear tarea'}
           </Button>
         </DialogFooter>
@@ -240,7 +285,3 @@ export function CreateTaskModal({
     </Dialog>
   )
 }
-
-
-
-
