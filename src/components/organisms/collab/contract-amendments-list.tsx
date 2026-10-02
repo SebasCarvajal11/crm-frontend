@@ -11,7 +11,7 @@ import {
   listProjectContractAmendmentsRequest,
   requestProjectContractAmendmentSignatureRequest,
 } from '@/features/collab/api'
-import { downloadSignedAmendmentPdf } from '@/features/collab/lib/contract-pdf'
+import { downloadSignedAmendmentPdf } from '@/features/collab/lib/contract-pdf-downloader'
 import { parseApiError } from '@/shared/lib'
 import { ContractAmendmentModal } from './contract-amendment-modal'
 import { ContractAmendmentSignDialog } from './contract-amendment-sign-dialog'

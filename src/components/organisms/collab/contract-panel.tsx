@@ -9,7 +9,7 @@ import {
   type ProjectMember,
 } from '@/features/collab/model'
 import { listProjectContractAmendmentsRequest } from '@/features/collab/api'
-import { downloadSignedContractPdf } from '@/features/collab/lib/contract-pdf'
+import { downloadSignedContractPdf } from '@/features/collab/lib/contract-pdf-downloader'
 import { generateContractPreviewText } from '@/features/collab/lib/contract-parser'
 import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 import { ContractClientSignature } from './contract-client-signature'

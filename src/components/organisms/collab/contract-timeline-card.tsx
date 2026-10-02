@@ -1,7 +1,7 @@
 import { Download, FileSignature, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { ProjectContract } from '@/features/collab/model'
-import { downloadSignedContractPdf } from '@/features/collab/lib/contract-pdf'
+import { downloadSignedContractPdf } from '@/features/collab/lib/contract-pdf-downloader'
 
 type Props = {
   contract: ProjectContract

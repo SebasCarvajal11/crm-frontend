@@ -21,6 +21,8 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      refetchOnWindowFocus: false,
       // Los 4xx representan una petición inválida o una decisión de autorización;
       // reintentarlos solo duplica tráfico y oculta la causa al usuario.
       retry: (failureCount, error) => {
