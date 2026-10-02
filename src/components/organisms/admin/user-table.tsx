@@ -87,14 +87,22 @@ export function AdminUserTable({ accessToken }: Props) {
           setViewMode={setViewMode}
         />
 
-        <CardContent data-tour={usersQ.isLoading || usersQ.isError ? undefined : 'admin-user-table'} className="space-y-4 p-4 sm:p-6">
+        <CardContent
+          data-tour={usersQ.isLoading || usersQ.isError ? undefined : 'admin-user-table'}
+          className="space-y-4 p-4 sm:p-6"
+        >
           {actionsError ? (
             <Alert variant="destructive" className="rounded-xl">
               <AlertTitle>No se pudo completar la acción</AlertTitle>
               <AlertDescription>{(actionsError as Error).message}</AlertDescription>
             </Alert>
           ) : actionsMessage ? (
-            <Alert className="rounded-xl border-emerald-500/30 bg-emerald-500/5 text-emerald-900 dark:text-emerald-300">
+            <Alert
+              className={[
+                'rounded-xl border-emerald-500/30 bg-emerald-500/5',
+                'text-emerald-900 dark:text-emerald-300',
+              ].join(' ')}
+            >
               <AlertTitle>Acción realizada</AlertTitle>
               <AlertDescription>{actionsMessage}</AlertDescription>
             </Alert>
@@ -139,7 +147,9 @@ export function AdminUserTable({ accessToken }: Props) {
             >
               <Table className="min-w-[780px] table-fixed">
                 <caption className="sr-only">Listado de usuarios administrables.</caption>
-                <TableHeader className="sticky top-0 z-10 bg-muted/60 backdrop-blur-md shadow-[0_1px_0_0_rgba(0,0,0,0.06)]">
+                <TableHeader
+                  className="sticky top-0 z-10 bg-muted/60 backdrop-blur-md shadow-[0_1px_0_0_rgba(0,0,0,0.06)]"
+                >
                   <TableRow className="border-b-0 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                     <TableHead className="w-[190px]">Usuario</TableHead>
                     <TableHead className="w-[200px]">Correo</TableHead>

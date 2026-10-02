@@ -93,7 +93,12 @@ export function FileManagerTable({
 
   if (files.length === 0) {
     return (
-      <div className="w-full py-8 px-4 sm:py-12 flex flex-col items-center justify-center text-center text-muted-foreground border rounded-lg bg-muted/10 min-h-[160px] lg:h-full">
+      <div
+        className={[
+          'w-full py-8 px-4 sm:py-12 flex flex-col items-center justify-center',
+          'text-center text-muted-foreground border rounded-lg bg-muted/10 min-h-[160px] lg:h-full',
+        ].join(' ')}
+      >
         <Archive className="size-8 mb-2 opacity-40" />
         <p className="text-sm font-medium">No hay archivos en esta carpeta o filtro</p>
         <p className="text-xs">Los archivos subidos aparecerán organizados aquí.</p>
@@ -106,9 +111,19 @@ export function FileManagerTable({
   const selectedBytes = selectedFiles.reduce((acc, f) => acc + f.sizeBytes, 0)
 
   return (
-    <div className="min-h-0 flex flex-col lg:h-full rounded-lg border border-border/60 overflow-hidden bg-background shadow-2xs">
+    <div
+      className={[
+        'min-h-0 flex flex-col lg:h-full rounded-lg border',
+        'border-border/60 overflow-hidden bg-background shadow-2xs',
+      ].join(' ')}
+    >
       {selectedIds.size > 0 && (
-        <div className="bg-primary/5 border-b border-primary/20 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs animate-in fade-in-50">
+        <div
+          className={[
+            'bg-primary/5 border-b border-primary/20 px-3 py-2 flex flex-wrap',
+            'items-center justify-between gap-2 text-xs animate-in fade-in-50',
+          ].join(' ')}
+        >
           <div className="flex items-center gap-2">
             <span className="font-semibold text-primary">
               {selectedIds.size} {selectedIds.size === 1 ? 'archivo seleccionado' : 'archivos seleccionados'}
@@ -168,7 +183,12 @@ export function FileManagerTable({
             <col className="w-[76px]" />
           </colgroup>
           <TableHeader className="sticky top-0 z-10 bg-muted/85 backdrop-blur-sm shadow-[0_1px_0_0_rgba(0,0,0,0.06)]">
-            <TableRow className="border-b border-border/60 text-[11px] font-bold uppercase tracking-wider text-muted-foreground hover:bg-transparent">
+            <TableRow
+              className={[
+                'border-b border-border/60 text-[11px] font-bold uppercase',
+                'tracking-wider text-muted-foreground hover:bg-transparent',
+              ].join(' ')}
+            >
               <TableHead className="w-[44px] text-center border-r border-border/40 py-2.5">
                 <Checkbox
                   checked={allActiveSelected}
@@ -215,7 +235,12 @@ export function FileManagerTable({
         </Table>
       </div>
 
-      <div className="px-3 py-2 border-t border-border/60 bg-muted/20 flex flex-wrap items-center justify-between gap-1 text-[11px] text-muted-foreground">
+      <div
+        className={[
+          'px-3 py-2 border-t border-border/60 bg-muted/20 flex flex-wrap',
+          'items-center justify-between gap-1 text-[11px] text-muted-foreground',
+        ].join(' ')}
+      >
         <span>
           Mostrando {files.length} {files.length === 1 ? 'archivo' : 'archivos'}
         </span>

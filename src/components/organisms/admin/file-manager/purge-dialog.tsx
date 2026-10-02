@@ -86,7 +86,8 @@ export function FilePurgeDialog({ file, isOpen, onClose, onConfirm }: Props) {
                 Depurar Archivo para Liberar Espacio
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
-                Esta acción eliminará el archivo binario en la nube para recuperar espacio en la cuota de almacenamiento.
+                Esta acción eliminará el archivo binario en la nube para recuperar espacio
+                en la cuota de almacenamiento.
               </DialogDescription>
             </div>
           </div>
@@ -169,7 +170,12 @@ export function FilePurgeDialog({ file, isOpen, onClose, onConfirm }: Props) {
           )}
 
           {errorMessage && (
-            <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive flex items-center gap-2">
+            <div
+              className={[
+                'flex items-center gap-2 rounded-xl border border-destructive/40',
+                'bg-destructive/10 p-3 text-xs text-destructive',
+              ].join(' ')}
+            >
               <AlertTriangle className="size-4 shrink-0" />
               <span>{errorMessage}</span>
             </div>

@@ -51,7 +51,9 @@ function CloudStatBoxes({ cloud }: { cloud: CloudStorageStats }) {
     <div className="grid grid-cols-3 gap-2.5 text-center">
       <div className="rounded-xl border border-border/60 bg-muted/20 p-3 shadow-2xs">
         <p className="text-[11px] font-semibold text-muted-foreground">Archivos en Nube</p>
-        <p className="mt-1 text-sm sm:text-base font-bold text-foreground tabular-nums">{formatBytes(cloud.usedBytes)}</p>
+        <p className="mt-1 text-sm sm:text-base font-bold text-foreground tabular-nums">
+          {formatBytes(cloud.usedBytes)}
+        </p>
       </div>
       <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 shadow-2xs">
         <p className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-300">Disponible</p>
@@ -61,7 +63,9 @@ function CloudStatBoxes({ cloud }: { cloud: CloudStorageStats }) {
       </div>
       <div className="rounded-xl border border-border/60 bg-muted/20 p-3 shadow-2xs">
         <p className="text-[11px] font-semibold text-muted-foreground">Cuota Total</p>
-        <p className="mt-1 text-sm sm:text-base font-bold text-foreground tabular-nums">{formatBytes(cloud.quotaBytes)}</p>
+        <p className="mt-1 text-sm sm:text-base font-bold text-foreground tabular-nums">
+          {formatBytes(cloud.quotaBytes)}
+        </p>
       </div>
     </div>
   )
@@ -69,7 +73,12 @@ function CloudStatBoxes({ cloud }: { cloud: CloudStorageStats }) {
 
 function CloudBreakdownBadges({ cloud }: { cloud: CloudStorageStats }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/70 bg-card/60 px-3.5 py-2.5 text-xs text-muted-foreground shadow-2xs">
+    <div
+      className={[
+        'flex flex-wrap items-center justify-between gap-3 rounded-xl border',
+        'border-border/70 bg-card/60 px-3.5 py-2.5 text-xs text-muted-foreground shadow-2xs',
+      ].join(' ')}
+    >
       <div className="flex items-center gap-1.5 font-medium">
         <FolderKanban className="size-3.5 text-primary" />
         <span>Archivos de Proyectos:</span>
@@ -110,7 +119,10 @@ function CloudStorageSection({ cloud }: { cloud: CloudStorageStats }) {
 function ServerDiskSection({ disk }: { disk: DiskStats }) {
   const color = getProgressColor(disk.usedPercentage)
   return (
-    <div data-tour="admin-storage-server-disk" className="rounded-xl border border-border/60 bg-muted/15 p-3.5 space-y-2 mt-4 shadow-2xs">
+    <div
+      data-tour="admin-storage-server-disk"
+      className="mt-4 space-y-2 rounded-xl border border-border/60 bg-muted/15 p-3.5 shadow-2xs"
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <HardDrive className="size-4 text-primary/80" />

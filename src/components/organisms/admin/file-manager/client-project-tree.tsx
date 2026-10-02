@@ -21,14 +21,22 @@ export function ClientProjectTree({
   return (
     <aside
       data-tour="admin-file-client-tree"
-      className="lg:col-span-4 flex flex-col min-h-0 lg:h-full border-b lg:border-b-0 lg:border-r border-border/60 bg-muted/10"
+      className={[
+        'lg:col-span-4 flex flex-col min-h-0 lg:h-full border-b',
+        'lg:border-b-0 lg:border-r border-border/60 bg-muted/10',
+      ].join(' ')}
     >
       <div className="p-3 border-b border-border/60 flex items-center justify-between bg-muted/20">
         <span className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-1.5">
           <Building2 className="size-3.5 text-primary" />
           Clientes y Proyectos
         </span>
-        <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border/40">
+        <span
+          className={[
+            'text-[11px] font-mono px-2 py-0.5 rounded-full bg-muted',
+            'text-muted-foreground border border-border/40',
+          ].join(' ')}
+        >
           {clients.length}
         </span>
       </div>
@@ -76,11 +84,13 @@ export function ClientProjectTree({
                             e.stopPropagation()
                             onSelectProject(proj.projectId)
                           }}
-                          className={`w-full flex items-center justify-between px-2 py-1 rounded text-[11px] text-left transition-colors ${
+                          className={[
+                            'w-full flex items-center justify-between px-2 py-1',
+                            'rounded text-[11px] text-left transition-colors',
                             isProjSelected
                               ? 'bg-primary/10 text-primary font-semibold'
-                              : 'text-muted-foreground hover:bg-muted/40'
-                          }`}
+                              : 'text-muted-foreground hover:bg-muted/40',
+                          ].join(' ')}
                         >
                           <span className="truncate">{proj.projectName}</span>
                           <span className="font-mono text-[10px] shrink-0 ml-1">

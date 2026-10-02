@@ -20,10 +20,48 @@ type Props = {
   accessToken: string
 }
 
-const cardClass = 'flex h-full flex-col overflow-hidden rounded-2xl border-border/80 bg-card shadow-md shadow-black/[0.04]'
+const cardClass = [
+  'flex h-full flex-col overflow-hidden rounded-2xl border-border/80 bg-card',
+  'shadow-md shadow-black/[0.04]',
+].join(' ')
 const cardHeaderClass = 'border-b bg-muted/20 p-5 sm:p-6'
 const inputClass = 'h-10 rounded-xl'
 const pairClass = 'grid grid-cols-1 gap-3 sm:grid-cols-2'
+
+type CardHeaderProps = {
+  icon: typeof UserPlus
+  iconClass: string
+  badgeClass: string
+  title: string
+  description: string
+  badgeText: string
+}
+
+function InviteCardHeader({
+  icon: Icon,
+  iconClass,
+  badgeClass,
+  title,
+  description,
+  badgeText,
+}: CardHeaderProps) {
+  return (
+    <CardHeader className={cardHeaderClass}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <span className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${iconClass}`}>
+            <Icon className="size-5" />
+          </span>
+          <div>
+            <CardTitle className="text-base font-semibold tracking-tight text-foreground">{title}</CardTitle>
+            <CardDescription className="mt-0.5 text-xs text-muted-foreground">{description}</CardDescription>
+          </div>
+        </div>
+        <Badge className={`rounded-full border text-[10px] font-semibold ${badgeClass}`}>{badgeText}</Badge>
+      </div>
+    </CardHeader>
+  )
+}
 
 /** Organismo: centro de incorporacion y generacion de accesos para roles del CRM. */
 export function AdminInviteForms({ accessToken }: Props) {
@@ -44,6 +82,9 @@ export function AdminInviteForms({ accessToken }: Props) {
   })
 
   const { adminMutation, inviteMutation, workerMutation } = useAdminInvites(accessToken)
+  const err = inviteForm.formState.errors
+  const wErr = workerForm.formState.errors
+  const aErr = adminForm.formState.errors
 
   return (
     <section className="space-y-4">
@@ -56,26 +97,14 @@ export function AdminInviteForms({ accessToken }: Props) {
       <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2 xl:grid-cols-3">
         {/* Invitar cliente */}
         <Card data-tour="admin-invite-client" className={cardClass}>
-          <CardHeader className={cardHeaderClass}>
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
-                  <UserPlus className="size-5" />
-                </span>
-                <div>
-                  <CardTitle className="text-base font-semibold tracking-tight text-foreground">
-                    Invitar cliente
-                  </CardTitle>
-                  <CardDescription className="mt-0.5 text-xs text-muted-foreground">
-                    Acceso al portal y seguimiento de proyectos.
-                  </CardDescription>
-                </div>
-              </div>
-              <Badge className="rounded-full border-emerald-500/20 bg-emerald-500/10 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-400">
-                Portal
-              </Badge>
-            </div>
-          </CardHeader>
+          <InviteCardHeader
+            icon={UserPlus}
+            iconClass="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+            badgeClass="border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+            title="Invitar cliente"
+            description="Acceso al portal y seguimiento de proyectos."
+            badgeText="Portal"
+          />
           <CardContent className="flex flex-1 flex-col justify-between p-5 sm:p-6">
             <form
               className="flex flex-1 flex-col justify-between space-y-4"
@@ -84,18 +113,18 @@ export function AdminInviteForms({ accessToken }: Props) {
               )}
             >
               <div className="space-y-4">
-                <FormField id="invite-email" label="Correo electrónico" error={inviteForm.formState.errors.email?.message}>
+                <FormField id="invite-email" label="Correo electrónico" error={err.email?.message}>
                   <Input type="email" autoComplete="email" className={inputClass} {...inviteForm.register('email')} />
                 </FormField>
                 <div className={pairClass}>
-                  <FormField id="invite-first" label="Nombres" error={inviteForm.formState.errors.first_name?.message}>
+                  <FormField id="invite-first" label="Nombres" error={err.first_name?.message}>
                     <Input className={inputClass} {...inviteForm.register('first_name')} />
                   </FormField>
-                  <FormField id="invite-last" label="Apellidos" error={inviteForm.formState.errors.last_name?.message}>
+                  <FormField id="invite-last" label="Apellidos" error={err.last_name?.message}>
                     <Input className={inputClass} {...inviteForm.register('last_name')} />
                   </FormField>
                 </div>
-                <FormField id="invite-kind" label="Tipo de cliente" error={inviteForm.formState.errors.client_kind?.message}>
+                <FormField id="invite-kind" label="Tipo de cliente" error={err.client_kind?.message}>
                   {(control) => (
                     <Select
                       value={inviteKind}
@@ -116,7 +145,7 @@ export function AdminInviteForms({ accessToken }: Props) {
                   )}
                 </FormField>
                 {inviteKind === 'juridical' && (
-                  <FormField id="invite-company" label="Empresa o Razón Social" error={inviteForm.formState.errors.company_name?.message}>
+                  <FormField id="invite-company" label="Empresa o Razón Social" error={err.company_name?.message}>
                     <Input className={inputClass} {...inviteForm.register('company_name')} />
                   </FormField>
                 )}
@@ -141,29 +170,16 @@ export function AdminInviteForms({ accessToken }: Props) {
             </form>
           </CardContent>
         </Card>
-
         {/* Registrar trabajador */}
         <Card data-tour="admin-invite-worker" className={cardClass}>
-          <CardHeader className={cardHeaderClass}>
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-700 dark:text-cyan-400">
-                  <BriefcaseBusiness className="size-5" />
-                </span>
-                <div>
-                  <CardTitle className="text-base font-semibold tracking-tight text-foreground">
-                    Registrar trabajador
-                  </CardTitle>
-                  <CardDescription className="mt-0.5 text-xs text-muted-foreground">
-                    Colaborador interno para gestión de proyectos.
-                  </CardDescription>
-                </div>
-              </div>
-              <Badge className="rounded-full border-cyan-500/20 bg-cyan-500/10 text-[10px] font-semibold text-cyan-700 hover:bg-cyan-500/15 dark:text-cyan-400">
-                Operación
-              </Badge>
-            </div>
-          </CardHeader>
+          <InviteCardHeader
+            icon={BriefcaseBusiness}
+            iconClass="bg-cyan-500/10 text-cyan-700 dark:text-cyan-400"
+            badgeClass="border-cyan-500/20 bg-cyan-500/10 text-cyan-700 hover:bg-cyan-500/15 dark:text-cyan-400"
+            title="Registrar trabajador"
+            description="Colaborador interno para gestión de proyectos."
+            badgeText="Operación"
+          />
           <CardContent className="flex flex-1 flex-col justify-between p-5 sm:p-6">
             <form
               className="flex flex-1 flex-col justify-between space-y-4"
@@ -172,19 +188,23 @@ export function AdminInviteForms({ accessToken }: Props) {
               )}
             >
               <div className="space-y-4">
-                <FormField id="worker-email" label="Correo institucional" error={workerForm.formState.errors.email?.message}>
+                <FormField id="worker-email" label="Correo institucional" error={wErr.email?.message}>
                   <Input type="email" autoComplete="email" className={inputClass} {...workerForm.register('email')} />
                 </FormField>
                 <div className={pairClass}>
-                  <FormField id="worker-first" label="Nombres" error={workerForm.formState.errors.first_name?.message}>
+                  <FormField id="worker-first" label="Nombres" error={wErr.first_name?.message}>
                     <Input className={inputClass} {...workerForm.register('first_name')} />
                   </FormField>
-                  <FormField id="worker-last" label="Apellidos" error={workerForm.formState.errors.last_name?.message}>
+                  <FormField id="worker-last" label="Apellidos" error={wErr.last_name?.message}>
                     <Input className={inputClass} {...workerForm.register('last_name')} />
                   </FormField>
                 </div>
-                <FormField id="worker-prof" label="Especialidad o Profesión" error={workerForm.formState.errors.profession?.message}>
-                  <Input className={inputClass} placeholder="Ej. Ingeniero de Software, Consultor" {...workerForm.register('profession')} />
+                <FormField id="worker-prof" label="Especialidad o Profesión" error={wErr.profession?.message}>
+                  <Input
+                    className={inputClass}
+                    placeholder="Ej. Ingeniero de Software, Consultor"
+                    {...workerForm.register('profession')}
+                  />
                 </FormField>
                 {workerMutation.isError && (
                   <Alert variant="destructive">
@@ -212,26 +232,14 @@ export function AdminInviteForms({ accessToken }: Props) {
 
         {/* Invitar administrador */}
         <Card data-tour="admin-invite-admin" className={cardClass}>
-          <CardHeader className={cardHeaderClass}>
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <ShieldPlus className="size-5" />
-                </span>
-                <div>
-                  <CardTitle className="text-base font-semibold tracking-tight text-foreground">
-                    Invitar administrador
-                  </CardTitle>
-                  <CardDescription className="mt-0.5 text-xs text-muted-foreground">
-                    Gobernanza, auditoría y control del sistema.
-                  </CardDescription>
-                </div>
-              </div>
-              <Badge className="rounded-full border-primary/20 bg-primary/10 text-[10px] font-semibold text-primary hover:bg-primary/15">
-                Total
-              </Badge>
-            </div>
-          </CardHeader>
+          <InviteCardHeader
+            icon={ShieldPlus}
+            iconClass="bg-primary/10 text-primary"
+            badgeClass="border-primary/20 bg-primary/10 text-primary hover:bg-primary/15"
+            title="Invitar administrador"
+            description="Gobernanza, auditoría y control del sistema."
+            badgeText="Total"
+          />
           <CardContent className="flex flex-1 flex-col justify-between p-5 sm:p-6">
             <form
               className="flex flex-1 flex-col justify-between space-y-4"
@@ -240,14 +248,14 @@ export function AdminInviteForms({ accessToken }: Props) {
               )}
             >
               <div className="space-y-4">
-                <FormField id="admin-email" label="Correo institucional" error={adminForm.formState.errors.email?.message}>
+                <FormField id="admin-email" label="Correo institucional" error={aErr.email?.message}>
                   <Input type="email" autoComplete="email" className={inputClass} {...adminForm.register('email')} />
                 </FormField>
                 <div className={pairClass}>
-                  <FormField id="admin-first" label="Nombres" error={adminForm.formState.errors.first_name?.message}>
+                  <FormField id="admin-first" label="Nombres" error={aErr.first_name?.message}>
                     <Input className={inputClass} {...adminForm.register('first_name')} />
                   </FormField>
-                  <FormField id="admin-last" label="Apellidos" error={adminForm.formState.errors.last_name?.message}>
+                  <FormField id="admin-last" label="Apellidos" error={aErr.last_name?.message}>
                     <Input className={inputClass} {...adminForm.register('last_name')} />
                   </FormField>
                 </div>

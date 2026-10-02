@@ -107,7 +107,12 @@ export function BulkExportProgressDialog({
               )}
             </div>
           ) : (
-            <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-destructive flex items-center gap-2">
+            <div
+              className={[
+                'flex items-center gap-2 rounded-xl border border-destructive/40',
+                'bg-destructive/10 p-3 text-destructive',
+              ].join(' ')}
+            >
               <AlertCircle className="size-4 shrink-0" />
               <span className="text-xs">{error}</span>
             </div>

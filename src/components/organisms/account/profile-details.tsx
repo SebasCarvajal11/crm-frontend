@@ -9,6 +9,7 @@ import {
   User,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/shared/lib/utils'
 import type { MeResponse } from '@/features/auth/model'
 
 type Role = MeResponse['data']['role']
@@ -40,11 +41,18 @@ interface DetailCardProps {
 function DetailCard({ icon: Icon, label, value, fullWidth = false }: DetailCardProps) {
   return (
     <div
-      className={`group flex items-start gap-3 rounded-xl border border-border/70 bg-card/60 p-3.5 transition-colors hover:border-primary/30 hover:bg-card ${
-        fullWidth ? 'sm:col-span-2 lg:col-span-2' : ''
-      }`}
+      className={cn(
+        'group flex items-start gap-3 rounded-xl border border-border/70 bg-card/60 p-3.5',
+        'transition-colors hover:border-primary/30 hover:bg-card',
+        fullWidth && 'sm:col-span-2 lg:col-span-2',
+      )}
     >
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+      <div
+        className={cn(
+          'flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary',
+          'transition-colors group-hover:bg-primary group-hover:text-primary-foreground',
+        )}
+      >
         <Icon className="size-4" />
       </div>
       <div className="min-w-0 flex-1">

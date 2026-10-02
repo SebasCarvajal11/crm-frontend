@@ -1,26 +1,14 @@
 import { useState } from 'react'
+import { AlertTriangle, Trash2, Loader2, Download, ShieldCheck } from 'lucide-react'
 import {
-  AlertTriangle,
-  Trash2,
-  Loader2,
-  Download,
-  ShieldCheck,
-} from 'lucide-react'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
+  AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { formatBytes } from '@/shared/lib'
 import {
-  exportProjectFilesAsZip,
-  type ExportProgress,
+  exportProjectFilesAsZip, type ExportProgress,
 } from '@/features/admin/services/storage-zip-exporter.service'
 import type { StorageFileItem } from '@/features/admin/api/admin-storage-explorer.api'
 
@@ -185,7 +173,12 @@ export function EmptyProjectFilesDialog({
             </div>
             <div className="flex items-center justify-between text-[11px] pt-0.5">
               <span className="text-muted-foreground">Espacio que se liberará:</span>
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+              <span
+                className={[
+                  'rounded px-2 py-0.5 font-semibold text-emerald-600',
+                  'bg-emerald-500/10 dark:text-emerald-400',
+                ].join(' ')}
+              >
                 {formatBytes(totalBytes)}
               </span>
             </div>
@@ -229,7 +222,12 @@ export function EmptyProjectFilesDialog({
           )}
 
           {errorMessage && (
-            <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-destructive flex items-center gap-2">
+            <div
+              className={[
+                'flex items-center gap-2 rounded-xl border border-destructive/40',
+                'bg-destructive/10 p-3 text-destructive',
+              ].join(' ')}
+            >
               <AlertTriangle className="size-4 shrink-0" />
               <span>{errorMessage}</span>
             </div>

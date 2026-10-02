@@ -20,20 +20,35 @@ type Props = {
 function roleBadge(role: UserRole) {
   if (role === 'admin') {
     return (
-      <Badge className="inline-flex min-w-[84px] justify-center rounded-full border-primary/20 bg-primary/10 text-xs font-semibold text-primary">
+      <Badge
+        className={[
+          'inline-flex min-w-[84px] justify-center rounded-full border-primary/20',
+          'bg-primary/10 text-xs font-semibold text-primary',
+        ].join(' ')}
+      >
         Admin
       </Badge>
     )
   }
   if (role === 'worker') {
     return (
-      <Badge className="inline-flex min-w-[84px] justify-center rounded-full border-cyan-500/20 bg-cyan-500/10 text-xs font-semibold text-cyan-700 dark:text-cyan-400">
+      <Badge
+        className={[
+          'inline-flex min-w-[84px] justify-center rounded-full border-cyan-500/20',
+          'bg-cyan-500/10 text-xs font-semibold text-cyan-700 dark:text-cyan-400',
+        ].join(' ')}
+      >
         Trabajador
       </Badge>
     )
   }
   return (
-    <Badge className="inline-flex min-w-[84px] justify-center rounded-full border-emerald-500/20 bg-emerald-500/10 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+    <Badge
+      className={[
+        'inline-flex min-w-[84px] justify-center rounded-full border-emerald-500/20',
+        'bg-emerald-500/10 text-xs font-semibold text-emerald-700 dark:text-emerald-400',
+      ].join(' ')}
+    >
       Cliente
     </Badge>
   )
@@ -53,7 +68,12 @@ function statusBadge(row: AdminUserRow) {
   }
   if (row.is_active) {
     return (
-      <Badge className="inline-flex min-w-[84px] items-center justify-center gap-1.5 rounded-full border-emerald-500/20 bg-emerald-500/10 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+      <Badge
+        className={[
+          'inline-flex min-w-[84px] items-center justify-center gap-1.5 rounded-full',
+          'border-emerald-500/20 bg-emerald-500/10 text-xs font-medium text-emerald-700 dark:text-emerald-400',
+        ].join(' ')}
+      >
         <span className="size-1.5 rounded-full bg-emerald-500" />
         Activo
       </Badge>
@@ -62,7 +82,10 @@ function statusBadge(row: AdminUserRow) {
   return (
     <Badge
       variant="outline"
-      className="inline-flex min-w-[84px] items-center justify-center gap-1.5 rounded-full text-xs font-medium text-muted-foreground"
+      className={[
+        'inline-flex min-w-[84px] items-center justify-center gap-1.5 rounded-full',
+        'text-xs font-medium text-muted-foreground',
+      ].join(' ')}
     >
       <span className="size-1.5 rounded-full bg-muted-foreground/40" />
       Inactivo

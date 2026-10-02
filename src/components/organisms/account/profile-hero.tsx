@@ -1,6 +1,7 @@
 import type { RefObject } from 'react'
 import { Camera, CheckCircle2, Clock, Loader2, Mail, Shield } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { cn } from '@/shared/lib/utils'
 import { UserAvatar } from '@/components/atoms/user-avatar'
 import {
   DropdownMenu,
@@ -45,8 +46,18 @@ export function ProfileHero({
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
       {/* Banner de marca CIMA con degradado ejecutivo */}
-      <div className="relative h-28 w-full overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-primary/80 sm:h-32">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.2),transparent_70%)]" />
+      <div
+        className={cn(
+          'relative h-28 w-full overflow-hidden sm:h-32',
+          'bg-gradient-to-r from-primary via-primary/90 to-primary/80',
+        )}
+      >
+        <div
+          className={cn(
+            'absolute inset-0',
+            'bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.2),transparent_70%)]',
+          )}
+        />
         <div className="absolute -bottom-8 -right-8 size-40 rounded-full bg-white/5 blur-2xl" />
       </div>
 
@@ -61,7 +72,12 @@ export function ProfileHero({
                     type="button"
                     aria-label="Opciones de foto de perfil"
                     data-tour="account-avatar-btn"
-                    className="group relative flex size-28 items-center justify-center rounded-full border-4 border-background bg-card shadow-lg ring-1 ring-black/5 transition-all duration-150 hover:scale-[1.03] active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:size-32"
+                    className={cn(
+                      'group relative flex size-28 cursor-pointer items-center justify-center',
+                      'rounded-full border-4 border-background bg-card shadow-lg ring-1 ring-black/5',
+                      'transition-all duration-150 hover:scale-[1.03] active:scale-[0.98]',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:size-32',
+                    )}
                   >
                     <UserAvatar
                       src={avatarUrl}
@@ -70,7 +86,13 @@ export function ProfileHero({
                       size="2xl"
                       className="size-full shadow-none border-0"
                     />
-                    <span className="absolute bottom-0 right-0 flex size-8 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-md transition-transform group-hover:scale-110">
+                    <span
+                      className={cn(
+                        'absolute bottom-0 right-0 flex size-8 items-center justify-center',
+                        'rounded-full border-2 border-background bg-primary text-primary-foreground',
+                        'shadow-md transition-transform group-hover:scale-110',
+                      )}
+                    >
                       <Camera className="size-3.5" />
                     </span>
                   </button>
@@ -112,7 +134,12 @@ export function ProfileHero({
                   </Badge>
                 </div>
               </div>
-              <p className="mt-1 flex items-center justify-center gap-1.5 text-xs text-muted-foreground sm:justify-start">
+              <p
+                className={cn(
+                  'mt-1 flex items-center justify-center gap-1.5',
+                  'text-xs text-muted-foreground sm:justify-start',
+                )}
+              >
                 <Mail className="size-3.5 shrink-0 opacity-60" />
                 <span className="break-all font-medium text-foreground/80">{identity.email}</span>
               </p>
@@ -121,11 +148,14 @@ export function ProfileHero({
 
           <div className="flex flex-col items-center gap-2 sm:items-end sm:pb-1">
             <Badge
-              className={
+              className={cn(
                 isVerified
-                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300'
-                  : 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300'
-              }
+                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                  : 'border-amber-200 bg-amber-50 text-amber-700',
+                isVerified
+                  ? 'dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300'
+                  : 'dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300',
+              )}
             >
               {isVerified ? (
                 <span className="flex items-center gap-1.5 py-0.5 text-xs font-semibold">
@@ -141,7 +171,10 @@ export function ProfileHero({
             </Badge>
 
             {isUploading && (
-              <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground" aria-live="polite">
+              <p
+                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground"
+                aria-live="polite"
+              >
                 <Loader2 className="size-3 animate-spin text-primary" />
                 Subiendo foto...
               </p>

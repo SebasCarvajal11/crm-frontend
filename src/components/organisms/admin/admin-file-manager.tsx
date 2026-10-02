@@ -7,17 +7,13 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { formatBytes } from '@/shared/lib'
 import { useAdminStorageExplorer } from '@/features/admin/hooks/use-admin-storage-explorer'
 import {
-  exportProjectFilesAsZip,
-  type ExportProgress,
+  exportProjectFilesAsZip, type ExportProgress,
 } from '@/features/admin/services/storage-zip-exporter.service'
-import { FileManagerTable } from './file-manager/file-table'
-import { FilePurgeDialog } from './file-manager/purge-dialog'
-import { EmptyProjectFilesDialog } from './file-manager/empty-project-files-dialog'
-import { ClientProjectTree } from './file-manager/client-project-tree'
-import { StorageSummaryCards } from './file-manager/storage-summary-cards'
-import { ProjectDetailHeader } from './file-manager/project-detail-header'
-import { FolderFilterTabs } from './file-manager/folder-filter-tabs'
-import { BulkExportProgressDialog } from './file-manager/bulk-export-progress-dialog'
+import {
+  BulkExportProgressDialog, ClientProjectTree, EmptyProjectFilesDialog,
+  FileManagerTable, FilePurgeDialog, FolderFilterTabs, ProjectDetailHeader,
+  StorageSummaryCards,
+} from './file-manager'
 import type { StorageFileItem } from '@/features/admin/api/admin-storage-explorer.api'
 
 type Props = {
@@ -26,23 +22,10 @@ type Props = {
 
 export function AdminFileManager({ accessToken }: Props) {
   const {
-    data,
-    loading,
-    isPurging,
-    searchTerm,
-    setSearchTerm,
-    setSelectedClientSub,
-    setSelectedProjectId,
-    selectedFolder,
-    setSelectedFolder,
-    filteredClients,
-    activeClient,
-    activeProject,
-    activeFiles,
-    projectStats,
-    refresh,
-    purgeFile,
-    purgeBatch,
+    data, loading, isPurging, searchTerm, setSearchTerm,
+    setSelectedClientSub, setSelectedProjectId, selectedFolder, setSelectedFolder,
+    filteredClients, activeClient, activeProject, activeFiles, projectStats,
+    refresh, purgeFile, purgeBatch,
   } = useAdminStorageExplorer(accessToken)
 
   const [fileToPurge, setFileToPurge] = useState<StorageFileItem | null>(null)
@@ -66,16 +49,22 @@ export function AdminFileManager({ accessToken }: Props) {
     setExportError(null)
   }
 
+  const notifyFeedback = (msg: string) => {
+    setFeedback(msg)
+    setTimeout(() => setFeedback(null), 4000)
+  }
+  const notifyError = (err: unknown, fallback: string) => {
+    setErrorFeedback(err instanceof Error ? err.message : fallback)
+    setTimeout(() => setErrorFeedback(null), 5000)
+  }
+
   const handlePurgeConfirm = async (reason: string, forcePurgeSigned: boolean) => {
     if (!fileToPurge) return
     try {
       const res = await purgeFile(fileToPurge.id, reason, forcePurgeSigned)
-      setFeedback(`Se liberaron ${formatBytes(res.freedBytes)} correctamente.`)
-      setTimeout(() => setFeedback(null), 4000)
+      notifyFeedback(`Se liberaron ${formatBytes(res.freedBytes)} correctamente.`)
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Error al depurar el archivo'
-      setErrorFeedback(msg)
-      setTimeout(() => setErrorFeedback(null), 5000)
+      notifyError(err, 'Error al depurar el archivo')
       throw err
     }
   }
@@ -88,62 +77,51 @@ export function AdminFileManager({ accessToken }: Props) {
         reason: 'Vaciado masivo por administración',
         forcePurgeSigned: false,
       })
-      setFeedback(`Se depuraron ${res.purgedCount} archivos (${formatBytes(res.freedBytes)} liberados).`)
-      setTimeout(() => setFeedback(null), 4000)
+      notifyFeedback(`Se depuraron ${res.purgedCount} archivos (${formatBytes(res.freedBytes)} liberados).`)
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Error al vaciar los archivos'
-      setErrorFeedback(msg)
-      setTimeout(() => setErrorFeedback(null), 5000)
+      notifyError(err, 'Error al vaciar los archivos')
       throw err
     }
   }
 
-  const handleExportProjectZip = async () => {
-    if (!activeProject || activeProjectFiles.length === 0) return
-    setExportTitle(`Descargando ${activeProject.projectName} (.zip)`)
+  const runExportZip = async (title: string, projectName: string, files: StorageFileItem[]) => {
+    if (!activeProject || files.length === 0) return
+    setExportTitle(title)
     setExportError(null)
     setExportDialogOpen(true)
     try {
       await exportProjectFilesAsZip({
         accessToken,
         clientName: activeClient?.clientName || 'Cliente',
-        projectName: activeProject.projectName,
-        files: activeProjectFiles,
+        projectName,
+        files,
         onProgress: setExportProgress,
       })
     } catch (err) {
-      setExportError(err instanceof Error ? err.message : 'Error al exportar paquete')
+      setExportError(err instanceof Error ? err.message : 'Error al exportar archivos')
     }
   }
 
-  const handleExportBatchZip = async (selectedFiles: StorageFileItem[]) => {
-    if (!activeProject || selectedFiles.length === 0) return
-    setExportTitle(`Descargando selección (${selectedFiles.length} archivos)`)
-    setExportError(null)
-    setExportDialogOpen(true)
-    try {
-      await exportProjectFilesAsZip({
-        accessToken,
-        clientName: activeClient?.clientName || 'Cliente',
-        projectName: `${activeProject.projectName}_lote`,
-        files: selectedFiles,
-        onProgress: setExportProgress,
-      })
-    } catch (err) {
-      setExportError(err instanceof Error ? err.message : 'Error al exportar lote')
-    }
-  }
+  const handleExportProjectZip = () =>
+    activeProject &&
+    runExportZip(`Descargando ${activeProject.projectName} (.zip)`, activeProject.projectName, activeProjectFiles)
+
+  const handleExportBatchZip = (selectedFiles: StorageFileItem[]) =>
+    activeProject &&
+    runExportZip(
+      `Descargando selección (${selectedFiles.length} archivos)`,
+      `${activeProject.projectName}_lote`,
+      selectedFiles
+    )
 
   if (loading && !data) {
     return (
       <Card className="rounded-2xl border-border/70 shadow-sm">
-        <CardHeader>
+        <CardHeader className="space-y-2">
           <Skeleton className="h-6 w-1/3" />
           <Skeleton className="h-4 w-1/2" />
         </CardHeader>
-        <CardContent>
-          <Skeleton className="h-48 w-full rounded-xl" />
-        </CardContent>
+        <CardContent><Skeleton className="h-48 w-full rounded-xl" /></CardContent>
       </Card>
     )
   }
@@ -181,14 +159,24 @@ export function AdminFileManager({ accessToken }: Props) {
         )}
 
         {feedback && (
-          <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-3 py-2 text-xs text-emerald-600">
+          <div
+            className={[
+              'flex items-center gap-2 rounded-xl border border-emerald-500/30',
+              'bg-emerald-500/10 px-3 py-2 text-xs text-emerald-600',
+            ].join(' ')}
+          >
             <CheckCircle2 className="size-4 shrink-0" />
             <span>{feedback}</span>
           </div>
         )}
 
         {errorFeedback && (
-          <div className="flex items-center gap-2 rounded-xl bg-destructive/10 border border-destructive/30 px-3 py-2 text-xs text-destructive">
+          <div
+            className={[
+              'flex items-center gap-2 rounded-xl border border-destructive/30',
+              'bg-destructive/10 px-3 py-2 text-xs text-destructive',
+            ].join(' ')}
+          >
             <AlertTriangle className="size-4 shrink-0" />
             <span>{errorFeedback}</span>
           </div>
@@ -206,7 +194,12 @@ export function AdminFileManager({ accessToken }: Props) {
           />
         </div>
 
-        <div className="rounded-xl border border-border/70 bg-card overflow-hidden grid grid-cols-1 lg:grid-cols-12 h-auto min-h-0 lg:h-[640px] shadow-2xs">
+        <div
+          className={[
+            'grid h-auto min-h-0 grid-cols-1 overflow-hidden rounded-xl border',
+            'border-border/70 bg-card shadow-2xs lg:h-[640px] lg:grid-cols-12',
+          ].join(' ')}
+        >
           <ClientProjectTree
             clients={filteredClients}
             activeClientSub={activeClient?.clientSub}
@@ -256,7 +249,13 @@ export function AdminFileManager({ accessToken }: Props) {
                 </div>
               </>
             ) : (
-              <div className="min-h-[160px] lg:h-full py-8 px-4 sm:py-12 flex flex-col items-center justify-center text-center text-xs text-muted-foreground border border-dashed rounded-lg bg-muted/5">
+              <div
+                className={[
+                  'flex min-h-[160px] flex-col items-center justify-center rounded-lg border',
+                  'border-dashed bg-muted/5 px-4 py-8 text-center text-xs text-muted-foreground',
+                  'sm:py-12 lg:h-full',
+                ].join(' ')}
+              >
                 Selecciona un cliente y proyecto para explorar sus archivos.
               </div>
             )}

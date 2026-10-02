@@ -53,7 +53,12 @@ export function ChangePasswordSection({ accessToken }: Props) {
         description="Actualiza tus credenciales periódicamente para mayor protección."
       />
 
-      <Card className="flex flex-1 flex-col justify-between overflow-hidden rounded-2xl border-border/80 bg-card shadow-sm">
+      <Card
+        className={[
+          'flex flex-1 flex-col justify-between overflow-hidden rounded-2xl',
+          'border-border/80 bg-card shadow-sm',
+        ].join(' ')}
+      >
         <CardHeader className="border-b bg-muted/30 pb-4">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -69,9 +74,16 @@ export function ChangePasswordSection({ accessToken }: Props) {
         </CardHeader>
 
         <CardContent className="flex flex-1 flex-col justify-between space-y-4 p-4 sm:p-6">
-          <div className="flex items-start gap-2.5 rounded-xl border border-amber-200/80 bg-amber-50/60 p-3 text-xs text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-200">
+          <div
+            className={[
+              'flex items-start gap-2.5 rounded-xl border border-amber-200/80 bg-amber-50/60 p-3',
+              'text-xs text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-200',
+            ].join(' ')}
+          >
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" />
-            <span>Al actualizar tu clave, se cerrarán los accesos abiertos en otros equipos para proteger tu cuenta.</span>
+            <span>
+              Al actualizar tu clave, se cerrarán los accesos abiertos en otros equipos para proteger tu cuenta.
+            </span>
           </div>
 
           <form
@@ -137,7 +149,12 @@ export function ChangePasswordSection({ accessToken }: Props) {
             )}
 
             {mutation.isSuccess && (
-              <Alert className="border-emerald-200/80 bg-emerald-50/60 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-200">
+              <Alert
+                className={[
+                  'border-emerald-200/80 bg-emerald-50/60 text-emerald-900',
+                  'dark:bg-emerald-950/20 dark:text-emerald-200',
+                ].join(' ')}
+              >
                 <Check className="size-4 text-emerald-600" />
                 <AlertTitle>Contraseña actualizada</AlertTitle>
                 <AlertDescription>
@@ -176,7 +193,8 @@ export function ChangePasswordSection({ accessToken }: Props) {
             </AlertDialogMedia>
             <AlertDialogTitle>Confirmar actualización de contraseña</AlertDialogTitle>
             <AlertDialogDescription>
-              Se cerrarán tus sesiones activas en otros equipos y tendrás que iniciar sesión nuevamente con tu nueva clave.
+              Se cerrarán tus sesiones activas en otros equipos y tendrás que iniciar sesión
+              nuevamente con tu nueva clave.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

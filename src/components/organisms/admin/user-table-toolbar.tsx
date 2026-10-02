@@ -58,7 +58,12 @@ export function UserTableToolbar({
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 rounded-xl border border-border/70 bg-background/80 px-2.5 py-1 text-xs text-muted-foreground shadow-sm">
+          <div
+            className={[
+              'flex items-center gap-1 rounded-xl border border-border/70',
+              'bg-background/80 px-2.5 py-1 text-xs text-muted-foreground shadow-sm',
+            ].join(' ')}
+          >
             <UsersRound className="size-3.5 text-primary" />
             <span className="font-semibold text-foreground">{totalItems}</span>
             <span>usuarios</span>
@@ -115,7 +120,12 @@ export function UserTableToolbar({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 items-end gap-3 rounded-2xl border border-border/70 bg-background/90 p-3.5 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_13rem_13rem]">
+      <div
+        className={[
+          'grid grid-cols-1 items-end gap-3 rounded-2xl border border-border/70',
+          'bg-background/90 p-3.5 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_13rem_13rem]',
+        ].join(' ')}
+      >
         <div className="space-y-1.5">
           <Label htmlFor="admin-search" className="text-xs font-semibold text-muted-foreground">
             Búsqueda rápida
@@ -160,7 +170,12 @@ export function UserTableToolbar({
           <Label htmlFor="admin-include-deleted" className="text-xs font-semibold text-muted-foreground">
             Estado de retención
           </Label>
-          <div className="flex h-9.5 w-full items-center rounded-xl border border-input bg-background px-3 transition-colors hover:bg-muted/20">
+          <div
+            className={[
+              'flex h-9.5 w-full items-center rounded-xl border border-input',
+              'bg-background px-3 transition-colors hover:bg-muted/20',
+            ].join(' ')}
+          >
             <div className="flex items-center gap-2 text-xs font-medium text-foreground leading-none">
               <Checkbox
                 id="admin-include-deleted"

@@ -57,7 +57,12 @@ export function ProfileAvatarDialogs({
                 className="size-64 rounded-full border-4 border-card object-cover shadow-lg"
               />
             ) : (
-              <div className="flex size-64 items-center justify-center rounded-full border-4 border-card bg-muted shadow-lg">
+              <div
+                className={[
+                  'flex size-64 items-center justify-center rounded-full',
+                  'border-4 border-card bg-muted shadow-lg',
+                ].join(' ')}
+              >
                 <UserCircle2 className="size-24 text-muted-foreground" />
               </div>
             )}
@@ -84,7 +89,12 @@ export function ProfileAvatarDialogs({
           </DialogHeader>
 
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
-            <div className="relative mx-auto aspect-square w-full max-h-[min(50dvh,18rem)] overflow-hidden rounded-xl border bg-black/90">
+            <div
+              className={[
+                'relative mx-auto aspect-square w-full max-h-[min(50dvh,18rem)]',
+                'overflow-hidden rounded-xl border bg-black/90',
+              ].join(' ')}
+            >
               {selectedImageSrc && (
                 <Cropper
                   image={selectedImageSrc}
