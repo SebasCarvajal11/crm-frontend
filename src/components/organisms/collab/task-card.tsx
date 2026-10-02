@@ -106,14 +106,9 @@ export const TaskCard = memo(function TaskCard({
   onClick,
 }: Props) {
   const isBlocked = Boolean(task.blockType)
-  const priorityAccent = isBlocked
-    ? 'border-l-2 border-l-rose-500'
-    : {
-        low:    'border-l-2 border-l-slate-400/40 dark:border-l-slate-600/40',
-        medium: 'border-l-2 border-l-sky-500/70',
-        high:   'border-l-2 border-l-amber-500/80',
-        urgent: 'border-l-2 border-l-rose-500/90',
-      }[task.priority]
+  const cardBorderClass = isBlocked
+    ? 'border-rose-500/40 bg-rose-500/[0.02]'
+    : 'border-border/80 bg-card hover:border-border'
 
   return (
     <button
@@ -127,8 +122,8 @@ export const TaskCard = memo(function TaskCard({
       onClick={onClick}
       aria-pressed={isSelected}
       aria-label={`Tarea: ${task.title}. Prioridad: ${task.priority}.`}
-      className={`group w-full text-left rounded-xl border border-border/80 bg-card p-3.5 shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 cursor-pointer ${priorityAccent} ${
-        isSelected ? 'ring-2 ring-primary ring-offset-1 shadow-md' : ''
+      className={`group w-full text-left rounded-xl border ${cardBorderClass} p-3.5 shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 cursor-pointer ${
+        isSelected ? 'ring-2 ring-primary ring-offset-1 shadow-sm' : ''
       }`}
     >
       <div className="flex items-start justify-between gap-2 mb-1">

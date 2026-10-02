@@ -93,7 +93,7 @@ function AccountContextStats({ role }: { role: string }) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-      <div className="border-l-2 border-primary/40 px-3 py-1">
+      <div className="rounded-xl border border-border/70 bg-muted/30 p-3 transition-colors hover:bg-muted/50">
         <div className="flex items-center gap-1.5">
           <KeyRound className="size-3.5 text-primary shrink-0" />
           <p className="text-[11px] font-semibold text-foreground">Nivel de Acceso</p>
@@ -102,7 +102,7 @@ function AccountContextStats({ role }: { role: string }) {
         <p className="text-[11px] text-muted-foreground truncate">{roleDesc}</p>
       </div>
 
-      <div className="border-l-2 border-primary/40 px-3 py-1">
+      <div className="rounded-xl border border-border/70 bg-muted/30 p-3 transition-colors hover:bg-muted/50">
         <div className="flex items-center gap-1.5">
           <Lock className="size-3.5 text-emerald-500 shrink-0" />
           <p className="text-[11px] font-semibold text-foreground">Seguridad de Sesión</p>

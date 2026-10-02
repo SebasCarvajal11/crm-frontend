@@ -46,7 +46,7 @@
 }
 
 .overview-stage .overview-panel [data-slot='card-title'] {
-  font-size: 1.05rem;
+  font-size: 1rem;
   line-height: 1.35;
   letter-spacing: -0.025em;
 }

@@ -31,7 +31,7 @@ function CloudUsageBar({ cloud }: { cloud: CloudStorageStats }) {
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm">
         <span className="font-medium text-foreground">
-          Uso en la nube: <span className="font-bold">{cloud.usedPercentage}%</span>
+          Uso en la nube: <span className="font-bold tabular-nums">{cloud.usedPercentage}%</span>
         </span>
         <span className="text-xs text-muted-foreground">
           {formatBytes(cloud.usedBytes)} de {formatBytes(cloud.quotaBytes)}
@@ -51,11 +51,11 @@ function CloudStatBoxes({ cloud }: { cloud: CloudStorageStats }) {
     <div className="grid grid-cols-3 gap-2 text-center">
       <div className="rounded-md border bg-muted/20 p-2.5">
         <p className="text-[11px] text-muted-foreground">Archivos en Nube</p>
-        <p className="text-sm font-semibold text-foreground">{formatBytes(cloud.usedBytes)}</p>
+        <p className="text-sm font-semibold text-foreground tabular-nums">{formatBytes(cloud.usedBytes)}</p>
       </div>
       <div className="rounded-md border bg-emerald-500/10 border-emerald-500/30 p-2.5">
         <p className="text-[11px] text-muted-foreground">Disponible para Subir</p>
-        <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+        <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
           {formatBytes(cloud.availableBytes)}
         </p>
       </div>

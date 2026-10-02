@@ -102,7 +102,7 @@ function ProposalCardHeader(props: {
         <ProposalMenuActions {...props} />
       </div>
 
-      <CardTitle className="mt-2 text-base leading-snug">
+      <CardTitle className="mt-2 text-base leading-snug tabular-nums">
         {formatCurrency(props.proposal.estimatedValue)}
       </CardTitle>
       <CardDescription className="truncate" title={props.clientLabel}>

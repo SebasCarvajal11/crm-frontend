@@ -22,7 +22,7 @@ export const ProjectCard = memo(function ProjectCard({ project, onClick }: Props
       type="button"
       onClick={onClick}
       aria-label={`Abrir proyecto ${project.name}, cliente ${project.clientName}, ${pct}% completado`}
-      className="group w-full text-left rounded-lg border border-border bg-background p-3.5 shadow-sm interactive-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer"
+      className="group w-full text-left rounded-xl border border-border/80 bg-card p-3.5 shadow-2xs hover:shadow-xs hover:border-border transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer"
     >
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <span className="font-semibold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors">
@@ -51,7 +51,7 @@ export const ProjectCard = memo(function ProjectCard({ project, onClick }: Props
       >
         <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
           <span>Progreso</span>
-          <span className="font-semibold">{pct}%</span>
+          <span className="font-semibold tabular-nums">{pct}%</span>
         </div>
         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
           <div

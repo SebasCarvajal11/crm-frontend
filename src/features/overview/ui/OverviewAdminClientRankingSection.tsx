@@ -76,19 +76,19 @@ export function OverviewAdminClientRankingSection({ items, isLoading }: Props) {
                     <div className="flex items-center gap-3 text-xs shrink-0">
                       <span className="inline-flex items-center gap-1 text-muted-foreground">
                         <FolderSync className="size-3.5 text-blue-500" />
-                        <span className="font-semibold text-foreground">
+                        <span className="font-semibold text-foreground tabular-nums">
                           {item.inProgressProjects}
                         </span>
                         <span className="hidden sm:inline">en curso</span>
                       </span>
                       <span className="inline-flex items-center gap-1 text-muted-foreground">
                         <FolderCheck className="size-3.5 text-emerald-500" />
-                        <span className="font-semibold text-foreground">
+                        <span className="font-semibold text-foreground tabular-nums">
                           {item.completedProjects}
                         </span>
                         <span className="hidden sm:inline">listos</span>
                       </span>
-                      <Badge variant="secondary" className="text-[11px] font-bold">
+                      <Badge variant="secondary" className="text-[11px] font-bold tabular-nums">
                         {item.totalProjects} {item.totalProjects === 1 ? 'total' : 'totales'}
                       </Badge>
                     </div>

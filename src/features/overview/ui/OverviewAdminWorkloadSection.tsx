@@ -35,15 +35,15 @@ function WorkloadWorkerCard({ worker, avatarUrl }: { worker: WorkerWorkloadItem;
         </div>
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className="inline-flex items-center gap-1 font-semibold text-foreground">
-            Total: {worker.totalAssigned}
+            Total: <span className="tabular-nums">{worker.totalAssigned}</span>
           </span>
           <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
             <CheckCheck className="size-3.5" />
-            {worker.completedCount} hechas
+            <span className="tabular-nums">{worker.completedCount}</span> hechas
           </span>
           <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400">
             <Clock className="size-3.5" />
-            {worker.pendingCount} pendientes
+            <span className="tabular-nums">{worker.pendingCount}</span> pendientes
           </span>
         </div>
       </div>
@@ -51,7 +51,7 @@ function WorkloadWorkerCard({ worker, avatarUrl }: { worker: WorkerWorkloadItem;
       <div className="mt-2.5 space-y-1">
         <div className="flex justify-between text-[11px]">
           <span className="text-muted-foreground">Tasa de resolución</span>
-          <span className="font-semibold text-foreground">{worker.resolutionRate}%</span>
+          <span className="font-semibold text-foreground tabular-nums">{worker.resolutionRate}%</span>
         </div>
         <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
           <div

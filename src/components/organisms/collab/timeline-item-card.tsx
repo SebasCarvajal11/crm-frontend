@@ -58,7 +58,7 @@ export function TimelineItemCard({
                 {item.label}
               </span>
             </div>
-            <p className="line-clamp-2 text-[13px] font-semibold leading-snug">{item.title}</p>
+            <p className="line-clamp-2 text-sm font-semibold leading-snug">{item.title}</p>
             {isFile && (
               <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
                 <p className="line-clamp-1 text-[11px] text-muted-foreground">{item.fileName}</p>
@@ -71,7 +71,7 @@ export function TimelineItemCard({
             )}
             {item.kind === 'task_completed' && linkedTask && (
               <p className="mt-0.5 text-[11px] text-muted-foreground">
-                Progreso final: {linkedTask.checklistProgress}%
+                Progreso final: <span className="tabular-nums">{linkedTask.checklistProgress}%</span>
               </p>
             )}
             {item.resolutionComment && (

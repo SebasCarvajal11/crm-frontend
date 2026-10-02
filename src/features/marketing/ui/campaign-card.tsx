@@ -144,7 +144,7 @@ function CampaignCardFooter({
 }) {
   return (
     <div className="border-t bg-muted/10 p-3 px-4 flex items-center justify-between">
-      <span className="text-[10px] text-muted-foreground">Campaña #{campaignId}</span>
+      <span className="text-[10px] text-muted-foreground tabular-nums">Campaña #{campaignId}</span>
       {onSelectForWorkflows && (
         <Button
           variant="ghost"

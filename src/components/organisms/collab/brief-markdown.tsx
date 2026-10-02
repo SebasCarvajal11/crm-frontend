@@ -93,7 +93,7 @@ export function BriefMarkdown({ content, className }: Props) {
             return (
               <h2
                 key={idx}
-                className="text-base font-semibold text-foreground mt-6 mb-3 flex items-center gap-2.5 border-l-2 border-primary pl-3 py-0.5"
+                className="text-base font-semibold text-foreground mt-6 mb-3 flex items-center gap-2"
               >
                 <span>{parseInline(block.text)}</span>
               </h2>
@@ -108,7 +108,7 @@ export function BriefMarkdown({ content, className }: Props) {
             return (
               <blockquote
                 key={idx}
-                className="rounded-r-lg border-l-2 border-primary/60 bg-muted/40 px-4 py-2.5 my-3 text-sm text-foreground/90 font-medium italic"
+                className="rounded-lg border border-border/80 bg-muted/40 px-4 py-2.5 my-3 text-sm text-foreground/90 font-medium italic"
               >
                 {parseInline(block.text)}
               </blockquote>
