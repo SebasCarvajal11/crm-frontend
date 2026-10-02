@@ -1,31 +1,40 @@
-/* Resumen: una jerarquía editorial sin tarjetas anidadas. Solo afecta esta vista. */
+/* Resumen: paneles con esquinas redondeadas coherentes y elevación suave */
 .overview-stage .overview-panel {
   gap: 0;
   padding-block: 0 1.25rem;
-  border: 0;
-  border-top: 2px solid var(--border);
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  --tw-ring-shadow: 0 0 #0000;
+  border: 1px solid var(--border);
+  border-top-width: 3px;
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.overview-stage .overview-panel:hover {
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--primary) 20%, var(--border));
 }
 
 .overview-stage .overview-panel-identity {
   border-top-color: var(--primary);
-  background: color-mix(in srgb, var(--accent) 22%, var(--background));
+  background: color-mix(in srgb, var(--accent) 15%, var(--card));
 }
 
 .overview-stage .overview-panel-news {
   border-top-color: var(--foreground);
-  background: color-mix(in srgb, var(--muted) 60%, var(--background));
+  background: var(--card);
 }
 
 .overview-stage .overview-panel-alert {
   border-top-color: var(--destructive);
+  background: var(--card);
 }
 
 .overview-stage .overview-panel-attention {
   border-top-color: var(--primary);
+  background: var(--card);
 }
 
 .overview-stage .overview-panel [data-slot='card-header'] {

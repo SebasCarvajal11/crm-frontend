@@ -1,9 +1,17 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CalendarRange, CheckCircle2, RefreshCw, XCircle } from 'lucide-react'
+import { CalendarRange, ChartAreaIcon, CheckCircle2, RefreshCw, XCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { IconButton } from '@/components/ui/icon-button'
+import { PageHeader } from '@/components/molecules/page-header'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   getCurrentKpisRequest,
@@ -59,59 +67,71 @@ export function KpiDashboard({ accessToken }: KpiDashboardProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight">Indicadores de gestión</h2>
-          <p className="text-sm text-muted-foreground">
-            Los ocho indicadores del período, calculados en el momento de la consulta
-          </p>
-        </div>
+      <div data-tour="analytics-header">
+        <PageHeader
+          eyebrow={
+            <>
+              Rendimiento e <span className="font-black text-primary">Indicadores</span>
+            </>
+          }
+          title={
+            <>
+              Analítica de{' '}
+              <span className="font-black tracking-tight text-foreground">
+                Gestión
+              </span>
+            </>
+          }
+          description="Los ocho indicadores del período comercial calculados en el momento de la consulta."
+          icon={ChartAreaIcon}
+          actions={
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <Select
+                value={period}
+                onValueChange={(val) => {
+                  setPeriod(val)
+                  setAviso(null)
+                }}
+              >
+                <SelectTrigger
+                  className="h-9 min-w-[160px] bg-card text-xs font-medium capitalize"
+                  aria-label="Seleccionar período"
+                >
+                  <CalendarRange className="mr-1.5 size-3.5 text-muted-foreground" />
+                  <SelectValue placeholder="Período" />
+                </SelectTrigger>
+                <SelectContent>
+                  {periodos.map((p) => (
+                    <SelectItem key={p.value} value={p.value} className="text-xs capitalize">
+                      {p.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="space-y-1.5">
-            <label
-              htmlFor="period"
-              className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
-            >
-              <CalendarRange className="h-3.5 w-3.5" />
-              Período
-            </label>
-            <select
-              id="period"
-              value={period}
-              onChange={(e) => {
-                setPeriod(e.target.value)
-                setAviso(null)
-              }}
-              className="h-10 rounded-md border border-input bg-background px-3 text-sm capitalize"
-            >
-              {periodos.map((p) => (
-                <option key={p.value} value={p.value} className="capitalize">
-                  {p.label}
-                </option>
-              ))}
-            </select>
-          </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 h-9"
+                onClick={() => kpisQuery.refetch()}
+                disabled={kpisQuery.isFetching}
+              >
+                <RefreshCw className={`size-3.5 ${kpisQuery.isFetching ? 'animate-spin' : ''}`} />
+                Actualizar
+              </Button>
 
-          <Button
-            variant="outline"
-            className="gap-2"
-            onClick={() => kpisQuery.refetch()}
-            disabled={kpisQuery.isFetching}
-          >
-            <RefreshCw className={`h-4 w-4 ${kpisQuery.isFetching ? 'animate-spin' : ''}`} />
-            Actualizar
-          </Button>
-
-          <Button
-            className="gap-2"
-            onClick={() => calculateMutation.mutate()}
-            disabled={calculateMutation.isPending}
-          >
-            <CheckCircle2 className="h-4 w-4" />
-            {calculateMutation.isPending ? 'Consolidando…' : 'Consolidar período'}
-          </Button>
-        </div>
+              <Button
+                size="sm"
+                className="gap-1.5 h-9"
+                onClick={() => calculateMutation.mutate()}
+                disabled={calculateMutation.isPending}
+              >
+                <CheckCircle2 className="size-3.5" />
+                {calculateMutation.isPending ? 'Consolidando…' : 'Consolidar período'}
+              </Button>
+            </div>
+          }
+        />
       </div>
 
       {aviso && (

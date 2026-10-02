@@ -1,5 +1,7 @@
 import type { MeResponse } from '@/features/auth/model'
+import { BarChart3 } from 'lucide-react'
 import { CimaLogo } from '@/components/ui/cima-logo'
+import { PageHeader } from '@/components/molecules/page-header'
 import type { ProjectListItem } from '@/features/collab/model'
 import type { WorkspaceTab } from '@/pages/dashboard/use-dashboard-navigation'
 import '@/features/overview/ui/overview.css'
@@ -89,14 +91,22 @@ export function DashboardOverview({
 
   return (
     <div className="overview-stage space-y-8 w-full max-w-full overflow-x-clip min-w-0">
-      <div className="space-y-1 animate-fade-up min-w-0">
-        <p className="text-2xl font-medium text-muted-foreground sm:text-3xl">
-          Hola <span className="font-black text-primary">{firstName}</span>
-        </p>
-        <p className="flex flex-wrap items-center gap-x-3 gap-y-2 text-2xl font-medium text-muted-foreground sm:text-3xl">
-          Bienvenido a{' '}
-          <CimaLogo variant="cimaxis" width={180} />
-        </p>
+      <div data-tour="overview-header" className="animate-fade-up">
+        <PageHeader
+          eyebrow={
+            <>
+              Hola <span className="font-black text-primary">{firstName}</span>
+            </>
+          }
+          title={
+            <span className="flex flex-wrap items-center gap-x-3 gap-y-2 font-medium text-muted-foreground">
+              Bienvenido a{' '}
+              <CimaLogo variant="cimaxis" width={180} />
+            </span>
+          }
+          description="Resumen ejecutivo y monitoreo en tiempo real de cuentas, proyectos y actividades."
+          icon={BarChart3}
+        />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] animate-fade-up stagger-1 min-w-0 w-full max-w-full">
