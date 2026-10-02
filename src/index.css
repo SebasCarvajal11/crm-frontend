@@ -68,6 +68,8 @@
   --shadow-xl: 0 20px 30px -8px rgb(40 40 41 / 0.16), 0 8px 12px -8px rgb(40 40 41 / 0.12);
   --shadow-2xl: 0 25px 50px -12px rgb(40 40 41 / 0.25);
   --app-zoom: 1;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 }
 .dark {
   --background: #1b1b1c;
@@ -173,6 +175,21 @@
     width: 100%;
   }
 
+  ::selection {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  input,
+  textarea {
+    caret-color: var(--primary);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
     scroll-behavior: smooth;
@@ -254,6 +271,14 @@
 }
 
 /* Interacciones globales estandarizadas */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.prose-measure {
+  max-width: 68ch;
+}
+
 .interactive-card {
   transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1),
