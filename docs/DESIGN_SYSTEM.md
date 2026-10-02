@@ -104,3 +104,26 @@ y proyectos permanecen en su lugar. `data-tour` se ancla a las secciones y no
 a posiciones de la cuadrícula, por lo que funciona con cualquier rol o ancho.
 Los estados de carga y vacío conservan el mismo orden. Las transiciones se
 desactivan con `prefers-reduced-motion`.
+
+---
+
+## 6. Directorio de Usuarios en Consola de Administración
+
+El Directorio de Usuarios (`src/components/organisms/admin/`) implementa una experiencia visual
+enriquecida e interactiva mediante un carrusel por tarjetas fluido:
+
+- **Modo Carrusel Interactivo (Predeterminado)**: Organizado en `UserCarousel` y `AdminUserCard`.
+  Utiliza CSS Scroll Snap nativo (`snap-x snap-mandatory`), gestos táctiles acelerados por hardware
+  y controles ergonómicos de desplazamiento horizontal con indicadores dinámicos.
+- **Línea Gráfica de Tarjetas**: Coherente con `ProjectMembers`, cada tarjeta destaca el rol
+  con acento lateral (`border-l-4`), avatar determinista memorizado (`getAvatarColor`),
+  badge de estado de cuenta (activo/inactivo/archivado), datos de contacto y acciones
+  completas de ciclo de vida (`AdminUserActions`).
+- **Modo Tabla Detallada**: Accesible mediante el selector de vista en `UserTableToolbar`
+  para auditorías y consultas densas en formato tabular virtualizado.
+- **Responsividad Homologada**:
+  - Pantallas 2K/UHD: 4 tarjetas simultáneas.
+  - Escritorio 1080p: 3 tarjetas simultáneas.
+  - Tablets: 2 tarjetas simultáneas.
+  - Móviles: 1 tarjeta centralizada por slide con adaptación táctil y sin desbordamiento global.
+

@@ -1,6 +1,7 @@
-import { Search, UsersRound } from 'lucide-react'
+import { GalleryHorizontalEnd, Search, Table as TableIcon, UsersRound } from 'lucide-react'
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -23,6 +24,8 @@ type Props = {
   pageSize: number
   setPageSize: (v: number) => void
   setPage: (v: number) => void
+  viewMode: 'carousel' | 'table'
+  setViewMode: (v: 'carousel' | 'table') => void
 }
 
 /** Componente molecular: barra de control y filtros del directorio de usuarios. */
@@ -37,6 +40,8 @@ export function UserTableToolbar({
   pageSize,
   setPageSize,
   setPage,
+  viewMode,
+  setViewMode,
 }: Props) {
   return (
     <CardHeader
@@ -58,6 +63,39 @@ export function UserTableToolbar({
             <span className="font-semibold text-foreground">{totalItems}</span>
             <span>usuarios</span>
           </div>
+          <div className="flex items-center rounded-xl border border-border/70 bg-background/80 p-0.5 shadow-2xs">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className={`size-7 rounded-lg transition-colors ${
+                viewMode === 'carousel'
+                  ? 'bg-primary text-primary-foreground shadow-2xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+              onClick={() => setViewMode('carousel')}
+              aria-label="Vista carrusel interactivo"
+              title="Vista carrusel de tarjetas"
+            >
+              <GalleryHorizontalEnd className="size-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className={`size-7 rounded-lg transition-colors ${
+                viewMode === 'table'
+                  ? 'bg-primary text-primary-foreground shadow-2xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+              onClick={() => setViewMode('table')}
+              aria-label="Vista tabla detallada"
+              title="Vista tabla"
+            >
+              <TableIcon className="size-3.5" />
+            </Button>
+          </div>
+
           <Select
             value={String(pageSize)}
             onValueChange={(v) => {

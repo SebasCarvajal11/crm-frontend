@@ -6,6 +6,8 @@ export class AdminPage {
   readonly searchInput: Locator
   readonly roleFilter: Locator
   readonly includeDeletedCheckbox: Locator
+  readonly userContainer: Locator
+  readonly userCards: Locator
   readonly userTable: Locator
   readonly prevPageButton: Locator
   readonly nextPageButton: Locator
@@ -18,6 +20,8 @@ export class AdminPage {
     this.searchInput = page.getByLabel('Buscar por nombre, empresa, apellido o correo')
     this.roleFilter = page.locator('#admin-role-filter')
     this.includeDeletedCheckbox = page.locator('#admin-include-deleted')
+    this.userContainer = page.locator('[data-tour="admin-user-table"]')
+    this.userCards = page.locator('[data-testid="admin-user-card"]')
     this.userTable = page.getByRole('table')
     this.prevPageButton = page.getByLabel('Pagina anterior')
     this.nextPageButton = page.getByLabel('Pagina siguiente')
@@ -27,7 +31,7 @@ export class AdminPage {
   }
 
   async expectLoaded() {
-    await this.userTable.waitFor({ state: 'visible', timeout: 15_000 })
+    await this.userContainer.waitFor({ state: 'visible', timeout: 15_000 })
   }
 
   async searchUser(query: string) {
@@ -46,6 +50,10 @@ export class AdminPage {
   }
 
   async getUserRows(): Promise<Locator> {
+    const cardCount = await this.userCards.count()
+    if (cardCount > 0) {
+      return this.userCards
+    }
     return this.userTable.locator('tbody tr')
   }
 
@@ -105,27 +113,35 @@ export class AdminPage {
   }
 
   async deactivateUser(email: string) {
-    const row = this.page.locator(`tr:has-text("${email}")`)
-    await row.getByRole('button', { name: /desactivar/i }).click()
+    const item = this.page
+      .locator(`[data-testid="admin-user-card"]:has-text("${email}"), tr:has-text("${email}")`)
+      .first()
+    await item.getByRole('button', { name: /desactivar/i }).click()
     await this.page.waitForTimeout(500)
   }
 
   async activateUser(email: string) {
-    const row = this.page.locator(`tr:has-text("${email}")`)
-    await row.getByRole('button', { name: /activar/i }).click()
+    const item = this.page
+      .locator(`[data-testid="admin-user-card"]:has-text("${email}"), tr:has-text("${email}")`)
+      .first()
+    await item.getByRole('button', { name: /activar/i }).click()
     await this.page.waitForTimeout(500)
   }
 
   async archiveUser(email: string) {
-    const row = this.page.locator(`tr:has-text("${email}")`)
-    await row.getByRole('button', { name: /archivar/i }).click()
+    const item = this.page
+      .locator(`[data-testid="admin-user-card"]:has-text("${email}"), tr:has-text("${email}")`)
+      .first()
+    await item.getByRole('button', { name: /archivar/i }).click()
     await this.page.getByRole('button', { name: /^archivar$/i }).click()
     await this.page.waitForTimeout(500)
   }
 
   async restoreUser(email: string) {
-    const row = this.page.locator(`tr:has-text("${email}")`)
-    await row.getByRole('button', { name: /restaurar/i }).click()
+    const item = this.page
+      .locator(`[data-testid="admin-user-card"]:has-text("${email}"), tr:has-text("${email}")`)
+      .first()
+    await item.getByRole('button', { name: /restaurar/i }).click()
     await this.page.waitForTimeout(500)
   }
 }

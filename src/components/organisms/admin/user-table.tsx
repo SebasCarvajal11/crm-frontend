@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent } from '@/components/ui/card'
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table'
 import { UserTableToolbar } from './user-table-toolbar'
 import { UserTableRow } from './user-table-row'
+import { UserCarousel } from './user-carousel'
 import { UserTablePagination } from './user-table-pagination'
 import { useAdminUsersTable } from '@/features/admin/hooks'
 import type { AdminUserRow } from '@/features/admin/model'
@@ -21,8 +22,9 @@ type Props = {
   accessToken: string
 }
 
-/** Organismo: tabla moderna de directorio de usuarios con virtualización, filtros y paginación. */
+/** Organismo: directorio interactivo de usuarios con vista carrusel y tabla tabular. */
 export function AdminUserTable({ accessToken }: Props) {
+  const [viewMode, setViewMode] = useState<'carousel' | 'table'>('carousel')
   const {
     pageSize,
     setPageSize,
@@ -77,6 +79,8 @@ export function AdminUserTable({ accessToken }: Props) {
           pageSize={pageSize}
           setPageSize={setPageSize}
           setPage={setPage}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
         />
 
         <CardContent data-tour={usersQ.isLoading || usersQ.isError ? undefined : 'admin-user-table'} className="space-y-4 p-4 sm:p-6">
@@ -114,6 +118,15 @@ export function AdminUserTable({ accessToken }: Props) {
               <AlertTitle>Sin resultados</AlertTitle>
               <AlertDescription>No hay usuarios para los filtros seleccionados.</AlertDescription>
             </Alert>
+          ) : viewMode === 'carousel' ? (
+            <UserCarousel
+              items={items}
+              patchStatus={patchStatus}
+              patchFlags={patchFlags}
+              softDelete={softDelete}
+              restore={restore}
+              clearActionMessage={() => setActionsMessage(null)}
+            />
           ) : (
             <div
               ref={parentRef}
