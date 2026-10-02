@@ -26,20 +26,8 @@ export interface Campaign {
   updatedAt?: string
 }
 
-/**
- * @deprecated Esta forma NO coincide con lo que devuelve el backend real
- * (verificado contra AnalyticsController el 2026-08-18). `getAnalyticsSummaryRequest`
- * ya no usa este tipo, retorna `AnalyticsSummaryDto` (ver '@/features/analytics/model').
- * Se deja sin borrar por si algo más en el repo la importa; no usar en código nuevo.
- */
-export interface AnalyticsSummary {
-  totalClients: number
-  activeCampaigns: number
-  lowStockItemsCount: number
-  averageKpis: Record<string, number>
-}
-
 export async function listCampaignsRequest(accessToken: string): Promise<Campaign[]> {
+
   return api.get(MARKETING_ROUTES.campaigns, { headers: bearer(accessToken) }).json<Campaign[]>()
 }
 
