@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { IconButton } from '@/components/ui/icon-button'
 import { PageHeader } from '@/components/molecules/page-header'
+import { MetricRibbon } from '@/components/molecules/metric-ribbon'
 import {
   Select,
   SelectContent,
@@ -12,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
 import {
   getCurrentKpisRequest,
   calculateKpisRequest,
@@ -144,11 +144,13 @@ export function KpiDashboard({ accessToken }: KpiDashboardProps) {
       )}
 
       {kpisQuery.isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-lg" />
-          ))}
-        </div>
+        <MetricRibbon
+          items={[]}
+          columns={4}
+          isLoading={true}
+          skeletonCount={8}
+          ariaLabel="Cargando indicadores"
+        />
       ) : kpisQuery.isError ? (
         <Card className="border-destructive/40">
           <CardContent className="py-10 text-center">
@@ -171,35 +173,23 @@ export function KpiDashboard({ accessToken }: KpiDashboardProps) {
             </div>
           )}
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {KPIS.map((kpi) => {
+          <MetricRibbon
+            items={KPIS.map((kpi) => {
               const Icon = kpi.icon
               const valor = Number(kpis[kpi.key] ?? 0)
-              return (
-                <Card
-                  key={String(kpi.key)}
-                  className={`border-l-4 ${
-                    kpi.destacado ? 'border-l-primary' : 'border-l-muted-foreground/30'
-                  }`}
-                >
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between gap-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                        {kpi.label}
-                      </p>
-                      <div className="rounded-full bg-muted p-1.5">
-                        <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-                      </div>
-                    </div>
-                    <p className="mt-2 text-2xl font-bold leading-none">
-                      {formatear(valor, kpi.formato)}
-                    </p>
-                    <p className="mt-2 text-xs text-muted-foreground">{kpi.origen}</p>
-                  </CardContent>
-                </Card>
-              )
+              return {
+                id: String(kpi.key),
+                label: kpi.label,
+                value: formatear(valor, kpi.formato),
+                subtext: kpi.origen,
+                icon: <Icon className="size-4" />,
+                accent: kpi.destacado ? 'primary' : 'muted',
+                highlight: kpi.destacado,
+              }
             })}
-          </div>
+            columns={4}
+            ariaLabel="Indicadores de gestión"
+          />
 
           <div className="rounded-lg border border-border bg-muted/30 p-4 text-xs text-muted-foreground">
             <p>

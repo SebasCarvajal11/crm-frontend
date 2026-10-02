@@ -1,5 +1,5 @@
 import { AlertTriangle, CheckCircle2, Clock, FileText } from 'lucide-react'
-import { SummaryCard } from './summary-card'
+import { MetricRibbon, type MetricRibbonItem } from '@/components/molecules/metric-ribbon'
 import { formatCurrency, UMBRAL_SIN_RESPUESTA_DIAS } from './proposal.constants'
 
 interface ProposalsSummaryHeaderProps {
@@ -14,38 +14,44 @@ interface ProposalsSummaryHeaderProps {
 }
 
 export function ProposalsSummaryHeader({ resumen }: ProposalsSummaryHeaderProps) {
+  const items: MetricRibbonItem[] = [
+    {
+      label: 'En seguimiento',
+      value: String(resumen.pendientes),
+      hint: formatCurrency(resumen.valorPipeline),
+      icon: <Clock className="size-4" />,
+      accent: 'primary',
+    },
+    {
+      label: 'Sin respuesta',
+      value: String(resumen.vencidas),
+      hint: `Más de ${UMBRAL_SIN_RESPUESTA_DIAS} días`,
+      icon: <AlertTriangle className="size-4" />,
+      accent: 'amber',
+    },
+    {
+      label: 'Aprobadas',
+      value: String(resumen.aprobadas),
+      hint: formatCurrency(resumen.valorAprobado),
+      icon: <CheckCircle2 className="size-4" />,
+      accent: 'emerald',
+    },
+    {
+      label: 'Total registradas',
+      value: String(resumen.total),
+      hint: 'Histórico completo',
+      icon: <FileText className="size-4" />,
+      accent: 'muted',
+    },
+  ]
+
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard
-          label="En seguimiento"
-          value={String(resumen.pendientes)}
-          hint={formatCurrency(resumen.valorPipeline)}
-          icon={Clock}
-          accent="border-l-primary"
-        />
-        <SummaryCard
-          label="Sin respuesta"
-          value={String(resumen.vencidas)}
-          hint={`Más de ${UMBRAL_SIN_RESPUESTA_DIAS} días`}
-          icon={AlertTriangle}
-          accent="border-l-amber-500"
-        />
-        <SummaryCard
-          label="Aprobadas"
-          value={String(resumen.aprobadas)}
-          hint={formatCurrency(resumen.valorAprobado)}
-          icon={CheckCircle2}
-          accent="border-l-emerald-600"
-        />
-        <SummaryCard
-          label="Total registradas"
-          value={String(resumen.total)}
-          hint="Histórico completo"
-          icon={FileText}
-          accent="border-l-muted-foreground"
-        />
-      </div>
+      <MetricRibbon
+        items={items}
+        columns={4}
+        ariaLabel="Resumen de propuestas"
+      />
 
       {resumen.vencidas > 0 && (
         <div className="flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4">
