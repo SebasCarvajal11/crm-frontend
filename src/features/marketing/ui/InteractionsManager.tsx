@@ -122,28 +122,24 @@ export function InteractionsManager({ accessToken }: InteractionsManagerProps) {
           value={resumen.total}
           hint={`${resumen.automaticas} automáticas / ${resumen.manuales} manuales`}
           icon={MessageSquare}
-          accent="border-l-primary"
         />
         <SummaryCard
           label="Con respuesta"
           value={resumen.conRespuesta}
           hint="Respuestas registradas o clics"
           icon={CheckCircle2}
-          accent="border-l-emerald-500"
         />
         <SummaryCard
           label="Pendientes"
           value={resumen.pendientes}
           hint="Sin respuesta aún"
           icon={User}
-          accent="border-l-amber-500"
         />
         <SummaryCard
           label="Tasa de respuesta"
           value={`${resumen.tasa}%`}
           hint="Sobre clientes únicos contactados"
           icon={TrendingUp}
-          accent="border-l-sky-500"
         />
       </div>
 

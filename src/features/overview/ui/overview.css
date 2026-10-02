@@ -62,29 +62,31 @@
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  transition: background-color 180ms ease, padding-left 180ms ease;
+  transition: background-color 180ms cubic-bezier(0.16, 1, 0.3, 1), transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .overview-stage .overview-row::before {
   position: absolute;
   inset-block: 0;
   left: 0;
-  width: 2px;
+  width: 3px;
   background: var(--primary);
   content: '';
   opacity: 0;
-  transition: opacity 180ms ease;
+  transform: scaleY(0.6);
+  transition: opacity 180ms ease, transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .overview-stage .overview-row:hover,
 .overview-stage .overview-row:focus-within {
-  padding-left: 1.1rem;
+  transform: translateX(4px);
   background: color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 .overview-stage .overview-row:hover::before,
 .overview-stage .overview-row:focus-within::before {
   opacity: 1;
+  transform: scaleY(1);
 }
 
 .overview-stage .overview-kpi-grid {

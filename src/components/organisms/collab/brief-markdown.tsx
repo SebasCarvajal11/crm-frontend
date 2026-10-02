@@ -108,7 +108,7 @@ export function BriefMarkdown({ content, className }: Props) {
             return (
               <blockquote
                 key={idx}
-                className="rounded-r-lg border-l-4 border-primary bg-primary/5 px-4 py-3 my-4 text-sm text-foreground/90 font-medium italic"
+                className="rounded-r-lg border-l-2 border-primary/60 bg-muted/40 px-4 py-2.5 my-3 text-sm text-foreground/90 font-medium italic"
               >
                 {parseInline(block.text)}
               </blockquote>

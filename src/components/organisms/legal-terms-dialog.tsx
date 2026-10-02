@@ -49,7 +49,7 @@ function TabNavigation({
             key={tab.id}
             type="button"
             onClick={() => onSelect(tab.id)}
-            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-t-md transition-all border-b-2 -mb-px cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold transition-all border-b-2 -mb-px cursor-pointer ${
               isActive
                 ? 'border-primary text-primary bg-primary/5 shadow-xs'
                 : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'

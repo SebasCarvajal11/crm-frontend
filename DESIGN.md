@@ -44,17 +44,36 @@ typography:
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: "normal"
+  base:
+    fontFamily: "Montserrat, system-ui, sans-serif"
+    fontSize: "1rem"
+    fontWeight: 400
+    lineHeight: 1.5
+    letterSpacing: "normal"
   label:
     fontFamily: "Montserrat, system-ui, sans-serif"
     fontSize: "0.75rem"
     fontWeight: 500
     lineHeight: 1.4
     letterSpacing: "0.01em"
+  caption:
+    fontFamily: "Montserrat, system-ui, sans-serif"
+    fontSize: "0.6875rem"
+    fontWeight: 500
+    lineHeight: 1.4
+    letterSpacing: "0.01em"
+  micro:
+    fontFamily: "Montserrat, system-ui, sans-serif"
+    fontSize: "0.625rem"
+    fontWeight: 600
+    lineHeight: 1.3
+    letterSpacing: "0.01em"
 rounded:
   sm: "4px"
   md: "6px"
   lg: "8px"
   xl: "12px"
+  2xl: "16px"
   full: "9999px"
 spacing:
   xs: "4px"

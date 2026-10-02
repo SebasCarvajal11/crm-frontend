@@ -19,10 +19,10 @@ export const ChatTypingIndicator = memo(function ChatTypingIndicator({ typers }:
       role="status"
       aria-live="polite"
     >
-      <span className="inline-flex items-center gap-0.5">
-        <span className="size-1.5 rounded-full bg-primary/70 animate-bounce [animation-delay:-0.3s]" />
-        <span className="size-1.5 rounded-full bg-primary/70 animate-bounce [animation-delay:-0.15s]" />
-        <span className="size-1.5 rounded-full bg-primary/70 animate-bounce" />
+      <span className="inline-flex items-center gap-1">
+        <span className="size-1.5 rounded-full bg-primary/80 animate-typing-dot [animation-delay:-0.32s]" />
+        <span className="size-1.5 rounded-full bg-primary/80 animate-typing-dot [animation-delay:-0.16s]" />
+        <span className="size-1.5 rounded-full bg-primary/80 animate-typing-dot" />
       </span>
       <span className="font-medium text-foreground/80">{formatTypingLabel(typers)}</span>
     </div>

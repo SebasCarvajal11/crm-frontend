@@ -187,7 +187,7 @@ export function TaskSheet({
               aria-selected={tab === item.key}
               onClick={() => setTab(item.key)}
               className={[
-                '-mb-px flex items-center gap-1.5 whitespace-nowrap rounded-t border-b-2 px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none',
+                '-mb-px flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none',
                 tab === item.key ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground',
               ].join(' ')}
             >

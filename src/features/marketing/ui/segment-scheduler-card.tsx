@@ -19,7 +19,7 @@ export function SegmentSchedulerCard({
   clientName,
 }: SegmentSchedulerCardProps) {
   return (
-    <Card className="border-l-4 border-l-primary">
+    <Card className="border border-border/80 shadow-xs hover:border-primary/40 transition-all">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <Zap className="h-5 w-5 text-primary" />

@@ -219,7 +219,7 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
                 const showEmailLine = Boolean(member.email && member.email !== displayName)
                 const avatarUrl = memberAvatarUrl(member.userSub, member.email)
                 return (
-                  <article key={member.userSub} className={`rounded-xl border border-l-4 bg-card p-4 shadow-sm interactive-card ${cfg.cardClass}`}>
+                  <article key={member.userSub} className="rounded-xl border border-border/70 bg-card p-4 shadow-xs interactive-card hover:border-primary/30 transition-all">
                     <div className="flex items-start gap-3">
                       <UserAvatar
                         src={avatarUrl}

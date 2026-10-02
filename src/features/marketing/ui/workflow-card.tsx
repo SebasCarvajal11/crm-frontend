@@ -39,10 +39,10 @@ export function WorkflowCard({
 
   return (
     <Card
-      className={`overflow-hidden shadow-sm hover:shadow-md transition-all border ${
+      className={`overflow-hidden shadow-xs hover:shadow-md transition-all border border-border/80 ${
         w.active
-          ? 'border-l-4 border-l-primary'
-          : 'border-l-4 border-l-muted-foreground/40 opacity-75'
+          ? 'hover:border-primary/40'
+          : 'opacity-75 bg-muted/20'
       }`}
     >
       <div className="p-4 space-y-3">

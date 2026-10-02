@@ -66,12 +66,6 @@ function statusBadge(row: AdminUserRow) {
   )
 }
 
-function roleAccentBorder(role: UserRole): string {
-  if (role === 'admin') return 'border-l-primary'
-  if (role === 'worker') return 'border-l-cyan-500'
-  return 'border-l-emerald-500'
-}
-
 /** Componente molecular: tarjeta interactiva individual para visualización de usuario. */
 export function AdminUserCard({
   row,
@@ -89,7 +83,7 @@ export function AdminUserCard({
   return (
     <Card
       data-testid="admin-user-card"
-      className={`interactive-card relative flex h-full flex-col justify-between rounded-2xl border border-border/70 border-l-4 ${roleAccentBorder(row.role)} bg-card p-4 sm:p-5 shadow-xs`}
+      className="interactive-card relative flex h-full flex-col justify-between rounded-2xl border border-border/70 bg-card p-4 sm:p-5 shadow-xs hover:border-primary/30 transition-all"
     >
       <div className="space-y-3.5">
         <div className="flex items-start justify-between gap-3">

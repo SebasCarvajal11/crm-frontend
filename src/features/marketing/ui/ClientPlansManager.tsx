@@ -136,7 +136,7 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
           const total = conteoPorPlan[plan.value] ?? 0
           const pct = clients.length > 0 ? Math.round((total / clients.length) * 100) : 0
           return (
-            <Card key={plan.value} className="border-l-4 border-l-primary">
+            <Card key={plan.value} className="border border-border/80 shadow-xs hover:border-primary/40 transition-all">
               <CardContent className="flex items-start justify-between gap-3 pt-6">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -153,7 +153,7 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
           )
         })}
 
-        <Card className={`border-l-4 ${sinPlan.length > 0 ? 'border-l-amber-500' : 'border-l-muted'}`}>
+        <Card className={`border border-border/80 shadow-xs transition-all ${sinPlan.length > 0 ? 'bg-amber-500/[0.03] border-amber-500/40' : ''}`}>
           <CardContent className="flex items-start justify-between gap-3 pt-6">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">

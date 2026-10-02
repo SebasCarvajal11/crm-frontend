@@ -179,7 +179,7 @@ export function WorkflowsManager({
       {executionResultMsg && (
         <Alert
           variant={executionResultMsg.success ? 'default' : 'destructive'}
-          className="border-l-4"
+          className="shadow-xs"
         >
           {executionResultMsg.success ? (
             <CheckCircle2 className="size-4" />
