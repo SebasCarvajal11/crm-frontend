@@ -4,7 +4,6 @@ import { CalendarRange, ChartAreaIcon, CheckCircle2, RefreshCw, XCircle } from '
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { IconButton } from '@/components/ui/icon-button'
-import { PageHeader } from '@/components/molecules/page-header'
 import { MetricRibbon } from '@/components/molecules/metric-ribbon'
 import {
   Select,
@@ -67,71 +66,66 @@ export function KpiDashboard({ accessToken }: KpiDashboardProps) {
 
   return (
     <div className="space-y-6">
-      <div data-tour="analytics-header">
-        <PageHeader
-          eyebrow={
-            <>
-              Rendimiento e <span className="font-black text-primary">Indicadores</span>
-            </>
-          }
-          title={
-            <>
-              Analítica de{' '}
-              <span className="font-black tracking-tight text-foreground">
-                Gestión
-              </span>
-            </>
-          }
-          description="Los ocho indicadores del período comercial calculados en el momento de la consulta."
-          icon={ChartAreaIcon}
-          actions={
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <Select
-                value={period}
-                onValueChange={(val) => {
-                  setPeriod(val)
-                  setAviso(null)
-                }}
-              >
-                <SelectTrigger
-                  className="h-9 min-w-[160px] bg-card text-xs font-medium capitalize"
-                  aria-label="Seleccionar período"
-                >
-                  <CalendarRange className="mr-1.5 size-3.5 text-muted-foreground" />
-                  <SelectValue placeholder="Período" />
-                </SelectTrigger>
-                <SelectContent>
-                  {periodos.map((p) => (
-                    <SelectItem key={p.value} value={p.value} className="text-xs capitalize">
-                      {p.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border/80 bg-card p-4 sm:px-5 sm:py-3.5 shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-2xs">
+            <ChartAreaIcon className="size-5" />
+          </div>
+          <div>
+            <h2 className="text-sm sm:text-base font-bold tracking-tight text-foreground leading-snug">
+              Indicadores del Período Comercial
+            </h2>
+            <p className="text-xs font-medium text-muted-foreground">
+              Métricas consolidadas de gestión calculadas para el período seleccionado.
+            </p>
+          </div>
+        </div>
 
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5 h-9"
-                onClick={() => kpisQuery.refetch()}
-                disabled={kpisQuery.isFetching}
-              >
-                <RefreshCw className={`size-3.5 ${kpisQuery.isFetching ? 'animate-spin' : ''}`} />
-                Actualizar
-              </Button>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+          <Select
+            value={period}
+            onValueChange={(val) => {
+              setPeriod(val)
+              setAviso(null)
+            }}
+          >
+            <SelectTrigger
+              className="h-9 min-w-[150px] bg-muted/20 text-xs font-semibold capitalize rounded-xl border-border/80"
+              aria-label="Seleccionar período"
+            >
+              <CalendarRange className="mr-1.5 size-3.5 text-primary" />
+              <SelectValue placeholder="Período" />
+            </SelectTrigger>
+            <SelectContent>
+              {periodos.map((p) => (
+                <SelectItem key={p.value} value={p.value} className="text-xs capitalize font-medium">
+                  {p.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-              <Button
-                size="sm"
-                className="gap-1.5 h-9"
-                onClick={() => calculateMutation.mutate()}
-                disabled={calculateMutation.isPending}
-              >
-                <CheckCircle2 className="size-3.5" />
-                {calculateMutation.isPending ? 'Consolidando…' : 'Consolidar período'}
-              </Button>
-            </div>
-          }
-        />
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5 h-9 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground"
+            onClick={() => kpisQuery.refetch()}
+            disabled={kpisQuery.isFetching}
+          >
+            <RefreshCw className={`size-3.5 ${kpisQuery.isFetching ? 'animate-spin' : ''}`} />
+            Actualizar
+          </Button>
+
+          <Button
+            size="sm"
+            className="gap-1.5 h-9 rounded-xl text-xs font-semibold shadow-xs"
+            onClick={() => calculateMutation.mutate()}
+            disabled={calculateMutation.isPending}
+          >
+            <CheckCircle2 className="size-3.5" />
+            {calculateMutation.isPending ? 'Consolidando…' : 'Consolidar período'}
+          </Button>
+        </div>
       </div>
 
       {aviso && (
