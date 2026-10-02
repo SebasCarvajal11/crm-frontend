@@ -65,14 +65,14 @@ function TaskCardProgress({
     >
       <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1 font-medium">
         <span className="flex items-center gap-1">
-          <CheckSquare className="size-3" />
+          <CheckSquare className="size-3 text-emerald-600 dark:text-emerald-400" />
           {completedCount}/{subtasks.length}
         </span>
-        <span>{progress}%</span>
+        <span className="font-bold tabular-nums text-foreground">{progress}%</span>
       </div>
-      <div className="h-1 rounded-full bg-muted overflow-hidden">
+      <div className="h-1.5 rounded-full bg-muted/80 overflow-hidden">
         <div
-          className="h-full bg-emerald-500 transition-all duration-300 rounded-full"
+          className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-300 rounded-full"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -107,8 +107,8 @@ export const TaskCard = memo(function TaskCard({
 }: Props) {
   const isBlocked = Boolean(task.blockType)
   const cardBorderClass = isBlocked
-    ? 'border-rose-500/40 bg-rose-500/[0.02]'
-    : 'border-border/80 bg-card hover:border-border'
+    ? 'border-rose-500/50 bg-rose-500/[0.03] shadow-rose-500/5'
+    : 'border-border/80 bg-card hover:border-primary/40'
 
   return (
     <button
@@ -122,22 +122,24 @@ export const TaskCard = memo(function TaskCard({
       onClick={onClick}
       aria-pressed={isSelected}
       aria-label={`Tarea: ${task.title}. Prioridad: ${task.priority}.`}
-      className={`group w-full text-left rounded-xl border ${cardBorderClass} p-3.5 shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 cursor-pointer ${
-        isSelected ? 'ring-2 ring-primary ring-offset-1 shadow-sm' : ''
+      className={`group w-full text-left rounded-xl border ${cardBorderClass} p-3.5 shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 cursor-pointer ${
+        isSelected ? 'ring-2 ring-primary ring-offset-1 shadow-md border-primary/60' : ''
       }`}
     >
-      <div className="flex items-start justify-between gap-2 mb-1">
-        <span className="text-sm font-medium leading-snug line-clamp-2">{task.title}</span>
+      <div className="flex items-start justify-between gap-2 mb-1.5">
+        <span className="text-sm font-semibold tracking-tight leading-snug line-clamp-2 text-foreground group-hover:text-primary transition-colors">
+          {task.title}
+        </span>
         {canDrag && (
           <GripVertical
-            className="size-4 text-muted-foreground/40 group-hover:text-muted-foreground shrink-0 mt-0.5 cursor-grab transition-colors"
+            className="size-4 text-muted-foreground/30 group-hover:text-muted-foreground shrink-0 mt-0.5 cursor-grab transition-colors"
             aria-hidden="true"
           />
         )}
       </div>
 
       {task.description && (
-        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{task.description}</p>
+        <p className="text-xs text-muted-foreground line-clamp-2 mb-2 leading-relaxed">{task.description}</p>
       )}
 
       <TaskCardBadges task={task} />

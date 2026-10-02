@@ -161,12 +161,12 @@ export const ChatMessageList = memo(function ChatMessageList({
     return (
       <div key={message.id}>
         {showDaySeparator && (
-          <div className="my-2 flex items-center gap-2">
-            <div className="h-px flex-1 bg-border" />
-            <span className="rounded-full border bg-background px-2 py-0.5 text-[10px] font-medium capitalize text-muted-foreground">
+          <div className="my-2.5 flex items-center gap-2">
+            <div className="h-px flex-1 bg-border/60" />
+            <span className="rounded-full border border-border/70 bg-card/90 px-3 py-0.5 text-[10px] font-semibold tracking-wide uppercase text-muted-foreground shadow-2xs backdrop-blur-xs">
               {formatDaySeparator(message.createdAt)}
             </span>
-            <div className="h-px flex-1 bg-border" />
+            <div className="h-px flex-1 bg-border/60" />
           </div>
         )}
         <div
@@ -198,15 +198,11 @@ export const ChatMessageList = memo(function ChatMessageList({
               </span>
             )}
             <div
-              className={`break-words px-3.5 py-1.5 text-sm leading-relaxed shadow-sm ${
+              className={`break-words px-3.5 py-2 text-sm leading-relaxed ${
                 isOwn
-                  ? sameAuthorAsPrevious
-                    ? 'rounded-2xl rounded-br-sm bg-primary text-primary-foreground'
-                    : 'rounded-t-2xl rounded-bl-2xl rounded-br-sm bg-primary text-primary-foreground'
-                  : sameAuthorAsPrevious
-                    ? 'rounded-2xl rounded-bl-sm bg-muted'
-                    : 'rounded-t-2xl rounded-br-2xl rounded-bl-sm bg-muted'
-              } ${isMentionedToCurrentUser && !isOwn ? 'bg-amber-50 ring-1 ring-amber-300/70' : ''}`}
+                  ? 'rounded-2xl rounded-br-xs bg-gradient-to-br from-primary via-[#86070c] to-[#680609] text-white shadow-xs'
+                  : 'rounded-2xl rounded-bl-xs bg-card border border-border/70 text-foreground shadow-2xs'
+              } ${isMentionedToCurrentUser && !isOwn ? 'bg-amber-500/10 border-amber-500/30 ring-1 ring-amber-500/20' : ''}`}
             >
               {message.body}
             </div>

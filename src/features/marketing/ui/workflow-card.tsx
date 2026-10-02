@@ -39,13 +39,13 @@ export function WorkflowCard({
 
   return (
     <Card
-      className={`overflow-hidden shadow-xs hover:shadow-md transition-all border border-border/80 ${
+      className={`overflow-hidden rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 border border-border/80 ${
         w.active
-          ? 'hover:border-primary/40'
-          : 'opacity-75 bg-muted/20'
+          ? 'hover:border-primary/40 hover:-translate-y-0.5 bg-card'
+          : 'opacity-75 bg-muted/15'
       }`}
     >
-      <div className="p-4 space-y-3">
+      <div className="p-4 sm:p-5 space-y-3.5">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -73,10 +73,10 @@ export function WorkflowCard({
               size="sm"
               onClick={() => onToggle(w.workflowId)}
               disabled={isToggling}
-              className={`text-xs px-2.5 h-7 rounded-full font-bold ${
+              className={`text-xs px-3 h-7 rounded-full font-bold shadow-2xs transition-all ${
                 w.active
-                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                  : 'bg-muted text-muted-foreground'
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-600'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
               {w.active ? 'ON' : 'OFF'}
@@ -88,11 +88,11 @@ export function WorkflowCard({
           <p className="text-xs text-muted-foreground leading-relaxed">{w.description}</p>
         )}
 
-        <div className="grid grid-cols-1 gap-2 rounded-lg bg-muted/40 p-2.5 text-xs sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2.5 rounded-xl border border-border/50 bg-muted/20 p-3 text-xs sm:grid-cols-2">
           <div className="space-y-0.5">
             <span className="text-[10px] uppercase font-bold text-muted-foreground">Disparador</span>
-            <p className="font-semibold text-foreground flex items-center gap-1">
-              <Clock className="size-3 text-primary" />
+            <p className="font-semibold text-foreground flex items-center gap-1.5">
+              <Clock className="size-3.5 text-primary" />
               {triggerInfo?.label || w.triggerType}
               {w.noContactDays ? ` (${w.noContactDays}d)` : ''}
             </p>
@@ -100,25 +100,25 @@ export function WorkflowCard({
 
           <div className="space-y-0.5">
             <span className="text-[10px] uppercase font-bold text-muted-foreground">Acción</span>
-            <p className="font-semibold text-foreground flex items-center gap-1">
-              <ActionIcon className="size-3 text-primary" />
+            <p className="font-semibold text-foreground flex items-center gap-1.5">
+              <ActionIcon className="size-3.5 text-primary" />
               {actionInfo?.label || w.actionType}
             </p>
           </div>
         </div>
 
         {w.messageTemplate && (
-          <div className="rounded-md border bg-card p-2 text-[11px] text-muted-foreground italic">
+          <div className="rounded-xl border border-border/60 bg-background/80 p-2.5 text-xs text-muted-foreground italic leading-relaxed">
             "{w.messageTemplate}"
           </div>
         )}
 
-        <div className="flex items-center justify-between border-t pt-3">
+        <div className="flex items-center justify-between border-t border-border/60 pt-3">
           <Button
             variant="outline"
             size="sm"
             onClick={() => onViewHistory(w)}
-            className="text-xs h-8 gap-1.5"
+            className="text-xs h-8 gap-1.5 rounded-lg"
           >
             <History className="size-3.5" />
             Historial
@@ -129,7 +129,7 @@ export function WorkflowCard({
               variant="ghost"
               size="icon-sm"
               onClick={() => onDelete(w.workflowId, w.workflowName)}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10 size-8"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 size-8 rounded-lg"
             >
               <Trash2 className="size-3.5" />
             </Button>
@@ -138,7 +138,7 @@ export function WorkflowCard({
               size="sm"
               onClick={() => onRun(w.workflowId)}
               disabled={!w.active || isRunning}
-              className="text-xs h-8 gap-1.5 font-bold shadow-sm"
+              className="text-xs h-8 gap-1.5 font-bold shadow-xs rounded-lg"
             >
               <Play className="size-3 fill-current" />
               {isRunning ? 'Ejecutando…' : 'Ejecutar Ahora'}

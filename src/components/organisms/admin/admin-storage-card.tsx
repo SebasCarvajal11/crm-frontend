@@ -20,26 +20,26 @@ type Props = {
 }
 
 function getProgressColor(percentage: number): string {
-  if (percentage >= 85) return 'bg-rose-600 dark:bg-rose-500'
-  if (percentage >= 70) return 'bg-amber-500 dark:bg-amber-400'
-  return 'bg-emerald-600 dark:bg-emerald-500'
+  if (percentage >= 85) return 'bg-gradient-to-r from-rose-500 to-red-600'
+  if (percentage >= 70) return 'bg-gradient-to-r from-amber-500 to-orange-500'
+  return 'bg-gradient-to-r from-emerald-500 to-teal-500'
 }
 
 function CloudUsageBar({ cloud }: { cloud: CloudStorageStats }) {
   const color = getProgressColor(cloud.usedPercentage)
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-foreground">
-          Uso en la nube: <span className="font-bold tabular-nums">{cloud.usedPercentage}%</span>
+      <div className="flex items-center justify-between text-sm font-medium">
+        <span className="text-foreground">
+          Uso en la nube: <span className="font-bold tabular-nums text-foreground">{cloud.usedPercentage}%</span>
         </span>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs text-muted-foreground font-medium">
           {formatBytes(cloud.usedBytes)} de {formatBytes(cloud.quotaBytes)}
         </span>
       </div>
       <Progress
         value={Math.max(1, cloud.usedPercentage)}
-        className="h-3 bg-muted"
+        className="h-2.5 bg-muted/80 rounded-full overflow-hidden"
         indicatorClassName={color}
       />
     </div>
@@ -48,20 +48,20 @@ function CloudUsageBar({ cloud }: { cloud: CloudStorageStats }) {
 
 function CloudStatBoxes({ cloud }: { cloud: CloudStorageStats }) {
   return (
-    <div className="grid grid-cols-3 gap-2 text-center">
-      <div className="rounded-md border bg-muted/20 p-2.5">
-        <p className="text-[11px] text-muted-foreground">Archivos en Nube</p>
-        <p className="text-sm font-semibold text-foreground tabular-nums">{formatBytes(cloud.usedBytes)}</p>
+    <div className="grid grid-cols-3 gap-2.5 text-center">
+      <div className="rounded-xl border border-border/60 bg-muted/20 p-3 shadow-2xs">
+        <p className="text-[11px] font-semibold text-muted-foreground">Archivos en Nube</p>
+        <p className="mt-1 text-sm sm:text-base font-bold text-foreground tabular-nums">{formatBytes(cloud.usedBytes)}</p>
       </div>
-      <div className="rounded-md border bg-emerald-500/10 border-emerald-500/30 p-2.5">
-        <p className="text-[11px] text-muted-foreground">Disponible para Subir</p>
-        <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
+      <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 shadow-2xs">
+        <p className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-300">Disponible</p>
+        <p className="mt-1 text-sm sm:text-base font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">
           {formatBytes(cloud.availableBytes)}
         </p>
       </div>
-      <div className="rounded-md border bg-muted/20 p-2.5">
-        <p className="text-[11px] text-muted-foreground">Cuota Incluida</p>
-        <p className="text-sm font-semibold text-foreground">{formatBytes(cloud.quotaBytes)}</p>
+      <div className="rounded-xl border border-border/60 bg-muted/20 p-3 shadow-2xs">
+        <p className="text-[11px] font-semibold text-muted-foreground">Cuota Total</p>
+        <p className="mt-1 text-sm sm:text-base font-bold text-foreground tabular-nums">{formatBytes(cloud.quotaBytes)}</p>
       </div>
     </div>
   )
@@ -69,26 +69,26 @@ function CloudStatBoxes({ cloud }: { cloud: CloudStorageStats }) {
 
 function CloudBreakdownBadges({ cloud }: { cloud: CloudStorageStats }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/10 px-3 py-2 text-xs text-muted-foreground">
-      <div className="flex items-center gap-1.5">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/70 bg-card/60 px-3.5 py-2.5 text-xs text-muted-foreground shadow-2xs">
+      <div className="flex items-center gap-1.5 font-medium">
         <FolderKanban className="size-3.5 text-primary" />
         <span>Archivos de Proyectos:</span>
-        <span className="font-medium text-foreground">
+        <span className="font-bold text-foreground tabular-nums">
           {cloud.projectFilesCount} ({formatBytes(cloud.projectFilesBytes)})
         </span>
       </div>
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1.5 font-medium">
         <ImageIcon className="size-3.5 text-primary" />
         <span>Avatares:</span>
-        <span className="font-medium text-foreground">
+        <span className="font-bold text-foreground tabular-nums">
           {cloud.avatarsCount} ({formatBytes(cloud.avatarsBytes)})
         </span>
       </div>
       {cloud.documentsCount > 0 && (
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 font-medium">
           <FileText className="size-3.5 text-primary" />
           <span>Documentos Directos:</span>
-          <span className="font-medium text-foreground">
+          <span className="font-bold text-foreground tabular-nums">
             {cloud.documentsCount} ({formatBytes(cloud.documentsBytes)})
           </span>
         </div>
@@ -110,21 +110,21 @@ function CloudStorageSection({ cloud }: { cloud: CloudStorageStats }) {
 function ServerDiskSection({ disk }: { disk: DiskStats }) {
   const color = getProgressColor(disk.usedPercentage)
   return (
-    <div data-tour="admin-storage-server-disk" className="rounded-lg border bg-muted/10 p-3 space-y-2 mt-4">
+    <div data-tour="admin-storage-server-disk" className="rounded-xl border border-border/60 bg-muted/15 p-3.5 space-y-2 mt-4 shadow-2xs">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <HardDrive className="size-4 text-muted-foreground" />
+          <HardDrive className="size-4 text-primary/80" />
           <div>
-            <p className="text-xs font-semibold text-foreground">Estado del Sistema y Servidor</p>
+            <p className="text-xs font-bold text-foreground">Estado del Servidor y Base de Datos</p>
             <p className="text-[11px] text-muted-foreground">
-              Espacio de almacenamiento local para la base de datos y operaciones internas. No consume cuota de archivos.
+              Almacenamiento del servidor para la base de datos interna. No descuenta cuota en la nube.
             </p>
           </div>
         </div>
-        <span className="text-xs font-bold text-muted-foreground">{disk.usedPercentage}%</span>
+        <span className="text-xs font-bold tabular-nums text-foreground">{disk.usedPercentage}%</span>
       </div>
-      <Progress value={disk.usedPercentage} className="h-1.5 bg-muted" indicatorClassName={color} />
-      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+      <Progress value={disk.usedPercentage} className="h-1.5 bg-muted/80 rounded-full" indicatorClassName={color} />
+      <div className="flex items-center justify-between text-[11px] text-muted-foreground font-medium tabular-nums">
         <span>{formatBytes(disk.usedBytes)} usados</span>
         <span>{formatBytes(disk.availableBytes)} libres de {formatBytes(disk.totalBytes)}</span>
       </div>

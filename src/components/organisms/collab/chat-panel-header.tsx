@@ -20,18 +20,18 @@ export function ChatPanelHeader({
   onOpenExport,
 }: Props) {
   return (
-    <div className="shrink-0 border-b bg-muted/20 px-4 py-3" data-tour="workspace-chat-channels">
+    <div className="shrink-0 border-b border-border/80 bg-card/90 px-4 py-3 backdrop-blur-md" data-tour="workspace-chat-channels">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-semibold">
+          <p className="text-sm font-bold tracking-tight text-foreground">
             {channel === 'external' ? 'Chat con el Cliente' : 'Chat del Equipo'}
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground font-medium">
             {channel === 'external' ? (
               'Canal compartido con el cliente'
             ) : (
               <span className="flex items-center gap-1">
-                <Shield className="size-3 inline" />
+                <Shield className="size-3 inline text-primary" />
                 Canal privado del equipo
               </span>
             )}
@@ -41,7 +41,7 @@ export function ChatPanelHeader({
         <div className="flex items-center gap-2">
           {!isClient && (
             <div
-              className="flex gap-1 rounded-lg border bg-background p-0.5"
+              className="flex gap-1 rounded-xl border border-border/70 bg-muted/30 p-1"
               role="tablist"
               aria-label="Seleccionar canal"
             >
@@ -52,12 +52,12 @@ export function ChatPanelHeader({
                   aria-selected={channel === nextChannel}
                   onClick={() => onChannelChange(nextChannel)}
                   className={cn(
-                    'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium',
+                    'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold',
                     'transition-all duration-150 cursor-pointer active:scale-[0.98]',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
                     channel === nextChannel
-                      ? 'bg-primary text-primary-foreground shadow-xs'
-                      : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+                      ? 'bg-primary text-primary-foreground shadow-2xs'
+                      : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
                   )}
                 >
                   {nextChannel === 'external' ? (

@@ -16,37 +16,37 @@ export function ProjectHeader({ project }: Props) {
   const pct = project?.progressPercent ?? 0
 
   return (
-    <div className="rounded-2xl border bg-card px-4 py-3 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
+    <div className="rounded-2xl border border-border/80 bg-card p-4 sm:px-5 sm:py-4 shadow-xs">
+      <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <div className="mb-0.5 flex flex-wrap items-center gap-1.5">
-            <h1 className="min-w-0 line-clamp-2 text-base font-semibold leading-tight sm:truncate" title={project?.name ?? undefined}>
+          <div className="mb-1 flex flex-wrap items-center gap-2">
+            <h1 className="min-w-0 line-clamp-2 text-base sm:text-lg font-bold tracking-tight text-foreground leading-tight sm:truncate" title={project?.name ?? undefined}>
               {project?.name ?? '…'}
             </h1>
             {project?.type && (
               <ProjectTypeBadge type={project.type} className="hidden sm:inline-flex" />
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground font-medium">
             {status && project && (
-              <span className="flex items-center gap-1">
-                <span className={`size-1.5 rounded-full ${STATUS_DOT[project.status]}`} aria-hidden="true" />
+              <span className="flex items-center gap-1.5">
+                <span className={`size-2 rounded-full ${STATUS_DOT[project.status]} shadow-2xs`} aria-hidden="true" />
                 {status.label}
               </span>
             )}
-            <span className="flex items-center gap-1">
-              <User className="size-3" aria-hidden="true" />
-              <span className="truncate max-w-[140px]">{project?.clientName ?? '…'}</span>
+            <span className="flex items-center gap-1.5">
+              <User className="size-3.5 text-primary/70" aria-hidden="true" />
+              <span className="truncate max-w-[160px]">{project?.clientName ?? '…'}</span>
             </span>
           </div>
         </div>
         {project && (
-          <div className="flex items-center gap-2 shrink-0" role="progressbar"
+          <div className="flex items-center gap-3 shrink-0" role="progressbar"
             aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={`Progreso: ${pct}%`}>
-            <div className="flex flex-col items-end gap-1">
-              <span className="text-sm font-semibold leading-none">{pct}%</span>
-              <div className="w-20 sm:w-28 h-1.5 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-primary rounded-full transition-all duration-500"
+            <div className="flex flex-col items-end gap-1.5">
+              <span className="text-sm font-bold tabular-nums leading-none text-foreground">{pct}%</span>
+              <div className="w-24 sm:w-32 h-2 bg-muted/80 rounded-full overflow-hidden p-0.5">
+                <div className="h-full bg-gradient-to-r from-primary to-[#bd2f35] rounded-full transition-all duration-500"
                   style={{ width: `${Math.max(pct > 0 ? 4 : 0, pct)}%` }} />
               </div>
             </div>

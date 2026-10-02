@@ -83,7 +83,7 @@ export function AdminUserCard({
   return (
     <Card
       data-testid="admin-user-card"
-      className="interactive-card relative flex h-full flex-col justify-between rounded-2xl border border-border/70 bg-card p-4 sm:p-5 shadow-xs hover:border-primary/30 transition-all"
+      className="relative flex h-full flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 sm:p-5 shadow-xs hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
     >
       <div className="space-y-3.5">
         <div className="flex items-start justify-between gap-3">

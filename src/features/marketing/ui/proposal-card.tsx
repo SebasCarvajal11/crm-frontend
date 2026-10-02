@@ -94,7 +94,7 @@ function ProposalCardHeader(props: {
     <CardHeader className="pb-3">
       <div className="flex items-start justify-between gap-2">
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${meta.chip}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold shadow-2xs ${meta.chip}`}
         >
           <StatusIcon className="h-3 w-3" />
           {meta.label}
@@ -102,10 +102,10 @@ function ProposalCardHeader(props: {
         <ProposalMenuActions {...props} />
       </div>
 
-      <CardTitle className="mt-2 text-base leading-snug tabular-nums">
+      <CardTitle className="mt-2.5 text-xl font-bold tracking-tight tabular-nums text-foreground">
         {formatCurrency(props.proposal.estimatedValue)}
       </CardTitle>
-      <CardDescription className="truncate" title={props.clientLabel}>
+      <CardDescription className="truncate font-medium text-xs text-muted-foreground" title={props.clientLabel}>
         {props.clientLabel}
       </CardDescription>
     </CardHeader>
@@ -123,16 +123,16 @@ function ProposalTimelineMeta({
 }) {
   return (
     <>
-      <div className="space-y-1.5 text-xs text-muted-foreground">
+      <div className="space-y-1.5 text-xs text-muted-foreground font-medium">
         <div className="flex items-center gap-2">
-          <CalendarClock className="h-3.5 w-3.5" />
+          <CalendarClock className="h-3.5 w-3.5 text-primary/70" />
           <span>Enviada el {formatDate(proposal.createdDate)}</span>
-          {dias !== null && <span>· hace {dias} d</span>}
+          {dias !== null && <span className="tabular-nums">· hace {dias} d</span>}
         </div>
 
         {proposal.responseDate && (
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-3.5 w-3.5" />
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>Respondida el {formatDate(proposal.responseDate)}</span>
           </div>
         )}
@@ -142,7 +142,7 @@ function ProposalTimelineMeta({
             href={proposal.documentUrl}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-2 text-primary hover:underline"
+            className="flex items-center gap-2 text-primary font-semibold hover:underline"
           >
             <Link2 className="h-3.5 w-3.5" />
             Ver documento
@@ -151,9 +151,9 @@ function ProposalTimelineMeta({
       </div>
 
       {venceSinRespuesta && (
-        <div className="flex items-center gap-2 rounded-md border border-amber-300 bg-amber-50 px-2.5 py-2 text-xs text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300">
-          <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-          <span>Sin respuesta hace {dias} días — candidata a seguimiento automático</span>
+        <div className="flex items-center gap-2 rounded-xl border border-amber-300/80 bg-amber-50/80 px-3 py-2 text-xs text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300 shadow-2xs">
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
+          <span className="font-medium">Sin respuesta hace {dias} días — seguimiento sugerido</span>
         </div>
       )}
     </>
@@ -172,15 +172,15 @@ function ProposalCardFooter({
   onChangeStatus: (status: ProposalStatus) => void
 }) {
   return (
-    <div className="mt-auto flex items-center justify-between border-t pt-3">
-      <span className="text-xs text-muted-foreground">#{proposalId}</span>
+    <div className="mt-auto flex items-center justify-between border-t border-border/60 pt-3">
+      <span className="text-[11px] font-mono text-muted-foreground">#{proposalId}</span>
 
       {estaPendiente && (
-        <div className="flex gap-1">
+        <div className="flex gap-1.5">
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 gap-1 text-xs text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-950/50"
+            className="h-7 gap-1 rounded-lg px-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-950/50"
             onClick={() => onChangeStatus('Approved')}
             disabled={isBusy}
           >
@@ -190,7 +190,7 @@ function ProposalCardFooter({
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 gap-1 text-xs text-destructive hover:bg-destructive/5"
+            className="h-7 gap-1 rounded-lg px-2 text-xs font-semibold text-destructive hover:bg-destructive/5"
             onClick={() => onChangeStatus('Rejected')}
             disabled={isBusy}
           >
@@ -213,14 +213,14 @@ export function ProposalCard(props: ProposalCardProps) {
 
   return (
     <Card
-      className={`group flex flex-col overflow-hidden rounded-xl border border-border/80 bg-card transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md ${
-        venceSinRespuesta ? 'border-l-2 border-l-amber-500' : 'border-l-2 border-l-primary'
+      className={`group flex flex-col overflow-hidden rounded-2xl border border-border/80 bg-card shadow-xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md ${
+        venceSinRespuesta ? 'border-l-4 border-l-amber-500' : 'border-l-4 border-l-primary'
       }`}
     >
       <ProposalCardHeader {...props} />
 
       <CardContent className="flex flex-1 flex-col gap-3">
-        <p className="line-clamp-3 min-h-[3.5rem] rounded-md bg-muted/50 p-3 text-sm">
+        <p className="line-clamp-3 min-h-[3.5rem] rounded-xl border border-border/40 bg-muted/30 p-3 text-xs sm:text-sm text-foreground/90 leading-relaxed">
           {proposal.description || 'Sin descripción registrada'}
         </p>
 

@@ -54,14 +54,16 @@ export function ProposalsSummaryHeader({ resumen }: ProposalsSummaryHeaderProps)
       />
 
       {resumen.vencidas > 0 && (
-        <div className="flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4">
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
-          <div className="text-sm">
-            <p className="font-semibold text-amber-900">
+        <div className="flex items-start gap-3.5 rounded-2xl border border-amber-300/80 bg-amber-50/70 dark:border-amber-900/60 dark:bg-amber-950/30 p-4 shadow-2xs backdrop-blur-xs">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-400 shadow-2xs">
+            <AlertTriangle className="size-4.5" />
+          </div>
+          <div className="text-sm space-y-0.5">
+            <p className="font-bold tracking-tight text-amber-950 dark:text-amber-200">
               {resumen.vencidas} propuesta(s) llevan más de {UMBRAL_SIN_RESPUESTA_DIAS} días sin respuesta
             </p>
-            <p className="text-amber-800">
-              Son las que el planificador tomará al ejecutar los flujos con disparador
+            <p className="text-xs text-amber-800/90 dark:text-amber-300/80 leading-relaxed">
+              Son las que el planificador tomará automáticamente al ejecutar los flujos con disparador
               «Propuesta sin respuesta».
             </p>
           </div>

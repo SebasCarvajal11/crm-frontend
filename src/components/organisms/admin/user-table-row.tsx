@@ -90,7 +90,7 @@ export function UserTableRow({
       key={row.id}
       data-index={virtualIndex}
       ref={measureElement}
-      className="group align-middle interactive-row"
+      className="group align-middle hover:bg-primary/[0.03] transition-colors"
     >
       <TableCell className="py-3">
         <div className="flex items-center gap-3">

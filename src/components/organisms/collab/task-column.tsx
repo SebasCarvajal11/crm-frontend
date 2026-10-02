@@ -44,8 +44,10 @@ export function TaskColumn({
     <section
       id={`kanban-col-${column.id}`}
       aria-label={`Columna ${column.title}, ${tasks.length} tarea${tasks.length !== 1 ? 's' : ''}`}
-      className={`flex flex-col rounded-xl border transition-colors duration-150 ${
-        isDragOver ? 'border-primary bg-primary/5 shadow-md' : 'bg-muted/30 border-border'
+      className={`flex flex-col rounded-2xl border transition-all duration-200 overflow-hidden shadow-2xs ${
+        isDragOver
+          ? 'border-primary/80 bg-primary/[0.04] shadow-md ring-2 ring-primary/20'
+          : 'bg-muted/20 border-border/80 hover:border-border'
       }`}
       onDragOver={(e) => {
         if (canDrag) {
@@ -63,18 +65,18 @@ export function TaskColumn({
       }}
     >
       <div
-        className="flex items-center justify-between gap-2 border-b bg-background/70 px-3 py-2.5 rounded-t-xl shrink-0"
+        className="flex items-center justify-between gap-2 border-b border-border/70 bg-card/90 px-3.5 py-3 rounded-t-2xl shrink-0 backdrop-blur-md"
       >
-        <h3 className="min-w-0 flex-1 truncate text-sm font-semibold leading-tight" title={column.title}>
+        <h3 className="min-w-0 flex-1 truncate text-sm font-bold tracking-tight text-foreground leading-tight" title={column.title}>
           {column.title}
         </h3>
         <div className="flex shrink-0 items-center gap-2">
           {column.isClientVisible && (
             <span title="Columna visible para el cliente">
-              <Users className="size-3 text-muted-foreground" aria-label="Visible para el cliente" />
+              <Users className="size-3.5 text-muted-foreground" aria-label="Visible para el cliente" />
             </span>
           )}
-          <Badge variant="secondary" className="text-xs min-w-[1.4rem] justify-center tabular-nums">
+          <Badge variant="secondary" className="text-xs font-bold min-w-[1.5rem] justify-center tabular-nums shadow-2xs">
             {tasks.length}
           </Badge>
           {canCreateTask && (
@@ -84,9 +86,9 @@ export function TaskColumn({
               variant="ghost"
               data-tour={isFirstColumn ? 'workspace-create-task-btn' : undefined}
               className={[
-                'size-7 rounded-full text-muted-foreground transition-all duration-150',
-                'hover:scale-110 hover:bg-primary/10 hover:text-primary',
-                'focus-visible:scale-110 focus-visible:bg-primary/10 focus-visible:text-primary',
+                'size-7 rounded-lg text-muted-foreground transition-all duration-150',
+                'hover:scale-105 hover:bg-primary/10 hover:text-primary',
+                'focus-visible:scale-105 focus-visible:bg-primary/10 focus-visible:text-primary',
               ].join(' ')}
               onClick={onCreateTask}
               aria-label={`Crear tarea en ${column.title}`}

@@ -203,7 +203,7 @@ export function CollabPanel({
                   key={col.key}
                   data-tour={`collab-column-${col.key}`}
                   className={cn(
-                    'flex flex-col h-full rounded-2xl border border-border/70 bg-muted/30 shadow-xs overflow-hidden',
+                    'flex flex-col h-full rounded-2xl border border-border/80 bg-muted/20 shadow-xs overflow-hidden transition-colors',
                     'border-t-4',
                     col.accent,
                   )}
@@ -213,24 +213,24 @@ export function CollabPanel({
                 >
                   <div
                     className={cn(
-                      'flex items-center justify-between gap-2 border-b border-border/60',
-                      'bg-background/85 px-3.5 py-3 shrink-0 backdrop-blur-xs',
+                      'flex items-center justify-between gap-2 border-b border-border/70',
+                      'bg-card/90 px-4 py-3 shrink-0 backdrop-blur-md',
                     )}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                       <span className="text-muted-foreground" aria-hidden="true">{col.icon}</span>
-                      <h2 className="text-sm font-semibold tracking-tight text-foreground">{col.label}</h2>
+                      <h2 className="text-sm font-bold tracking-tight text-foreground">{col.label}</h2>
                     </div>
                     <Badge
                       variant="secondary"
-                      className="text-xs font-bold min-w-[1.5rem] justify-center"
+                      className="text-xs font-bold min-w-[1.6rem] justify-center tabular-nums shadow-2xs"
                       aria-label={`${colProjects.length} proyectos`}
                     >
                       {colProjects.length}
                     </Badge>
                   </div>
                   <div
-                    className="flex-1 min-h-0 overflow-y-auto p-2.5 flex flex-col gap-2.5 scrollbar-thin"
+                    className="flex-1 min-h-0 overflow-y-auto p-3 flex flex-col gap-3 scrollbar-thin"
                     aria-label={`Proyectos en ${col.label}`}
                   >
                     {!hasProjects ? (
