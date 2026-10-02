@@ -87,9 +87,12 @@ Si un selector de botón o input cambia ligeramente en el DOM pero su texto o at
 | Comando | Propósito | Requisitos de Entorno |
 | :--- | :--- | :--- |
 | `pnpm test:unit` | Pruebas unitarias de funciones puras y hooks. | Ninguno (autocontenido) |
+| `pnpm test:brand` | Validación de marca, favicon y los 6 viewports responsivos con Playwright. | Compilación local (Vite preview) |
+| `pnpm test:ui` | Suite completa de interfaz (marca, tutorial y presencia) en Playwright. | Compilación local (Vite preview) |
 | `pnpm lint` | Validación de ESLint y reglas de React Hooks. | Ninguno |
 | `pnpm build` | Compilación de Vite y verificación estricta de TypeScript. | Ninguno |
 | `pnpm audit:gateway-routes` | Auditoría de rutas frontend vs. manifests KrakenD. | Repositorios hermanos |
 | `pnpm test:e2e` | Ejecución completa de suites Playwright en headless. | Stack Docker activo |
 | `pnpm test:e2e:ui` | Interfaz interactiva de Playwright con inspector visual. | Stack Docker activo |
 | `pnpm test:e2e:report` | Visualización del reporte HTML de la última corrida. | Ninguno |
+

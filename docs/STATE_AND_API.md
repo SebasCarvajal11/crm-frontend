@@ -54,9 +54,18 @@ Toda comunicación hacia el backend se realiza mediante la instancia configurada
 
 ---
 
-## 3. Convención de Claves en TanStack Query
+## 3. Configuración y Convención de Claves en TanStack Query
 
+### A. Calibración Global del Cliente (`main.tsx`)
+Para evitar sobrecarga de red y optimizar la experiencia en dispositivos móviles:
+- `staleTime: 60 * 1000` (60s): Los datos se consideran frescos durante 1 minuto antes de solicitar revalidación.
+- `gcTime: 10 * 60 * 1000` (10m): Los datos inactivos se retienen en memoria para transiciones instantáneas entre vistas.
+- `refetchOnWindowFocus: false`: Suprime peticiones automáticas masivas al alternar pestañas del navegador o desbloquear la pantalla del móvil.
+- `retry`: Suprime reintentos automáticos para errores de cliente (4xx) evitando multiplicar tráfico inválido.
+
+### B. Convención de Claves Canónicas
 Para garantizar que las invalidaciones de caché sean precisas y no produzcan refetching innecesario:
+
 
 | Recurso | Query Key Canónica |
 | :--- | :--- |
