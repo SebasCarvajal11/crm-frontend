@@ -175,43 +175,60 @@ export function ProposalsManager({ accessToken }: ProposalsManagerProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-            <FileText className="h-6 w-6 text-primary" />
-            PROPUESTAS COMERCIALES
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Registro, seguimiento y cierre de las propuestas enviadas a clientes
-          </p>
+    <div className="space-y-5">
+      <div
+        data-tour="marketing-proposals-action"
+        className={[
+          'flex flex-col gap-3.5 rounded-xl border border-border/70 bg-card p-4.5 shadow-2xs',
+          'sm:flex-row sm:items-center sm:justify-between',
+        ].join(' ')}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className={[
+              'flex size-10 shrink-0 items-center justify-center rounded-xl',
+              'bg-primary/10 text-primary ring-1 ring-primary/20 shadow-2xs',
+            ].join(' ')}
+          >
+            <FileText className="size-5" />
+          </div>
+          <div className="space-y-0.5">
+            <h2 className="text-base font-bold text-foreground tracking-tight">Propuestas comerciales</h2>
+            <p className="text-xs text-muted-foreground">
+              Registro, seguimiento y cierre de las propuestas enviadas a clientes
+            </p>
+          </div>
         </div>
         <Button
           onClick={openCreate}
-          className="gap-2"
+          className="h-9 gap-2 rounded-lg font-semibold shadow-2xs shrink-0"
           data-tour="marketing-new-proposal-btn"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="size-4" />
           Nueva Propuesta
         </Button>
       </div>
 
       <ProposalsSummaryHeader resumen={resumen} />
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Buscar por descripción o cliente..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9"
+            className="h-9 pl-9 rounded-lg border-border/70 text-xs focus-visible:ring-primary/20"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="h-10 rounded-md border border-input bg-background px-3 text-sm sm:w-56"
+          aria-label="Filtrar por estado de propuesta"
+          className={[
+            'h-9 rounded-lg border border-border/70 bg-background px-3 text-xs font-medium',
+            'text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 sm:w-56',
+          ].join(' ')}
         >
           <option value="ALL">Todos los estados</option>
           {PROPOSAL_STATUSES.map((s) => (

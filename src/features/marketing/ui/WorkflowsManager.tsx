@@ -146,16 +146,29 @@ export function WorkflowsManager({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-black uppercase tracking-tight text-foreground flex items-center gap-2">
-            <Zap className="size-5 text-primary" />
-            Flujos Automatizados
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            Disparadores automáticos por inactividad, eventos de cliente y notificaciones
-          </p>
+    <div className="space-y-5">
+      <div
+        data-tour="marketing-workflows-action"
+        className={[
+          'flex flex-col gap-3.5 rounded-xl border border-border/70 bg-card p-4.5 shadow-2xs',
+          'sm:flex-row sm:items-center sm:justify-between',
+        ].join(' ')}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className={[
+              'flex size-10 shrink-0 items-center justify-center rounded-xl',
+              'bg-primary/10 text-primary ring-1 ring-primary/20 shadow-2xs',
+            ].join(' ')}
+          >
+            <Zap className="size-5" />
+          </div>
+          <div className="space-y-0.5">
+            <h2 className="text-base font-bold text-foreground tracking-tight">Flujos automatizados</h2>
+            <p className="text-xs text-muted-foreground">
+              Disparadores automáticos por inactividad, eventos de cliente y notificaciones
+            </p>
+          </div>
         </div>
 
         <Button
@@ -169,7 +182,7 @@ export function WorkflowsManager({
           }}
           disabled={sinCampanas}
           title={sinCampanas ? 'Cree primero una campaña' : undefined}
-          className="gap-2 font-semibold shadow-sm"
+          className="h-9 gap-2 rounded-lg font-semibold shadow-2xs shrink-0"
         >
           <Plus className="size-4" />
           Nueva Automatización

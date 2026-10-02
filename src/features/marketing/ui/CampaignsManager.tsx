@@ -126,16 +126,29 @@ export function CampaignsManager({
   })
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-black uppercase tracking-tight text-foreground flex items-center gap-2">
-            <Megaphone className="size-5 text-primary" />
-            Campañas de Marketing
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            Diseño, programación y seguimiento de campañas publicitarias y de contenidos
-          </p>
+    <div className="space-y-5">
+      <div
+        data-tour="marketing-campaigns-action"
+        className={[
+          'flex flex-col gap-3.5 rounded-xl border border-border/70 bg-card p-4.5 shadow-2xs',
+          'sm:flex-row sm:items-center sm:justify-between',
+        ].join(' ')}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className={[
+              'flex size-10 shrink-0 items-center justify-center rounded-xl',
+              'bg-primary/10 text-primary ring-1 ring-primary/20 shadow-2xs',
+            ].join(' ')}
+          >
+            <Megaphone className="size-5" />
+          </div>
+          <div className="space-y-0.5">
+            <h2 className="text-base font-bold text-foreground tracking-tight">Campañas de marketing</h2>
+            <p className="text-xs text-muted-foreground">
+              Diseño, programación y seguimiento de campañas publicitarias y de contenidos
+            </p>
+          </div>
         </div>
 
         <Button
@@ -144,7 +157,7 @@ export function CampaignsManager({
             setFormData(INITIAL_FORM_DATA)
             setIsCreateOpen(true)
           }}
-          className="gap-2 font-semibold shadow-sm"
+          className="h-9 gap-2 rounded-lg font-semibold shadow-2xs shrink-0"
         >
           <Plus className="size-4" />
           Nueva Campaña
@@ -153,12 +166,12 @@ export function CampaignsManager({
 
       <div data-tour="marketing-campaigns-filters" className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         <div className="relative sm:col-span-2">
-          <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Buscar por nombre u objetivo…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 text-xs"
+            className="h-9 pl-9 rounded-lg border-border/70 text-xs focus-visible:ring-primary/20"
           />
         </div>
 
@@ -167,7 +180,10 @@ export function CampaignsManager({
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             aria-label="Filtrar por estado de campaña"
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+            className={[
+              'h-9 w-full rounded-lg border border-border/70 bg-background px-3 text-xs',
+              'font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40',
+            ].join(' ')}
           >
             <option value="ALL">Todos los Estados</option>
             {CAMPAIGN_STATUSES.map((st) => (
@@ -183,7 +199,10 @@ export function CampaignsManager({
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
             aria-label="Filtrar por tipo de campaña"
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+            className={[
+              'h-9 w-full rounded-lg border border-border/70 bg-background px-3 text-xs',
+              'font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40',
+            ].join(' ')}
           >
             <option value="ALL">Todos los Tipos</option>
             {CAMPAIGN_TYPES.map((tp) => (

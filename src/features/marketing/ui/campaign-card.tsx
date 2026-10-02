@@ -164,7 +164,12 @@ export function CampaignCard(props: CampaignCardProps) {
   const { campaign, clientName, onEdit, onDelete, onSelectForWorkflows } = props
 
   return (
-    <Card className="flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card shadow-xs hover:shadow-md hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-200">
+    <Card
+      className={[
+        'flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card shadow-xs',
+        'hover:shadow-md hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-200',
+      ].join(' ')}
+    >
       <div>
         <CampaignCardHeader
           campaign={campaign}

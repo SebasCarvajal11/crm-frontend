@@ -102,16 +102,31 @@ export function InteractionsManager({ accessToken }: InteractionsManagerProps) {
   }, [interactions, searchTerm, originFilter, clientLabel])
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-            <MessageSquare className="h-6 w-6 text-primary" />
-            HISTORIAL DE INTERACCIONES
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Contactos registrados automáticamente por flujos o cargados de forma manual
-          </p>
+    <div className="space-y-5">
+      <div
+        data-tour="marketing-interactions-action"
+        className={[
+          'flex flex-col gap-3.5 rounded-xl border border-border/70 bg-card p-4.5 shadow-2xs',
+          'sm:flex-row sm:items-center sm:justify-between',
+        ].join(' ')}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className={[
+              'flex size-10 shrink-0 items-center justify-center rounded-xl',
+              'bg-primary/10 text-primary ring-1 ring-primary/20 shadow-2xs',
+            ].join(' ')}
+          >
+            <MessageSquare className="size-5" />
+          </div>
+          <div className="space-y-0.5">
+            <h2 className="text-base font-bold text-foreground tracking-tight">
+              Historial de interacciones
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Contactos registrados automáticamente por flujos o cargados de forma manual
+            </p>
+          </div>
         </div>
         <RegisterContactDialog accessToken={accessToken} />
       </div>
@@ -143,20 +158,23 @@ export function InteractionsManager({ accessToken }: InteractionsManagerProps) {
         />
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Buscar por cliente o contenido de respuesta..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9"
+            className="pl-9 h-9 text-xs"
           />
         </div>
         <select
           value={originFilter}
           onChange={(e) => setOriginFilter(e.target.value as typeof originFilter)}
-          className="h-10 rounded-md border border-input bg-background px-3 text-sm sm:w-56"
+          className={[
+            'h-9 rounded-md border border-input bg-background px-3 text-xs',
+            'transition-colors hover:border-primary/50 focus:border-primary sm:w-56',
+          ].join(' ')}
         >
           <option value="ALL">Todas las interacciones</option>
           <option value="AUTO">Solo automáticas</option>

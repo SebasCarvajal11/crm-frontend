@@ -38,13 +38,22 @@ export function ClientPlansTable({ clients, isBusy, onAssignPlan }: ClientPlansT
                     <td className="px-4 py-3">
                       {meta && Icon ? (
                         <span
-                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${meta.chip}`}
+                          className={[
+                            'inline-flex items-center gap-1.5 rounded-full border',
+                            'px-2.5 py-0.5 text-xs font-semibold',
+                            meta.chip,
+                          ].join(' ')}
                         >
                           <Icon className="h-3 w-3" />
                           {meta.label}
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">
+                        <span
+                          className={[
+                            'inline-flex items-center gap-1.5 rounded-full border',
+                            'border-border bg-muted px-2.5 py-0.5 text-xs text-muted-foreground',
+                          ].join(' ')}
+                        >
                           Sin clasificar
                         </span>
                       )}

@@ -116,7 +116,12 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
       <Dialog open={open} onOpenChange={(v) => !v && cerrar()}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader className="flex flex-row items-start gap-3 space-y-0">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20">
+            <div
+              className={[
+                'flex size-10 shrink-0 items-center justify-center rounded-xl',
+                'bg-primary/10 text-primary ring-1 ring-primary/20',
+              ].join(' ')}
+            >
               <PhoneCall className="size-5" />
             </div>
             <div className="flex flex-col gap-1 text-left">
@@ -215,7 +220,12 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
             </div>
 
             {error && (
-              <div className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+              <div
+                className={[
+                  'rounded-md border border-destructive/40 bg-destructive/5',
+                  'px-3 py-2 text-sm text-destructive',
+                ].join(' ')}
+              >
                 {error}
               </div>
             )}

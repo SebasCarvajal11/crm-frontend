@@ -37,7 +37,9 @@ export function SegmentPreviewCard({
           <>
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-center">
               <Users className="mx-auto mb-2 h-6 w-6 text-primary" />
-              <p className="text-4xl font-bold leading-none">{preview.total}</p>
+              <p className="text-4xl font-bold leading-none tabular-nums text-foreground">
+                {preview.total}
+              </p>
               <p className="mt-2 text-sm text-muted-foreground">
                 cliente(s) cumplen los criterios
               </p>
@@ -48,7 +50,10 @@ export function SegmentPreviewCard({
                 {preview.clients.map((c) => (
                   <div
                     key={c.clientId}
-                    className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2 text-xs"
+                    className={[
+                      'flex items-center justify-between gap-2 rounded-md',
+                      'border border-border px-3 py-2 text-xs',
+                    ].join(' ')}
                   >
                     <span className="truncate">
                       {c.additionalInfo || c.contactInfo || c.clientId}

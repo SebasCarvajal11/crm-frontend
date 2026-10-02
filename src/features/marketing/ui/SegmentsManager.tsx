@@ -242,7 +242,12 @@ export function SegmentsManager({ accessToken }: SegmentsManagerProps) {
       </div>
 
       {mensaje && (
-        <div className="flex items-start justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
+        <div
+          className={[
+            'flex items-start justify-between gap-3 rounded-lg border',
+            'border-primary/30 bg-primary/5 p-4 text-sm',
+          ].join(' ')}
+        >
           <span>{mensaje}</span>
           <IconButton label="Cerrar aviso" onClick={() => setMensaje(null)}>
             <XCircle className="h-4 w-4" />

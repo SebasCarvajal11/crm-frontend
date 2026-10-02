@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -144,12 +145,24 @@ export function InteractionResponseDialog({
   return (
     <Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Registrar respuesta del cliente</DialogTitle>
-          <DialogDescription>
-            Se actualiza la misma interacción, no se crea una nueva. Este dato alimenta la tasa de
-            respuesta.
-          </DialogDescription>
+        <DialogHeader className="flex flex-row items-start gap-3 space-y-0">
+          <div
+            className={[
+              'flex size-10 shrink-0 items-center justify-center rounded-xl',
+              'bg-primary/10 text-primary ring-1 ring-primary/20 shadow-2xs',
+            ].join(' ')}
+          >
+            <MessageSquare className="size-5" />
+          </div>
+          <div className="flex flex-col gap-1 text-left">
+            <DialogTitle className="text-base font-semibold tracking-tight">
+              Registrar respuesta del cliente
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Se actualiza la misma interacción, no se crea una nueva. Este dato alimenta la tasa de
+              respuesta.
+            </DialogDescription>
+          </div>
         </DialogHeader>
 
         {target && (

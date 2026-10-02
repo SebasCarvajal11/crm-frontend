@@ -1,12 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  AlertTriangle,
-  CheckCircle2,
-  RefreshCw,
-  Search,
-  Users,
-  XCircle,
+  AlertTriangle, CheckCircle2, RefreshCw, Search, Users, XCircle,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -65,7 +60,8 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
     onSuccess: (data) => {
       invalidate()
       setFeedback(
-        `Sincronización completada: ${data.clientesSincronizados} cliente(s) y ${data.proyectosSincronizados} proyecto(s).`
+        `Sincronización completada: ${data.clientesSincronizados} cliente(s) ` +
+          `y ${data.proyectosSincronizados} proyecto(s).`
       )
     },
     onError: () =>
@@ -107,25 +103,39 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
   const isBusy = assignMutation.isPending || bulkMutation.isPending
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-            <Users className="h-6 w-6 text-primary" />
-            CLIENTES Y PLANES
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Clasificación comercial de la cartera sincronizada desde el CRM
-          </p>
+    <div className="space-y-5">
+      <div
+        data-tour="marketing-clients-action"
+        className={[
+          'flex flex-col gap-3.5 rounded-xl border border-border/70 bg-card p-4.5 shadow-2xs',
+          'sm:flex-row sm:items-center sm:justify-between',
+        ].join(' ')}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className={[
+              'flex size-10 shrink-0 items-center justify-center rounded-xl',
+              'bg-primary/10 text-primary ring-1 ring-primary/20 shadow-2xs',
+            ].join(' ')}
+          >
+            <Users className="size-5" />
+          </div>
+          <div className="space-y-0.5">
+            <h2 className="text-base font-bold text-foreground tracking-tight">Clientes y planes</h2>
+            <p className="text-xs text-muted-foreground">
+              Clasificación comercial de la cartera sincronizada desde el CRM
+            </p>
+          </div>
         </div>
+
         <Button
           variant="outline"
-          className="gap-2"
+          className="h-9 gap-2 rounded-lg font-semibold shadow-2xs shrink-0"
           onClick={() => syncMutation.mutate()}
           disabled={syncMutation.isPending}
           data-tour="marketing-clients-sync-btn"
         >
-          <RefreshCw className={`h-4 w-4 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`size-4 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
           {syncMutation.isPending ? 'Sincronizando…' : 'Sincronizar con el CRM'}
         </Button>
       </div>
@@ -153,7 +163,12 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
           )
         })}
 
-        <Card className={`border border-border/80 shadow-xs transition-all ${sinPlan.length > 0 ? 'bg-amber-500/[0.03] border-amber-500/40' : ''}`}>
+        <Card
+          className={[
+            'border border-border/80 shadow-xs transition-all',
+            sinPlan.length > 0 ? 'bg-amber-500/[0.03] border-amber-500/40' : '',
+          ].join(' ')}
+        >
           <CardContent className="flex items-start justify-between gap-3 pt-6">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -176,7 +191,12 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
       </div>
 
       {feedback && (
-        <div className="flex items-start justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
+        <div
+          className={[
+            'flex items-start justify-between gap-3 rounded-lg border border-primary/30',
+            'bg-primary/5 p-4 text-sm',
+          ].join(' ')}
+        >
           <span>{feedback}</span>
           <IconButton label="Cerrar aviso" onClick={() => setFeedback(null)}>
             <XCircle className="h-4 w-4" />

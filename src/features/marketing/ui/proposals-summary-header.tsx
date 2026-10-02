@@ -54,8 +54,18 @@ export function ProposalsSummaryHeader({ resumen }: ProposalsSummaryHeaderProps)
       />
 
       {resumen.vencidas > 0 && (
-        <div className="flex items-start gap-3.5 rounded-2xl border border-amber-300/80 bg-amber-50/70 dark:border-amber-900/60 dark:bg-amber-950/30 p-4 shadow-2xs backdrop-blur-xs">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-400 shadow-2xs">
+        <div
+          className={[
+            'flex items-start gap-3.5 rounded-2xl border border-amber-300/80 bg-amber-50/70 p-4',
+            'shadow-2xs backdrop-blur-xs dark:border-amber-900/60 dark:bg-amber-950/30',
+          ].join(' ')}
+        >
+          <div
+            className={[
+              'flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/15',
+              'text-amber-700 dark:text-amber-400 shadow-2xs',
+            ].join(' ')}
+          >
             <AlertTriangle className="size-4.5" />
           </div>
           <div className="text-sm space-y-0.5">

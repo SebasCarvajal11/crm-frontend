@@ -39,11 +39,12 @@ export function WorkflowCard({
 
   return (
     <Card
-      className={`overflow-hidden rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 border border-border/80 ${
+      className={[
+        'overflow-hidden rounded-2xl shadow-xs transition-all duration-200 border border-border/80',
         w.active
-          ? 'hover:border-primary/40 hover:-translate-y-0.5 bg-card'
-          : 'opacity-75 bg-muted/15'
-      }`}
+          ? 'hover:border-primary/40 hover:-translate-y-0.5 hover:shadow-md bg-card'
+          : 'opacity-75 bg-muted/15',
+      ].join(' ')}
     >
       <div className="p-4 sm:p-5 space-y-3.5">
         <div className="flex items-start justify-between gap-3">
@@ -73,11 +74,12 @@ export function WorkflowCard({
               size="sm"
               onClick={() => onToggle(w.workflowId)}
               disabled={isToggling}
-              className={`text-xs px-3 h-7 rounded-full font-bold shadow-2xs transition-all ${
+              className={[
+                'text-xs px-3 h-7 rounded-full font-bold shadow-2xs transition-all',
                 w.active
                   ? 'bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-600'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
+              ].join(' ')}
             >
               {w.active ? 'ON' : 'OFF'}
             </Button>
@@ -88,7 +90,12 @@ export function WorkflowCard({
           <p className="text-xs text-muted-foreground leading-relaxed">{w.description}</p>
         )}
 
-        <div className="grid grid-cols-1 gap-2.5 rounded-xl border border-border/50 bg-muted/20 p-3 text-xs sm:grid-cols-2">
+        <div
+          className={[
+            'grid grid-cols-1 gap-2.5 rounded-xl border border-border/50 bg-muted/20 p-3',
+            'text-xs sm:grid-cols-2',
+          ].join(' ')}
+        >
           <div className="space-y-0.5">
             <span className="text-[10px] uppercase font-bold text-muted-foreground">Disparador</span>
             <p className="font-semibold text-foreground flex items-center gap-1.5">
@@ -108,7 +115,12 @@ export function WorkflowCard({
         </div>
 
         {w.messageTemplate && (
-          <div className="rounded-xl border border-border/60 bg-background/80 p-2.5 text-xs text-muted-foreground italic leading-relaxed">
+          <div
+            className={[
+              'rounded-xl border border-border/60 bg-background/80 p-2.5 text-xs',
+              'text-muted-foreground italic leading-relaxed',
+            ].join(' ')}
+          >
             "{w.messageTemplate}"
           </div>
         )}

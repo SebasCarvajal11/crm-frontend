@@ -43,13 +43,16 @@ export function InteractionsTable({
                     <td className="px-4 py-3 font-medium">
                       {clientLabel(interaction.clientId)}
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">
+                    <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums">
                       {formatDateTime(interaction.contactDate)}
                     </td>
                     <td className="px-4 py-3 text-xs">{interaction.channel ?? '—'}</td>
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold ${meta.chip}`}
+                        className={[
+                          'inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold',
+                          meta.chip,
+                        ].join(' ')}
                       >
                         {meta.label}
                       </span>

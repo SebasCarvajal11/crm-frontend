@@ -62,7 +62,10 @@ export function SegmentSchedulerCard({
                 <p className="text-sm text-muted-foreground">
                   {schedulerResult.executionsGenerated > 0
                     ? 'Se envió la acción configurada a cada cliente que cumplía la condición.'
-                    : 'Ningún cliente cumple las condiciones en este momento. Un flujo no se ejecuta dos veces sobre el mismo cliente.'}
+                    : [
+                        'Ningún cliente cumple las condiciones en este momento.',
+                        'Un flujo no se ejecuta dos veces sobre el mismo cliente.',
+                      ].join(' ')}
                 </p>
 
                 {schedulerResult.executions.length > 0 && (

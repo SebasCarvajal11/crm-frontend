@@ -1,4 +1,5 @@
 import type { FormEvent } from 'react'
+import { Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
@@ -41,15 +42,27 @@ export function WorkflowFormDialog({
 }: WorkflowFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="max-w-md">
-        <form onSubmit={onSubmit} className="space-y-4">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-black uppercase text-foreground">
-              Nueva Automatización
-            </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              Configura el disparador, la acción y la plantilla de mensaje
-            </DialogDescription>
+      <DialogContent className="max-w-md p-0 overflow-hidden border-border/60 shadow-xl">
+        <form onSubmit={onSubmit}>
+          <DialogHeader className="px-5 pt-5 pb-4 border-b border-border/50 bg-muted/20">
+            <div className="flex items-center gap-3">
+              <div
+                className={[
+                  'flex size-10 shrink-0 items-center justify-center rounded-xl',
+                  'bg-primary/10 text-primary ring-1 ring-primary/20 shadow-2xs',
+                ].join(' ')}
+              >
+                <Zap className="size-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-base font-bold text-foreground tracking-tight">
+                  Nueva Automatización
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                  Configura el disparador, la acción y la plantilla de mensaje
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
 
           <div className="space-y-3 px-5 py-4 text-xs sm:px-6">
@@ -177,15 +190,15 @@ export function WorkflowFormDialog({
             </div>
           </div>
 
-          <DialogFooter className="gap-2 pt-2">
-            <Button type="button" variant="outline" size="sm" onClick={onClose}>
+          <DialogFooter className="px-5 py-3 border-t border-border/50 bg-muted/15 flex items-center justify-end gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={onClose} className="rounded-lg text-xs">
               Cancelar
             </Button>
             <Button
               type="submit"
               size="sm"
               disabled={isPending}
-              className="font-semibold"
+              className="rounded-lg text-xs font-semibold shadow-2xs"
             >
               {isPending ? 'Guardando…' : 'Crear Flujo'}
             </Button>
