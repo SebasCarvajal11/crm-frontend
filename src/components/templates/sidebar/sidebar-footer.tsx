@@ -152,7 +152,7 @@ function UserMenuActions({
       aria-label="Menu de usuario"
       data-tour="sidebar-footer-menu"
       className={cn(
-        'space-y-1 rounded-lg border border-primary-foreground/12 bg-primary text-primary-foreground',
+        'space-y-1 rounded-xl border border-primary-foreground/15 bg-primary/95 text-primary-foreground backdrop-blur-md',
         'p-1.5 shadow-xl animate-in fade-in-0 zoom-in-95 duration-150',
         placement === 'side'
           ? 'absolute bottom-0 left-[calc(100%+0.5rem)] z-50 min-w-[220px]'
@@ -223,7 +223,7 @@ export function SidebarFooter({
 
   return (
     <div className="relative border-t border-primary-foreground/10 p-3" ref={rootRef} data-tour="sidebar-footer">
-      <div className={cn('rounded-xl bg-primary-foreground/[0.07] p-3', compact && 'p-2')}>
+      <div className={cn('rounded-xl bg-primary-foreground/[0.08] p-3 transition-colors duration-150 hover:bg-primary-foreground/[0.11]', compact && 'p-2')}>
         <UserProfileTrigger
           userEmail={userEmail}
           userRole={userRole}

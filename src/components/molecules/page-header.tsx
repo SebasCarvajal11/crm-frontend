@@ -26,7 +26,7 @@ export function PageHeader({
 }: PageHeaderProps) {
   const renderedTitle =
     typeof title === 'string' ? (
-      <span className="font-black tracking-tight text-foreground">{title}</span>
+      <span className="font-bold tracking-tight text-foreground">{title}</span>
     ) : (
       title
     )
@@ -44,7 +44,7 @@ export function PageHeader({
             {eyebrow}
           </p>
         )}
-        <h1 className="text-2xl font-medium text-muted-foreground sm:text-3xl">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
           {renderedTitle}
         </h1>
         {description && (

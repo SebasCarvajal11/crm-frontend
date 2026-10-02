@@ -15,7 +15,7 @@ export function SidebarNav({
   const filteredItems = useMemo(() => visibleItems(items), [items])
 
   return (
-    <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="Navegacion principal" data-tour="sidebar-nav">
+    <nav className="flex-1 space-y-1.5 overflow-y-auto px-3 py-4 scrollbar-thin" aria-label="Navegacion principal" data-tour="sidebar-nav">
       {filteredItems.map((item) => (
         <button
           key={item.key}
@@ -32,17 +32,17 @@ export function SidebarNav({
           className={cn(
             navItemBaseClass,
             item.isActive
-              ? 'bg-primary-foreground/14 text-primary-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)]'
+              ? 'bg-primary-foreground/16 text-primary-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.16)] font-semibold'
               : 'text-primary-foreground/72 hover:bg-primary-foreground/9 hover:text-primary-foreground',
             compact && 'justify-center px-2.5'
           )}
         >
-          <span className="shrink-0" aria-hidden="true">{item.icon}</span>
+          <span className="shrink-0 transition-transform duration-150 group-hover:scale-105" aria-hidden="true">{item.icon}</span>
           {!compact && <span className="truncate">{item.label}</span>}
           {item.isActive && (
             <span
               className={cn(
-                'ml-auto inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary-foreground',
+                'ml-auto inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary-foreground ring-2 ring-primary-foreground/30',
                 compact && 'absolute -right-1 top-1/2 -translate-y-1/2'
               )}
               aria-hidden="true"

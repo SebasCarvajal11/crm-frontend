@@ -121,7 +121,7 @@ export function AppShell({
         <header
           className={cn(
             'sticky top-0 z-30 flex items-center justify-between gap-2 border-b',
-            'bg-card/95 px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur md:hidden'
+            'bg-background/85 px-3.5 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur-md border-border/80 md:hidden'
           )}
         >
           <Button
