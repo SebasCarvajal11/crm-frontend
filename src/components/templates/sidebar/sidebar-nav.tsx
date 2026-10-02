@@ -32,8 +32,8 @@ export function SidebarNav({
           className={cn(
             navItemBaseClass,
             item.isActive
-              ? 'bg-primary-foreground/16 text-primary-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.16)] font-semibold'
-              : 'text-primary-foreground/72 hover:bg-primary-foreground/9 hover:text-primary-foreground',
+              ? 'bg-white/18 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22),0_2px_4px_rgba(0,0,0,0.25)] font-semibold backdrop-blur-xs'
+              : 'text-white/75 hover:bg-white/10 hover:text-white',
             compact && 'justify-center px-2.5'
           )}
         >
@@ -42,7 +42,7 @@ export function SidebarNav({
           {item.isActive && (
             <span
               className={cn(
-                'ml-auto inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary-foreground ring-2 ring-primary-foreground/30',
+                'ml-auto inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9)] ring-2 ring-white/30',
                 compact && 'absolute -right-1 top-1/2 -translate-y-1/2'
               )}
               aria-hidden="true"

@@ -96,7 +96,7 @@ function MetricCell({ item }: { item: MetricRibbonItem }) {
         {item.icon && (
           <div
             className={cn(
-              'flex size-7 shrink-0 items-center justify-center rounded-lg transition-transform duration-200',
+              'flex size-8 shrink-0 items-center justify-center rounded-xl shadow-2xs transition-transform duration-200',
               'group-hover:scale-105',
               style.icon
             )}
@@ -108,7 +108,7 @@ function MetricCell({ item }: { item: MetricRibbonItem }) {
       </div>
 
       <div className="space-y-0.5">
-        <div className="text-2xl sm:text-3xl font-black tracking-tight text-foreground tabular-nums">
+        <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground tabular-nums">
           {item.value}
         </div>
         {(item.hint || item.subtext) && (

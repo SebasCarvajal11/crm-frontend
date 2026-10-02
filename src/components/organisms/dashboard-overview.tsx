@@ -106,6 +106,12 @@ export function DashboardOverview({
           }
           description="Resumen ejecutivo y monitoreo en tiempo real de cuentas, proyectos y actividades."
           icon={BarChart3}
+          actions={
+            <div className="flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 shadow-2xs">
+              <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Sistema Operativo • Conectado</span>
+            </div>
+          }
         />
       </div>
 

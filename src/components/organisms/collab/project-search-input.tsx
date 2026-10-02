@@ -44,6 +44,7 @@ export function ProjectSearchInput({
       <Input
         value={localText}
         onChange={(e) => setLocalText(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault() }}
         placeholder={canSearchByClient ? 'Buscar por proyecto, cliente o correo' : 'Buscar proyecto'}
         aria-label="Buscar proyectos"
       />

@@ -24,7 +24,7 @@ type Props = {
 function RoleBadge({ role }: { role: string }) {
   if (role === 'admin') {
     return (
-      <Badge variant="secondary" className="gap-1 text-[11px] font-semibold">
+      <Badge variant="secondary" className="gap-1.5 text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20 shadow-2xs">
         <ShieldCheck className="size-3 text-primary" />
         Administrador
       </Badge>
@@ -32,14 +32,14 @@ function RoleBadge({ role }: { role: string }) {
   }
   if (role === 'worker') {
     return (
-      <Badge variant="secondary" className="gap-1 text-[11px] font-semibold">
+      <Badge variant="secondary" className="gap-1.5 text-[11px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-2xs">
         <HardHat className="size-3 text-amber-500" />
         Trabajador
       </Badge>
     )
   }
   return (
-    <Badge variant="secondary" className="gap-1 text-[11px] font-semibold">
+    <Badge variant="secondary" className="gap-1.5 text-[11px] font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-2xs">
       <Briefcase className="size-3 text-blue-500" />
       Cliente
     </Badge>
@@ -64,7 +64,7 @@ function UserAvatar({
         name={name}
         userId={userId}
         size="xl"
-        className="size-14 ring-2 ring-primary/20"
+        className="size-14 ring-2 ring-primary/30 ring-offset-2 ring-offset-card shadow-sm"
       />
       {onOpenProfile && (
         <button

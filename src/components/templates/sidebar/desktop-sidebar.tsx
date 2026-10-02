@@ -44,7 +44,7 @@ export function DesktopSidebar({
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-30 hidden shrink-0 flex-col bg-primary',
+        'fixed inset-y-0 left-0 z-30 hidden shrink-0 flex-col bg-gradient-to-b from-[#680609] via-[#86070c] to-[#4d0407] shadow-xl border-r border-black/10',
         'text-primary-foreground transition-[width] duration-200 ease-out md:flex',
         collapsed ? 'md:w-20' : shellSidebarWidth
       )}
@@ -58,7 +58,8 @@ export function DesktopSidebar({
         )}
         style={{
           backgroundImage: `url(${BRAND_TEXTURES.sidebar})`,
-          opacity: isTextureLoaded ? 1 : 0,
+          opacity: isTextureLoaded ? 0.85 : 0,
+          mixBlendMode: 'overlay',
         }}
       />
       <div className="relative z-10 flex h-full flex-col">
