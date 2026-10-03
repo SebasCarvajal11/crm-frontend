@@ -233,10 +233,7 @@ export const ChatMessageList = memo(function ChatMessageList({
               className={[
                 'break-words px-3.5 py-2 text-sm leading-relaxed transition-colors',
                 isOwn
-                  ? [
-                      'rounded-2xl rounded-br-xs bg-gradient-to-br',
-                      'from-primary via-primary-800 to-primary-900 text-white shadow-xs',
-                    ].join(' ')
+                  ? 'rounded-2xl rounded-br-xs bg-primary text-primary-foreground shadow-2xs'
                   : 'rounded-2xl rounded-bl-xs bg-card border border-border/70 text-foreground shadow-2xs',
                 isMentioned && !isOwn
                   ? 'bg-amber-500/10 border-amber-500/30 ring-1 ring-amber-500/20'
