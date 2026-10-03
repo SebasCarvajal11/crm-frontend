@@ -9,7 +9,8 @@ import type { ClientSearchResult } from '@/shared/types'
 import type { MeResponse } from '@/shared/types'
 import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 import { getMemberDisplayName as getDisplayName } from '@/features/collab/lib/member-display'
-import { ProjectMemberCard, ROLE_CONFIG, getRoleDetail } from './project-member-card'
+import { ProjectMemberCard } from './project-member-card'
+import { ROLE_CONFIG, getRoleDetail } from './project-member-roles'
 
 type Props = {
   members: ProjectMember[]

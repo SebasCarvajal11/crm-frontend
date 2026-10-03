@@ -1,40 +1,10 @@
-import { Briefcase, CheckSquare2, Clock3, Crown, Mail, User } from 'lucide-react'
+import { CheckSquare2, Clock3, Mail } from 'lucide-react'
 import { UserAvatar } from '@/components/atoms/user-avatar'
-import type { ProjectMember, ProjectMemberRole } from '@/features/collab/model'
+import type { ProjectMember } from '@/features/collab/model'
 import {
   formatMemberDateLabel as formatDateLabel,
   getMemberRelativeActivity as getRelativeActivityLabel,
 } from '@/features/collab/lib/member-display'
-
-export const ROLE_CONFIG: Record<
-  ProjectMemberRole,
-  { label: string; icon: React.ReactNode; badgeClass: string; cardClass: string }
-> = {
-  admin: {
-    label: 'Administrador',
-    icon: <Crown className="size-3.5" />,
-    badgeClass: 'bg-violet-100 text-violet-700 border-violet-200',
-    cardClass: 'border-l-violet-400',
-  },
-  worker: {
-    label: 'Trabajador',
-    icon: <Briefcase className="size-3.5" />,
-    badgeClass: 'bg-sky-100 text-sky-700 border-sky-200',
-    cardClass: 'border-l-sky-400',
-  },
-  client: {
-    label: 'Cliente',
-    icon: <User className="size-3.5" />,
-    badgeClass: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    cardClass: 'border-l-emerald-400',
-  },
-}
-
-export function getRoleDetail(member: ProjectMember) {
-  if (member.role === 'worker') return member.profession?.trim() || 'Profesion no registrada'
-  if (member.role === 'client' && member.client_kind === 'juridical') return 'Cliente juridico'
-  return ROLE_CONFIG[member.role].label
-}
 
 type Props = {
   member: ProjectMember
