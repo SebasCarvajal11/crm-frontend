@@ -227,9 +227,9 @@ export function ProposalCard(props: ProposalCardProps) {
   return (
     <Card
       className={[
-        'group flex flex-col overflow-hidden rounded-2xl border border-border/80 bg-card shadow-xs',
-        'transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md',
-        venceSinRespuesta ? 'border-l-4 border-l-amber-500' : 'border-l-4 border-l-primary',
+        'group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-xs',
+        'transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:border-primary/40',
+        venceSinRespuesta ? 'border-amber-500/60 bg-amber-50/10 dark:bg-amber-950/10' : 'border-border/80',
       ].join(' ')}
     >
       <ProposalCardHeader {...props} />

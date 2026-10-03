@@ -68,7 +68,7 @@ function AdminConsoleSections({
   const showInvites = activeTab === 'all' || activeTab === 'invites'
 
   return (
-    <div className="tab-pane-transition space-y-8">
+    <div key={activeTab} className="tab-pane-transition space-y-8">
       {showUsers && (
         <div className="space-y-6 animate-fade-up">
           <AdminKpiCards accessToken={accessToken} />

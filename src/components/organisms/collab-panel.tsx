@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query'
 import { KanbanSquare, Plus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { PageHeader } from '@/components/molecules/page-header'
 import { cn } from '@/shared/lib/utils'
 import { listProjectsRequest, searchProjectsRequest } from '@/features/collab/api'
@@ -21,19 +22,20 @@ import { CreateProjectModal } from './collab/create-project-modal'
 import type { ProjectListItem, ParentProjectStatus } from '@/features/collab/model'
 import type { MeResponse } from '@/shared/types'
 
+type CollabWorkspaceTab = 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
 
 type Props = {
   accessToken: string
   identity: MeResponse['data']
   initialProjects?: ProjectListItem[]
   openProjectId?: string
-  workspaceTab?: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members'
+  workspaceTab?: CollabWorkspaceTab
   chatChannel?: 'internal' | 'external'
   chatMessageId?: string
   taskId?: string
   onOpenProject: (projectId: string) => void
   onCloseProject: () => void
-  onTabChange: (tab: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members') => void
+  onTabChange: (tab: CollabWorkspaceTab) => void
 }
 
 export function CollabPanel({
@@ -58,17 +60,15 @@ export function CollabPanel({
   const projectsQ = useQuery({
     queryKey: collabKeys.projects(),
     queryFn: () => listProjectsRequest(accessToken, { page: 1, limit: 100 }),
-    initialData: initialProjects
-      ? {
-          data: {
-            items: initialProjects,
-            page: 1,
-            limit: initialProjects.length || 1,
-            total: initialProjects.length,
-            total_pages: 1,
-          },
-        }
-      : undefined,
+    initialData: initialProjects ? {
+      data: {
+        items: initialProjects,
+        page: 1,
+        limit: initialProjects.length || 1,
+        total: initialProjects.length,
+        total_pages: 1,
+      },
+    } : undefined,
   })
   const projects = useMemo(() => projectsQ.data?.data.items ?? [], [projectsQ.data])
 
@@ -120,19 +120,8 @@ export function CollabPanel({
   return (
     <div className="flex flex-col gap-6 min-h-0 min-w-0 w-full max-w-full overflow-hidden">
       <PageHeader
-        eyebrow={
-          <>
-            Espacio de <span className="font-black text-primary">Colaboración</span>
-          </>
-        }
-        title={
-          <>
-            Gestión de{' '}
-            <span className="font-black tracking-tight text-foreground">
-              Proyectos
-            </span>
-          </>
-        }
+        eyebrow={<>Espacio de <span className="font-black text-primary">Colaboración</span></>}
+        title={<>Gestión de <span className="font-black tracking-tight text-foreground">Proyectos</span></>}
         description="Vista Kanban por estado. Abre un proyecto para gestionar su espacio de trabajo."
         icon={KanbanSquare}
         actions={(
@@ -166,7 +155,10 @@ export function CollabPanel({
           accessToken={accessToken}
           open={showModal}
           onClose={() => setShowModal(false)}
-          onCreated={(id) => { setShowModal(false); onOpenProject(id) }}
+          onCreated={(id) => {
+            setShowModal(false)
+            onOpenProject(id)
+          }}
         />
       )}
 
@@ -177,8 +169,27 @@ export function CollabPanel({
       )}
 
       {projectsQ.isLoading && (
-        <div className="flex justify-center items-center py-24" role="status" aria-label="Cargando proyectos">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted border-t-primary" />
+        <div className="overflow-x-auto pb-4" role="status" aria-label="Cargando tablero de proyectos">
+          <div
+            className="grid grid-cols-4 gap-4 min-w-[960px]"
+            style={{ height: 'max(480px, calc(100dvh - 13.5rem))' }}
+          >
+            {[1, 2, 3, 4].map((colIndex) => (
+              <div
+                key={colIndex}
+                className="flex flex-col h-full rounded-2xl border border-border/70 bg-muted/20 p-3 space-y-3"
+              >
+                <div className="flex items-center justify-between pb-2 border-b border-border/60">
+                  <Skeleton className="h-5 w-24 rounded-md" />
+                  <Skeleton className="h-5 w-6 rounded-md" />
+                </div>
+                <div className="flex-1 space-y-3">
+                  <Skeleton className="h-28 w-full rounded-xl" />
+                  <Skeleton className="h-28 w-full rounded-xl" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -203,8 +214,8 @@ export function CollabPanel({
                   key={col.key}
                   data-tour={`collab-column-${col.key}`}
                   className={cn(
-                    'flex flex-col h-full rounded-2xl border border-border/80 bg-muted/20 shadow-xs overflow-hidden transition-colors',
-                    'border-t-4',
+                    'flex flex-col h-full rounded-2xl border border-border/80 bg-muted/20',
+                    'shadow-xs overflow-hidden transition-colors border-t-4',
                     col.accent,
                   )}
                   aria-label={
@@ -241,13 +252,16 @@ export function CollabPanel({
                             'border border-dashed border-border/80 bg-background/40 p-6 text-center',
                           )}
                         >
-                          <div className="flex size-11 items-center justify-center rounded-2xl bg-muted/80 text-muted-foreground shadow-2xs">
+                          <div
+                            className={
+                              'flex size-11 items-center justify-center rounded-2xl bg-muted/80 ' +
+                              'text-muted-foreground shadow-2xs'
+                            }
+                          >
                             {col.icon}
                           </div>
                           <div className="space-y-1">
-                            <p className="text-xs font-semibold text-foreground/85">
-                              {col.emptyText}
-                            </p>
+                            <p className="text-xs font-semibold text-foreground/85">{col.emptyText}</p>
                             <p className="text-[11px] text-muted-foreground/70">
                               No hay proyectos en esta etapa
                             </p>

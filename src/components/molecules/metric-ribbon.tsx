@@ -96,8 +96,9 @@ function MetricCell({ item }: { item: MetricRibbonItem }) {
         {item.icon && (
           <div
             className={cn(
-              'flex size-8 shrink-0 items-center justify-center rounded-xl shadow-2xs transition-transform duration-200',
-              'group-hover:scale-105',
+              'flex size-8 shrink-0 items-center justify-center rounded-xl shadow-2xs',
+              'transition-transform duration-200 ease-out',
+              'group-hover:scale-110 group-hover:-translate-y-0.5',
               style.icon
             )}
             aria-hidden="true"

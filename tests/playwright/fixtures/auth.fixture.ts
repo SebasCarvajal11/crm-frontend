@@ -25,11 +25,11 @@ export const USERS: Record<string, TestUser> = {
     lastName: 'Martínez',
   },
   client: {
-    email: process.env.CLIENT_EMAIL || 'contacto@restauranteelbuensabor.com',
+    email: process.env.CLIENT_EMAIL || 'contacto@clinicasalud360.com',
     password: process.env.CLIENT_PASSWORD || 'Demo123!',
     role: 'client',
     firstName: 'Contacto',
-    lastName: 'El Buen Sabor',
+    lastName: 'Clinica Salud 360',
   },
 }
 
@@ -38,7 +38,7 @@ async function loginViaUI(page: Page, user: TestUser): Promise<void> {
   await page.getByLabel('Correo').fill(user.email)
   await page.locator('#password').fill(user.password)
   await page.getByRole('button', { name: /entrar/i }).click()
-  await page.waitForURL('**/dashboard', { timeout: 15_000 })
+  await page.waitForURL('**/dashboard**', { timeout: 15_000 })
   await page.waitForLoadState('networkidle')
 }
 

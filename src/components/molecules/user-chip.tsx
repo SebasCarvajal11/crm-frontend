@@ -14,7 +14,7 @@ export function UserChip({ email, onRemove, role }: Props) {
       <User className="size-3 text-muted-foreground shrink-0" aria-hidden="true" />
       <span className="truncate max-w-[160px]">{email}</span>
       {role && (
-        <span className="text-[9px] text-muted-foreground font-medium ml-0.5">({role})</span>
+        <span className="text-[10px] text-muted-foreground font-medium ml-0.5">({role})</span>
       )}
       {onRemove && (
         <IconButton

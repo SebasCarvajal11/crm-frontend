@@ -153,7 +153,7 @@ export function SessionsSection({ accessToken }: Props) {
                     'sm:flex-row sm:items-center sm:justify-between',
                     session.is_current
                       ? 'border-primary/40 bg-primary/[0.03] shadow-xs'
-                      : 'border-border/70 bg-card hover:border-border',
+                      : 'border-border/70 bg-card hover:border-primary/30 hover:bg-muted/30',
                   )}
                 >
                   <div className="flex min-w-0 items-start gap-3">

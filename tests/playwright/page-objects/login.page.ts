@@ -12,8 +12,8 @@ export class LoginPage {
   constructor(page: Page) {
     this.page = page
     this.emailInput = page.getByLabel('Correo')
-    this.passwordInput = page.getByLabel(/contrase(?:n|ñ)a/i)
-    this.submitButton = page.getByRole('button', { name: 'Entrar' })
+    this.passwordInput = page.locator('#password')
+    this.submitButton = page.getByRole('button', { name: /entrar/i })
     this.forgotPasswordLink = page.getByRole('link', { name: /olvidaste.*contrase(?:n|ñ)a/i })
     this.errorMessage = page.getByRole('alert')
     this.backToHomeLink = page.getByRole('link', { name: /volver al inicio/i })
@@ -28,7 +28,7 @@ export class LoginPage {
     await this.emailInput.fill(email)
     await this.passwordInput.fill(password)
     await this.submitButton.click()
-    await this.page.waitForURL('**/dashboard', { timeout: 15_000 })
+    await this.page.waitForURL('**/dashboard**', { timeout: 15_000 })
     await this.page.waitForLoadState('networkidle')
   }
 

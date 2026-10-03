@@ -63,7 +63,7 @@ export const NotificationCounterBadge = memo(function NotificationCounterBadge({
       )}
     >
       {hasMention && (
-        <span className="mr-0.5 text-[9px] font-black text-amber-200/95 leading-none select-none">@</span>
+        <span className="mr-0.5 text-[10px] font-black text-amber-200/95 leading-none select-none">@</span>
       )}
       <span className="font-mono tabular-nums leading-none">{displayValue}</span>
     </span>

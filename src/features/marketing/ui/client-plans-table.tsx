@@ -29,7 +29,7 @@ export function ClientPlansTable({ clients, isBusy, onAssignPlan }: ClientPlansT
                 return (
                   <tr
                     key={client.clientId}
-                    className="border-b last:border-0 hover:bg-muted/30"
+                    className="border-b last:border-0 hover:bg-muted/30 transition-colors duration-150"
                   >
                     <td className="px-4 py-3 font-medium">{clientLabel(client)}</td>
                     <td className="px-4 py-3 text-xs text-muted-foreground">

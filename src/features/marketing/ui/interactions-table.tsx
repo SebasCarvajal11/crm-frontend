@@ -38,7 +38,7 @@ export function InteractionsTable({
                 return (
                   <tr
                     key={interaction.interactionId}
-                    className="border-b last:border-0 hover:bg-muted/30"
+                    className="border-b last:border-0 hover:bg-muted/30 transition-colors duration-150"
                   >
                     <td className="px-4 py-3 font-medium">
                       {clientLabel(interaction.clientId)}

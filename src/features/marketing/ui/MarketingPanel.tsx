@@ -30,6 +30,13 @@ const TABS: SectionTabItem<MarketingTab>[] = [
   { value: 'interactions', label: 'Interacciones', icon: <MessageSquare className="size-4" /> },
 ]
 
+function tabPaneProps(isActive: boolean) {
+  return {
+    style: { display: isActive ? 'block' : 'none' },
+    className: isActive ? 'tab-pane-transition' : undefined,
+  }
+}
+
 export function MarketingPanel({ accessToken }: Props) {
   const [activeTab, setActiveTab] = useState<MarketingTab>('clients')
   const [visitedTabs, setVisitedTabs] = useState<Set<MarketingTab>>(() => new Set([activeTab]))
@@ -77,15 +84,15 @@ export function MarketingPanel({ accessToken }: Props) {
         />
       </div>
 
-      <div className="tab-pane-transition">
+      <div>
         {visitedTabs.has('clients') && (
-          <div style={{ display: activeTab === 'clients' ? 'block' : 'none' }}>
+          <div {...tabPaneProps(activeTab === 'clients')}>
             <ClientPlansManager accessToken={accessToken} />
           </div>
         )}
 
         {visitedTabs.has('campaigns') && (
-          <div style={{ display: activeTab === 'campaigns' ? 'block' : 'none' }}>
+          <div {...tabPaneProps(activeTab === 'campaigns')}>
             <CampaignsManager
               accessToken={accessToken}
               onSelectCampaignForWorkflows={handleSelectCampaignForWorkflows}
@@ -94,13 +101,13 @@ export function MarketingPanel({ accessToken }: Props) {
         )}
 
         {visitedTabs.has('proposals') && (
-          <div style={{ display: activeTab === 'proposals' ? 'block' : 'none' }}>
+          <div {...tabPaneProps(activeTab === 'proposals')}>
             <ProposalsManager accessToken={accessToken} />
           </div>
         )}
 
         {visitedTabs.has('workflows') && (
-          <div style={{ display: activeTab === 'workflows' ? 'block' : 'none' }}>
+          <div {...tabPaneProps(activeTab === 'workflows')}>
             <WorkflowsManager
               accessToken={accessToken}
               preselectedCampaignId={preselectedCampaignId}
@@ -109,13 +116,13 @@ export function MarketingPanel({ accessToken }: Props) {
         )}
 
         {visitedTabs.has('segments') && (
-          <div style={{ display: activeTab === 'segments' ? 'block' : 'none' }}>
+          <div {...tabPaneProps(activeTab === 'segments')}>
             <SegmentsManager accessToken={accessToken} />
           </div>
         )}
 
         {visitedTabs.has('interactions') && (
-          <div style={{ display: activeTab === 'interactions' ? 'block' : 'none' }}>
+          <div {...tabPaneProps(activeTab === 'interactions')}>
             <InteractionsManager accessToken={accessToken} />
           </div>
         )}

@@ -22,7 +22,7 @@ export function HelpCenterQuestionItem({ question, scopeMode, tabLabel, onClick 
             {question.question}
           </p>
           {scopeMode === 'all' && (
-            <Badge variant="outline" className="text-[9px] py-0 px-1 font-normal text-muted-foreground">
+            <Badge variant="outline" className="text-[10px] py-0 px-1 font-normal text-muted-foreground">
               {tabLabel ?? question.tab}
             </Badge>
           )}
