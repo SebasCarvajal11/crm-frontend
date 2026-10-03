@@ -10,12 +10,27 @@ export interface KpiCardProps {
   icon: ComponentType<{ className?: string }>
   accent: Accent
   loading?: boolean
+  className?: string
 }
 
-export function KpiCard({ label, value, subtitle, icon: Icon, accent, loading }: KpiCardProps) {
+export function KpiCard({
+  label,
+  value,
+  subtitle,
+  icon: Icon,
+  accent,
+  loading,
+  className,
+}: KpiCardProps) {
   const styles = ACCENT_STYLES[accent]
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card p-5 shadow-xs hover:shadow-md hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-200">
+    <div
+      className={
+        'group relative overflow-hidden rounded-2xl border border-border/80 bg-card p-5 ' +
+        'shadow-xs hover:shadow-md hover:border-primary/40 hover:-translate-y-0.5 ' +
+        `transition-all duration-200 ${className ?? ''}`
+      }
+    >
       <div className={`absolute inset-x-0 top-0 h-1.5 ${styles.bar}`} />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -23,11 +38,18 @@ export function KpiCard({ label, value, subtitle, icon: Icon, accent, loading }:
           {loading ? (
             <div className="mt-2 h-9 w-20 animate-pulse rounded-lg bg-muted" />
           ) : (
-            <p className="mt-1.5 text-3xl sm:text-4xl font-black tracking-tight tabular-nums text-foreground">{value}</p>
+            <p className="mt-1.5 text-3xl sm:text-4xl font-black tracking-tight tabular-nums text-foreground">
+              {value}
+            </p>
           )}
           <p className="mt-1.5 truncate text-xs font-medium text-muted-foreground">{subtitle}</p>
         </div>
-        <div className={`shrink-0 rounded-xl ${styles.iconBg} p-3 ${styles.iconText} shadow-2xs group-hover:scale-105 transition-transform duration-200`}>
+        <div
+          className={
+            `shrink-0 rounded-xl ${styles.iconBg} p-3 ${styles.iconText} ` +
+            'shadow-2xs group-hover:scale-105 transition-transform duration-200'
+          }
+        >
           <Icon className="size-5" />
         </div>
       </div>

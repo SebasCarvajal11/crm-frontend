@@ -270,6 +270,14 @@
   background-color: var(--primary);
 }
 
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Interacciones globales estandarizadas */
 .tabular-nums {
   font-variant-numeric: tabular-nums;

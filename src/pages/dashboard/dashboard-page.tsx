@@ -27,24 +27,23 @@ import { getAccessTokenRole } from '@/shared/lib/access-token-role'
 import { useTourStore } from '@/features/tour'
 import type { DashboardTab } from '@/routes/-dashboard.search'
 
-const CollabPanel = lazy(() =>
-  import('@/features/collab/ui').then((m) => ({ default: m.CollabPanel }))
-)
-const NotificationsPanel = lazy(() =>
-  import('@/features/collab/ui').then((m) => ({ default: m.NotificationsPanel }))
-)
-const MarketingPanel = lazy(() =>
-  import('@/features/marketing').then((m) => ({ default: m.MarketingPanel }))
-)
+const CollabPanel = lazy(() => import('@/features/collab/ui').then((m) => ({ default: m.CollabPanel })))
+const NotificationsPanel = lazy(() => import('@/features/collab/ui').then((m) => ({ default: m.NotificationsPanel })))
+const MarketingPanel = lazy(() => import('@/features/marketing').then((m) => ({ default: m.MarketingPanel })))
 const DashboardAnalytics = lazy(() =>
   import('@/components/organisms/dashboard-analytics').then((m) => ({ default: m.DashboardAnalytics }))
 )
-const AdminConsole = lazy(() =>
-  import('@/features/admin/ui').then((m) => ({ default: m.AdminConsole }))
-)
+const AdminConsole = lazy(() => import('@/features/admin/ui').then((m) => ({ default: m.AdminConsole })))
 const AccountPanel = lazy(() =>
   import('@/components/organisms/account-panel').then((m) => ({ default: m.AccountPanel }))
 )
+
+function tabPaneProps(isActive: boolean) {
+  return {
+    style: { display: isActive ? 'block' : 'none' },
+    className: isActive ? 'tab-pane-transition' : undefined,
+  }
+}
 
 type Props = {
   tab?: DashboardTab
@@ -95,7 +94,8 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     },
   })
 
-  const isUnauthorized = dashboardQuery.isError && isHTTPError(dashboardQuery.error) && dashboardQuery.error.response.status === 401
+  const isUnauthorized =
+    dashboardQuery.isError && isHTTPError(dashboardQuery.error) && dashboardQuery.error.response.status === 401
 
   useEffect(() => {
     if (!bootstrapped || token) return
@@ -148,9 +148,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   const handleOpenHelp = useCallback(() => { useTourStore.getState().openHelpCenter() }, [])
   const handleLogout = useCallback(() => { logoutMutation.mutate() }, [logoutMutation])
   const handleGoToLogin = useCallback(() => {
-    clearSession()
-    queryClient.clear()
-    navigate({ to: '/login', replace: true })
+    clearSession(); queryClient.clear(); navigate({ to: '/login', replace: true })
   }, [clearSession, queryClient, navigate])
 
   const identity = dashboardQuery.data?.identity
@@ -226,7 +224,9 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
         <Alert variant="destructive" className="mb-6">
           <AlertTitle>Tu sesión necesita actualizarse</AlertTitle>
           <AlertDescription className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <span>Tu rol cambió desde que iniciaste sesión. Vuelve a iniciar sesión para aplicar los permisos actuales.</span>
+            <span>
+              Tu rol cambió desde que iniciaste sesión. Vuelve a iniciar sesión para aplicar los permisos actuales.
+            </span>
             <Button variant="outline" size="sm" onClick={handleLogout} disabled={logoutMutation.isPending}>
               Actualizar sesión
             </Button>
@@ -234,7 +234,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
         </Alert>
       )}
       {visitedTabs.has('overview') && canViewOverview && (
-        <div style={{ display: activeTab === 'overview' ? 'block' : 'none' }}>
+        <div {...tabPaneProps(activeTab === 'overview')}>
           <DashboardOverview
             identity={identity}
             avatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}
@@ -248,7 +248,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
       )}
       <Suspense fallback={<DashboardTabSkeleton />}>
         {visitedTabs.has('collab') && (
-          <div style={{ display: activeTab === 'collab' ? 'block' : 'none' }}>
+          <div {...tabPaneProps(activeTab === 'collab')}>
             <CollabPanel
               accessToken={token}
               identity={identity}
@@ -265,17 +265,17 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
           </div>
         )}
         {visitedTabs.has('marketing') && canUseMarketing && (
-          <div style={{ display: activeTab === 'marketing' ? 'block' : 'none' }}>
+          <div {...tabPaneProps(activeTab === 'marketing')}>
             <MarketingPanel accessToken={token} />
           </div>
         )}
         {visitedTabs.has('account') && (
-          <div style={{ display: activeTab === 'account' ? 'block' : 'none' }}>
+          <div {...tabPaneProps(activeTab === 'account')}>
             <AccountPanel accessToken={token} identity={identity} />
           </div>
         )}
         {visitedTabs.has('notifications') && (
-          <div style={{ display: activeTab === 'notifications' ? 'block' : 'none' }}>
+          <div {...tabPaneProps(activeTab === 'notifications')}>
             <NotificationsPanel
               accessToken={token}
               onOpenNotification={openNotificationTarget}
@@ -283,12 +283,12 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
           </div>
         )}
         {visitedTabs.has('admin') && isAdmin && (
-          <div style={{ display: activeTab === 'admin' ? 'block' : 'none' }}>
+          <div {...tabPaneProps(activeTab === 'admin')}>
             <AdminConsole accessToken={token} />
           </div>
         )}
         {visitedTabs.has('analytics') && canUseMarketing && (
-          <div style={{ display: activeTab === 'analytics' ? 'block' : 'none' }}>
+          <div {...tabPaneProps(activeTab === 'analytics')}>
             <DashboardAnalytics accessToken={token} />
           </div>
         )}
