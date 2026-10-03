@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { CheckCircle2, FileText, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { ProjectChangeRequest } from '@/features/collab/model'
 import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 import { ChangeRequestItemCard } from './brief-change-request-card'
@@ -28,7 +29,10 @@ function BriefContentView({ brief }: { brief: BriefData }) {
   return (
     <div
       data-tour="workspace-brief-content"
-      className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`}
+      className={[
+        'flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm',
+        COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS,
+      ].join(' ')}
       role="region"
       aria-label="Brief del proyecto"
     >
@@ -36,7 +40,10 @@ function BriefContentView({ brief }: { brief: BriefData }) {
         <div>
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-semibold text-foreground">Brief del Proyecto</h3>
-            <Badge variant="outline" className="text-[10px] gap-1 py-0 h-4 border-primary/30 text-primary bg-primary/5">
+            <Badge
+              variant="outline"
+              className="text-[10px] gap-1 py-0 h-4 border-primary/30 text-primary bg-primary/5"
+            >
               <Sparkles className="size-2.5" />
               Documento Oficial
             </Badge>
@@ -92,7 +99,10 @@ function ChangeRequestsSidebar({
   return (
     <div
       data-tour="workspace-brief-changes"
-      className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`}
+      className={[
+        'flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm',
+        COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS,
+      ].join(' ')}
       role="region"
       aria-label="Historial de cambios formales"
     >
@@ -143,7 +153,9 @@ function ChangeRequestsSidebar({
 
       <div className="min-h-0 flex-1 overflow-y-auto scroll-smooth scrollbar-thin p-3">
         {filtered.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground p-6 text-center">
+          <div
+            className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground p-6 text-center"
+          >
             <CheckCircle2 className="size-8 opacity-20" aria-hidden="true" />
             <p className="text-xs font-medium">Sin cambios en esta categoría.</p>
             <p className="text-[11px] text-muted-foreground/80">
@@ -157,6 +169,47 @@ function ChangeRequestsSidebar({
             ))}
           </ol>
         )}
+      </div>
+    </div>
+  )
+}
+
+function BriefSkeleton() {
+  return (
+    <div
+      className="grid gap-4 min-[1280px]:grid-cols-[minmax(0,1fr)_minmax(22rem,0.65fr)]"
+      role="status"
+      aria-label="Cargando brief"
+    >
+      <div
+        className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} flex-col rounded-xl border bg-card p-6 space-y-4`}
+      >
+        <div className="flex items-center justify-between pb-3 border-b border-border/60">
+          <Skeleton className="h-6 w-40 rounded-md" />
+          <Skeleton className="h-5 w-28 rounded-full" />
+        </div>
+        <Skeleton className="h-4 w-3/4 rounded" />
+        <Skeleton className="h-4 w-5/6 rounded" />
+        <Skeleton className="h-4 w-2/3 rounded" />
+        <div className="pt-4 space-y-3">
+          <Skeleton className="h-5 w-48 rounded" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+        </div>
+      </div>
+      <div
+        className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} flex-col rounded-xl border bg-card p-4 space-y-3`}
+      >
+        <div className="flex items-center justify-between pb-2 border-b border-border/60">
+          <Skeleton className="h-5 w-32 rounded-md" />
+          <Skeleton className="h-5 w-16 rounded-full" />
+        </div>
+        <div className="flex gap-2 pb-1">
+          <Skeleton className="h-6 w-16 rounded-lg" />
+          <Skeleton className="h-6 w-20 rounded-lg" />
+          <Skeleton className="h-6 w-20 rounded-lg" />
+        </div>
+        <Skeleton className="h-20 w-full rounded-xl" />
+        <Skeleton className="h-20 w-full rounded-xl" />
       </div>
     </div>
   )
@@ -190,15 +243,7 @@ export function BriefPanel({ brief, changeRequests, formalChanges, isLoading }: 
   }, [changeRequests, formalChanges, brief?.projectId])
 
   if (isLoading) {
-    return (
-      <div
-        className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} items-center justify-center rounded-xl border bg-card shadow-sm`}
-        role="status"
-        aria-label="Cargando brief"
-      >
-        <div className="animate-spin rounded-full h-6 w-6 border-2 border-muted border-t-primary" />
-      </div>
-    )
+    return <BriefSkeleton />
   }
 
   return (

@@ -80,20 +80,11 @@ export function ChangeRequestCard({ request, isAdmin, members, tasks, onAccept, 
 
   const priorityMeta = priorityConfig[request.priority ?? 'medium'] ?? priorityConfig.medium
 
-  const statusBorderClass = isPending
-    ? 'border-l-amber-500/80'
-    : isApproved
-      ? 'border-l-emerald-500/80'
-      : isRejected
-        ? 'border-l-rose-500/80'
-        : 'border-l-border'
-
   return (
     <article
       className={[
-        'rounded-xl border border-l-4 border-border/70 bg-card p-4 shadow-2xs',
-        'transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm hover:border-primary/30',
-        statusBorderClass,
+        'rounded-xl border border-border/80 bg-card p-4 shadow-2xs',
+        'transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm hover:border-primary/40',
       ].join(' ')}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

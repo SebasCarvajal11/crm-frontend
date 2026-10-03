@@ -106,7 +106,11 @@ export const ChatMessageList = memo(function ChatMessageList({
           e.stopPropagation()
           setSelectedMessageId(message.id)
         }}
-        className="inline-flex items-center gap-0.5 rounded p-0.5 transition-colors hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className={[
+          'inline-flex items-center gap-0.5 rounded p-0.5 transition-colors',
+          'hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer',
+          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+        ].join(' ')}
         title={`${checkTitle} · Ver quién ha leído`}
         aria-label={`Estado de lectura: ${checkTitle}. Clic para ver detalles`}
       >
@@ -129,10 +133,11 @@ export const ChatMessageList = memo(function ChatMessageList({
       {messages.map((message, index) => {
     const isOwn = message.authorSub === identity.id
     const isSystem = message.messageType !== 'text'
-    const isMentionedToCurrentUser = Array.isArray(message.mentionedSubs) && message.mentionedSubs.includes(identity.id)
+    const isMentioned = Array.isArray(message.mentionedSubs) && message.mentionedSubs.includes(identity.id)
     const previousMessage = index > 0 ? messages[index - 1] : null
     const nextMessage = index < messages.length - 1 ? messages[index + 1] : null
-    const showDaySeparator = !previousMessage || !isSameDay(new Date(previousMessage.createdAt), new Date(message.createdAt))
+    const showDaySeparator =
+      !previousMessage || !isSameDay(new Date(previousMessage.createdAt), new Date(message.createdAt))
     const sameAuthorAsPrevious =
       !!previousMessage &&
       previousMessage.messageType === message.messageType &&
@@ -148,8 +153,13 @@ export const ChatMessageList = memo(function ChatMessageList({
 
     if (isSystem) {
       return (
-        <div key={message.id} className="flex justify-center py-1.5">
-          <span className="inline-flex items-center gap-1.5 rounded-full border bg-muted/60 px-2.5 py-1 text-[10px] text-muted-foreground">
+        <div key={message.id} className="flex justify-center py-1.5 animate-in fade-in-0 duration-150">
+          <span
+            className={[
+              'inline-flex items-center gap-1.5 rounded-full border bg-muted/60',
+              'px-2.5 py-1 text-[10px] text-muted-foreground',
+            ].join(' ')}
+          >
             <MessageSquare className="size-3 shrink-0" />
             {message.body}
             <span className="opacity-60">{formatMessageTime(message.createdAt)}</span>
@@ -163,7 +173,13 @@ export const ChatMessageList = memo(function ChatMessageList({
         {showDaySeparator && (
           <div className="my-2.5 flex items-center gap-2">
             <div className="h-px flex-1 bg-border/60" />
-            <span className="rounded-full border border-border/70 bg-card/90 px-3 py-0.5 text-[10px] font-semibold tracking-wide uppercase text-muted-foreground shadow-2xs backdrop-blur-xs">
+            <span
+              className={[
+                'rounded-full border border-border/70 bg-card/90 px-3 py-0.5',
+                'text-[10px] font-semibold tracking-wide uppercase text-muted-foreground',
+                'shadow-2xs backdrop-blur-xs',
+              ].join(' ')}
+            >
               {formatDaySeparator(message.createdAt)}
             </span>
             <div className="h-px flex-1 bg-border/60" />
@@ -171,7 +187,12 @@ export const ChatMessageList = memo(function ChatMessageList({
         )}
         <div
           data-message-id={message.id}
-          className={`flex gap-2 ${isOwn ? 'flex-row-reverse' : 'flex-row'} ${sameAuthorAsNext ? 'mb-0.5' : 'mb-2.5'} ${highlightMessageId === message.id ? 'rounded-lg bg-amber-100/60 px-1 py-1 dark:bg-amber-300/15' : ''}`}
+          className={[
+            'flex gap-2 animate-in fade-in-0 slide-in-from-bottom-0.5 duration-150',
+            isOwn ? 'flex-row-reverse' : 'flex-row',
+            sameAuthorAsNext ? 'mb-0.5' : 'mb-2.5',
+            highlightMessageId === message.id ? 'rounded-lg bg-amber-100/60 px-1 py-1 dark:bg-amber-300/15' : '',
+          ].join(' ')}
         >
           {!isOwn && (
             <div className="flex w-7 shrink-0 items-end">
@@ -186,28 +207,49 @@ export const ChatMessageList = memo(function ChatMessageList({
               )}
             </div>
           )}
-          <div className={`flex max-w-[75%] flex-col ${isOwn ? 'items-end' : 'items-start'} ${sameAuthorAsPrevious ? 'pt-0' : 'pt-0.5'}`}>
+          <div
+            className={[
+              'flex max-w-[75%] flex-col',
+              isOwn ? 'items-end' : 'items-start',
+              sameAuthorAsPrevious ? 'pt-0' : 'pt-0.5',
+            ].join(' ')}
+          >
             {!isOwn && !sameAuthorAsPrevious && (
               <span className="mb-0.5 px-3 text-[11px] font-semibold text-muted-foreground">
                 {getDisplayName(message)} · {getAuthorTag(message)}
-                {isMentionedToCurrentUser && (
-                  <span className="ml-2 inline-flex items-center rounded-full border border-amber-300/70 bg-amber-100/70 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
+                {isMentioned && (
+                  <span
+                    className={[
+                      'ml-2 inline-flex items-center rounded-full border border-amber-300/70',
+                      'bg-amber-100/70 px-1.5 py-0.5 text-[10px] font-medium text-amber-800',
+                    ].join(' ')}
+                  >
                     Te menciono
                   </span>
                 )}
               </span>
             )}
             <div
-              className={`break-words px-3.5 py-2 text-sm leading-relaxed ${
+              className={[
+                'break-words px-3.5 py-2 text-sm leading-relaxed transition-colors',
                 isOwn
-                  ? 'rounded-2xl rounded-br-xs bg-gradient-to-br from-primary via-[#86070c] to-[#680609] text-white shadow-xs'
-                  : 'rounded-2xl rounded-bl-xs bg-card border border-border/70 text-foreground shadow-2xs'
-              } ${isMentionedToCurrentUser && !isOwn ? 'bg-amber-500/10 border-amber-500/30 ring-1 ring-amber-500/20' : ''}`}
+                  ? [
+                      'rounded-2xl rounded-br-xs bg-gradient-to-br',
+                      'from-primary via-primary-800 to-primary-900 text-white shadow-xs',
+                    ].join(' ')
+                  : 'rounded-2xl rounded-bl-xs bg-card border border-border/70 text-foreground shadow-2xs',
+                isMentioned && !isOwn
+                  ? 'bg-amber-500/10 border-amber-500/30 ring-1 ring-amber-500/20'
+                  : '',
+              ].join(' ')}
             >
               {message.body}
             </div>
             {!sameAuthorAsNext && (
-              <span className="mt-0.5 inline-flex items-center gap-1 px-1 text-[10px] text-muted-foreground" title={formatMessageDateTime(message.createdAt)}>
+              <span
+                className="mt-0.5 inline-flex items-center gap-1 px-1 text-[10px] text-muted-foreground"
+                title={formatMessageDateTime(message.createdAt)}
+              >
                 {formatMessageTime(message.createdAt)}
                 {isOwn && renderReadReceipt(message)}
               </span>

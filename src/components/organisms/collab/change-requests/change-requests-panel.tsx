@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
-import { GitPullRequest, Loader2, Plus } from 'lucide-react'
+import { GitPullRequest, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { ChangeRequestCard } from './change-request-card'
 import { CreateChangeRequestModal } from './create-change-request-modal'
@@ -157,9 +158,9 @@ export function ChangeRequestsPanel({
 
       <div data-tour="workspace-change-requests-list">
         {isLoading ? (
-          <div className="flex items-center justify-center py-16 text-muted-foreground">
-            <Loader2 className="mr-2.5 size-5 animate-spin text-primary" />
-            <span className="text-xs font-medium">Cargando solicitudes de cambio...</span>
+          <div className="space-y-3" role="status" aria-label="Cargando solicitudes de cambio">
+            <Skeleton className="h-32 w-full rounded-xl" />
+            <Skeleton className="h-32 w-full rounded-xl" />
           </div>
         ) : filteredRequests.length === 0 ? (
           <div

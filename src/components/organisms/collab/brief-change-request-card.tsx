@@ -8,7 +8,10 @@ export function StatusBadge({ status }: { status: string }) {
     return (
       <Badge
         variant="outline"
-        className="gap-1 border-amber-200 bg-amber-50 text-[10px] text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300"
+        className={[
+          'gap-1 border-amber-200 bg-amber-50 text-[10px] text-amber-800',
+          'dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300',
+        ].join(' ')}
       >
         <Clock className="size-2.5" /> Pendiente
       </Badge>
@@ -18,7 +21,10 @@ export function StatusBadge({ status }: { status: string }) {
     return (
       <Badge
         variant="outline"
-        className="gap-1 border-emerald-200 bg-emerald-50 text-[10px] text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
+        className={[
+          'gap-1 border-emerald-200 bg-emerald-50 text-[10px] text-emerald-800',
+          'dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300',
+        ].join(' ')}
       >
         <CheckCircle2 className="size-2.5" /> Aprobado
       </Badge>
@@ -28,7 +34,10 @@ export function StatusBadge({ status }: { status: string }) {
     return (
       <Badge
         variant="outline"
-        className="gap-1 border-rose-200 bg-rose-50 text-[10px] text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300"
+        className={[
+          'gap-1 border-rose-200 bg-rose-50 text-[10px] text-rose-800',
+          'dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300',
+        ].join(' ')}
       >
         <XCircle className="size-2.5" /> Rechazado
       </Badge>
@@ -37,7 +46,10 @@ export function StatusBadge({ status }: { status: string }) {
   return (
     <Badge
       variant="outline"
-      className="gap-1 border-purple-200 bg-purple-50 text-[10px] text-purple-800 dark:border-purple-900 dark:bg-purple-950/40 dark:text-purple-300"
+      className={[
+        'gap-1 border-purple-200 bg-purple-50 text-[10px] text-purple-800',
+        'dark:border-purple-900 dark:bg-purple-950/40 dark:text-purple-300',
+      ].join(' ')}
     >
       <AlertTriangle className="size-2.5" /> {status}
     </Badge>
@@ -47,12 +59,18 @@ export function StatusBadge({ status }: { status: string }) {
 export function PriorityBadge({ priority }: { priority?: string }) {
   if (!priority) return null
   const colors: Record<string, string> = {
-    urgent:
-      'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 font-semibold',
-    high:
-      'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800',
-    medium:
-      'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800',
+    urgent: [
+      'bg-rose-50 text-rose-800 border-rose-200 font-semibold',
+      'dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800',
+    ].join(' '),
+    high: [
+      'bg-amber-50 text-amber-800 border-amber-200',
+      'dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800',
+    ].join(' '),
+    medium: [
+      'bg-sky-50 text-sky-700 border-sky-200',
+      'dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800',
+    ].join(' '),
     low: 'bg-muted text-muted-foreground border-border',
   }
   const labels: Record<string, string> = {
@@ -73,7 +91,13 @@ export function ChangeRequestItemCard({ item }: { item: ProjectChangeRequest }) 
   const isApproved = item.status === 'accepted' || item.status === 'approved'
 
   return (
-    <li className="rounded-lg border bg-background p-3.5 space-y-2 transition-colors hover:bg-muted/20">
+    <li
+      className={[
+        'rounded-lg border border-border/80 bg-background p-3.5 space-y-2',
+        'transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-2xs',
+        'hover:border-primary/40',
+      ].join(' ')}
+    >
       <div className="flex flex-wrap items-center justify-between gap-1.5">
         <div className="flex items-center gap-1.5 flex-wrap">
           <StatusBadge status={item.status} />
@@ -102,7 +126,12 @@ export function ChangeRequestItemCard({ item }: { item: ProjectChangeRequest }) 
       )}
 
       {isRejected && item.resolutionComment && (
-        <div className="flex items-start gap-1.5 rounded border border-rose-200/80 bg-rose-50/70 p-2 text-xs text-rose-900 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-200">
+        <div
+          className={[
+            'flex items-start gap-1.5 rounded border border-rose-200/80 bg-rose-50/70 p-2',
+            'text-xs text-rose-900 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-200',
+          ].join(' ')}
+        >
           <AlertCircle className="size-3.5 text-rose-600 shrink-0 mt-0.5" />
           <div>
             <span className="font-semibold text-[11px] block">Motivo del rechazo:</span>
@@ -112,7 +141,12 @@ export function ChangeRequestItemCard({ item }: { item: ProjectChangeRequest }) 
       )}
 
       {isApproved && item.resolutionComment && (
-        <div className="flex items-start gap-1.5 rounded border border-emerald-200/80 bg-emerald-50/70 p-2 text-xs text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200">
+        <div
+          className={[
+            'flex items-start gap-1.5 rounded border border-emerald-200/80 bg-emerald-50/70 p-2',
+            'text-xs text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200',
+          ].join(' ')}
+        >
           <CheckCircle2 className="size-3.5 text-emerald-600 shrink-0 mt-0.5" />
           <div>
             <span className="font-semibold text-[11px] block">Nota de aprobación:</span>

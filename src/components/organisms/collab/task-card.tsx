@@ -22,7 +22,10 @@ function TaskCardBadges({ task }: { task: ProjectTask }) {
       <PriorityBadge priority={task.priority} />
       {task.blockType && (
         <span
-          className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400 font-semibold gap-0.5"
+          className={[
+            'inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full',
+            'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400 font-semibold gap-0.5',
+          ].join(' ')}
           title={task.blockReason ? `Bloqueada: ${task.blockReason}` : 'Tarea Bloqueada'}
         >
           <AlertOctagon className="size-2.5" aria-hidden="true" />
@@ -30,13 +33,23 @@ function TaskCardBadges({ task }: { task: ProjectTask }) {
         </span>
       )}
       {task.isClientVisible && (
-        <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300 gap-0.5">
+        <span
+          className={[
+            'inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full',
+            'bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300 gap-0.5',
+          ].join(' ')}
+        >
           <User className="size-2.5" aria-hidden="true" />
           Cliente
         </span>
       )}
       {task.deadline && (
-        <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground gap-0.5">
+        <span
+          className={[
+            'inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full',
+            'bg-muted text-muted-foreground gap-0.5',
+          ].join(' ')}
+        >
           <Calendar className="size-2.5" aria-hidden="true" />
           {fmtShort(task.deadline)}
         </span>
@@ -72,7 +85,10 @@ function TaskCardProgress({
       </div>
       <div className="h-1.5 rounded-full bg-muted/80 overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-300 rounded-full"
+          className={[
+            'h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400',
+            'transition-[width] duration-300 ease-out',
+          ].join(' ')}
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -122,24 +138,39 @@ export const TaskCard = memo(function TaskCard({
       onClick={onClick}
       aria-pressed={isSelected}
       aria-label={`Tarea: ${task.title}. Prioridad: ${task.priority}.`}
-      className={`group w-full text-left rounded-xl border ${cardBorderClass} p-3.5 shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 cursor-pointer ${
-        isSelected ? 'ring-2 ring-primary ring-offset-1 shadow-md border-primary/60' : ''
-      }`}
+      className={[
+        'group w-full text-left rounded-xl border p-3.5 shadow-2xs',
+        'transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md active:scale-[0.985]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+        'cursor-pointer',
+        cardBorderClass,
+        isSelected ? 'ring-2 ring-primary ring-offset-1 shadow-md border-primary/60' : '',
+      ].join(' ')}
     >
       <div className="flex items-start justify-between gap-2 mb-1.5">
-        <span className="text-sm font-semibold tracking-tight leading-snug line-clamp-2 text-foreground group-hover:text-primary transition-colors">
+        <span
+          className={[
+            'text-sm font-semibold tracking-tight leading-snug line-clamp-2',
+            'text-foreground group-hover:text-primary transition-colors',
+          ].join(' ')}
+        >
           {task.title}
         </span>
         {canDrag && (
           <GripVertical
-            className="size-4 text-muted-foreground/30 group-hover:text-muted-foreground shrink-0 mt-0.5 cursor-grab transition-colors"
+            className={[
+              'size-4 text-muted-foreground/30 group-hover:text-muted-foreground',
+              'shrink-0 mt-0.5 cursor-grab transition-colors',
+            ].join(' ')}
             aria-hidden="true"
           />
         )}
       </div>
 
       {task.description && (
-        <p className="text-xs text-muted-foreground line-clamp-2 mb-2 leading-relaxed">{task.description}</p>
+        <p className="text-xs text-muted-foreground line-clamp-2 mb-2 leading-relaxed">
+          {task.description}
+        </p>
       )}
 
       <TaskCardBadges task={task} />

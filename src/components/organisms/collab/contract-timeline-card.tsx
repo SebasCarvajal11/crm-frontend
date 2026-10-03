@@ -40,10 +40,10 @@ export function ContractTimelineCard({ contract, projectName, onError }: Props) 
 
   return (
     <div
-      className={`rounded-xl border border-l-4 p-3.5 shadow-2xs transition-all ${
+      className={`rounded-xl border p-3.5 shadow-2xs transition-all ${
         isSigned
-          ? 'border-emerald-200 border-l-emerald-600 bg-emerald-50/40 dark:border-emerald-900/60 dark:bg-emerald-950/20'
-          : 'border-sky-200 border-l-sky-600 bg-sky-50/40 dark:border-sky-900/60 dark:bg-sky-950/20'
+          ? 'border-emerald-200/80 bg-emerald-50/40 dark:border-emerald-900/60 dark:bg-emerald-950/20'
+          : 'border-sky-200/80 bg-sky-50/40 dark:border-sky-900/60 dark:bg-sky-950/20'
       }`}
     >
       <div className="flex items-center justify-between gap-2 border-b border-border/60 pb-2">

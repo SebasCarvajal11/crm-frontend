@@ -17,15 +17,9 @@ type FormProps = {
   onPlanChange: (plan: (typeof SERVICE_PLANS)[number]) => void
 }
 
-function Field({
-  label,
-  className,
-  children,
-}: {
-  label: string
-  className?: string
-  children: React.ReactNode
-}) {
+type FieldProps = { label: string; className?: string; children: React.ReactNode }
+
+function Field({ label, className, children }: FieldProps) {
   return (
     <div className={className}>
       <Label className="mb-1.5 block text-xs font-medium text-foreground">{label}</Label>
@@ -187,13 +181,18 @@ function PlanTermsFields({
               type="button"
               key={plan.name}
               onClick={() => onPlanChange(plan)}
-              className={`rounded-xl border p-3 text-left transition-all cursor-pointer ${
+              className={[
+                'rounded-xl border p-3 text-left transition-all duration-200 ease-out',
+                'hover:-translate-y-0.5 hover:shadow-2xs active:scale-[0.985] cursor-pointer',
                 isSelected
                   ? 'border-primary bg-primary/5 ring-1 ring-primary shadow-xs'
-                  : 'hover:border-primary/50 hover:bg-muted/30'
-              }`}
+                  : 'border-border/80 hover:border-primary/50 hover:bg-muted/30',
+              ].join(' ')}
             >
-              <p className="font-semibold text-sm">{plan.name}</p>
+              <div className="flex items-center justify-between">
+                <p className="font-semibold text-sm">{plan.name}</p>
+                {isSelected && <span className="size-2 rounded-full bg-primary" aria-hidden="true" />}
+              </div>
               <p className="mt-1 text-base font-bold text-foreground">
                 {formatMoney(planFee)}
                 <span className="ml-1 text-xs font-normal text-muted-foreground">/ mes</span>

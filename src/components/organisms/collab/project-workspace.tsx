@@ -1,12 +1,10 @@
-import { useCallback, useMemo, useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlertCircle, ArrowLeft, FileSignature, FileText, GitPullRequest, KanbanSquare, MessageSquare, Users } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { AlertCircle, ArrowLeft } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { SectionTabs, type SectionTabItem } from '@/components/molecules/section-tabs'
-import { NotificationCounterBadge } from '@/components/atoms/notification-counter-badge'
-import { listUnreadNotificationsRequest } from '@/features/collab/api'
-import { useProjectBoardMutations, useProjectWorkspaceData, useTaskSearch, useBoardData } from '@/features/collab/hooks'
+import { SectionTabs } from '@/components/molecules/section-tabs'
+import { useProjectBoardMutations, useProjectWorkspaceData, useBoardData } from '@/features/collab/hooks'
 import { ProjectHeader } from './project-header'
 import { TaskSearchBar } from './task-search-bar'
 import { TaskBoard } from './task-board'
@@ -15,6 +13,9 @@ import { BriefPanel } from './brief-panel'
 import { ProjectMembers } from './project-members'
 import { ContractPanel } from './contract-panel'
 import { ChangeRequestsPanel } from './change-requests'
+import { WorkspaceTabPanel } from './workspace-tab-panel'
+import { useWorkspaceTabs } from './use-workspace-tabs'
+import { useWorkspaceTaskSearch } from './use-workspace-task-search'
 import { collabKeys } from '@/features/collab/model'
 import {
   type WorkspaceTab,
@@ -36,37 +37,12 @@ export function ProjectWorkspace({
 }: Props) {
   const queryClient = useQueryClient()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [taskSearchDebounced, setTaskSearchDebounced] = useState('')
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(initialTaskId ?? null)
   const [prevInitialTaskId, setPrevInitialTaskId] = useState<string | undefined>(initialTaskId)
   const [prevActiveTab, setPrevActiveTab] = useState<WorkspaceTab>(activeTab)
   const [visitedTabs, setVisitedTabs] = useState<Set<WorkspaceTab>>(() => new Set([activeTab]))
 
-  const notificationsQ = useQuery({
-    queryKey: collabKeys.notifications(),
-    queryFn: () => listUnreadNotificationsRequest(accessToken),
-    staleTime: 12_000,
-  })
-
-  const { unreadChatCount, hasUnreadMention } = useMemo(() => {
-    const list = notificationsQ.data?.data ?? []
-    const chat = list.filter((n) => n.project_id === projectId && (n.resource_type === 'chat_message' || n.source === 'mention'))
-    return { unreadChatCount: chat.length, hasUnreadMention: chat.some((n) => n.source === 'mention') }
-  }, [notificationsQ.data, projectId])
-
-  const tabs = useMemo<SectionTabItem<WorkspaceTab>[]>(() => [
-    { value: 'board', label: 'Tablero', icon: <KanbanSquare className="size-4" /> },
-    {
-      value: 'chat', label: 'Conversación', icon: <MessageSquare className="size-4" />,
-      badge: unreadChatCount > 0
-        ? <NotificationCounterBadge count={unreadChatCount} maxCount={9} size="sm" hasMention={hasUnreadMention} />
-        : undefined,
-    },
-    { value: 'brief', label: 'Brief', icon: <FileText className="size-4" /> },
-    { value: 'contract', label: 'Contrato', icon: <FileSignature className="size-4" /> },
-    { value: 'change-requests', label: 'Solicitud de cambios', icon: <GitPullRequest className="size-4" /> },
-    { value: 'members', label: 'Integrantes', icon: <Users className="size-4" /> },
-  ], [unreadChatCount, hasUnreadMention])
+  const { tabs } = useWorkspaceTabs({ accessToken, projectId })
 
   if (initialTaskId !== prevInitialTaskId) {
     setPrevInitialTaskId(initialTaskId)
@@ -81,8 +57,17 @@ export function ProjectWorkspace({
   const isClient = identity.role === 'client'
   const canOperate = identity.role === 'admin' || identity.role === 'worker'
 
-  const { boardQ, briefQ, contractQ, changeRequestsQ } = useProjectWorkspaceData({ accessToken, projectId, activeTab, isClient })
-  const { moveTask, invalidateBoardScope } = useProjectBoardMutations({ accessToken, projectId, onError: (message) => setErrorMsg(message) })
+  const { boardQ, briefQ, contractQ, changeRequestsQ } = useProjectWorkspaceData({
+    accessToken,
+    projectId,
+    activeTab,
+    isClient,
+  })
+  const { moveTask, invalidateBoardScope } = useProjectBoardMutations({
+    accessToken,
+    projectId,
+    onError: (message) => setErrorMsg(message),
+  })
 
   const boardData = boardQ.data?.data
   const project = boardData?.project ?? projectMeta
@@ -91,24 +76,40 @@ export function ProjectWorkspace({
 
   const { boardColumns, boardTasks, tasksByColumn, taskIndexMap } = useBoardData(boardData?.board)
 
-  const handleTaskSearchDebounced = useCallback((value: string) => {
-    setTaskSearchDebounced(value)
-  }, [])
+  const { handleTaskSearchDebounced, searchableTasks, isSearching } = useWorkspaceTaskSearch({
+    accessToken,
+    projectId,
+    boardColumns,
+    boardTasks,
+    isTruncated,
+  })
 
-  const localSearchResults = useMemo(() => {
-    if (isTruncated) return []
-    const normalized = taskSearchDebounced.trim().toLowerCase()
-    if (normalized.length < 2) return []
-    return boardTasks
-      .filter((task) => {
-        const columnTitle = boardColumns.find((c) => c.id === task.columnId)?.title ?? ''
-        return [task.title, task.description ?? '', task.priority, columnTitle].join(' ').toLowerCase().includes(normalized)
+  const handleMoveTask = useCallback(
+    (taskId: string, targetColumnId: string) => {
+      setErrorMsg(null)
+      const task = taskIndexMap.get(taskId)
+      const targetColumn = boardColumns.find((column) => column.id === targetColumnId)
+      const hasSubtasks = (task?.subtasks?.length ?? 0) > 0
+      const isFinalColumn = targetColumn && FINALIZATION_COLUMN_KEYS.has(targetColumn.key)
+      if (task && isFinalColumn && hasSubtasks && task.checklistProgress < 100) {
+        setErrorMsg('No puedes mover la tarea a la columna final sin completar todas las subtareas')
+        return
+      }
+      moveTask.mutate({
+        taskId,
+        targetColumnId,
+        position: (tasksByColumn[targetColumnId] ?? []).length,
       })
-      .slice(0, 8)
-  }, [boardColumns, boardTasks, taskSearchDebounced, isTruncated])
+    },
+    [taskIndexMap, boardColumns, tasksByColumn, moveTask],
+  )
 
-  const { results: remoteSearchResults, isSearching } = useTaskSearch({ accessToken, projectId, rawQuery: taskSearchDebounced, enabled: isTruncated })
-  const searchableTasks = isTruncated ? remoteSearchResults : localSearchResults
+  const handleRefreshChangeRequests = useCallback(() => {
+    void changeRequestsQ?.refetch()
+    void queryClient.invalidateQueries({ queryKey: collabKeys.timeline(projectId) })
+    void queryClient.invalidateQueries({ queryKey: collabKeys.brief(projectId) })
+    void queryClient.invalidateQueries({ queryKey: collabKeys.pendingChangeRequests() })
+  }, [changeRequestsQ, queryClient, projectId])
 
   return (
     <div className="flex min-h-0 flex-col gap-5 min-w-0 w-full max-w-full overflow-hidden">
@@ -150,12 +151,11 @@ export function ProjectWorkspace({
       </div>
 
       <div className="min-h-0">
-        <div
-          id="tabpanel-board"
-          role="tabpanel"
-          aria-label="Tablero de tareas"
-          className={activeTab === 'board' ? 'tab-pane-transition' : undefined}
-          style={{ display: activeTab === 'board' ? 'block' : 'none' }}
+        <WorkspaceTabPanel
+          tab="board"
+          activeTab={activeTab}
+          isVisited={true}
+          ariaLabel="Tablero de tareas"
         >
           <div data-tour="workspace-task-search">
             <TaskSearchBar
@@ -167,7 +167,12 @@ export function ProjectWorkspace({
             />
           </div>
           {boardData?.board.tasksTruncated ? (
-            <Alert className="mb-3 border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
+            <Alert
+              className={[
+                'mb-3 border-amber-200 bg-amber-50 text-amber-950',
+                'dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100',
+              ].join(' ')}
+            >
               <AlertDescription>
                 Este proyecto tiene {boardData.board.tasksTotal ?? 'más de'}{' '}
                 {boardData.board.tasksLimit ?? 2000} tareas. Solo se muestran las primeras{' '}
@@ -185,125 +190,98 @@ export function ProjectWorkspace({
             members={members}
             canOperate={canOperate}
             isLoading={boardQ.isLoading}
-            onMoveTask={(taskId, targetColumnId) => {
-              setErrorMsg(null)
-              const task = taskIndexMap.get(taskId)
-              const targetColumn = boardColumns.find((column) => column.id === targetColumnId)
-              const hasSubtasks = (task?.subtasks?.length ?? 0) > 0
-              const isFinalColumn = targetColumn && FINALIZATION_COLUMN_KEYS.has(targetColumn.key)
-              if (task && isFinalColumn && hasSubtasks && task.checklistProgress < 100) {
-                setErrorMsg('No puedes mover la tarea a la columna final sin completar todas las subtareas')
-                return
-              }
-              moveTask.mutate({ taskId, targetColumnId,
-                position: (tasksByColumn[targetColumnId] ?? []).length })
-            }}
+            onMoveTask={handleMoveTask}
             onTaskSaved={invalidateBoardScope}
             onError={setErrorMsg}
             focusedTaskId={focusedTaskId}
           />
-        </div>
+        </WorkspaceTabPanel>
 
-        {visitedTabs.has('chat') && (
-          <div
-            id="tabpanel-chat"
-            role="tabpanel"
-            className={activeTab === 'chat' ? 'tab-pane-transition' : undefined}
-            style={{ display: activeTab === 'chat' ? 'block' : 'none' }}
-          >
-            <ConversationPanel
-              accessToken={accessToken}
-              projectId={projectId}
-              identity={identity}
-              isClient={isClient}
-              initialChannel={chatChannel}
-              initialMessageId={chatMessageId}
-              members={members}
-              tasks={boardTasks}
-              project={boardData?.project ?? null}
-              onError={setErrorMsg}
-              isVisible={activeTab === 'chat'}
-            />
-          </div>
-        )}
+        <WorkspaceTabPanel
+          tab="chat"
+          activeTab={activeTab}
+          isVisited={visitedTabs.has('chat')}
+          ariaLabel="Conversación del proyecto"
+        >
+          <ConversationPanel
+            accessToken={accessToken}
+            projectId={projectId}
+            identity={identity}
+            isClient={isClient}
+            initialChannel={chatChannel}
+            initialMessageId={chatMessageId}
+            members={members}
+            tasks={boardTasks}
+            project={boardData?.project ?? null}
+            onError={setErrorMsg}
+            isVisible={activeTab === 'chat'}
+          />
+        </WorkspaceTabPanel>
 
-        {visitedTabs.has('brief') && (
-          <div
-            id="tabpanel-brief"
-            role="tabpanel"
-            className={activeTab === 'brief' ? 'tab-pane-transition' : undefined}
-            style={{ display: activeTab === 'brief' ? 'block' : 'none' }}
-          >
-            <BriefPanel
-              brief={briefQ.data?.brief ?? null}
-              changeRequests={briefQ.data?.changeRequests ?? []}
-              isLoading={briefQ.isLoading}
-            />
-          </div>
-        )}
+        <WorkspaceTabPanel
+          tab="brief"
+          activeTab={activeTab}
+          isVisited={visitedTabs.has('brief')}
+          ariaLabel="Brief del proyecto"
+        >
+          <BriefPanel
+            brief={briefQ.data?.brief ?? null}
+            changeRequests={briefQ.data?.changeRequests ?? []}
+            isLoading={briefQ.isLoading}
+          />
+        </WorkspaceTabPanel>
 
-        {visitedTabs.has('contract') && (
-          <div
-            id="tabpanel-contract"
-            role="tabpanel"
-            className={activeTab === 'contract' ? 'tab-pane-transition' : undefined}
-            style={{ display: activeTab === 'contract' ? 'block' : 'none' }}
-          >
-            <ContractPanel
-              accessToken={accessToken}
-              project={boardData?.project ?? null}
-              contract={contractQ.data?.data ?? null}
-              members={members}
-              role={identity.role}
-              onError={setErrorMsg}
-            />
-          </div>
-        )}
+        <WorkspaceTabPanel
+          tab="contract"
+          activeTab={activeTab}
+          isVisited={visitedTabs.has('contract')}
+          ariaLabel="Contrato del proyecto"
+        >
+          <ContractPanel
+            accessToken={accessToken}
+            project={boardData?.project ?? null}
+            contract={contractQ.data?.data ?? null}
+            members={members}
+            role={identity.role}
+            onError={setErrorMsg}
+          />
+        </WorkspaceTabPanel>
 
-        {visitedTabs.has('change-requests') && (
-          <div
-            id="tabpanel-change-requests"
-            role="tabpanel"
-            className={activeTab === 'change-requests' ? 'tab-pane-transition' : undefined}
-            style={{ display: activeTab === 'change-requests' ? 'block' : 'none' }}
-          >
-            <ChangeRequestsPanel
-              accessToken={accessToken}
-              projectId={projectId}
-              identity={identity}
-              tasks={boardTasks}
-              members={members}
-              changeRequests={changeRequestsQ?.data?.data ?? []}
-              isLoading={changeRequestsQ?.isLoading ?? false}
-              onRefresh={() => {
-                void changeRequestsQ?.refetch()
-                void queryClient.invalidateQueries({ queryKey: collabKeys.timeline(projectId) })
-                void queryClient.invalidateQueries({ queryKey: collabKeys.brief(projectId) })
-                void queryClient.invalidateQueries({ queryKey: collabKeys.pendingChangeRequests() })
-              }}
-              onError={setErrorMsg}
-            />
-          </div>
-        )}
+        <WorkspaceTabPanel
+          tab="change-requests"
+          activeTab={activeTab}
+          isVisited={visitedTabs.has('change-requests')}
+          ariaLabel="Solicitudes de cambio"
+        >
+          <ChangeRequestsPanel
+            accessToken={accessToken}
+            projectId={projectId}
+            identity={identity}
+            tasks={boardTasks}
+            members={members}
+            changeRequests={changeRequestsQ?.data?.data ?? []}
+            isLoading={changeRequestsQ?.isLoading ?? false}
+            onRefresh={handleRefreshChangeRequests}
+            onError={setErrorMsg}
+          />
+        </WorkspaceTabPanel>
 
-        {visitedTabs.has('members') && (
-          <div
-            id="tabpanel-members"
-            role="tabpanel"
-            className={activeTab === 'members' ? 'tab-pane-transition' : undefined}
-            style={{ display: activeTab === 'members' ? 'block' : 'none' }}
-          >
-            <ProjectMembers
-              members={members}
-              isLoading={boardQ.isLoading}
-              accessToken={accessToken}
-              projectId={projectId}
-              identity={identity}
-              canManageMembers={identity.role === 'admin'}
-              onError={setErrorMsg}
-            />
-          </div>
-        )}
+        <WorkspaceTabPanel
+          tab="members"
+          activeTab={activeTab}
+          isVisited={visitedTabs.has('members')}
+          ariaLabel="Integrantes del proyecto"
+        >
+          <ProjectMembers
+            members={members}
+            isLoading={boardQ.isLoading}
+            accessToken={accessToken}
+            projectId={projectId}
+            identity={identity}
+            canManageMembers={identity.role === 'admin'}
+            onError={setErrorMsg}
+          />
+        </WorkspaceTabPanel>
       </div>
     </div>
   )

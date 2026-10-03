@@ -65,9 +65,15 @@ export function TaskColumn({
       }}
     >
       <div
-        className="flex items-center justify-between gap-2 border-b border-border/70 bg-card/90 px-3.5 py-3 rounded-t-2xl shrink-0 backdrop-blur-md"
+        className={[
+          'flex items-center justify-between gap-2 border-b border-border/70',
+          'bg-card/90 px-3.5 py-3 rounded-t-2xl shrink-0 backdrop-blur-md',
+        ].join(' ')}
       >
-        <h3 className="min-w-0 flex-1 truncate text-sm font-bold tracking-tight text-foreground leading-tight" title={column.title}>
+        <h3
+          className="min-w-0 flex-1 truncate text-sm font-bold tracking-tight text-foreground leading-tight"
+          title={column.title}
+        >
           {column.title}
         </h3>
         <div className="flex shrink-0 items-center gap-2">
@@ -76,7 +82,10 @@ export function TaskColumn({
               <Users className="size-3.5 text-muted-foreground" aria-label="Visible para el cliente" />
             </span>
           )}
-          <Badge variant="secondary" className="text-xs font-bold min-w-[1.5rem] justify-center tabular-nums shadow-2xs">
+          <Badge
+            variant="secondary"
+            className="text-xs font-bold min-w-[1.5rem] justify-center tabular-nums shadow-2xs"
+          >
             {tasks.length}
           </Badge>
           {canCreateTask && (
@@ -108,10 +117,20 @@ export function TaskColumn({
         aria-label={`Tareas de la columna ${column.title}`}
       >
         {tasks.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-center text-xs text-muted-foreground opacity-50">
-              {canDrag ? 'Arrastra tareas aqui' : 'Sin tareas'}
-            </p>
+          <div className="flex h-full min-h-[200px] items-center justify-center p-2">
+            <div
+              className={[
+                'flex size-full flex-col items-center justify-center rounded-xl border-2 border-dashed',
+                'p-4 text-center transition-all duration-200',
+                isDragOver
+                  ? 'border-primary/60 bg-primary/10 scale-[1.01]'
+                  : 'border-border/60 bg-card/30',
+              ].join(' ')}
+            >
+              <p className="text-xs font-medium text-muted-foreground/70">
+                {canDrag ? 'Arrastra tareas aquí' : 'Sin tareas'}
+              </p>
+            </div>
           </div>
         ) : (
           <div

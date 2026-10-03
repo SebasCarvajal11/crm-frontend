@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { Briefcase, CheckSquare2, Clock3, Crown, Mail, Plus, ShieldCheck, User, Users } from 'lucide-react'
+import { Plus, ShieldCheck, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { UserAvatar } from '@/components/atoms/user-avatar'
 import { UserSearch } from '@/components/molecules/user-search'
 import { UserChip } from '@/components/molecules/user-chip'
 import { useProjectMembers } from '@/features/collab/hooks'
@@ -9,11 +8,8 @@ import type { ProjectMember, ProjectMemberRole } from '@/features/collab/model'
 import type { ClientSearchResult } from '@/shared/types'
 import type { MeResponse } from '@/shared/types'
 import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
-import {
-  getMemberDisplayName as getDisplayName,
-  formatMemberDateLabel as formatDateLabel,
-  getMemberRelativeActivity as getRelativeActivityLabel,
-} from '@/features/collab/lib/member-display'
+import { getMemberDisplayName as getDisplayName } from '@/features/collab/lib/member-display'
+import { ProjectMemberCard, ROLE_CONFIG, getRoleDetail } from './project-member-card'
 
 type Props = {
   members: ProjectMember[]
@@ -25,35 +21,15 @@ type Props = {
   onError: (msg: string) => void
 }
 
-const ROLE_CONFIG: Record<ProjectMemberRole, { label: string; icon: React.ReactNode; badgeClass: string; cardClass: string }> = {
-  admin: {
-    label: 'Administrador',
-    icon: <Crown className="size-3.5" />,
-    badgeClass: 'bg-violet-100 text-violet-700 border-violet-200',
-    cardClass: 'border-l-violet-400',
-  },
-  worker: {
-    label: 'Trabajador',
-    icon: <Briefcase className="size-3.5" />,
-    badgeClass: 'bg-sky-100 text-sky-700 border-sky-200',
-    cardClass: 'border-l-sky-400',
-  },
-  client: {
-    label: 'Cliente',
-    icon: <User className="size-3.5" />,
-    badgeClass: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    cardClass: 'border-l-emerald-400',
-  },
-}
-
-function getRoleDetail(member: ProjectMember) {
-  if (member.role === 'worker') return member.profession?.trim() || 'Profesion no registrada'
-  if (member.role === 'client' && member.client_kind === 'juridical') return 'Cliente juridico'
-  return ROLE_CONFIG[member.role].label
-}
-
-
-export function ProjectMembers({ members, isLoading, accessToken, projectId, identity, canManageMembers, onError }: Props) {
+export function ProjectMembers({
+  members,
+  isLoading,
+  accessToken,
+  projectId,
+  identity,
+  canManageMembers,
+  onError,
+}: Props) {
   const [selectedWorkers, setSelectedWorkers] = useState<ClientSearchResult[]>([])
   const { membersQ, resolvedMembers, addWorker, memberAvatarUrl } = useProjectMembers({
     accessToken,
@@ -66,31 +42,61 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
   })
 
   if (isLoading || membersQ.isLoading) {
-    return <div className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} items-center justify-center rounded-xl border bg-card shadow-sm`}><div className="h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary" /></div>
+    return (
+      <div
+        className={[
+          'flex items-center justify-center rounded-xl border bg-card shadow-sm',
+          COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS,
+        ].join(' ')}
+        role="status"
+        aria-label="Cargando integrantes"
+      >
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary" />
+      </div>
+    )
   }
+
   if (resolvedMembers.length === 0) {
-    return <div data-tour="workspace-members-list" className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} flex-col items-center justify-center gap-3 rounded-xl border bg-card text-muted-foreground shadow-sm`}><Users className="size-10 opacity-20" /><p className="text-sm">No hay integrantes en este proyecto.</p></div>
+    return (
+      <div
+        data-tour="workspace-members-list"
+        className={[
+          'flex flex-col items-center justify-center gap-3 rounded-xl border',
+          'bg-card text-muted-foreground shadow-sm',
+          COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS,
+        ].join(' ')}
+      >
+        <Users className="size-10 opacity-20" aria-hidden="true" />
+        <p className="text-sm">No hay integrantes en este proyecto.</p>
+      </div>
+    )
   }
 
   const memberSubs = new Set(resolvedMembers.map((m) => m.userSub))
   const filteredSelection = selectedWorkers.filter((w) => !memberSubs.has(w.subject))
   const excludedWorkerSubjects = Array.from(new Set([
-    ...resolvedMembers
-      .filter((member) => member.role === 'worker')
-      .map((member) => member.userSub),
-    ...filteredSelection.map((worker) => worker.subject),
+    ...resolvedMembers.filter((m) => m.role === 'worker').map((m) => m.userSub),
+    ...filteredSelection.map((w) => w.subject),
   ]))
-  const byRole = resolvedMembers.reduce<Record<ProjectMemberRole, ProjectMember[]>>((acc, member) => {
-    acc[member.role] = [...acc[member.role], member]
-    return acc
-  }, { admin: [], worker: [], client: [] })
+  const byRole = resolvedMembers.reduce<Record<ProjectMemberRole, ProjectMember[]>>(
+    (acc, m) => {
+      acc[m.role] = [...acc[m.role], m]
+      return acc
+    },
+    { admin: [], worker: [], client: [] }
+  )
 
   return (
-    <div className={`grid gap-4 ${canManageMembers ? 'min-[1280px]:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.8fr)]' : ''}`}>
+    <div
+      className={`grid gap-4 ${
+        canManageMembers ? 'min-[1280px]:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.8fr)]' : ''
+      }`}
+    >
       {canManageMembers && (
         <section
           data-tour="workspace-members-invite"
-          className={`order-2 flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm min-[1280px]:order-2`}
+          className={`order-2 flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col ` +
+            'overflow-hidden rounded-xl border bg-card shadow-sm min-[1280px]:order-2'}
           aria-label="Gestionar integrantes"
         >
           <div className="border-b px-4 py-3">
@@ -146,7 +152,12 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
                   </p>
                 </div>
               </div>
-              <div className="rounded-lg bg-card/70 border border-border/60 p-2.5 text-[11px] text-muted-foreground space-y-1">
+              <div
+                className={
+                  'rounded-lg border border-border/60 bg-card/70 p-2.5 ' +
+                  'text-[11px] text-muted-foreground space-y-1'
+                }
+              >
                 <p className="font-semibold text-foreground text-[11px]">Permisos por rol:</p>
                 <p>• <strong>Administrador:</strong> Contratos, miembros y tablero.</p>
                 <p>• <strong>Trabajador:</strong> Tareas asignadas, chat y entregables.</p>
@@ -170,7 +181,8 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
 
       <section
         data-tour="workspace-members-list"
-        className={`order-1 flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm min-[1280px]:order-1`}
+        className={`order-1 flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col ` +
+          'overflow-hidden rounded-xl border bg-card shadow-sm min-[1280px]:order-1'}
         aria-label="Integrantes del proyecto"
       >
         <div className="border-b px-4 py-3">
@@ -185,13 +197,24 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
             if (count === 0) return null
             const cfg = ROLE_CONFIG[role]
             return (
-              <span key={role} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium ${cfg.badgeClass}`}>
+              <span
+                key={role}
+                className={
+                  'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 ' +
+                  `text-xs font-medium ${cfg.badgeClass}`
+                }
+              >
                 {cfg.icon}
                 {cfg.label}: {count}
               </span>
             )
           })}
-          <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground">
+          <span
+            className={
+              'ml-auto inline-flex items-center gap-1.5 rounded-full border bg-background ' +
+              'px-3 py-1.5 text-xs font-medium text-muted-foreground'
+            }
+          >
             <Users className="size-3.5" />
             {resolvedMembers.length} en total
           </span>
@@ -206,65 +229,35 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
         return (
           <section key={role} className="space-y-3">
             <div className="flex items-center gap-2">
-              <div className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${cfg.badgeClass}`}>
+              <div
+                className={
+                  'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 ' +
+                  `text-xs font-semibold ${cfg.badgeClass}`
+                }
+              >
                 {cfg.icon}
                 {cfg.label}
               </div>
               <div className="h-px flex-1 bg-border" />
             </div>
 
-            <div className={group.length === 1 ? 'grid gap-3' : 'grid gap-3 sm:grid-cols-2 min-[1280px]:grid-cols-3'}>
-              {group.map((member) => {
-                const displayName = getDisplayName(member)
-                const showEmailLine = Boolean(member.email && member.email !== displayName)
-                const avatarUrl = memberAvatarUrl(member.userSub, member.email)
-                return (
-                  <article key={member.userSub} className="rounded-xl border border-border/70 bg-card p-4 shadow-xs interactive-card hover:border-primary/30 transition-all">
-                    <div className="flex items-start gap-3">
-                      <UserAvatar
-                        src={avatarUrl}
-                        name={displayName}
-                        userId={member.userSub}
-                        size="lg"
-                        className="shrink-0"
-                      />
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <p className="truncate text-sm font-semibold" title={displayName}>{displayName}</p>
-                        <p className="truncate text-xs text-muted-foreground">{cfg.label} · {getRoleDetail(member)}</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-3 space-y-1.5 text-xs text-muted-foreground">
-                      {showEmailLine && (
-                        <p className="flex items-center gap-1.5 truncate">
-                          <Mail className="size-3.5 shrink-0" />
-                          <span className="truncate">{member.email}</span>
-                        </p>
-                      )}
-                      <p>Desde: {formatDateLabel(member.createdAt)}</p>
-                      {member.role !== 'admin' && (
-                        <p>
-                          Ultima actividad: {getRelativeActivityLabel(member.lastSeenAt)}
-                          {member.lastSeenAt ? <span className="ml-1 text-[10px]">({formatDateLabel(member.lastSeenAt)})</span> : null}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="mt-3 flex items-center justify-end gap-3 border-t pt-2.5 text-xs text-muted-foreground">
-                      {member.role !== 'admin' && (
-                        <span className="inline-flex items-center gap-1">
-                          <Clock3 className="size-3.5" />
-                          Activo en proyecto
-                        </span>
-                      )}
-                      <span className="inline-flex items-center gap-1">
-                        <CheckSquare2 className="size-3.5" />
-                        <strong className="text-foreground">{member.taskCount}</strong>
-                      </span>
-                    </div>
-                  </article>
-                )
-              })}
+            <div
+              className={
+                group.length === 1
+                  ? 'grid gap-3'
+                  : 'grid gap-3 sm:grid-cols-2 min-[1280px]:grid-cols-3'
+              }
+            >
+              {group.map((member) => (
+                <ProjectMemberCard
+                  key={member.userSub}
+                  member={member}
+                  displayName={getDisplayName(member)}
+                  avatarUrl={memberAvatarUrl(member.userSub, member.email)}
+                  roleLabel={cfg.label}
+                  roleDetail={getRoleDetail(member)}
+                />
+              ))}
             </div>
           </section>
         )
@@ -275,6 +268,3 @@ export function ProjectMembers({ members, isLoading, accessToken, projectId, ide
     </div>
   )
 }
-
-
-

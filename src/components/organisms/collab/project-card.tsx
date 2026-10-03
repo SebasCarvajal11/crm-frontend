@@ -22,7 +22,7 @@ export const ProjectCard = memo(function ProjectCard({ project, onClick }: Props
       type="button"
       onClick={onClick}
       aria-label={`Abrir proyecto ${project.name}, cliente ${project.clientName}, ${pct}% completado`}
-      className="group w-full text-left rounded-2xl border border-border/80 bg-card p-4 shadow-2xs hover:shadow-md hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer"
+      className="group w-full text-left rounded-2xl border border-border/80 bg-card p-4 shadow-2xs hover:shadow-md hover:border-primary/40 hover:-translate-y-0.5 active:scale-[0.985] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer"
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <span className="font-bold text-sm tracking-tight leading-snug line-clamp-2 group-hover:text-primary transition-colors">
@@ -56,7 +56,7 @@ export const ProjectCard = memo(function ProjectCard({ project, onClick }: Props
         </div>
         <div className="h-1.5 rounded-full bg-muted/80 overflow-hidden p-0.5">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${progressColor}`}
+            className={`h-full rounded-full transition-[width] duration-500 ease-out ${progressColor}`}
             style={{ width: `${Math.max(pct > 0 ? 6 : 0, pct)}%` }}
           />
         </div>
