@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/shared/lib/utils'
 import type { AdminPendingChangeRequestItem } from '../model/overview.types'
 
 type Props = {
@@ -91,10 +92,15 @@ function PendingChangeCard({
           variant="outline"
           size="sm"
           onClick={() => onOpenProject(item.projectId)}
-          className="shrink-0 gap-1.5 text-xs border-amber-300/80 hover:bg-amber-50 dark:border-amber-800 dark:hover:bg-amber-950/40"
+          className={cn(
+            "shrink-0 gap-1.5 text-xs border-amber-300/80 hover:bg-amber-50",
+            "dark:border-amber-800 dark:hover:bg-amber-950/40 group/btn"
+          )}
         >
           Revisar
-          <ExternalLink className="size-3.5" />
+          <ExternalLink
+            className="size-3.5 transition-transform duration-200 group-hover/btn:translate-x-0.5"
+          />
         </Button>
       )}
     </div>
@@ -107,7 +113,12 @@ export function OverviewAdminPendingChangeRequestsSection({
   onOpenProject,
 }: Props) {
   return (
-    <Card className="overview-panel overview-panel-attention min-w-0 w-full max-w-full overflow-hidden">
+    <Card
+      className={cn(
+        "overview-panel overview-panel-attention h-full flex flex-col",
+        "justify-between min-w-0 w-full max-w-full overflow-hidden"
+      )}
+    >
       <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
         <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">
@@ -123,20 +134,28 @@ export function OverviewAdminPendingChangeRequestsSection({
         {items.length > 0 && (
           <Badge
             variant="outline"
-            className="border-amber-300 bg-amber-100/70 text-amber-800 text-xs font-semibold shrink-0 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
+            className={cn(
+              "border-amber-300 bg-amber-100/70 text-amber-800 text-xs",
+              "font-semibold shrink-0 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
+            )}
           >
             {items.length} {items.length === 1 ? 'pendiente' : 'pendientes'}
           </Badge>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col flex-1 justify-between gap-3 min-w-0 w-full">
         {isLoading ? (
-          <div className="space-y-2.5">
+          <div className="space-y-2.5 flex-1 flex flex-col justify-center">
             <Skeleton className="h-16 w-full rounded-lg" />
             <Skeleton className="h-16 w-full rounded-lg" />
           </div>
         ) : items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-emerald-500/30 bg-emerald-500/[0.03] py-7 text-center">
+          <div
+            className={cn(
+              "flex flex-1 flex-col items-center justify-center rounded-lg border",
+              "border-dashed border-emerald-500/30 bg-emerald-500/[0.03] py-7 text-center"
+            )}
+          >
             <ShieldAlert className="size-7 text-emerald-500/80 mb-1.5 opacity-60" />
             <p className="text-sm font-medium text-foreground">Sin solicitudes pendientes</p>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -144,7 +163,7 @@ export function OverviewAdminPendingChangeRequestsSection({
             </p>
           </div>
         ) : (
-          <div className="space-y-2.5 max-h-[340px] overflow-y-auto scroll-smooth scrollbar-thin pr-1">
+          <div className="space-y-2.5 max-h-[320px] overflow-y-auto scroll-smooth scrollbar-thin pr-1 flex-1">
             {items.map((item) => (
               <PendingChangeCard
                 key={item.id}

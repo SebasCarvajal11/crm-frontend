@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/shared/lib/utils'
 import type { AdminBlockedTaskItem } from '../model/overview.types'
 
 type Props = {
@@ -25,7 +26,12 @@ export function OverviewAdminBlockedTasksSection({
   onOpenProject,
 }: Props) {
   return (
-    <Card className="overview-panel overview-panel-alert min-w-0 w-full max-w-full overflow-hidden">
+    <Card
+      className={cn(
+        "overview-panel overview-panel-warning h-full flex flex-col",
+        "justify-between min-w-0 w-full max-w-full overflow-hidden"
+      )}
+    >
       <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
         <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-2">
@@ -39,19 +45,30 @@ export function OverviewAdminBlockedTasksSection({
           </CardDescription>
         </div>
         {tasks.length > 0 && (
-          <Badge variant="destructive" className="text-xs font-semibold shrink-0">
-            {tasks.length} {tasks.length === 1 ? 'bloqueada' : 'bloqueadas'}
+          <Badge variant="destructive" className="gap-1.5 text-xs font-semibold shrink-0">
+            <span className="relative flex size-2">
+              <span
+                className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75"
+              />
+              <span className="relative inline-flex size-2 rounded-full bg-rose-500" />
+            </span>
+            <span>{tasks.length} {tasks.length === 1 ? 'bloqueada' : 'bloqueadas'}</span>
           </Badge>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col flex-1 justify-between gap-3 min-w-0 w-full max-w-full">
         {isLoading ? (
-          <div className="space-y-2.5">
+          <div className="space-y-2.5 flex-1 flex flex-col justify-center">
             <Skeleton className="h-16 w-full rounded-lg" />
             <Skeleton className="h-16 w-full rounded-lg" />
           </div>
         ) : tasks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-emerald-500/30 bg-emerald-500/[0.03] py-8 text-center">
+          <div
+            className={cn(
+              "flex flex-1 flex-col items-center justify-center rounded-lg border",
+              "border-dashed border-emerald-500/30 bg-emerald-500/[0.03] py-8 text-center"
+            )}
+          >
             <CheckCircle className="size-8 text-emerald-500/80 mb-2" />
             <p className="text-sm font-medium text-foreground">Flujo despejado</p>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -59,7 +76,7 @@ export function OverviewAdminBlockedTasksSection({
             </p>
           </div>
         ) : (
-          <div className="space-y-2.5 max-h-[320px] overflow-y-auto scroll-smooth scrollbar-thin pr-1">
+          <div className="space-y-2.5 max-h-[320px] overflow-y-auto scroll-smooth scrollbar-thin pr-1 flex-1">
             {tasks.map((task) => (
               <div
                 key={task.taskId}
@@ -96,10 +113,15 @@ export function OverviewAdminBlockedTasksSection({
                     variant="outline"
                     size="sm"
                     onClick={() => onOpenProject(task.projectId)}
-                    className="shrink-0 gap-1 text-xs border-destructive/40 hover:bg-destructive/10"
+                    className={cn(
+                      "shrink-0 gap-1 text-xs border-destructive/40",
+                      "hover:bg-destructive/10 group/btn"
+                    )}
                   >
                     <span>Desatascar</span>
-                    <ExternalLink className="size-3" />
+                    <ExternalLink
+                      className="size-3 transition-transform duration-200 group-hover/btn:translate-x-0.5"
+                    />
                   </Button>
                 )}
               </div>

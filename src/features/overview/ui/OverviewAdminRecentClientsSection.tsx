@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { UserAvatar } from '@/components/atoms/user-avatar'
+import { cn } from '@/shared/lib/utils'
 import { useSessionStore } from '@/app/session/session-store'
 import { useUserAvatars } from '@/shared/hooks'
 import type { AdminUserRow } from '@/features/admin/model'
@@ -34,7 +35,12 @@ export function OverviewAdminRecentClientsSection({ clients, isLoading }: Props)
   const { getAvatarUrl } = useUserAvatars(token, clientIds)
 
   return (
-    <Card className="overview-panel min-w-0 w-full max-w-full overflow-hidden">
+    <Card
+      className={cn(
+        "overview-panel h-full flex flex-col justify-between",
+        "min-w-0 w-full max-w-full overflow-hidden"
+      )}
+    >
       <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3 min-w-0 w-full">
         <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-2">
@@ -49,15 +55,20 @@ export function OverviewAdminRecentClientsSection({ clients, isLoading }: Props)
           {clients.length} {clients.length === 1 ? 'cliente' : 'clientes'}
         </Badge>
       </CardHeader>
-      <CardContent className="min-w-0 w-full max-w-full overflow-hidden">
+      <CardContent className="flex flex-col flex-1 justify-between gap-3 min-w-0 w-full max-w-full overflow-hidden">
         {isLoading ? (
-          <div className="space-y-2.5 min-w-0 w-full">
+          <div className="space-y-2.5 min-w-0 w-full flex-1 flex flex-col justify-center">
             <Skeleton className="h-12 w-full rounded-lg" />
             <Skeleton className="h-12 w-full rounded-lg" />
             <Skeleton className="h-12 w-full rounded-lg" />
           </div>
         ) : clients.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-8 text-center min-w-0 w-full">
+          <div
+            className={cn(
+              "flex flex-1 flex-col items-center justify-center rounded-lg border",
+              "border-dashed py-8 text-center min-w-0 w-full"
+            )}
+          >
             <Users className="size-8 text-muted-foreground/60 mb-2" />
             <p className="text-sm font-medium text-foreground">Sin clientes registrados</p>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -65,13 +76,16 @@ export function OverviewAdminRecentClientsSection({ clients, isLoading }: Props)
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-border/60 min-w-0 w-full max-w-full overflow-hidden">
+          <div className="divide-y divide-border/60 min-w-0 w-full max-w-full overflow-hidden flex-1">
             {clients.slice(0, 5).map((client) => {
               const name = getClientDisplayName(client)
               return (
                 <div
                   key={client.id}
-                  className="flex items-center justify-between gap-2.5 py-2.5 px-2 rounded-md interactive-row min-w-0 w-full overflow-hidden"
+                  className={cn(
+                    "flex items-center justify-between gap-2.5 py-2.5 px-2",
+                    "rounded-md interactive-row min-w-0 w-full overflow-hidden"
+                  )}
                 >
                   <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
                     <UserAvatar

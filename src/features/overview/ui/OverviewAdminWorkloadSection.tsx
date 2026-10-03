@@ -55,7 +55,7 @@ function WorkloadWorkerCard({ worker, avatarUrl }: { worker: WorkerWorkloadItem;
         </div>
         <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
           <div
-            className="h-full bg-emerald-500 transition-all duration-300"
+            className="h-full bg-emerald-500 rounded-full overview-progress-bar transition-all duration-300"
             style={{ width: `${worker.resolutionRate}%` }}
           />
         </div>

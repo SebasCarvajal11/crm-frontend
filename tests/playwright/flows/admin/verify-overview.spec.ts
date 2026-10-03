@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../../fixtures/auth.fixture'
 import path from 'path'
 import fs from 'fs'
 
@@ -16,15 +16,15 @@ test.describe('Verificación de Pestaña Resumen por Rol', () => {
     // 1920x1080
     await page.setViewportSize({ width: 1920, height: 1080 })
     await page.goto('/login')
-    await page.getByLabel('Correo').fill('admin@cima.dev')
-    await page.getByLabel(/contrase(?:n|ñ)a/i).fill('Admin123!')
+    await page.getByLabel('Correo').fill('gerente@cima.dev')
+    await page.locator('#password').fill('Demo123!')
     await page.getByRole('button', { name: 'Entrar' }).click()
     await page.waitForURL('**/dashboard**')
     await page.waitForTimeout(2000)
 
     // Sección Tu cuenta
     await expect(page.getByText('Tu cuenta')).toBeVisible()
-    await expect(page.getByRole('main').getByText('admin@cima.dev')).toBeVisible()
+    await expect(page.getByRole('main').getByText('gerente@cima.dev')).toBeVisible()
 
     // Documentación Swagger DEBE HABER SIDO ELIMINADA
     await expect(page.getByText('Documentación')).not.toBeVisible()
@@ -48,7 +48,17 @@ test.describe('Verificación de Pestaña Resumen por Rol', () => {
     // Sección exclusiva de Worker NO debe verse en Admin
     await expect(page.getByText('Mis tareas pendientes')).not.toBeVisible()
 
+    // Captura Ultra HD / 2K (2560x1440)
+    await page.setViewportSize({ width: 2560, height: 1440 })
+    await page.waitForTimeout(600)
+    await page.screenshot({
+      path: path.join(outputDir, 'overview-admin-2k-2560.png'),
+      fullPage: true,
+    })
+
     // Captura Desktop 1920x1080
+    await page.setViewportSize({ width: 1920, height: 1080 })
+    await page.waitForTimeout(600)
     await page.screenshot({
       path: path.join(outputDir, 'overview-admin-desktop-1920.png'),
       fullPage: true,
@@ -85,7 +95,7 @@ test.describe('Verificación de Pestaña Resumen por Rol', () => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/login')
     await page.getByLabel('Correo').fill('ana.martinez@cima.dev')
-    await page.getByLabel(/contrase(?:n|ñ)a/i).fill('Demo123!')
+    await page.locator('#password').fill('Demo123!')
     await page.getByRole('button', { name: 'Entrar' }).click()
     await page.waitForURL('**/dashboard**')
     await page.waitForTimeout(2000)
@@ -125,25 +135,17 @@ test.describe('Verificación de Pestaña Resumen por Rol', () => {
     })
   })
 
-  test('3. Client - Pestaña Resumen oculta y redirige a Colaboración', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 })
-    await page.goto('/login')
-    await page.getByLabel('Correo').fill('contacto@restauranteelbuensabor.com')
-    await page.getByLabel(/contrase(?:n|ñ)a/i).fill('Demo123!')
-    await page.getByRole('button', { name: 'Entrar' }).click()
-    await page.waitForURL('**/dashboard**')
-    await page.waitForTimeout(1500)
-
+  test('3. Client - Pestaña Resumen oculta y redirige a Colaboración', async ({ clientPage }) => {
     // En el sidebar no existe Resumen
-    const navButtons = await page
+    const navButtons = await clientPage
       .locator('aside:visible nav[aria-label="Navegacion principal"] button')
       .allInnerTexts()
     const cleanedTabs = navButtons.map((t) => t.trim())
     expect(cleanedTabs).not.toContain('Resumen')
 
     // Intento de navegación forzada a ?tab=overview
-    await page.goto('/dashboard?tab=overview')
-    await page.waitForTimeout(1000)
-    expect(page.url()).toContain('tab=collab')
+    await clientPage.goto('/dashboard?tab=overview')
+    await clientPage.waitForTimeout(1000)
+    expect(clientPage.url()).toContain('tab=collab')
   })
 })

@@ -1,40 +1,57 @@
-/* Resumen: paneles con esquinas redondeadas coherentes y elevación suave */
+/* Resumen: paneles operativos con elevación refinada, flex-stretch y auras sutiles */
 .overview-stage .overview-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  min-height: 100%;
   gap: 0;
   padding-block: 0 1.25rem;
   border: 1px solid var(--border);
-  border-top-width: 3px;
   border-radius: var(--radius-xl);
   background: var(--card);
   box-shadow: var(--shadow-xs);
-  transition: box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 220ms cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
 
 .overview-stage .overview-panel:hover {
+  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  border-color: color-mix(in srgb, var(--primary) 20%, var(--border));
+  border-color: color-mix(in srgb, var(--primary) 24%, var(--border));
 }
 
 .overview-stage .overview-panel-identity {
-  border-top-color: var(--primary);
-  background: color-mix(in srgb, var(--accent) 15%, var(--card));
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--accent) 18%, var(--card)) 0%,
+    var(--card) 100%
+  );
+  border-color: color-mix(in srgb, var(--primary) 18%, var(--border));
 }
 
 .overview-stage .overview-panel-news {
-  border-top-color: var(--foreground);
   background: var(--card);
 }
 
-.overview-stage .overview-panel-alert {
-  border-top-color: var(--destructive);
-  background: var(--card);
+.overview-stage .overview-panel-warning {
+  border-color: color-mix(in srgb, var(--destructive) 24%, var(--border));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--destructive) 3%, var(--card)) 0%,
+    var(--card) 100%
+  );
 }
 
 .overview-stage .overview-panel-attention {
-  border-top-color: var(--primary);
-  background: var(--card);
+  border-color: color-mix(in srgb, var(--primary) 28%, var(--border));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 12%, var(--card)) 0%,
+    var(--card) 100%
+  );
 }
 
 .overview-stage .overview-panel [data-slot='card-header'] {
@@ -114,6 +131,32 @@
   background: transparent;
 }
 
+/* Animación de llenado GPU para barras de progreso (sin reflow) */
+@keyframes overviewProgressFill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.overview-stage .overview-progress-bar {
+  transform-origin: left;
+  animation: overviewProgressFill 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Micro-interacción en filas interactivas de clientes y ranking */
+.overview-stage .interactive-row {
+  transition: background-color 160ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.overview-stage .interactive-row:hover {
+  transform: translateX(3px);
+  background-color: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
 @media (min-width: 640px) {
   .overview-stage .overview-kpi-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -154,9 +197,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .overview-stage .overview-panel,
   .overview-stage .overview-row,
   .overview-stage .overview-row::before,
-  .overview-stage .overview-kpi {
-    transition: none;
+  .overview-stage .overview-kpi,
+  .overview-stage .interactive-row,
+  .overview-stage .overview-progress-bar {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
   }
 }

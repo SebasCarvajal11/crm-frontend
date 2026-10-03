@@ -2,6 +2,7 @@ import type { MeResponse } from '@/features/auth/model'
 import { BarChart3 } from 'lucide-react'
 import { CimaLogo } from '@/components/ui/cima-logo'
 import { PageHeader } from '@/components/molecules/page-header'
+import { cn } from '@/shared/lib/utils'
 import type { ProjectListItem } from '@/features/collab/model'
 import type { WorkspaceTab } from '@/pages/dashboard/use-dashboard-navigation'
 import '@/features/overview/ui/overview.css'
@@ -107,23 +108,39 @@ export function DashboardOverview({
           description="Resumen ejecutivo y monitoreo en tiempo real de cuentas, proyectos y actividades."
           icon={BarChart3}
           actions={
-            <div className="flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 shadow-2xs">
-              <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div
+              className={cn(
+                "flex items-center gap-2 rounded-full border border-emerald-500/25",
+                "bg-emerald-500/10 px-3.5 py-1.5 text-xs font-semibold",
+                "text-emerald-700 dark:text-emerald-400 shadow-2xs"
+              )}
+            >
+              <span className="relative flex size-2 shrink-0">
+                <span
+                  className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"
+                />
+                <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+              </span>
               <span>Sistema Operativo • Conectado</span>
             </div>
           }
         />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] animate-fade-up stagger-1 min-w-0 w-full max-w-full">
-        <div data-tour="overview-identity" className="min-w-0 w-full max-w-full">
+      <div
+        className={cn(
+          "grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]",
+          "animate-fade-up stagger-1 min-w-0 w-full max-w-full items-stretch"
+        )}
+      >
+        <div data-tour="overview-identity" className="min-w-0 w-full max-w-full h-full">
           <OverviewIdentityCard
             identity={identity}
             avatarUrl={avatarUrl}
             onOpenProfile={onOpenProfile}
           />
         </div>
-        <div data-tour="overview-notifications" className="min-w-0 w-full max-w-full">
+        <div data-tour="overview-notifications" className="min-w-0 w-full max-w-full h-full">
           <OverviewNotificationsSection
             notifications={notifications}
             isLoading={isNotifLoading}
@@ -150,32 +167,46 @@ export function DashboardOverview({
       )}
 
       {isAdmin && (
-        <div className="space-y-8 animate-fade-up stagger-3 min-w-0 w-full max-w-full">
-          <div data-tour="overview-admin-changes" className="min-w-0 w-full max-w-full">
-            <OverviewAdminPendingChangeRequestsSection
-              items={adminPendingChangeRequests}
-              isLoading={isAdminPendingChangeRequestsLoading}
-              onOpenProject={(projectId) => onOpenProject?.(projectId, 'change-requests')}
-            />
+        <div className="space-y-6 min-w-0 w-full max-w-full">
+          {/* Zona de Triaje Operativo / Atención Inmediata */}
+          <div
+            className={cn(
+              "grid gap-6 lg:grid-cols-2 min-w-0 w-full max-w-full items-stretch",
+              "animate-fade-up stagger-3"
+            )}
+          >
+            <div data-tour="overview-admin-changes" className="min-w-0 w-full max-w-full h-full">
+              <OverviewAdminPendingChangeRequestsSection
+                items={adminPendingChangeRequests}
+                isLoading={isAdminPendingChangeRequestsLoading}
+                onOpenProject={(projectId) => onOpenProject?.(projectId, 'change-requests')}
+              />
+            </div>
+
+            <div data-tour="overview-admin-blocked" className="min-w-0 w-full max-w-full h-full">
+              <OverviewAdminBlockedTasksSection
+                tasks={adminBlockedTasks}
+                isLoading={isCollabLoading}
+                onOpenProject={onOpenProject}
+              />
+            </div>
           </div>
 
-          <div data-tour="overview-admin-blocked" className="min-w-0 w-full max-w-full">
-            <OverviewAdminBlockedTasksSection
-              tasks={adminBlockedTasks}
-              isLoading={isCollabLoading}
-              onOpenProject={onOpenProject}
-            />
-          </div>
-
-          <div className="grid gap-6 xl:grid-cols-2 min-w-0 w-full max-w-full">
-            <div data-tour="overview-recent-projects" className="min-w-0 w-full max-w-full">
+          {/* Matriz de Actividad Reciente */}
+          <div
+            className={cn(
+              "grid gap-6 lg:grid-cols-2 min-w-0 w-full max-w-full items-stretch",
+              "animate-fade-up stagger-4"
+            )}
+          >
+            <div data-tour="overview-recent-projects" className="min-w-0 w-full max-w-full h-full">
               <OverviewAdminRecentProjectsSection
                 projects={adminRecentProjects}
                 isLoading={isCollabLoading}
                 onOpenProject={onOpenProject}
               />
             </div>
-            <div data-tour="overview-admin-clients" className="min-w-0 w-full max-w-full">
+            <div data-tour="overview-admin-clients" className="min-w-0 w-full max-w-full h-full">
               <OverviewAdminRecentClientsSection
                 clients={recentClientsQ.data ?? []}
                 isLoading={recentClientsQ.isLoading}
@@ -183,14 +214,20 @@ export function DashboardOverview({
             </div>
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-2 min-w-0 w-full max-w-full">
-            <div data-tour="overview-admin-workload" className="min-w-0 w-full max-w-full">
+          {/* Matriz de Capacidad y Cartera */}
+          <div
+            className={cn(
+              "grid gap-6 lg:grid-cols-2 min-w-0 w-full max-w-full items-stretch",
+              "animate-fade-up stagger-4"
+            )}
+          >
+            <div data-tour="overview-admin-workload" className="min-w-0 w-full max-w-full h-full">
               <OverviewAdminWorkloadSection
                 workload={adminWorkerWorkload}
                 isLoading={isCollabLoading}
               />
             </div>
-            <div data-tour="overview-admin-ranking" className="min-w-0 w-full max-w-full">
+            <div data-tour="overview-admin-ranking" className="min-w-0 w-full max-w-full h-full">
               <OverviewAdminClientRankingSection
                 items={adminClientRanking}
                 isLoading={isCollabLoading}
