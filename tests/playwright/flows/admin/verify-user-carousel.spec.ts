@@ -64,4 +64,37 @@ test.describe('Admin - Carrusel Interactivo de Directorio de Usuarios', () => {
     const carouselRegion = adminPage.getByRole('region', { name: /directorio de usuarios interactivo/i })
     await expect(carouselRegion).toBeVisible()
   })
+
+  test('pausa el movimiento automático al pasar el cursor (hover) y lo reanuda al salir', async ({ adminPage }) => {
+    const admin = new AdminPage(adminPage)
+    await admin.expectLoaded()
+
+    const carouselRegion = adminPage.getByRole('region', { name: /directorio de usuarios interactivo/i })
+    await expect(carouselRegion).toBeVisible()
+
+    // En estado inicial sin hover muestra badge Auto
+    await expect(carouselRegion.getByText(/auto/i)).toBeVisible({ timeout: 5_000 })
+    await carouselRegion.scrollIntoViewIfNeeded()
+
+    const scrollContainer = carouselRegion.locator('.overflow-x-auto')
+    const initialPos = await scrollContainer.evaluate((el) => el.scrollLeft)
+    await adminPage.waitForTimeout(1500)
+    const movingPos = await scrollContainer.evaluate((el) => el.scrollLeft)
+    expect(movingPos).toBeGreaterThanOrEqual(initialPos + 15)
+
+    // Al hacer hover se pausa inmediatamente
+    await carouselRegion.hover()
+    await expect(carouselRegion.getByText(/en pausa/i)).toBeVisible({ timeout: 5_000 })
+    const hoverPos1 = await scrollContainer.evaluate((el) => el.scrollLeft)
+    await adminPage.waitForTimeout(1000)
+    const hoverPos2 = await scrollContainer.evaluate((el) => el.scrollLeft)
+    expect(hoverPos2).toBe(hoverPos1)
+
+    // Al mover el cursor fuera del carrusel se reanuda
+    await adminPage.mouse.move(0, 0)
+    await expect(carouselRegion.getByText(/auto/i)).toBeVisible({ timeout: 5_000 })
+    await adminPage.waitForTimeout(1500)
+    const resumedPos = await scrollContainer.evaluate((el) => el.scrollLeft)
+    expect(resumedPos).toBeGreaterThan(hoverPos2)
+  })
 })
