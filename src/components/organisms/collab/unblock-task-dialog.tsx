@@ -6,6 +6,8 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
+  DialogBody,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -52,31 +54,35 @@ export function UnblockTaskDialog({
 
   return (
     <Dialog open={open} onOpenChange={(next) => !isPending && !next && onClose()}>
-      <DialogContent className="sm:max-w-md font-sans">
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <DialogContent size="md">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
           <DialogHeader>
-            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-              <CheckCircle2 className="size-5 shrink-0" aria-hidden="true" />
-              <DialogTitle className="text-base font-semibold">Desbloquear Tarea</DialogTitle>
+            <div className="flex items-center gap-3">
+              <DialogMedia variant="success">
+                <CheckCircle2 className="size-5" aria-hidden="true" />
+              </DialogMedia>
+              <div className="space-y-0.5">
+                <DialogTitle>Desbloquear Tarea</DialogTitle>
+                <DialogDescription>
+                  Reactivar el flujo de trabajo para:{' '}
+                  <span className="font-medium text-foreground">&ldquo;{taskTitle}&rdquo;</span>.
+                </DialogDescription>
+              </div>
             </div>
-            <DialogDescription className="text-xs text-muted-foreground text-left pt-1">
-              Reactivar el flujo de trabajo para:{' '}
-              <span className="font-medium text-foreground">&ldquo;{taskTitle}&rdquo;</span>.
-            </DialogDescription>
           </DialogHeader>
 
-          <div className="px-5 py-2 sm:px-6 space-y-4">
+          <DialogBody className="space-y-3.5">
             {blockReason && (
-              <div className="rounded-md border border-border bg-muted/40 p-2.5 text-left text-xs space-y-1">
-                <span className="font-medium text-muted-foreground block">
+              <div className="rounded-xl border border-border/70 bg-muted/30 p-3 text-left text-xs space-y-1 shadow-2xs">
+                <span className="font-medium text-muted-foreground block text-[11px]">
                   Motivo original del bloqueo ({isClientTimeout ? 'Timeout de Cliente' : 'Impedimento Interno'}):
                 </span>
-                <p className="text-foreground italic">{blockReason}</p>
+                <p className="text-foreground italic leading-relaxed">{blockReason}</p>
               </div>
             )}
 
             <div className="space-y-1.5 text-left">
-              <Label htmlFor="unblock-comment" className="text-xs font-medium">
+              <Label htmlFor="unblock-comment" className="text-xs font-semibold text-foreground/90">
                 Comentario de resolución <span className="text-muted-foreground font-normal">(opcional)</span>
               </Label>
               <Textarea
@@ -84,23 +90,30 @@ export function UnblockTaskDialog({
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Explica cómo se resolvió el impedimento..."
-                rows={2}
+                rows={3}
                 maxLength={300}
-                className="text-xs resize-none"
+                className="text-xs resize-none rounded-xl"
                 disabled={isPending}
               />
             </div>
-          </div>
+          </DialogBody>
 
-          <DialogFooter className="gap-2 sm:gap-0 pt-2">
-            <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={isPending}>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onClose}
+              disabled={isPending}
+              className="text-xs"
+            >
               Cancelar
             </Button>
             <Button
               type="submit"
               size="sm"
               disabled={isPending}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 text-xs font-semibold shadow-2xs"
             >
               {isPending ? (
                 <>

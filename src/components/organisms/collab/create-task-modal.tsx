@@ -7,6 +7,8 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
+  DialogBody,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -80,20 +82,15 @@ export function CreateTaskModal({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => { if (!nextOpen) handleClose() }}>
-      <DialogContent className="max-w-xl p-0 overflow-hidden border-border/60 shadow-xl">
-        <DialogHeader className="px-5 pt-5 pb-4 border-b border-border/50 bg-muted/20">
+      <DialogContent size="xl">
+        <DialogHeader>
           <div className="flex items-center gap-3">
-            <div
-              className={
-                'flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary ' +
-                'shrink-0 ring-1 ring-primary/20 shadow-2xs'
-              }
-            >
+            <DialogMedia variant="default">
               <ListTodo className="size-5" />
-            </div>
+            </DialogMedia>
             <div>
-              <DialogTitle className="text-base font-bold text-foreground tracking-tight">Nueva tarea</DialogTitle>
-              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+              <DialogTitle>Nueva tarea</DialogTitle>
+              <DialogDescription>
                 {column
                   ? `Completa los datos para crear la tarea en ${column.title}.`
                   : 'Completa los datos para crear la tarea en el tablero.'}
@@ -104,12 +101,13 @@ export function CreateTaskModal({
 
         <form
           id="create-task-form"
-          className="space-y-4 px-5 py-4 sm:px-6 max-h-[75vh] overflow-y-auto"
+          className="flex flex-col flex-1 min-h-0"
           onSubmit={(event) => {
             event.preventDefault()
             createTask.mutate()
           }}
         >
+          <DialogBody className="space-y-4 max-h-[65vh]">
           <div className="space-y-1.5">
             <Label htmlFor="ct-title" className="text-xs font-semibold text-foreground/90">
               Título <span className="text-destructive">*</span>
@@ -256,18 +254,17 @@ export function CreateTaskModal({
             onAddSubtask={handleAddSubtask}
             onRemoveSubtask={(subtaskId) => setSubtasks((prev) => prev.filter((entry) => entry.id !== subtaskId))}
           />
+          </DialogBody>
         </form>
 
-        <DialogFooter
-          className="px-5 py-3.5 sm:px-6 border-t border-border/50 bg-muted/15 flex items-center justify-end gap-2.5"
-        >
+        <DialogFooter>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={handleClose}
             disabled={createTask.isPending}
-            className="rounded-lg text-xs"
+            className="text-xs"
           >
             Cancelar
           </Button>
@@ -276,7 +273,7 @@ export function CreateTaskModal({
             size="sm"
             form="create-task-form"
             disabled={!canSubmit || createTask.isPending}
-            className="rounded-lg text-xs shadow-xs"
+            className="text-xs font-semibold shadow-2xs"
           >
             {createTask.isPending ? 'Creando...' : 'Crear tarea'}
           </Button>

@@ -7,10 +7,12 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
   DialogTitle,
 } from '@/components/ui/dialog'
 import type {
@@ -42,32 +44,25 @@ export function WorkflowFormDialog({
 }: WorkflowFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="max-w-md p-0 overflow-hidden border-border/60 shadow-xl">
-        <form onSubmit={onSubmit}>
-          <DialogHeader className="px-5 pt-5 pb-4 border-b border-border/50 bg-muted/20">
-            <div className="flex items-center gap-3">
-              <div
-                className={[
-                  'flex size-10 shrink-0 items-center justify-center rounded-xl',
-                  'bg-primary/10 text-primary ring-1 ring-primary/20 shadow-2xs',
-                ].join(' ')}
-              >
-                <Zap className="size-5" />
-              </div>
-              <div>
-                <DialogTitle className="text-base font-bold text-foreground tracking-tight">
-                  Nueva Automatización
-                </DialogTitle>
-                <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                  Configura el disparador, la acción y la plantilla de mensaje
-                </DialogDescription>
-              </div>
+      <DialogContent size="lg">
+        <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0">
+          <DialogHeader>
+            <DialogMedia variant="default">
+              <Zap className="size-5" />
+            </DialogMedia>
+            <div className="flex flex-col gap-1 text-left min-w-0">
+              <DialogTitle>
+                Nueva Automatización
+              </DialogTitle>
+              <DialogDescription>
+                Configura el disparador, la acción y la plantilla de mensaje
+              </DialogDescription>
             </div>
           </DialogHeader>
 
-          <div className="space-y-3 px-5 py-4 text-xs sm:px-6">
-            <div>
-              <Label htmlFor="wfName" className="text-xs font-semibold">
+          <DialogBody className="space-y-3.5 text-xs">
+            <div className="space-y-1.5">
+              <Label htmlFor="wfName" className="text-xs font-medium text-foreground/90">
                 Nombre del Flujo *
               </Label>
               <Input
@@ -78,12 +73,12 @@ export function WorkflowFormDialog({
                 onChange={(e) =>
                   onFormDataChange({ ...formData, workflowName: e.target.value })
                 }
-                className="mt-1 text-xs"
+                className="h-9 rounded-xl border-border/70 text-xs"
               />
             </div>
 
-            <div>
-              <Label htmlFor="campaignSelect" className="text-xs font-semibold">
+            <div className="space-y-1.5">
+              <Label htmlFor="campaignSelect" className="text-xs font-medium text-foreground/90">
                 Campaña Vinculada *
               </Label>
               <NativeSelect
@@ -92,6 +87,7 @@ export function WorkflowFormDialog({
                 onChange={(e) =>
                   onFormDataChange({ ...formData, campaignId: Number(e.target.value) })
                 }
+                className="rounded-xl border-border/70 text-xs"
               >
                 {campaigns.map((c) => (
                   <option key={c.campaignId} value={c.campaignId}>
@@ -101,9 +97,9 @@ export function WorkflowFormDialog({
               </NativeSelect>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="triggerType" className="text-xs font-semibold">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="triggerType" className="text-xs font-medium text-foreground/90">
                   Disparador
                 </Label>
                 <NativeSelect
@@ -115,6 +111,7 @@ export function WorkflowFormDialog({
                       triggerType: e.target.value as TriggerType,
                     })
                   }
+                  className="rounded-xl border-border/70 text-xs"
                 >
                   {TRIGGER_TYPES.map((t) => (
                     <option key={t.value} value={t.value}>
@@ -124,8 +121,8 @@ export function WorkflowFormDialog({
                 </NativeSelect>
               </div>
 
-              <div>
-                <Label htmlFor="actionType" className="text-xs font-semibold">
+              <div className="space-y-1.5">
+                <Label htmlFor="actionType" className="text-xs font-medium text-foreground/90">
                   Acción a Ejecutar
                 </Label>
                 <NativeSelect
@@ -137,6 +134,7 @@ export function WorkflowFormDialog({
                       actionType: e.target.value as ActionType,
                     })
                   }
+                  className="rounded-xl border-border/70 text-xs"
                 >
                   {ACTION_TYPES.map((a) => (
                     <option key={a.value} value={a.value}>
@@ -148,8 +146,8 @@ export function WorkflowFormDialog({
             </div>
 
             {formData.triggerType === 'no_contact_x_days' && (
-              <div>
-                <Label htmlFor="noContactDays" className="text-xs font-semibold">
+              <div className="space-y-1.5">
+                <Label htmlFor="noContactDays" className="text-xs font-medium text-foreground/90">
                   Días sin contacto antes de disparar
                 </Label>
                 <Input
@@ -164,13 +162,13 @@ export function WorkflowFormDialog({
                       noContactDays: Number(e.target.value),
                     })
                   }
-                  className="mt-1 text-xs"
+                  className="h-9 rounded-xl border-border/70 text-xs"
                 />
               </div>
             )}
 
-            <div>
-              <Label htmlFor="msgTemplate" className="text-xs font-semibold">
+            <div className="space-y-1.5">
+              <Label htmlFor="msgTemplate" className="text-xs font-medium text-foreground/90">
                 Plantilla de Mensaje
               </Label>
               <Textarea
@@ -181,24 +179,24 @@ export function WorkflowFormDialog({
                   onFormDataChange({ ...formData, messageTemplate: e.target.value })
                 }
                 placeholder="Usa {nombre} y {workflow} para personalización automática…"
-                className="mt-1 min-h-24 resize-y text-xs"
+                className="min-h-24 resize-y rounded-xl border-border/70 text-xs"
               />
-              <p className="text-[10px] text-muted-foreground mt-1">
-                Variables disponibles: <code className="font-bold">{'{nombre}'}</code>,{' '}
-                <code className="font-bold">{'{workflow}'}</code>
+              <p className="text-[10px] text-muted-foreground">
+                Variables disponibles: <code className="font-semibold">{'{nombre}'}</code>,{' '}
+                <code className="font-semibold">{'{workflow}'}</code>
               </p>
             </div>
-          </div>
+          </DialogBody>
 
-          <DialogFooter className="px-5 py-3 border-t border-border/50 bg-muted/15 flex items-center justify-end gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={onClose} className="rounded-lg text-xs">
+          <DialogFooter>
+            <Button type="button" variant="outline" size="sm" onClick={onClose} className="rounded-xl text-xs">
               Cancelar
             </Button>
             <Button
               type="submit"
               size="sm"
               disabled={isPending}
-              className="rounded-lg text-xs font-semibold shadow-2xs"
+              className="rounded-xl text-xs font-medium shadow-xs"
             >
               {isPending ? 'Guardando…' : 'Crear Flujo'}
             </Button>

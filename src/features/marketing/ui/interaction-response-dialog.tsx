@@ -3,10 +3,12 @@ import { MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
@@ -33,34 +35,38 @@ function FormFields({
   formError,
 }: FormFieldsProps) {
   return (
-    <div className="space-y-4 px-5 py-4 sm:px-6">
-      <div className="rounded-md bg-muted/50 p-3 text-sm">
-        <p className="font-medium">{clientLabel}</p>
-        <p className="text-xs text-muted-foreground">
+    <DialogBody className="space-y-4">
+      <div className="rounded-xl border border-border/70 bg-muted/30 p-3.5 text-xs shadow-2xs">
+        <p className="font-semibold text-foreground tracking-tight">{clientLabel}</p>
+        <p className="mt-1 text-muted-foreground">
           Contactado el {formatDateTime(target.contactDate)} por{' '}
           {target.channel ?? 'canal no especificado'}
         </p>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="responseText">¿Qué respondió el cliente?</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="responseText" className="text-xs font-medium text-foreground/90">
+          ¿Qué respondió el cliente?
+        </Label>
         <textarea
           id="responseText"
           rows={3}
           value={responseText}
           onChange={(e) => setResponseText(e.target.value)}
           placeholder="Me interesa la propuesta, agendemos una reunión…"
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="w-full rounded-xl border border-border/70 bg-background px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="responseType">Tipo de respuesta</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="responseType" className="text-xs font-medium text-foreground/90">
+          Tipo de respuesta
+        </Label>
         <select
           id="responseType"
           value={responseType}
           onChange={(e) => setResponseType(e.target.value as InteractionType)}
-          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          className="h-9 w-full rounded-xl border border-border/70 bg-background px-3 text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
         >
           {INTERACTION_TYPES.filter((t) => t.esRespuesta).map((t) => (
             <option key={t.value} value={t.value}>
@@ -68,17 +74,17 @@ function FormFields({
             </option>
           ))}
         </select>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-[11px] text-muted-foreground">
           Solo estos tipos cuentan como respuesta efectiva en el indicador de conversión.
         </p>
       </div>
 
       {formError && (
-        <div className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+        <div className="rounded-xl border border-destructive/40 bg-destructive/5 px-3.5 py-2.5 text-xs text-destructive">
           {formError}
         </div>
       )}
-    </div>
+    </DialogBody>
   )
 }
 
@@ -116,10 +122,10 @@ function InteractionResponseForm({ target, clientLabel, isPending, onClose, onSu
         formError={formError}
       />
       <DialogFooter>
-        <Button variant="outline" onClick={onClose} disabled={isPending}>
+        <Button variant="outline" size="sm" onClick={onClose} disabled={isPending} className="rounded-xl text-xs">
           Cancelar
         </Button>
-        <Button onClick={handleSubmit} disabled={isPending}>
+        <Button size="sm" onClick={handleSubmit} disabled={isPending} className="rounded-xl text-xs font-medium shadow-xs">
           {isPending ? 'Guardando…' : 'Registrar respuesta'}
         </Button>
       </DialogFooter>
@@ -144,21 +150,16 @@ export function InteractionResponseDialog({
 }: InteractionResponseDialogProps) {
   return (
     <Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader className="flex flex-row items-start gap-3 space-y-0">
-          <div
-            className={[
-              'flex size-10 shrink-0 items-center justify-center rounded-xl',
-              'bg-primary/10 text-primary ring-1 ring-primary/20 shadow-2xs',
-            ].join(' ')}
-          >
+      <DialogContent size="md">
+        <DialogHeader>
+          <DialogMedia variant="default">
             <MessageSquare className="size-5" />
-          </div>
-          <div className="flex flex-col gap-1 text-left">
-            <DialogTitle className="text-base font-semibold tracking-tight">
+          </DialogMedia>
+          <div className="flex flex-col gap-1 text-left min-w-0">
+            <DialogTitle>
               Registrar respuesta del cliente
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
+            <DialogDescription>
               Se actualiza la misma interacción, no se crea una nueva. Este dato alimenta la tasa de
               respuesta.
             </DialogDescription>

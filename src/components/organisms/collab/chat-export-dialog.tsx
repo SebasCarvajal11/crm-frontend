@@ -6,6 +6,8 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
+  DialogBody,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -95,24 +97,22 @@ export function ChatExportDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent size="lg">
         <DialogHeader>
-          <div className="flex items-start sm:items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0 ring-1 ring-primary/20">
+          <div className="flex items-center gap-3">
+            <DialogMedia variant="default">
               <ShieldCheck className="size-5" />
-            </div>
+            </DialogMedia>
             <div className="space-y-0.5 min-w-0 pr-8">
-              <DialogTitle className="text-base font-semibold text-foreground">
-                Registro Probatorio de Conversación
-              </DialogTitle>
-              <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
+              <DialogTitle>Registro Probatorio de Conversación</DialogTitle>
+              <DialogDescription>
                 Exportación oficial certificada bajo estándares de mensajes de datos y trazabilidad forense.
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="space-y-4 px-5 py-4 sm:px-6 text-sm">
+        <DialogBody className="space-y-4">
           <div className="rounded-xl border border-border/80 bg-muted/25 p-3.5 space-y-2 text-xs">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-2 border-b border-border/40">
               <div className="space-y-0.5 min-w-0">
@@ -194,9 +194,9 @@ export function ChatExportDialog({
               <p className="font-mono text-[10px] break-all text-muted-foreground">{lastGeneratedHash}</p>
             </div>
           )}
-        </div>
+        </DialogBody>
 
-        <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
+        <DialogFooter>
           <Button
             type="button"
             variant="outline"
@@ -212,7 +212,7 @@ export function ChatExportDialog({
             size="default"
             onClick={handleExport}
             disabled={!custodyAgreed || isExporting}
-            className="w-full sm:w-auto gap-2 text-xs bg-primary text-primary-foreground hover:bg-primary/90"
+            className="w-full sm:w-auto gap-2 text-xs font-semibold shadow-2xs"
           >
             {isExporting ? (
               <>

@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { AlertTriangle, Trash2, CheckCircle2, Loader2 } from 'lucide-react'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogMedia,
+  DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -75,25 +77,23 @@ export function FilePurgeDialog({ file, isOpen, onClose, onConfirm }: Props) {
         onClose()
       }
     }}>
-      <DialogContent className="max-w-md">
+      <DialogContent size="md">
         <DialogHeader>
-          <div className="flex items-start sm:items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-600 shrink-0 ring-1 ring-rose-500/20">
-              <Trash2 className="size-5" />
-            </div>
-            <div className="space-y-0.5 min-w-0 pr-8">
-              <DialogTitle className="text-base font-semibold text-foreground">
-                Depurar Archivo para Liberar Espacio
-              </DialogTitle>
-              <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
-                Esta acción eliminará el archivo binario en la nube para recuperar espacio
-                en la cuota de almacenamiento.
-              </DialogDescription>
-            </div>
+          <DialogMedia variant="destructive">
+            <Trash2 className="size-5" />
+          </DialogMedia>
+          <div className="flex flex-col gap-1 text-left min-w-0">
+            <DialogTitle>
+              Depurar archivo para liberar espacio
+            </DialogTitle>
+            <DialogDescription>
+              Esta acción eliminará el archivo binario en la nube para recuperar espacio
+              en la cuota de almacenamiento.
+            </DialogDescription>
           </div>
         </DialogHeader>
 
-        <div className="space-y-3.5 px-5 py-4 sm:px-6 text-sm">
+        <DialogBody className="space-y-4">
           <div className="rounded-xl border border-border/80 bg-muted/25 p-3.5 space-y-2 text-xs">
             <div className="space-y-0.5">
               <span className="text-[11px] font-medium text-muted-foreground block">Archivo</span>
@@ -147,7 +147,7 @@ export function FilePurgeDialog({ file, isOpen, onClose, onConfirm }: Props) {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Ej. Proyecto cerrado hace más de 6 meses"
-              className="text-xs h-9"
+              className="text-xs h-9 rounded-xl border-border/70"
               disabled={loading}
             />
           </div>
@@ -180,33 +180,33 @@ export function FilePurgeDialog({ file, isOpen, onClose, onConfirm }: Props) {
               <span>{errorMessage}</span>
             </div>
           )}
-        </div>
+        </DialogBody>
 
-        <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
+        <DialogFooter>
           <Button
             variant="outline"
-            size="default"
+            size="sm"
             onClick={onClose}
             disabled={loading}
-            className="w-full sm:w-auto text-xs"
+            className="w-full sm:w-auto text-xs rounded-xl"
           >
             Cancelar
           </Button>
           <Button
             variant="destructive"
-            size="default"
+            size="sm"
             onClick={handleConfirm}
             disabled={loading || (isSigned && !forceSigned)}
-            className="w-full sm:w-auto gap-2 text-xs"
+            className="w-full sm:w-auto gap-2 text-xs rounded-xl font-medium shadow-xs"
           >
             {loading ? (
               <>
-                <Loader2 className="size-4 animate-spin" />
+                <Loader2 className="size-3.5 animate-spin" />
                 <span>Depurando... {progress}%</span>
               </>
             ) : (
               <>
-                <CheckCircle2 className="size-4" />
+                <CheckCircle2 className="size-3.5" />
                 <span>Confirmar y Liberar Espacio</span>
               </>
             )}

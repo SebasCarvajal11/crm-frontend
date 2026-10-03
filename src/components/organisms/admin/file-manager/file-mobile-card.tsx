@@ -107,6 +107,7 @@ export function FileMobileCard({
                 size="sm"
                 className="h-7 text-xs gap-1 px-2 text-destructive hover:bg-destructive/10"
                 onClick={() => onSelectForPurge(file)}
+                title="Depurar para liberar espacio"
               >
                 <Trash2 className="size-3" />
                 Depurar

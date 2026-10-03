@@ -104,10 +104,10 @@ export function AdminUserActions({
             Archivar
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent size="sm">
           <AlertDialogHeader>
-            <AlertDialogMedia>
-              <ShieldAlert className="size-6 text-destructive" />
+            <AlertDialogMedia variant="destructive">
+              <ShieldAlert className="size-5" />
             </AlertDialogMedia>
             <AlertDialogTitle>Archivar usuario</AlertDialogTitle>
             <AlertDialogDescription>
@@ -116,9 +116,9 @@ export function AdminUserActions({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl text-xs">Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl text-xs font-medium"
               onClick={() => {
                 clearActionMessage()
                 softDelete.mutate(row.id)

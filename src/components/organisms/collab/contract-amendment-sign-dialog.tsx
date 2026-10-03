@@ -8,7 +8,9 @@ import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
+  DialogMedia,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { SignaturePad } from '@/components/molecules/signature-pad'
@@ -66,54 +68,63 @@ export function ContractAmendmentSignDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="border-b px-5 py-3.5 bg-muted/20">
-          <DialogTitle className="flex items-center gap-2 text-sm font-semibold text-foreground">
-            <PenLine className="size-4 text-primary" />
-            Revisar y Firmar Otrosí N° {numStr}
-          </DialogTitle>
+      <DialogContent size="4xl" className="max-h-[92vh]">
+        <DialogHeader>
+          <div className="flex items-center gap-3">
+            <DialogMedia variant="default">
+              <PenLine className="size-5" />
+            </DialogMedia>
+            <div className="space-y-0.5">
+              <DialogTitle>Revisar y Firmar Otrosí N° {numStr}</DialogTitle>
+              <DialogDescription>
+                Valida las estipulaciones contractuales y estampa tu firma manuscrita digital bajo la Ley 527/1999.
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
-        <div className="flex-1 grid gap-4 p-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,22rem)] overflow-hidden">
-          <div className="h-[20rem] lg:h-[28rem] overflow-y-auto pr-1">
+        <div className="flex-1 grid gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,22rem)] overflow-hidden">
+          <div className="h-[20rem] lg:h-[28rem] overflow-y-auto pr-1 rounded-xl border border-border/70 bg-card p-3 shadow-inner scrollbar-thin">
             <ContractDocumentReader
               content={amendment.contentSnapshot || amendment.serviceScope}
             />
           </div>
 
-          <div className="flex flex-col space-y-3 overflow-y-auto rounded-xl border bg-card p-3 text-xs">
+          <div className="flex flex-col space-y-3.5 overflow-y-auto rounded-xl border border-border/70 bg-muted/20 p-4 text-xs shadow-2xs">
             <div>
-              <Label className="mb-1 block font-medium">Nombre de quien firma</Label>
+              <Label className="mb-1 block text-xs font-semibold text-foreground/90">Nombre de quien firma</Label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Nombre completo"
                 data-testid="amendment-signer-name-input"
+                className="text-xs h-9 bg-card"
               />
             </div>
 
             <div>
-              <Label className="mb-1 block font-medium">Firma manuscrita digital</Label>
+              <Label className="mb-1 block text-xs font-semibold text-foreground/90">Firma manuscrita digital</Label>
               <SignaturePad onChange={setSignature} />
             </div>
 
-            <div className="flex items-start gap-2 pt-1">
+            <div className="flex items-start gap-2.5 pt-1 rounded-lg border border-border/60 bg-card/60 p-2.5">
               <Checkbox
                 id="accept-amendment-terms"
                 checked={accepted}
                 onCheckedChange={(val) => setAccepted(Boolean(val))}
                 data-testid="amendment-accept-checkbox"
+                className="mt-0.5"
               />
               <label
                 htmlFor="accept-amendment-terms"
-                className="text-[11px] leading-tight text-muted-foreground cursor-pointer"
+                className="text-[11px] leading-relaxed text-muted-foreground cursor-pointer"
               >
                 Acepto los términos y modificaciones estipulados en este Otrosí bajo la Ley 527 de 1999 de Colombia.
               </label>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2 mt-auto">
-              <Button type="button" variant="outline" size="sm" onClick={onClose}>
+            <div className="flex justify-end gap-2 pt-3 mt-auto border-t border-border/50">
+              <Button type="button" variant="outline" size="sm" onClick={onClose} className="text-xs">
                 Cancelar
               </Button>
               <Button
@@ -122,6 +133,7 @@ export function ContractAmendmentSignDialog({
                 disabled={!isReady}
                 onClick={() => sign.mutate()}
                 data-testid="submit-amendment-sign-btn"
+                className="text-xs font-semibold shadow-2xs"
               >
                 {sign.isPending ? 'Firmando...' : 'Firmar Otrosí'}
               </Button>

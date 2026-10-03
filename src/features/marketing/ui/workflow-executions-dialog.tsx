@@ -1,10 +1,12 @@
 import { Clock, History } from 'lucide-react'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -29,31 +31,24 @@ export function WorkflowExecutionsDialog({
 }: WorkflowExecutionsDialogProps) {
   return (
     <Dialog open={workflow !== null} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-lg max-h-[85vh] p-0 overflow-hidden border-border/60 shadow-xl flex flex-col">
-        <DialogHeader className="px-5 pt-5 pb-4 border-b border-border/50 bg-muted/20 shrink-0">
-          <div className="flex items-center gap-3">
-            <div
-              className={[
-                'flex size-10 shrink-0 items-center justify-center rounded-xl',
-                'bg-primary/10 text-primary ring-1 ring-primary/20 shadow-2xs',
-              ].join(' ')}
-            >
-              <History className="size-5" />
-            </div>
-            <div>
-              <DialogTitle className="text-base font-bold text-foreground tracking-tight">
-                Historial: {workflow?.workflowName}
-              </DialogTitle>
-              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                Registro de mensajes y acciones ejecutadas para clientes
-              </DialogDescription>
-            </div>
+      <DialogContent size="xl">
+        <DialogHeader>
+          <DialogMedia variant="default">
+            <History className="size-5" />
+          </DialogMedia>
+          <div className="flex flex-col gap-1 text-left min-w-0">
+            <DialogTitle>
+              Historial: {workflow?.workflowName}
+            </DialogTitle>
+            <DialogDescription>
+              Registro de mensajes y acciones ejecutadas para clientes
+            </DialogDescription>
           </div>
         </DialogHeader>
 
-        <div className="space-y-3 px-5 py-4 overflow-y-auto flex-1">
+        <DialogBody className="space-y-3">
           {isLoading ? (
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               <Skeleton className="h-14 w-full rounded-xl" />
               <Skeleton className="h-14 w-full rounded-xl" />
             </div>
@@ -64,9 +59,9 @@ export function WorkflowExecutionsDialog({
           ) : (
             <div className="divide-y divide-border/60 text-xs">
               {executions.map((ex) => (
-                <div key={ex.executionId} className="py-3 space-y-1.5">
+                <div key={ex.executionId} className="py-3 space-y-1.5 first:pt-0 last:pb-0">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-bold text-foreground">
+                    <span className="font-semibold text-foreground">
                       {ex.clientId ? (clientName?.(ex.clientId) ?? 'Cliente') : 'Todos los clientes'}
                     </span>
                     <Badge
@@ -79,8 +74,8 @@ export function WorkflowExecutionsDialog({
                   {ex.sentMessage && (
                     <p
                       className={[
-                        'text-muted-foreground italic text-[11px] bg-muted/30 p-2',
-                        'rounded-lg border border-border/40',
+                        'text-muted-foreground italic text-[11px] bg-muted/30 p-2.5',
+                        'rounded-xl border border-border/40',
                       ].join(' ')}
                     >
                       "{ex.sentMessage}"
@@ -94,15 +89,10 @@ export function WorkflowExecutionsDialog({
               ))}
             </div>
           )}
-        </div>
+        </DialogBody>
 
-        <DialogFooter
-          className={[
-            'px-5 py-3 border-t border-border/50 bg-muted/15',
-            'flex items-center justify-end shrink-0',
-          ].join(' ')}
-        >
-          <Button size="sm" onClick={onClose} className="rounded-lg text-xs font-semibold shadow-2xs">
+        <DialogFooter>
+          <Button size="sm" onClick={onClose} className="rounded-xl text-xs font-medium shadow-xs">
             Cerrar
           </Button>
         </DialogFooter>

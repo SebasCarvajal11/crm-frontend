@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, RefreshCw, Search, Users, WifiOff, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog'
+import { DialogContent, DialogDescription, DialogHeader, DialogMedia, DialogTitle, DialogClose } from '@/components/ui/dialog'
 import { UserAvatar } from '@/components/atoms/user-avatar'
 import { useSessionStore } from '@/app/session/session-store'
 import { useUserAvatars } from '@/shared/hooks'
@@ -127,11 +127,16 @@ export function PresencePanel({ owner }: { owner: string }) {
     width: `min(30rem, calc((${viewport.width}px - 2rem) / var(--app-zoom, 1)))`,
     maxWidth: 'none', maxHeight: `calc((${viewport.height}px - 2rem) / var(--app-zoom, 1))`,
   }} onOpenAutoFocus={(event) => { event.preventDefault(); titleRef.current?.focus() }}>
-    <DialogHeader className="shrink-0 pl-4 pr-14 pb-3 pt-4 sm:pl-5 sm:pt-4">
-      <DialogTitle ref={titleRef} tabIndex={-1} className="outline-none">Usuarios en línea</DialogTitle>
-      <DialogDescription>Presencia y actividad reciente del equipo y los clientes.</DialogDescription>
+    <DialogHeader className="shrink-0 pr-14">
+      <DialogMedia variant="default">
+        <Users className="size-5" />
+      </DialogMedia>
+      <div className="flex flex-col gap-1 text-left min-w-0">
+        <DialogTitle ref={titleRef} tabIndex={-1} className="outline-none">Usuarios en línea</DialogTitle>
+        <DialogDescription>Presencia y actividad reciente del equipo y los clientes.</DialogDescription>
+      </div>
     </DialogHeader>
-    <DialogClose asChild><Button variant="ghost" size="icon" aria-label="Cerrar panel de presencia" className="absolute right-2 top-2 size-11 rounded-full"><X className="size-4" /></Button></DialogClose>
+    <DialogClose asChild><Button variant="ghost" size="icon" aria-label="Cerrar panel de presencia" className="absolute right-3 top-3 size-9 rounded-xl"><X className="size-4" /></Button></DialogClose>
     <PanelContent owner={owner} />
   </DialogContent>
 }

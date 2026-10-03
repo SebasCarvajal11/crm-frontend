@@ -127,3 +127,28 @@ enriquecida e interactiva mediante un carrusel por tarjetas fluido:
   - Tablets: 2 tarjetas simultáneas.
   - Móviles: 1 tarjeta centralizada por slide con adaptación táctil y sin desbordamiento global.
 
+---
+
+## 7. Arquitectura y Estandarización de Modales y Diálogos
+
+Todos los modales y diálogos del sistema (`Dialog` y `AlertDialog`) se rigen bajo una arquitectura unificada y modular en `src/components/ui/dialog.tsx` y `src/components/ui/alert-dialog.tsx`:
+
+- **Escala de Tamaños Tipada (`size`)**:
+  - `sm` (max-w-sm / 384px): Acciones atómicas de confirmación o avisos breves.
+  - `md` (max-w-md / 448px): Formularios compactos (bloqueo/desbloqueo de tareas, respuestas directas).
+  - `lg` (max-w-lg / 512px): Formularios de entidad media (exportación de chat, registro de contacto, campañas).
+  - `xl` (max-w-xl / 576px): Formularios estructurados y wizards (creación de proyectos, edición de tareas).
+  - `2xl` (max-w-2xl / 672px): Vistas legales, términos y condiciones y configuraciones densas.
+  - `3xl` / `4xl` (768px / 896px): Diálogos de firma electrónica de contratos y paneles de auditoría.
+  - `5xl` / `full` (1024px / viewport): Previsualizadores de documentos PDF/imágenes e interfaces inmersivas.
+
+- **Componentes Estructurales de Alto Orden**:
+  - `DialogMedia` / `AlertDialogMedia`: Indicador semántico de cabecera con anillo de halo (`default`, `destructive`, `warning`, `success`, `info`) con colores oficiales CIMA.
+  - `DialogBody`: Contenedor de contenido desacoplado con scroll vertical restringido (`max-h-[72vh]`), padding uniforme y scrollbar estilizada.
+  - `DialogFooter`: Zona de interacción y botones anclada al pie, con soporte de layout invertido en móvil y alineación flexible.
+
+- **Ergonomía, Animaciones y Compatibilidad**:
+  - Curvas de interpolación `cubic-bezier(0.16, 1, 0.3, 1)` para entrada/salida suave y sin brincos de layout.
+  - Gestión de áreas seguras (`safe-area-inset-top`, `safe-area-inset-bottom`) garantizando compatibilidad con Safari iOS y navegadores móviles.
+  - Validación automatizada en 4 resoluciones (4K, 1080p, Tablet, Mobile) vía Playwright.
+

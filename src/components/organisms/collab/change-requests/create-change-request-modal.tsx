@@ -4,10 +4,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -88,42 +90,35 @@ export function CreateChangeRequestModal({ open, accessToken, projectId, tasks, 
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { resetForm(); onClose() } }}>
-      <DialogContent className="max-w-lg p-0 overflow-hidden border-border/60 shadow-xl">
-        <DialogHeader
-          className="flex flex-row items-start gap-3 space-y-0 px-5 pt-5 pb-4 border-b border-border/50 bg-muted/20"
-        >
-          <div
-            className={
-              'flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ' +
-              'text-primary ring-1 ring-primary/20 shadow-2xs'
-            }
-          >
-            <GitPullRequest className="size-5" />
-          </div>
-          <div className="flex flex-col gap-0.5 text-left">
-            <DialogTitle className="text-base font-bold tracking-tight text-foreground">
-              Solicitar cambio de proyecto
-            </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              Describe el requerimiento o ajuste que deseas solicitar. Será revisado por un administrador.
-            </DialogDescription>
-          </div>
-        </DialogHeader>
+      <DialogContent size="lg">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <DialogHeader>
+            <DialogMedia variant="default">
+              <GitPullRequest className="size-5" />
+            </DialogMedia>
+            <div className="flex flex-col gap-1 text-left min-w-0">
+              <DialogTitle>Solicitar cambio de proyecto</DialogTitle>
+              <DialogDescription>
+                Describe el requerimiento o ajuste que deseas solicitar. Será revisado por un administrador.
+              </DialogDescription>
+            </div>
+          </DialogHeader>
 
-        <div className="px-5 py-4 sm:px-6 max-h-[75vh] overflow-y-auto">
-          {errorMsg && (
-            <Alert variant="destructive" className="mb-4 py-2.5 rounded-lg border-destructive/30">
-              <AlertCircle className="size-4" />
-              <AlertDescription className="text-xs">{errorMsg}</AlertDescription>
-            </Alert>
-          )}
+          <DialogBody className="space-y-4">
+            {errorMsg && (
+              <Alert variant="destructive" className="py-2.5 rounded-xl border-destructive/30">
+                <AlertCircle className="size-4" />
+                <AlertDescription className="text-xs">{errorMsg}</AlertDescription>
+              </Alert>
+            )}
 
-          <form onSubmit={handleSubmit} className="space-y-3.5">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="space-y-1.5">
-                <Label htmlFor="cr-type" className="text-xs font-semibold text-foreground/90">Tipo de cambio</Label>
+                <Label htmlFor="cr-type" className="text-xs font-medium text-foreground/90">
+                  Tipo de cambio
+                </Label>
                 <Select value={type} onValueChange={(v) => setType(v as ChangeRequestType)}>
-                  <SelectTrigger id="cr-type" className="h-9 rounded-lg border-border/70 text-xs">
+                  <SelectTrigger id="cr-type" className="h-9 rounded-xl border-border/70 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -134,11 +129,11 @@ export function CreateChangeRequestModal({ open, accessToken, projectId, tasks, 
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="cr-priority" className="text-xs font-semibold text-foreground/90">
+                <Label htmlFor="cr-priority" className="text-xs font-medium text-foreground/90">
                   Urgencia / Prioridad
                 </Label>
                 <Select value={priority} onValueChange={(v) => setPriority(v as ChangeRequestPriority)}>
-                  <SelectTrigger id="cr-priority" className="h-9 rounded-lg border-border/70 text-xs">
+                  <SelectTrigger id="cr-priority" className="h-9 rounded-xl border-border/70 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -152,7 +147,7 @@ export function CreateChangeRequestModal({ open, accessToken, projectId, tasks, 
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="cr-title" className="text-xs font-semibold text-foreground/90">
+              <Label htmlFor="cr-title" className="text-xs font-medium text-foreground/90">
                 Título del requerimiento
               </Label>
               <Input
@@ -160,17 +155,17 @@ export function CreateChangeRequestModal({ open, accessToken, projectId, tasks, 
                 placeholder="Ej. Modificar texto en cabecera principal"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="h-9 rounded-lg border-border/70 text-xs focus-visible:ring-primary/20"
+                className="h-9 rounded-xl border-border/70 text-xs focus-visible:ring-primary/20"
                 maxLength={200}
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="cr-task" className="text-xs font-semibold text-foreground/90">
+              <Label htmlFor="cr-task" className="text-xs font-medium text-foreground/90">
                 Entregable o tarea asociada (opcional)
               </Label>
               <Select value={taskId} onValueChange={setTaskId}>
-                <SelectTrigger id="cr-task" className="h-9 rounded-lg border-border/70 text-xs">
+                <SelectTrigger id="cr-task" className="h-9 rounded-xl border-border/70 text-xs">
                   <SelectValue placeholder="General del proyecto" />
                 </SelectTrigger>
                 <SelectContent>
@@ -185,7 +180,7 @@ export function CreateChangeRequestModal({ open, accessToken, projectId, tasks, 
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="cr-desc" className="text-xs font-semibold text-foreground/90">
+              <Label htmlFor="cr-desc" className="text-xs font-medium text-foreground/90">
                 Descripción detallada
               </Label>
               <Textarea
@@ -193,14 +188,14 @@ export function CreateChangeRequestModal({ open, accessToken, projectId, tasks, 
                 placeholder="Detalla qué cambio necesitas y el resultado esperado..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="min-h-[85px] rounded-lg border-border/70 text-xs resize-none focus-visible:ring-primary/20"
+                className="min-h-[85px] rounded-xl border-border/70 text-xs resize-none focus-visible:ring-primary/20"
                 maxLength={3000}
               />
             </div>
 
             {type === 'formal' && (
               <div className="space-y-1.5">
-                <Label htmlFor="cr-just" className="text-xs font-semibold text-foreground/90">
+                <Label htmlFor="cr-just" className="text-xs font-medium text-foreground/90">
                   Justificación del cambio
                 </Label>
                 <Textarea
@@ -208,44 +203,39 @@ export function CreateChangeRequestModal({ open, accessToken, projectId, tasks, 
                   placeholder="Explica la justificación o razón estratégica de este cambio de alcance..."
                   value={justification}
                   onChange={(e) => setJustification(e.target.value)}
-                  className="min-h-[70px] rounded-lg border-border/70 text-xs resize-none focus-visible:ring-primary/20"
+                  className="min-h-[70px] rounded-xl border-border/70 text-xs resize-none focus-visible:ring-primary/20"
                   maxLength={2000}
                 />
               </div>
             )}
+          </DialogBody>
 
-            <DialogFooter
-              className={
-                'px-5 py-3.5 sm:px-6 border-t border-border/50 bg-muted/15 -mx-5 ' +
-                'sm:-mx-6 -mb-4 mt-5 flex items-center justify-end gap-2.5'
-              }
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="rounded-xl text-xs"
             >
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={onClose}
-                disabled={isSubmitting}
-                className="rounded-lg text-xs"
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                disabled={isSubmitting}
-                className="rounded-lg text-xs gap-1.5 shadow-2xs font-semibold"
-              >
-                {isSubmitting ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : (
-                  <GitPullRequest className="size-3.5" />
-                )}
-                {isSubmitting ? 'Enviando...' : 'Solicitar cambio'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </div>
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              size="sm"
+              disabled={isSubmitting}
+              className="rounded-xl text-xs gap-1.5 shadow-xs font-medium"
+            >
+              {isSubmitting ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <GitPullRequest className="size-3.5" />
+              )}
+              {isSubmitting ? 'Enviando...' : 'Solicitar cambio'}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

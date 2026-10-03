@@ -6,7 +6,14 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { IconButton } from '@/components/ui/icon-button'
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogMedia,
+  DialogBody,
+  DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -69,20 +76,15 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose() }}>
-      <DialogContent className="max-w-xl p-0 overflow-hidden border-border/60 shadow-xl">
-        <DialogHeader className="px-5 pt-5 pb-4 border-b border-border/50 bg-muted/20">
+      <DialogContent size="xl">
+        <DialogHeader>
           <div className="flex items-center gap-3">
-            <div
-              className={
-                'flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary ' +
-                'shrink-0 ring-1 ring-primary/20 shadow-2xs'
-              }
-            >
+            <DialogMedia variant="default">
               <FolderOpen className="size-5" />
-            </div>
+            </DialogMedia>
             <div>
-              <DialogTitle className="text-base font-bold text-foreground tracking-tight">Nuevo proyecto</DialogTitle>
-              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+              <DialogTitle>Nuevo proyecto</DialogTitle>
+              <DialogDescription>
                 Completa los datos y asocia un cliente para crear el espacio de trabajo colaborativo.
               </DialogDescription>
             </div>
@@ -91,12 +93,13 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
 
         <form
           id="create-project-form"
-          className="space-y-4 px-5 py-4 sm:px-6 max-h-[75vh] overflow-y-auto"
+          className="flex flex-col flex-1 min-h-0"
           onSubmit={(event) => {
             event.preventDefault()
             createProject.mutate()
           }}
         >
+          <DialogBody className="space-y-4 max-h-[65vh]">
           <div className="space-y-1.5">
             <Label htmlFor="cp-name" className="text-xs font-semibold text-foreground/90">
               Nombre del proyecto <span className="text-destructive">*</span>
@@ -248,18 +251,17 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
               <AlertDescription className="text-xs">{errorMsg}</AlertDescription>
             </Alert>
           )}
+          </DialogBody>
         </form>
 
-        <DialogFooter
-          className="px-5 py-3.5 sm:px-6 border-t border-border/50 bg-muted/15 flex items-center justify-end gap-2.5"
-        >
+        <DialogFooter>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={handleClose}
             disabled={createProject.isPending}
-            className="rounded-lg text-xs"
+            className="text-xs"
           >
             Cancelar
           </Button>
@@ -268,7 +270,7 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
             size="sm"
             form="create-project-form"
             disabled={!canSubmit || createProject.isPending}
-            className="rounded-lg text-xs shadow-xs"
+            className="text-xs font-semibold shadow-2xs"
           >
             {createProject.isPending ? 'Creando…' : 'Crear proyecto'}
           </Button>

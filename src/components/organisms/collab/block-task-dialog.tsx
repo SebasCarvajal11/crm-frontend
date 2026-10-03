@@ -6,6 +6,8 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
+  DialogBody,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -47,27 +49,30 @@ export function BlockTaskDialog({ open, taskTitle, isPending, onClose, onConfirm
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md font-sans">
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <DialogContent size="md">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
           <DialogHeader>
-            <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400">
-              <AlertOctagon className="size-5 shrink-0" aria-hidden="true" />
-              <DialogTitle className="text-base font-semibold">Bloquear Tarea</DialogTitle>
+            <div className="flex items-center gap-3">
+              <DialogMedia variant="destructive">
+                <AlertOctagon className="size-5" aria-hidden="true" />
+              </DialogMedia>
+              <div className="space-y-0.5">
+                <DialogTitle>Bloquear Tarea</DialogTitle>
+                <DialogDescription>
+                  Indica el motivo o impedimento por el cual se detiene el avance de:{' '}
+                  <span className="font-medium text-foreground">&ldquo;{taskTitle}&rdquo;</span>.
+                </DialogDescription>
+              </div>
             </div>
-            <DialogDescription className="text-xs text-muted-foreground text-left pt-1">
-              Indica el motivo o impedimento por el cual se detiene el avance de:{' '}
-              <span className="font-medium text-foreground">&ldquo;{taskTitle}&rdquo;</span>.
-              Esta acción notificará al equipo y registrará la incidencia en el historial.
-            </DialogDescription>
           </DialogHeader>
 
-          <div className="px-5 py-2 sm:px-6 space-y-4">
+          <DialogBody className="space-y-3.5">
             <div className="space-y-1.5 text-left">
               <div className="flex items-center justify-between">
-                <Label htmlFor="block-reason" className="text-xs font-medium">
-                  Motivo del bloqueo <span className="text-rose-500">*</span>
+                <Label htmlFor="block-reason" className="text-xs font-semibold text-foreground/90">
+                  Motivo del bloqueo <span className="text-destructive">*</span>
                 </Label>
-                <span className="text-[11px] text-muted-foreground">
+                <span className="text-[11px] text-muted-foreground font-mono">
                   {trimmed.length}/{MAX_REASON_LENGTH}
                 </span>
               </div>
@@ -77,29 +82,30 @@ export function BlockTaskDialog({ open, taskTitle, isPending, onClose, onConfirm
                 onChange={(e) => setReason(e.target.value)}
                 onBlur={() => setTouched(true)}
                 placeholder="Describe detalladamente el impedimento (mínimo 5 caracteres)..."
-                rows={3}
+                rows={4}
                 maxLength={MAX_REASON_LENGTH}
-                className={`text-xs resize-none ${
-                  touched && !isValid ? 'border-rose-500 focus-visible:ring-rose-500' : ''
+                className={`text-xs resize-none rounded-xl ${
+                  touched && !isValid ? 'border-destructive focus-visible:ring-destructive' : ''
                 }`}
                 disabled={isPending}
                 autoFocus
               />
               {touched && trimmed.length < MIN_REASON_LENGTH && (
-                <p className="text-[11px] text-rose-500">
+                <p className="text-[11px] text-destructive font-medium">
                   El motivo debe contener al menos {MIN_REASON_LENGTH} caracteres.
                 </p>
               )}
             </div>
-          </div>
+          </DialogBody>
 
-          <DialogFooter className="gap-2 sm:gap-0 pt-2">
+          <DialogFooter>
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={onClose}
               disabled={isPending}
+              className="text-xs"
             >
               Cancelar
             </Button>
@@ -108,7 +114,7 @@ export function BlockTaskDialog({ open, taskTitle, isPending, onClose, onConfirm
               variant="destructive"
               size="sm"
               disabled={!isValid || isPending}
-              className="bg-rose-600 hover:bg-rose-700 text-white gap-1.5"
+              className="gap-1.5 text-xs font-semibold shadow-2xs"
             >
               {isPending ? (
                 <>

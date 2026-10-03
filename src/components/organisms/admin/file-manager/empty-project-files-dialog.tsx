@@ -1,8 +1,14 @@
 import { useState } from 'react'
 import { AlertTriangle, Trash2, Loader2, Download, ShieldCheck } from 'lucide-react'
 import {
-  AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
-  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -134,25 +140,21 @@ export function EmptyProjectFilesDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={(open) => !open && !loading && onClose()}>
-      <AlertDialogContent className="max-w-lg">
+      <AlertDialogContent size="lg">
         <AlertDialogHeader>
-          <div className="flex items-start sm:items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-600 shrink-0 ring-1 ring-rose-500/20">
-              <Trash2 className="size-5" />
-            </div>
-            <div className="space-y-0.5">
-              <AlertDialogTitle className="text-base font-bold text-foreground">
-                Vaciar Archivos del Proyecto
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-xs text-muted-foreground leading-relaxed">
-                Esta acción depurará los archivos binarios activos para liberar espacio en la nube.
-              </AlertDialogDescription>
-            </div>
-          </div>
+          <AlertDialogMedia variant="destructive">
+            <Trash2 className="size-5" />
+          </AlertDialogMedia>
+          <AlertDialogTitle>
+            Vaciar archivos del proyecto
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta acción depurará los archivos binarios activos para liberar espacio en la nube.
+          </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className="space-y-3 py-1 text-xs">
-          <div className="rounded-xl border border-border/80 bg-muted/25 p-3 space-y-2">
+        <div className="space-y-3.5 py-1 text-xs">
+          <div className="rounded-xl border border-border/80 bg-muted/25 p-3.5 space-y-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-2 border-b border-border/40">
               <div className="space-y-0.5 min-w-0">
                 <span className="text-[11px] font-medium text-muted-foreground block">
@@ -164,7 +166,7 @@ export function EmptyProjectFilesDialog({
               </div>
               <div className="space-y-0.5 min-w-0">
                 <span className="text-[11px] font-medium text-muted-foreground block">
-                  Total de archivos a depurar: {filesCount}
+                  Total de archivos a depurar:
                 </span>
                 <span className="font-semibold text-foreground text-xs block">
                   {filesCount} documentos
@@ -175,7 +177,7 @@ export function EmptyProjectFilesDialog({
               <span className="text-muted-foreground">Espacio que se liberará:</span>
               <span
                 className={[
-                  'rounded px-2 py-0.5 font-semibold text-emerald-600',
+                  'rounded-lg px-2 py-0.5 font-semibold text-emerald-600',
                   'bg-emerald-500/10 dark:text-emerald-400',
                 ].join(' ')}
               >
@@ -184,11 +186,11 @@ export function EmptyProjectFilesDialog({
             </div>
           </div>
 
-          <div className="rounded-xl border border-sky-500/35 bg-sky-500/10 p-2.5 flex items-start gap-2.5">
+          <div className="rounded-xl border border-sky-500/35 bg-sky-500/10 p-3 flex items-start gap-2.5">
             <ShieldCheck className="size-4 text-sky-600 dark:text-sky-400 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
               <p className="font-semibold text-sky-700 dark:text-sky-300">
-                Recomendación de seguridad (Google Drive)
+                Recomendación de seguridad
               </p>
               <p className="text-muted-foreground leading-relaxed text-[11px]">
                 Te sugerimos descargar un respaldo comprimido (.zip) con los archivos organizados por
@@ -197,7 +199,7 @@ export function EmptyProjectFilesDialog({
             </div>
           </div>
 
-          <div className="rounded-xl border border-amber-500/35 bg-amber-500/10 p-2.5 flex items-start gap-2.5">
+          <div className="rounded-xl border border-amber-500/35 bg-amber-500/10 p-3 flex items-start gap-2.5">
             <AlertTriangle className="size-4 text-amber-600 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
               <p className="font-semibold text-amber-700 dark:text-amber-400">Acción irreversible</p>
@@ -237,54 +239,72 @@ export function EmptyProjectFilesDialog({
         <AlertDialogFooter className="w-full pt-1">
           {canDownload ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
-              <AlertDialogCancel disabled={loading} onClick={onClose} className="w-full text-xs m-0">
+              <AlertDialogCancel disabled={loading} onClick={onClose} className="w-full text-xs m-0 rounded-xl">
                 Cancelar
               </AlertDialogCancel>
               <Button
                 variant="outline"
-                size="default"
+                size="sm"
                 disabled={loading}
                 onClick={handleDownloadOnly}
-                className="w-full gap-1.5 text-xs"
+                className="w-full gap-1.5 text-xs rounded-xl"
               >
                 <Download className="size-3.5" />
-                <span>Solo Descargar (.zip)</span>
+                <span>Solo descargar (.zip)</span>
               </Button>
               <Button
                 variant="destructive"
-                size="default"
+                size="sm"
                 disabled={loading}
                 onClick={() => void executePurge()}
-                className="w-full gap-1.5 text-xs"
+                className="w-full gap-1.5 text-xs rounded-xl font-medium shadow-xs"
               >
-                <Trash2 className="size-3.5" />
-                <span>Confirmar y Vaciar</span>
+                {loading ? (
+                  <>
+                    <Loader2 className="size-3.5 animate-spin" />
+                    <span>Depurando... {progress}%</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="size-3.5" />
+                    <span>Confirmar y Vaciar</span>
+                  </>
+                )}
               </Button>
               <Button
                 variant="default"
-                size="default"
+                size="sm"
                 disabled={loading}
                 onClick={handleDownloadAndPurge}
-                className="w-full gap-1.5 text-xs bg-sky-600 hover:bg-sky-700 text-white"
+                className="w-full gap-1.5 text-xs rounded-xl font-medium shadow-xs bg-sky-600 hover:bg-sky-700 text-white"
               >
                 <ShieldCheck className="size-3.5" />
-                <span>Descargar y Vaciar</span>
+                <span>Descargar y vaciar</span>
               </Button>
             </div>
           ) : (
             <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-2 w-full">
-              <AlertDialogCancel disabled={loading} onClick={onClose} className="w-full sm:w-auto text-xs">
+              <AlertDialogCancel disabled={loading} onClick={onClose} className="w-full sm:w-auto text-xs rounded-xl">
                 Cancelar
               </AlertDialogCancel>
               <Button
                 variant="destructive"
-                size="default"
+                size="sm"
                 disabled={loading}
                 onClick={() => void executePurge()}
-                className="w-full sm:w-auto gap-2 text-xs"
+                className="w-full sm:w-auto gap-2 text-xs rounded-xl font-medium shadow-xs"
               >
-                <Trash2 className="size-4" />
-                <span>Confirmar y Vaciar</span>
+                {loading ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    <span>Depurando... {progress}%</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="size-4" />
+                    <span>Confirmar y Vaciar</span>
+                  </>
+                )}
               </Button>
             </div>
           )}

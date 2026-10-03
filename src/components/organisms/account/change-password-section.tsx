@@ -186,10 +186,10 @@ export function ChangePasswordSection({ accessToken }: Props) {
       </Card>
 
       <AlertDialog open={confirmSubmitOpen} onOpenChange={setConfirmSubmitOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent size="default">
           <AlertDialogHeader>
-            <AlertDialogMedia className="bg-primary/10 text-primary ring-primary/20">
-              <KeyRound className="size-6" />
+            <AlertDialogMedia variant="default">
+              <KeyRound className="size-5" />
             </AlertDialogMedia>
             <AlertDialogTitle>Confirmar actualización de contraseña</AlertDialogTitle>
             <AlertDialogDescription>
@@ -198,8 +198,9 @@ export function ChangePasswordSection({ accessToken }: Props) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Volver</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl text-xs">Volver</AlertDialogCancel>
             <AlertDialogAction
+              className="rounded-xl text-xs font-medium"
               onClick={() => {
                 if (!pendingPayload) return
                 mutation.mutate(pendingPayload)
@@ -213,10 +214,10 @@ export function ChangePasswordSection({ accessToken }: Props) {
       </AlertDialog>
 
       <AlertDialog open={confirmCancelOpen} onOpenChange={setConfirmCancelOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent size="default">
           <AlertDialogHeader>
-            <AlertDialogMedia className="bg-muted text-muted-foreground ring-border">
-              <AlertTriangle className="size-6" />
+            <AlertDialogMedia variant="warning">
+              <AlertTriangle className="size-5" />
             </AlertDialogMedia>
             <AlertDialogTitle>Descartar cambios</AlertDialogTitle>
             <AlertDialogDescription>
@@ -224,8 +225,8 @@ export function ChangePasswordSection({ accessToken }: Props) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Volver</AlertDialogCancel>
-            <AlertDialogAction onClick={() => reset()}>
+            <AlertDialogCancel className="rounded-xl text-xs">Volver</AlertDialogCancel>
+            <AlertDialogAction className="rounded-xl text-xs font-medium" onClick={() => reset()}>
               Descartar
             </AlertDialogAction>
           </AlertDialogFooter>

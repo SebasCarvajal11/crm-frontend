@@ -4,10 +4,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
   DialogTitle,
 } from '@/components/ui/dialog'
 import type { Proposal, ProposalStatus, CreateProposalInput } from '../api/proposals-api'
@@ -41,38 +43,31 @@ export function ProposalFormDialog({
 }: ProposalFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-border/60 shadow-xl">
-        <DialogHeader className="px-5 pt-5 pb-4 border-b border-border/50 bg-muted/20">
-          <div className="flex items-center gap-3">
-            <div
-              className={[
-                'flex size-10 shrink-0 items-center justify-center rounded-xl',
-                'bg-primary/10 text-primary ring-1 ring-primary/20 shadow-2xs',
-              ].join(' ')}
-            >
-              <FileText className="size-5" />
-            </div>
-            <div>
-              <DialogTitle className="text-base font-bold text-foreground tracking-tight">
-                {editingProposal ? 'Editar propuesta' : 'Nueva propuesta comercial'}
-              </DialogTitle>
-              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                La propuesta queda asociada al cliente y alimenta los indicadores de ingresos estimados.
-              </DialogDescription>
-            </div>
+      <DialogContent size="lg">
+        <DialogHeader>
+          <DialogMedia variant="default">
+            <FileText className="size-5" />
+          </DialogMedia>
+          <div className="flex flex-col gap-1 text-left min-w-0">
+            <DialogTitle>
+              {editingProposal ? 'Editar propuesta' : 'Nueva propuesta comercial'}
+            </DialogTitle>
+            <DialogDescription>
+              La propuesta queda asociada al cliente y alimenta los indicadores de ingresos estimados.
+            </DialogDescription>
           </div>
         </DialogHeader>
 
-        <div className="space-y-4 px-5 py-4 sm:px-6">
+        <DialogBody className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="clientId" className="text-xs font-semibold text-foreground/90">Cliente</Label>
+            <Label htmlFor="clientId" className="text-xs font-medium text-foreground/90">Cliente</Label>
             <select
               id="clientId"
               value={formData.clientId}
               onChange={(e) => onFormDataChange({ ...formData, clientId: e.target.value })}
               disabled={Boolean(editingProposal)}
               className={[
-                'h-9 w-full rounded-lg border border-border/70 bg-background px-3 text-xs',
+                'h-9 w-full rounded-xl border border-border/70 bg-background px-3 text-xs',
                 'font-medium text-foreground disabled:opacity-60 focus:outline-none focus:ring-1 focus:ring-primary',
               ].join(' ')}
             >
@@ -97,7 +92,7 @@ export function ProposalFormDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="description" className="text-xs font-semibold text-foreground/90">Descripción</Label>
+            <Label htmlFor="description" className="text-xs font-medium text-foreground/90">Descripción</Label>
             <textarea
               id="description"
               rows={3}
@@ -105,7 +100,7 @@ export function ProposalFormDialog({
               onChange={(e) => onFormDataChange({ ...formData, description: e.target.value })}
               placeholder="Producción audiovisual y pauta digital para lanzamiento…"
               className={[
-                'w-full rounded-lg border border-border/70 bg-background px-3 py-2 text-xs',
+                'w-full rounded-xl border border-border/70 bg-background px-3 py-2 text-xs',
                 'focus:outline-none focus:ring-1 focus:ring-primary',
               ].join(' ')}
             />
@@ -113,7 +108,7 @@ export function ProposalFormDialog({
 
           <div className="grid gap-3.5 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="estimatedValue" className="text-xs font-semibold text-foreground/90">
+              <Label htmlFor="estimatedValue" className="text-xs font-medium text-foreground/90">
                 Valor estimado (COP)
               </Label>
               <Input
@@ -129,12 +124,12 @@ export function ProposalFormDialog({
                   })
                 }
                 placeholder="4500000"
-                className="h-9 rounded-lg border-border/70 text-xs"
+                className="h-9 rounded-xl border-border/70 text-xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="createdDate" className="text-xs font-semibold text-foreground/90">
+              <Label htmlFor="createdDate" className="text-xs font-medium text-foreground/90">
                 Fecha de la propuesta
               </Label>
               <Input
@@ -142,13 +137,13 @@ export function ProposalFormDialog({
                 type="date"
                 value={formData.createdDate ?? ''}
                 onChange={(e) => onFormDataChange({ ...formData, createdDate: e.target.value })}
-                className="h-9 rounded-lg border-border/70 text-xs"
+                className="h-9 rounded-xl border-border/70 text-xs"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="status" className="text-xs font-semibold text-foreground/90">Estado</Label>
+            <Label htmlFor="status" className="text-xs font-medium text-foreground/90">Estado</Label>
             <select
               id="status"
               value={formData.status}
@@ -156,7 +151,7 @@ export function ProposalFormDialog({
                 onFormDataChange({ ...formData, status: e.target.value as ProposalStatus })
               }
               className={[
-                'h-9 w-full rounded-lg border border-border/70 bg-background px-3 text-xs',
+                'h-9 w-full rounded-xl border border-border/70 bg-background px-3 text-xs',
                 'font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary',
               ].join(' ')}
             >
@@ -169,7 +164,7 @@ export function ProposalFormDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="documentUrl" className="text-xs font-semibold text-foreground/90">
+            <Label htmlFor="documentUrl" className="text-xs font-medium text-foreground/90">
               Enlace al documento (opcional)
             </Label>
             <Input
@@ -177,29 +172,29 @@ export function ProposalFormDialog({
               value={formData.documentUrl ?? ''}
               onChange={(e) => onFormDataChange({ ...formData, documentUrl: e.target.value })}
               placeholder="https://drive.google.com/…"
-              className="h-9 rounded-lg border-border/70 text-xs"
+              className="h-9 rounded-xl border-border/70 text-xs"
             />
           </div>
 
           {formError && (
             <div
               className={[
-                'rounded-lg border border-rose-300/60 bg-rose-50/70 p-2.5 text-xs text-rose-800',
+                'rounded-xl border border-rose-300/60 bg-rose-50/70 p-2.5 text-xs text-rose-800',
                 'dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300 shadow-2xs',
               ].join(' ')}
             >
               {formError}
             </div>
           )}
-        </div>
+        </DialogBody>
 
-        <DialogFooter className="px-5 py-3 border-t border-border/50 bg-muted/15 flex items-center justify-end gap-2">
+        <DialogFooter>
           <Button
             variant="outline"
             size="sm"
             onClick={onClose}
             disabled={isSaving}
-            className="rounded-lg text-xs"
+            className="rounded-xl text-xs"
           >
             Cancelar
           </Button>
@@ -207,7 +202,7 @@ export function ProposalFormDialog({
             size="sm"
             onClick={onSubmit}
             disabled={isSaving}
-            className="rounded-lg text-xs font-semibold shadow-2xs"
+            className="rounded-xl text-xs font-medium shadow-xs"
           >
             {isSaving ? 'Guardando…' : editingProposal ? 'Guardar cambios' : 'Crear propuesta'}
           </Button>

@@ -4,10 +4,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
@@ -80,47 +82,41 @@ export function ResolveChangeRequestModal({
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
-      <DialogContent className="max-w-md p-0 overflow-hidden border-border/60 shadow-xl">
-        <DialogHeader
-          className="flex flex-row items-start gap-3 space-y-0 px-5 pt-5 pb-4 border-b border-border/50 bg-muted/20"
-        >
-          <div
-            className={`flex size-10 shrink-0 items-center justify-center rounded-xl ring-1 shadow-2xs ${
-              isReject
-                ? 'bg-destructive/10 text-destructive ring-destructive/20'
-                : 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20'
-            }`}
-          >
-            {isReject ? <XCircle className="size-5" /> : <CheckCircle2 className="size-5" />}
-          </div>
-          <div className="flex flex-col gap-0.5 text-left">
-            <DialogTitle className="text-base font-bold tracking-tight text-foreground">
-              {isReject ? 'Rechazar solicitud de cambio' : 'Aceptar solicitud de cambio'}
-            </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              {isReject
-                ? 'Indica el motivo del rechazo. El cliente recibirá una notificación con tu justificación.'
-                : 'La solicitud será aprobada y quedará registrada formalmente en la trazabilidad del proyecto.'}
-            </DialogDescription>
-          </div>
-        </DialogHeader>
+      <DialogContent size="md">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <DialogHeader>
+            <DialogMedia variant={isReject ? 'destructive' : 'success'}>
+              {isReject ? <XCircle className="size-5" /> : <CheckCircle2 className="size-5" />}
+            </DialogMedia>
+            <div className="flex flex-col gap-1 text-left min-w-0">
+              <DialogTitle>
+                {isReject ? 'Rechazar solicitud de cambio' : 'Aceptar solicitud de cambio'}
+              </DialogTitle>
+              <DialogDescription>
+                {isReject
+                  ? 'Indica el motivo del rechazo. El cliente recibirá una notificación con tu justificación.'
+                  : 'La solicitud será aprobada y quedará registrada formalmente en la trazabilidad del proyecto.'}
+              </DialogDescription>
+            </div>
+          </DialogHeader>
 
-        <div className="px-5 py-4 sm:px-6">
-          {errorMsg && (
-            <Alert variant="destructive" className="mb-4 py-2.5 rounded-lg border-destructive/30">
-              <AlertCircle className="size-4" />
-              <AlertDescription className="text-xs">{errorMsg}</AlertDescription>
-            </Alert>
-          )}
+          <DialogBody className="space-y-4">
+            {errorMsg && (
+              <Alert variant="destructive" className="py-2.5 rounded-xl border-destructive/30">
+                <AlertCircle className="size-4" />
+                <AlertDescription className="text-xs">{errorMsg}</AlertDescription>
+              </Alert>
+            )}
 
-          <form onSubmit={handleSubmit} className="space-y-3.5">
-            <div className="rounded-lg border border-border/70 bg-muted/30 p-3 text-xs shadow-2xs">
-              <p className="font-bold text-foreground">{changeRequest?.title}</p>
-              <p className="mt-1 line-clamp-2 text-muted-foreground leading-relaxed">{changeRequest?.description}</p>
+            <div className="rounded-xl border border-border/70 bg-muted/30 p-3.5 text-xs shadow-2xs">
+              <p className="font-semibold text-foreground tracking-tight">{changeRequest?.title}</p>
+              <p className="mt-1.5 line-clamp-2 text-muted-foreground leading-relaxed">
+                {changeRequest?.description}
+              </p>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="resolve-comment" className="text-xs font-semibold text-foreground/90">
+              <Label htmlFor="resolve-comment" className="text-xs font-medium text-foreground/90">
                 {isReject ? 'Motivo del rechazo (obligatorio)' : 'Comentarios o notas de resolución (opcional)'}
               </Label>
               <Textarea
@@ -132,53 +128,45 @@ export function ResolveChangeRequestModal({
                 }
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                className="min-h-[90px] rounded-lg border-border/70 text-xs resize-none focus-visible:ring-primary/20"
+                className="min-h-[90px] rounded-xl border-border/70 text-xs resize-none focus-visible:ring-primary/20"
                 maxLength={2000}
               />
             </div>
+          </DialogBody>
 
-            <DialogFooter
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleClose}
+              disabled={isSubmitting}
+              className="rounded-xl text-xs"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              size="sm"
+              variant={isReject ? 'destructive' : 'default'}
+              disabled={isSubmitting}
               className={
-                'px-5 py-3.5 sm:px-6 border-t border-border/50 bg-muted/15 -mx-5 sm:-mx-6 ' +
-                '-mb-4 mt-5 flex items-center justify-end gap-2.5'
+                !isReject
+                  ? 'rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs gap-1.5 shadow-xs font-medium'
+                  : 'rounded-xl text-xs gap-1.5 shadow-xs font-medium'
               }
             >
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleClose}
-                disabled={isSubmitting}
-                className="rounded-lg text-xs"
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                variant={isReject ? 'destructive' : 'default'}
-                disabled={isSubmitting}
-                className={
-                  !isReject
-                    ? [
-                        'rounded-lg bg-emerald-600 hover:bg-emerald-700',
-                        'text-white text-xs gap-1.5 shadow-2xs font-semibold',
-                      ].join(' ')
-                    : 'rounded-lg text-xs gap-1.5 shadow-2xs font-semibold'
-                }
-              >
-                {isSubmitting ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : isReject ? (
-                  <XCircle className="size-3.5" />
-                ) : (
-                  <CheckCircle2 className="size-3.5" />
-                )}
-                {isSubmitting ? 'Procesando...' : isReject ? 'Rechazar cambio' : 'Aceptar cambio'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </div>
+              {isSubmitting ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : isReject ? (
+                <XCircle className="size-3.5" />
+              ) : (
+                <CheckCircle2 className="size-3.5" />
+              )}
+              {isSubmitting ? 'Procesando...' : isReject ? 'Rechazar cambio' : 'Aceptar cambio'}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

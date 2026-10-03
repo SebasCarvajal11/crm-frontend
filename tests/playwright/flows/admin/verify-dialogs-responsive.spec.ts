@@ -96,11 +96,15 @@ const mockTree = {
   },
 }
 
+const mockAdminJwt = `cima.${Buffer.from(
+  JSON.stringify({ role: 'admin', sub: '11111111-1111-4111-8111-111111111111' })
+).toString('base64url')}.cima`
+
 async function setupMocks(page: Page) {
-  await page.addInitScript(() => {
-    sessionStorage.setItem('cima_access_token', 'mock-access-token-jwt')
+  await page.addInitScript(({ token }) => {
+    sessionStorage.setItem('cima_access_token', token)
     sessionStorage.setItem('cima_user_email', 'valeria.quintero@cima.dev')
-  })
+  }, { token: mockAdminJwt })
 
   await page.route('**/api/v1/auth/login', async (route: Route) => {
     await route.fulfill({
@@ -108,7 +112,7 @@ async function setupMocks(page: Page) {
       contentType: 'application/json',
       body: JSON.stringify({
         data: {
-          accessToken: 'mock-access-token-jwt',
+          accessToken: mockAdminJwt,
           refreshToken: 'mock-refresh-token',
           expiresIn: 3600,
           tokenType: 'Bearer',

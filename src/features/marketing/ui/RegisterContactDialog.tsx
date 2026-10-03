@@ -6,10 +6,12 @@ import { NativeSelect } from '@/components/ui/native-select'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
@@ -114,34 +116,32 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
       </Button>
 
       <Dialog open={open} onOpenChange={(v) => !v && cerrar()}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-          <DialogHeader className="flex flex-row items-start gap-3 space-y-0">
-            <div
-              className={[
-                'flex size-10 shrink-0 items-center justify-center rounded-xl',
-                'bg-primary/10 text-primary ring-1 ring-primary/20',
-              ].join(' ')}
-            >
+        <DialogContent size="lg">
+          <DialogHeader>
+            <DialogMedia variant="default">
               <PhoneCall className="size-5" />
-            </div>
-            <div className="flex flex-col gap-1 text-left">
-              <DialogTitle className="text-base font-semibold tracking-tight">
+            </DialogMedia>
+            <div className="flex flex-col gap-1 text-left min-w-0">
+              <DialogTitle>
                 Registrar un contacto realizado
               </DialogTitle>
-              <DialogDescription className="text-xs text-muted-foreground">
+              <DialogDescription>
                 Deje constancia de una llamada, reunión o mensaje que ya ocurrió fuera del
                 sistema. Esto no envía nada: solo completa el historial del cliente.
               </DialogDescription>
             </div>
           </DialogHeader>
 
-          <div className="space-y-4 px-5 py-4 sm:px-6">
-            <div className="space-y-2">
-              <Label htmlFor="rc-client">Cliente</Label>
+          <DialogBody className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="rc-client" className="text-xs font-medium text-foreground/90">
+                Cliente
+              </Label>
               <NativeSelect
                 id="rc-client"
                 value={clientId}
                 onChange={(e) => setClientId(e.target.value)}
+                className="rounded-xl border-border/70 text-xs"
               >
                 <option value="">Seleccione un cliente…</option>
                 {clients.map((c) => (
@@ -152,12 +152,15 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
               </NativeSelect>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="rc-campaign">Campaña relacionada</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="rc-campaign" className="text-xs font-medium text-foreground/90">
+                Campaña relacionada
+              </Label>
               <NativeSelect
                 id="rc-campaign"
                 value={campaignId}
                 onChange={(e) => setCampaignId(e.target.value)}
+                className="rounded-xl border-border/70 text-xs"
               >
                 <option value="">Seleccione una campaña…</option>
                 {campaigns.map((c) => (
@@ -166,19 +169,22 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
                   </option>
                 ))}
               </NativeSelect>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[11px] text-muted-foreground">
                 Todo contacto pertenece a una campaña; es lo que permite medir su
                 efectividad.
               </p>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="rc-channel">Canal</Label>
+            <div className="grid gap-3.5 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="rc-channel" className="text-xs font-medium text-foreground/90">
+                  Canal
+                </Label>
                 <NativeSelect
                   id="rc-channel"
                   value={channel}
                   onChange={(e) => setChannel(e.target.value)}
+                  className="rounded-xl border-border/70 text-xs"
                 >
                   {CANALES.map((c) => (
                     <option key={c.value} value={c.value}>
@@ -188,12 +194,15 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
                 </NativeSelect>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="rc-type">Resultado</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="rc-type" className="text-xs font-medium text-foreground/90">
+                  Resultado
+                </Label>
                 <NativeSelect
                   id="rc-type"
                   value={interactionType}
                   onChange={(e) => setInteractionType(e.target.value as InteractionType)}
+                  className="rounded-xl border-border/70 text-xs"
                 >
                   {TIPOS.map((t) => (
                     <option key={t.value} value={t.value}>
@@ -202,40 +211,53 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
                   ))}
                 </NativeSelect>
                 {tipoSeleccionado && (
-                  <p className="text-xs text-muted-foreground">{tipoSeleccionado.ayuda}</p>
+                  <p className="text-[11px] text-muted-foreground">{tipoSeleccionado.ayuda}</p>
                 )}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="rc-response">Notas (opcional)</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="rc-response" className="text-xs font-medium text-foreground/90">
+                Notas (opcional)
+              </Label>
               <Textarea
                 id="rc-response"
                 rows={3}
                 value={response}
                 onChange={(e) => setResponse(e.target.value)}
                 placeholder="Llamada de seguimiento: solicitó ampliar la cotización a dos piezas…"
-                className="min-h-24 resize-y"
+                className="min-h-24 resize-y rounded-xl border-border/70 text-xs"
               />
             </div>
 
             {error && (
               <div
                 className={[
-                  'rounded-md border border-destructive/40 bg-destructive/5',
-                  'px-3 py-2 text-sm text-destructive',
+                  'rounded-xl border border-destructive/40 bg-destructive/5',
+                  'px-3.5 py-2.5 text-xs text-destructive',
                 ].join(' ')}
               >
                 {error}
               </div>
             )}
-          </div>
+          </DialogBody>
 
           <DialogFooter>
-            <Button variant="outline" onClick={cerrar} disabled={createMutation.isPending}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={cerrar}
+              disabled={createMutation.isPending}
+              className="rounded-xl text-xs"
+            >
               Cancelar
             </Button>
-            <Button onClick={enviar} disabled={createMutation.isPending}>
+            <Button
+              size="sm"
+              onClick={enviar}
+              disabled={createMutation.isPending}
+              className="rounded-xl text-xs font-medium shadow-xs"
+            >
               {createMutation.isPending ? 'Registrando…' : 'Registrar contacto'}
             </Button>
           </DialogFooter>

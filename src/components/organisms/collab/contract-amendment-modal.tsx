@@ -8,7 +8,11 @@ import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
+  DialogMedia,
+  DialogBody,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
@@ -114,34 +118,48 @@ export function ContractAmendmentModal({ accessToken, projectId, role, onError }
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent size="xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-            <FileText className="size-4 text-primary" />
-            {role === 'admin'
-              ? 'Formalizar Otrosí al Contrato Principal'
-              : 'Solicitud de Adición de Servicio'}
-          </DialogTitle>
+          <div className="flex items-center gap-3">
+            <DialogMedia variant="default">
+              <FileText className="size-5" />
+            </DialogMedia>
+            <div className="space-y-0.5">
+              <DialogTitle>
+                {role === 'admin'
+                  ? 'Formalizar Otrosí al Contrato Principal'
+                  : 'Solicitud de Adición de Servicio'}
+              </DialogTitle>
+              <DialogDescription>
+                {role === 'admin'
+                  ? 'Define los términos contractuales, adiciones de alcance y valor pactado.'
+                  : 'Describe los servicios adicionales o requerimientos requeridos para su evaluación.'}
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
         {role === 'admin' ? (
           <form
+            id="amendment-admin-form"
             onSubmit={(e) => {
               e.preventDefault()
               adminCreate.mutate()
             }}
-            className="space-y-3.5 text-xs"
+            className="flex flex-col flex-1 min-h-0"
           >
-            <div>
-              <Label className="mb-1 block font-medium">Título o Concepto de la Adición</Label>
-              <Input
-                required
-                placeholder="Ej: Adición de 2 videos publicitarios para Facebook"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                data-testid="amendment-title-input"
-              />
-            </div>
+            <DialogBody className="space-y-3.5 max-h-[60vh]">
+              <div>
+                <Label className="mb-1 block text-xs font-semibold text-foreground/90">Título o Concepto de la Adición</Label>
+                <Input
+                  required
+                  placeholder="Ej: Adición de 2 videos publicitarios para Facebook"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  data-testid="amendment-title-input"
+                  className="text-xs h-9"
+                />
+              </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div>
@@ -216,8 +234,10 @@ export function ContractAmendmentModal({ accessToken, projectId, role, onError }
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" size="sm" onClick={() => setOpen(false)}>
+            </DialogBody>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" size="sm" onClick={() => setOpen(false)} className="text-xs">
                 Cancelar
               </Button>
               <Button
@@ -225,10 +245,11 @@ export function ContractAmendmentModal({ accessToken, projectId, role, onError }
                 size="sm"
                 disabled={isSubmitting || !title.trim() || !serviceScope.trim()}
                 data-testid="save-amendment-draft-btn"
+                className="text-xs font-semibold shadow-2xs"
               >
                 {isSubmitting ? 'Guardando...' : 'Guardar Borrador de Otrosí'}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         ) : (
           <form
@@ -236,33 +257,37 @@ export function ContractAmendmentModal({ accessToken, projectId, role, onError }
               e.preventDefault()
               clientRequest.mutate()
             }}
-            className="space-y-3.5 text-xs"
+            className="flex flex-col flex-1 min-h-0"
           >
-            <div>
-              <Label className="mb-1 block font-medium">¿Qué servicio nuevo necesitas?</Label>
-              <Input
-                required
-                placeholder="Ej: Requerimos agregar 2 videos adicionales este mes"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                data-testid="client-request-title-input"
-              />
-            </div>
+            <DialogBody className="space-y-3.5 max-h-[60vh]">
+              <div>
+                <Label className="mb-1 block text-xs font-semibold text-foreground/90">¿Qué servicio nuevo necesitas?</Label>
+                <Input
+                  required
+                  placeholder="Ej: Requerimos agregar 2 videos adicionales este mes"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  data-testid="client-request-title-input"
+                  className="text-xs h-9"
+                />
+              </div>
 
-            <div>
-              <Label className="mb-1 block font-medium">Detalle del Requerimiento</Label>
-              <Textarea
-                required
-                rows={4}
-                placeholder="Describe qué entregables necesitas, en qué formato y la fecha ideal..."
-                value={clientDesc}
-                onChange={(e) => setClientDesc(e.target.value)}
-                data-testid="client-request-desc-input"
-              />
-            </div>
+              <div>
+                <Label className="mb-1 block text-xs font-semibold text-foreground/90">Detalle del Requerimiento</Label>
+                <Textarea
+                  required
+                  rows={4}
+                  placeholder="Describe qué entregables necesitas, en qué formato y la fecha ideal..."
+                  value={clientDesc}
+                  onChange={(e) => setClientDesc(e.target.value)}
+                  data-testid="client-request-desc-input"
+                  className="text-xs resize-none rounded-xl"
+                />
+              </div>
+            </DialogBody>
 
-            <div className="flex justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" size="sm" onClick={() => setOpen(false)}>
+            <DialogFooter>
+              <Button type="button" variant="outline" size="sm" onClick={() => setOpen(false)} className="text-xs">
                 Cancelar
               </Button>
               <Button
@@ -270,10 +295,11 @@ export function ContractAmendmentModal({ accessToken, projectId, role, onError }
                 size="sm"
                 disabled={isSubmitting || !title.trim() || !clientDesc.trim()}
                 data-testid="send-client-request-btn"
+                className="text-xs font-semibold shadow-2xs"
               >
                 {isSubmitting ? 'Enviando...' : 'Enviar Solicitud al Administrador'}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         )}
       </DialogContent>

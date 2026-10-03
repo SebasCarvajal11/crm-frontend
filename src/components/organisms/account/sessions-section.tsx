@@ -121,10 +121,10 @@ export function SessionsSection({ accessToken }: Props) {
                         : 'Cerrar sesión en todos los dispositivos'}
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent size="default">
                     <AlertDialogHeader>
-                      <AlertDialogMedia>
-                        <LogOut className="size-6 text-destructive" />
+                      <AlertDialogMedia variant="destructive">
+                        <LogOut className="size-5" />
                       </AlertDialogMedia>
                       <AlertDialogTitle>Cerrar sesión en todos los dispositivos</AlertDialogTitle>
                       <AlertDialogDescription>
@@ -133,9 +133,9 @@ export function SessionsSection({ accessToken }: Props) {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogCancel className="rounded-xl text-xs">Cancelar</AlertDialogCancel>
                       <AlertDialogAction
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl text-xs font-medium"
                         onClick={() => revokeAllMutation.mutate()}
                       >
                         Confirmar cierre global

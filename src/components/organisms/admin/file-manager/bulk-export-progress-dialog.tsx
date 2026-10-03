@@ -3,6 +3,7 @@ import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -47,42 +48,30 @@ export function BulkExportProgressDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={(open) => !open && (isComplete || isError) && onClose()}>
-      <AlertDialogContent className="max-w-md">
+      <AlertDialogContent size="default">
         <AlertDialogHeader>
-          <div className="flex items-start sm:items-center gap-3">
-            <div
-              className={`p-2.5 rounded-xl shrink-0 ring-1 ${
-                isComplete
-                  ? 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20'
-                  : isError
-                    ? 'bg-rose-500/10 text-rose-600 ring-rose-500/20'
-                    : 'bg-primary/10 text-primary ring-primary/20'
-              }`}
-            >
-              {isComplete ? (
-                <CheckCircle2 className="size-5" />
-              ) : isError ? (
-                <AlertCircle className="size-5" />
-              ) : (
-                <Archive className="size-5 animate-pulse" />
-              )}
-            </div>
-            <div className="space-y-0.5 min-w-0 flex-1">
-              <AlertDialogTitle className="text-base font-bold text-foreground truncate">
-                {title}
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-xs text-muted-foreground">
-                {isComplete
-                  ? 'La descarga comenzará automáticamente en tu navegador.'
-                  : isError
-                    ? 'Ocurrió un error al intentar generar el archivo comprimido.'
-                    : 'Empaquetando archivos con estructura de carpetas tipo Google Drive.'}
-              </AlertDialogDescription>
-            </div>
-          </div>
+          <AlertDialogMedia variant={isComplete ? 'success' : isError ? 'destructive' : 'default'}>
+            {isComplete ? (
+              <CheckCircle2 className="size-5" />
+            ) : isError ? (
+              <AlertCircle className="size-5" />
+            ) : (
+              <Archive className="size-5 animate-pulse" />
+            )}
+          </AlertDialogMedia>
+          <AlertDialogTitle className="truncate">
+            {title}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {isComplete
+              ? 'La descarga comenzará automáticamente en tu navegador.'
+              : isError
+                ? 'Ocurrió un error al intentar generar el archivo comprimido.'
+                : 'Empaquetando archivos con estructura de carpetas tipo Google Drive.'}
+          </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className="space-y-3 py-2 text-xs">
+        <div className="space-y-3 py-1 text-xs">
           {!isError ? (
             <div className="rounded-xl border border-border/80 bg-muted/20 p-3.5 space-y-2.5">
               <div className="flex items-center justify-between font-medium">
@@ -121,7 +110,7 @@ export function BulkExportProgressDialog({
 
         <AlertDialogFooter>
           {(isComplete || isError) && (
-            <Button size="sm" onClick={onClose} className="w-full sm:w-auto text-xs gap-1.5">
+            <Button size="sm" onClick={onClose} className="w-full sm:w-auto text-xs rounded-xl font-medium shadow-xs gap-1.5">
               {isComplete ? <Download className="size-3.5" /> : null}
               {isComplete ? 'Listo' : 'Cerrar'}
             </Button>

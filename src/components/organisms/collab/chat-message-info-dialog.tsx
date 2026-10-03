@@ -1,6 +1,14 @@
 import { useMemo } from 'react'
 import { Check, CheckCheck, Clock } from 'lucide-react'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogMedia,
+  DialogBody,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 import type { ChatMessageReadReceipt, ProjectChatMessage, ProjectMember } from '@/features/collab/model'
 import type { UserAvatarsResponse } from '@/shared/types'
@@ -81,20 +89,27 @@ export function ChatMessageInfoDialog({ open, onOpenChange, message, members, av
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-0 overflow-hidden sm:max-w-lg">
-        <DialogHeader className="border-b px-5 py-4 bg-muted/20">
-          <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-            <CheckCheck className="size-5 text-sky-500" />
-            Info del mensaje
-          </DialogTitle>
+      <DialogContent size="lg">
+        <DialogHeader>
+          <div className="flex items-center gap-3">
+            <DialogMedia variant="info">
+              <CheckCheck className="size-5" />
+            </DialogMedia>
+            <div className="space-y-0.5 min-w-0 pr-8">
+              <DialogTitle>Info del mensaje</DialogTitle>
+              <DialogDescription>
+                Trazabilidad y confirmación de lectura de participantes.
+              </DialogDescription>
+            </div>
+          </div>
           {message && (
-            <DialogDescription className="mt-2 line-clamp-2 rounded-lg border border-border/70 bg-background/80 p-2.5 text-xs text-muted-foreground italic">
+            <div className="mt-2 line-clamp-2 rounded-xl border border-border/70 bg-card/60 p-2.5 text-xs text-muted-foreground italic shadow-2xs">
               &ldquo;{message.body}&rdquo;
-            </DialogDescription>
+            </div>
           )}
         </DialogHeader>
 
-        <div className="max-h-[60vh] divide-y divide-border/60 overflow-y-auto px-5 py-2">
+        <DialogBody className="divide-y divide-border/60 py-1">
           <section className="py-3">
             <div className="mb-2 flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -178,7 +193,7 @@ export function ChatMessageInfoDialog({ open, onOpenChange, message, members, av
               </div>
             )}
           </section>
-        </div>
+        </DialogBody>
       </DialogContent>
     </Dialog>
   )
