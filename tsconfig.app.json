@@ -26,6 +26,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "lucide-react": [
+        "./src/components/ui/cima-icon.tsx"
       ]
     }
   },
