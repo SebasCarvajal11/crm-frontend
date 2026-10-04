@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/shared/lib/utils'
 import { useProjectChatData, useProjectChatSend } from '@/features/collab/hooks'
 import type { ProjectMember } from '@/features/collab/model'
 import type { MeResponse } from '@/shared/types'
@@ -79,6 +80,14 @@ export function ChatPanel({
     () => (mentionQuery ? buildMentionSuggestions(mentionQuery.query, identity.role, members) : []),
     [mentionQuery, identity.role, members]
   )
+
+  useEffect(() => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+    textarea.style.height = 'auto'
+    const nextHeight = Math.min(Math.max(textarea.scrollHeight, 44), 112)
+    textarea.style.height = `${nextHeight}px`
+  }, [body])
 
   useEffect(() => {
     if (!highlightMessageId || messages.length === 0) return
@@ -180,11 +189,11 @@ export function ChatPanel({
 
       <div className="shrink-0 border-t bg-background/80 p-3">
         <ChatTypingIndicator typers={activeTypers} />
-        <div className="relative flex items-end gap-2 max-md:pr-14">
+        <div className="relative flex items-end gap-2">
           <div className="min-w-0 flex-1">
             <Textarea
               ref={textareaRef}
-              placeholder={`Escribe un mensaje ${channel === 'internal' ? 'al equipo' : 'al cliente'}... Usa @ para mencionar`}
+              placeholder="Escribe un mensaje... Usa @ para mencionar"
               value={body}
               onChange={(event) => {
                 setBody(event.target.value)
@@ -224,7 +233,7 @@ export function ChatPanel({
                   submitMessage()
                 }
               }}
-              className="min-h-[44px] max-h-28 resize-none text-sm"
+              className="min-h-[44px] max-h-28 resize-none py-2.5 text-sm leading-snug"
               rows={1}
               aria-label="Escribir mensaje"
               onSelect={(event) => {
@@ -236,7 +245,12 @@ export function ChatPanel({
 
           <Button
             size="icon"
-            className="h-[44px] w-[44px] shrink-0 rounded-lg"
+            className={cn(
+              'h-[44px] w-[44px] shrink-0 rounded-lg transition-all duration-150',
+              body.trim().length > 0 && !send.isPending
+                ? 'bg-primary text-primary-foreground shadow-xs hover:bg-primary-hover active:scale-95'
+                : 'bg-muted text-muted-foreground/50 border border-border/60 cursor-not-allowed opacity-70'
+            )}
             disabled={body.trim().length < 1 || send.isPending}
             onClick={submitMessage}
             aria-label="Enviar mensaje"
@@ -263,7 +277,7 @@ export function ChatPanel({
           )}
         </div>
 
-        <p className="mt-1 text-[11px] text-muted-foreground">Menciones permitidas: {mentionHints(identity.role).join(' · ')}</p>
+        <p className="mt-1.5 text-[11px] text-muted-foreground/90">Menciones permitidas: {mentionHints(identity.role).join(' · ')}</p>
       </div>
 
       {identity.role === 'admin' && (

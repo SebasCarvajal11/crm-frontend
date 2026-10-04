@@ -44,34 +44,40 @@ export const UserAvatar = memo(function UserAvatar({
   return (
     <div
       className={cn(
-        'relative inline-flex shrink-0 select-none items-center justify-center overflow-hidden rounded-full font-semibold',
+        'relative inline-flex shrink-0 select-none items-center justify-center',
         cfg.container,
-        hasValidImage ? 'border border-border/60 bg-muted/20' : `${bgColor} text-white shadow-2xs`,
         className
       )}
       title={name ?? undefined}
       data-testid="user-avatar"
     >
-      {hasValidImage ? (
-        <img
-          src={src!}
-          alt={altText}
-          className="size-full object-cover rounded-full"
-          onError={() => setLoadError(true)}
-          loading="lazy"
-        />
-      ) : initials ? (
-        <span className={cn('tracking-tight uppercase', cfg.text)} aria-hidden="true">
-          {initials}
-        </span>
-      ) : (
-        <UserRound className="size-1/2 opacity-90" aria-hidden="true" />
-      )}
+      <div
+        className={cn(
+          'flex size-full items-center justify-center overflow-hidden rounded-full font-semibold',
+          hasValidImage ? 'border border-border/60 bg-muted/20' : `${bgColor} text-white shadow-2xs`
+        )}
+      >
+        {hasValidImage ? (
+          <img
+            src={src!}
+            alt={altText}
+            className="size-full object-cover rounded-full"
+            onError={() => setLoadError(true)}
+            loading="lazy"
+          />
+        ) : initials ? (
+          <span className={cn('tracking-tight uppercase', cfg.text)} aria-hidden="true">
+            {initials}
+          </span>
+        ) : (
+          <UserRound className="size-1/2 opacity-90" aria-hidden="true" />
+        )}
+      </div>
 
       {presenceStatus && (
         <span
           className={cn(
-            'absolute bottom-0 right-0 rounded-full ring-2 ring-background',
+            'absolute bottom-0 right-0 z-10 rounded-full ring-2 ring-background',
             cfg.dot,
             presenceStatus === 'online' ? 'bg-emerald-500' : 'bg-muted-foreground/40'
           )}

@@ -45,5 +45,7 @@ describe('UserAvatar', () => {
     )
     expect(markup).toContain('bg-emerald-500')
     expect(markup).toContain('aria-label="En línea"')
+    expect(markup).toContain('z-10')
+    expect(markup).toContain('ring-2 ring-background')
   })
 })
