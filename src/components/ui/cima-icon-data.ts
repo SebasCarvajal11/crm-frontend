@@ -283,6 +283,13 @@ export const CIMA_ICONS_DATA: Record<string, CimaIconDefinition> = {
     prefix: "line-md",
     name: "download"
   },
+  "Copy": {
+    body: "<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"><rect width=\"13\" height=\"13\" x=\"9\" y=\"9\" rx=\"2\" ry=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></g>",
+    width: 24,
+    height: 24,
+    prefix: "solar",
+    name: "copy-linear"
+  },
   "Edit2": {
     body: "<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path stroke-dasharray=\"44\" stroke-dashoffset=\"44\" d=\"M7 17v-4l10 -10l4 4l-10 10h-4\"><animate fill=\"freeze\" attributeName=\"stroke-dashoffset\" begin=\"0.3s\" dur=\"0.5s\" to=\"0\"/></path><path stroke-dasharray=\"20\" d=\"M3 21h18\"><animate fill=\"freeze\" attributeName=\"stroke-dashoffset\" dur=\"0.3s\" values=\"20;0\"/></path><path stroke-dasharray=\"8\" stroke-dashoffset=\"8\" d=\"M14 6l4 4\"><animate fill=\"freeze\" attributeName=\"stroke-dashoffset\" begin=\"0.8s\" dur=\"0.2s\" to=\"0\"/></path></g>",
     width: 24,

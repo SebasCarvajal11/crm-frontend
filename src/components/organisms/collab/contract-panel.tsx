@@ -56,6 +56,7 @@ export function ContractPanel({
   onError,
 }: Props) {
   const [activeTab, setActiveTab] = useState<'contract' | 'amendments'>('contract')
+  const [isClientViewingSeal, setIsClientViewingSeal] = useState(false)
 
   const { data: amendments = [] } = useQuery({
     queryKey: collabKeys.contractAmendments(project?.id ?? ''),
@@ -113,7 +114,8 @@ export function ContractPanel({
   }
 
   const badge = statusCopy[contract.status]
-  const isClientSigning = contract.status === 'pending_signature' && role === 'client'
+  const isClientSigning =
+    (contract.status === 'pending_signature' || isClientViewingSeal) && role === 'client'
 
   return (
     <section
@@ -213,8 +215,11 @@ export function ContractPanel({
             <ContractClientSignature
               accessToken={accessToken}
               projectId={project.id}
+              projectName={project.name}
               contract={contract}
               onError={onError}
+              onSealComplete={() => setIsClientViewingSeal(true)}
+              onDismissSeal={() => setIsClientViewingSeal(false)}
             />
           ) : (
             <ContractLegalTraceability

@@ -38,6 +38,10 @@ const queryClient = new QueryClient({
   },
 })
 
+if (typeof window !== 'undefined') {
+  ;(window as unknown as { __queryClient?: QueryClient }).__queryClient = queryClient
+}
+
 const router = createRouter({ routeTree })
 
 declare module '@tanstack/react-router' {

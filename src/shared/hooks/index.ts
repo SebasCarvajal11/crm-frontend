@@ -1,1 +1,4 @@
 export * from './use-user-avatars'
+export * from './use-prefers-reduced-motion'
+export * from './use-element-in-viewport'
+export * from './use-animated-counter'

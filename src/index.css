@@ -369,6 +369,151 @@
 .stagger-5 { animation-delay: 200ms; }
 .stagger-6 { animation-delay: 240ms; }
 
+/* Animaciones de progreso y kanban táctil */
+@keyframes progressShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.animate-progress-shimmer {
+  animation: progressShimmer 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Sello Legal Digital Inmutable (Formalización Contractual) */
+@keyframes legalStampSettle {
+  0% {
+    opacity: 0;
+    transform: scale3d(1.08, 1.08, 1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes legalStampGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45), 0 0 0 0 rgba(217, 119, 6, 0.35);
+  }
+  35% {
+    box-shadow: 0 0 24px 3px rgba(16, 185, 129, 0.28), 0 0 12px 1px rgba(217, 119, 6, 0.22);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0), 0 0 0 0 rgba(217, 119, 6, 0);
+  }
+}
+
+.animate-legal-stamp {
+  animation: legalStampSettle 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards,
+             legalStampGlow 900ms ease-out forwards;
+  will-change: transform, opacity, box-shadow;
+}
+
+/* Inserción física amortiguada de mensajes (Chat) */
+@keyframes chatMessageSpring {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.animate-chat-message-spring {
+  animation: chatMessageSpring 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+/* Morphing elástico de doble check en recibo de lectura */
+@keyframes readReceiptMorph {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  65% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-read-receipt-morph {
+  animation: readReceiptMorph 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+/* Descarte con colapso suave en CSS Grid (Notificaciones) */
+.notification-collapse-row {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 200ms cubic-bezier(0.16, 1, 0.3, 1),
+              margin 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  opacity: 1;
+  will-change: grid-template-rows, opacity;
+}
+
+.notification-collapse-row[data-dismissing="true"] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.notification-collapse-inner {
+  min-height: 0;
+  overflow: hidden;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.notification-collapse-row[data-dismissing="true"] .notification-collapse-inner {
+  transform: translate3d(24px, 0, 0);
+}
+
+/* Kanban Tactile Lift & Tilt (GPU Composited) */
+.kanban-task-card {
+  transform: translate3d(0, 0, 0);
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 140ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 140ms ease-out,
+              opacity 140ms ease-out;
+  will-change: transform, box-shadow;
+}
+
+@media (hover: hover) {
+  .kanban-task-card:hover:not([data-dragging="true"]) {
+    transform: translate3d(0, -2px, 0) scale(1.025) rotate(1.1deg);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+.kanban-task-card:active:not([data-dragging="true"]) {
+  transform: translate3d(0, -1px, 0) scale(1.02) rotate(0.8deg);
+  box-shadow: var(--shadow-md);
+}
+
+.kanban-task-card[data-dragging="true"] {
+  opacity: 0.45;
+  transform: scale(0.98);
+  border-style: dashed;
+}
+
+.kanban-column-dropzone {
+  transition: border-color 150ms ease-out,
+              box-shadow 150ms ease-out,
+              background-color 150ms ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,
@@ -384,4 +529,47 @@
   .interactive-scale:active {
     transform: none !important;
   }
+  .kanban-task-card {
+    transform: none !important;
+    transition: opacity 140ms ease-out, border-color 140ms ease-out !important;
+    transition-duration: 140ms !important;
+  }
+  .kanban-task-card:hover,
+  .kanban-task-card:active,
+  .kanban-task-card[data-dragging="true"] {
+    transform: none !important;
+  }
+  .kanban-column-dropzone {
+    transition: border-color 150ms ease-out,
+                box-shadow 150ms ease-out,
+                background-color 150ms ease-out !important;
+    transition-duration: 150ms !important;
+  }
+  .animate-progress-shimmer {
+    animation: none !important;
+  }
+  .animate-legal-stamp {
+    animation: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  .animate-chat-message-spring {
+    animation: none !important;
+    transform: none !important;
+  }
+  .animate-read-receipt-morph {
+    animation: none !important;
+    transform: none !important;
+  }
+  .notification-collapse-row {
+    transition: none !important;
+  }
+  .notification-collapse-inner {
+    transition: none !important;
+    transform: none !important;
+  }
+  .notification-collapse-row[data-dismissing="true"] .notification-collapse-inner {
+    transform: none !important;
+  }
 }
+

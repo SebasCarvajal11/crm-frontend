@@ -1,11 +1,18 @@
 import { memo, useMemo, useState } from 'react'
-import { Check, CheckCheck, MessageSquare } from 'lucide-react'
-import type { MeResponse } from '@/shared/types'
+import { MessageSquare } from 'lucide-react'
+import type { MeResponse, UserAvatarsResponse } from '@/shared/types'
 import type { ProjectChatMessage, ProjectMember } from '@/features/collab/model'
-import type { UserAvatarsResponse } from '@/shared/types'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
-import { UserAvatar } from '@/components/atoms/user-avatar'
 import { ChatMessageInfoDialog } from './chat-message-info-dialog'
+import { ChatMessageBubble } from './chat/chat-message-bubble'
+import {
+  formatDaySeparator,
+  formatMessageTime,
+  getAuthorDisplayName,
+  getAuthorRoleTag,
+  isSameDay,
+} from './chat/chat-message-types'
+import { useNewlyArrivedMessages } from './chat/use-newly-arrived-messages'
 
 type Props = {
   messages: ProjectChatMessage[]
@@ -16,29 +23,39 @@ type Props = {
   members?: ProjectMember[]
 }
 
+function ChatSystemMessageItem({ message }: { message: ProjectChatMessage }) {
+  return (
+    <div className="flex justify-center py-1.5 animate-in fade-in-0 duration-150">
+      <span
+        className={[
+          'inline-flex items-center gap-1.5 rounded-full border bg-muted/60',
+          'px-2.5 py-1 text-[10px] text-muted-foreground',
+        ].join(' ')}
+      >
+        <MessageSquare className="size-3 shrink-0" />
+        {message.body}
+        <span className="opacity-60">{formatMessageTime(message.createdAt)}</span>
+      </span>
+    </div>
+  )
+}
 
-const formatMessageTime = (iso: string): string =>
-  new Date(iso).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false })
-
-const formatMessageDateTime = (iso: string): string =>
-  new Date(iso).toLocaleString('es-CO', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    hour12: false,
-  })
-
-const isSameDay = (first: Date, second: Date): boolean =>
-  first.getFullYear() === second.getFullYear() &&
-  first.getMonth() === second.getMonth() &&
-  first.getDate() === second.getDate()
-
-const formatDaySeparator = (iso: string): string => {
-  const date = new Date(iso)
-  const now = new Date()
-  if (isSameDay(date, now)) return 'Hoy'
-  const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
-  if (isSameDay(date, yesterday)) return 'Ayer'
-  return date.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+function ChatDaySeparatorItem({ isoDate }: { isoDate: string }) {
+  return (
+    <div className="my-2.5 flex items-center gap-2">
+      <div className="h-px flex-1 bg-border/60" />
+      <span
+        className={[
+          'rounded-full border border-border/70 bg-card/90 px-3 py-0.5',
+          'text-[10px] font-semibold tracking-wide uppercase text-muted-foreground',
+          'shadow-2xs backdrop-blur-xs',
+        ].join(' ')}
+      >
+        {formatDaySeparator(isoDate)}
+      </span>
+      <div className="h-px flex-1 bg-border/60" />
+    </div>
+  )
 }
 
 export const ChatMessageList = memo(function ChatMessageList({
@@ -50,6 +67,7 @@ export const ChatMessageList = memo(function ChatMessageList({
   members: propMembers,
 }: Props) {
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null)
+  const { isNewlyArrived } = useNewlyArrivedMessages(messages)
 
   const selectedMessageForInfo = useMemo(
     () => (selectedMessageId ? messages.find((m) => m.id === selectedMessageId) ?? null : null),
@@ -60,64 +78,6 @@ export const ChatMessageList = memo(function ChatMessageList({
     if (propMembers && propMembers.length > 0) return propMembers
     return Array.from(memberBySub.values())
   }, [propMembers, memberBySub])
-
-  const getDisplayName = (message: ProjectChatMessage): string => {
-    const member = message.authorSub ? memberBySub.get(message.authorSub) : undefined
-    const memberFullName = `${member?.first_name ?? ''} ${member?.last_name ?? ''}`.trim()
-    const fullName = `${message.authorFirstName ?? ''} ${message.authorLastName ?? ''}`.trim()
-    return memberFullName || fullName || member?.email || message.authorEmail || 'Sistema'
-  }
-
-  const getAuthorTag = (message: ProjectChatMessage): string => {
-    const member = message.authorSub ? memberBySub.get(message.authorSub) : undefined
-    const profession = member?.profession ?? message.authorProfession
-    const role = member?.role ?? message.authorRole
-    if (role === 'worker' && profession) return `Worker · ${profession}`
-    if (role === 'worker') return 'Worker'
-    if (role === 'admin') return 'Administrador'
-    if (role === 'client') return 'Cliente'
-    return 'Sistema'
-  }
-
-  const renderReadReceipt = (message: ProjectChatMessage) => {
-    const readStatus = message.readStatus
-    const seenCount = readStatus?.seenCount ?? 0
-    const requiredCount = readStatus?.requiredCount ?? 0
-    const isSeenByAll = readStatus?.isSeen ?? false
-
-    let checkIcon: React.ReactNode
-    let checkTitle: string
-
-    if (seenCount === 0) {
-      checkIcon = <Check className="size-3 text-muted-foreground" />
-      checkTitle = 'Enviado'
-    } else if (isSeenByAll || (requiredCount > 0 && seenCount >= requiredCount)) {
-      checkIcon = <CheckCheck className="size-3 text-sky-500" />
-      checkTitle = `Leído por todos (${seenCount}/${requiredCount})`
-    } else {
-      checkIcon = <CheckCheck className="size-3 text-muted-foreground" />
-      checkTitle = `Leído por ${seenCount} de ${requiredCount}`
-    }
-
-    return (
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation()
-          setSelectedMessageId(message.id)
-        }}
-        className={[
-          'inline-flex items-center gap-0.5 rounded p-0.5 transition-colors',
-          'hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer',
-          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
-        ].join(' ')}
-        title={`${checkTitle} · Ver quién ha leído`}
-        aria-label={`Estado de lectura: ${checkTitle}. Clic para ver detalles`}
-      >
-        {checkIcon}
-      </button>
-    )
-  }
 
   if (messages.length === 0) {
     return (
@@ -131,140 +91,65 @@ export const ChatMessageList = memo(function ChatMessageList({
   return (
     <>
       {messages.map((message, index) => {
-    const isOwn = message.authorSub === identity.id
-    const isSystem = message.messageType !== 'text'
-    const isMentioned = Array.isArray(message.mentionedSubs) && message.mentionedSubs.includes(identity.id)
-    const previousMessage = index > 0 ? messages[index - 1] : null
-    const nextMessage = index < messages.length - 1 ? messages[index + 1] : null
-    const showDaySeparator =
-      !previousMessage || !isSameDay(new Date(previousMessage.createdAt), new Date(message.createdAt))
-    const sameAuthorAsPrevious =
-      !!previousMessage &&
-      previousMessage.messageType === message.messageType &&
-      previousMessage.authorSub === message.authorSub &&
-      previousMessage.authorEmail === message.authorEmail &&
-      isSameDay(new Date(previousMessage.createdAt), new Date(message.createdAt))
-    const sameAuthorAsNext =
-      !!nextMessage &&
-      nextMessage.messageType === message.messageType &&
-      nextMessage.authorSub === message.authorSub &&
-      nextMessage.authorEmail === message.authorEmail &&
-      isSameDay(new Date(nextMessage.createdAt), new Date(message.createdAt))
+        const isOwn = message.authorSub === identity.id
+        const isSystem = message.messageType !== 'text'
+        const isMentioned =
+          Array.isArray(message.mentionedSubs) && message.mentionedSubs.includes(identity.id)
+        const prev = index > 0 ? messages[index - 1] : null
+        const next = index < messages.length - 1 ? messages[index + 1] : null
 
-    if (isSystem) {
-      return (
-        <div key={message.id} className="flex justify-center py-1.5 animate-in fade-in-0 duration-150">
-          <span
-            className={[
-              'inline-flex items-center gap-1.5 rounded-full border bg-muted/60',
-              'px-2.5 py-1 text-[10px] text-muted-foreground',
-            ].join(' ')}
-          >
-            <MessageSquare className="size-3 shrink-0" />
-            {message.body}
-            <span className="opacity-60">{formatMessageTime(message.createdAt)}</span>
-          </span>
-        </div>
-      )
-    }
+        const showDaySeparator =
+          !prev || !isSameDay(new Date(prev.createdAt), new Date(message.createdAt))
+        const sameAuthorAsPrev =
+          !!prev &&
+          prev.messageType === message.messageType &&
+          prev.authorSub === message.authorSub &&
+          prev.authorEmail === message.authorEmail &&
+          isSameDay(new Date(prev.createdAt), new Date(message.createdAt))
+        const sameAuthorAsNext =
+          !!next &&
+          next.messageType === message.messageType &&
+          next.authorSub === message.authorSub &&
+          next.authorEmail === message.authorEmail &&
+          isSameDay(new Date(next.createdAt), new Date(message.createdAt))
 
-    return (
-      <div key={message.id}>
-        {showDaySeparator && (
-          <div className="my-2.5 flex items-center gap-2">
-            <div className="h-px flex-1 bg-border/60" />
-            <span
-              className={[
-                'rounded-full border border-border/70 bg-card/90 px-3 py-0.5',
-                'text-[10px] font-semibold tracking-wide uppercase text-muted-foreground',
-                'shadow-2xs backdrop-blur-xs',
-              ].join(' ')}
-            >
-              {formatDaySeparator(message.createdAt)}
-            </span>
-            <div className="h-px flex-1 bg-border/60" />
+        if (isSystem) {
+          return <ChatSystemMessageItem key={message.id} message={message} />
+        }
+
+        const avatarUrl = message.authorSub
+          ? pickAvatarUrl(avatarBySub[message.authorSub]?.urls, '64')
+          : null
+
+        return (
+          <div key={message.id}>
+            {showDaySeparator && <ChatDaySeparatorItem isoDate={message.createdAt} />}
+            <ChatMessageBubble
+              message={message}
+              isOwn={isOwn}
+              isMentioned={isMentioned}
+              sameAuthorAsPrevious={sameAuthorAsPrev}
+              sameAuthorAsNext={sameAuthorAsNext}
+              displayName={getAuthorDisplayName(message, memberBySub)}
+              authorTag={getAuthorRoleTag(message, memberBySub)}
+              avatarUrl={avatarUrl}
+              isNewlyArrived={isNewlyArrived(message.id)}
+              highlightMessageId={highlightMessageId}
+              onOpenDetails={setSelectedMessageId}
+            />
           </div>
-        )}
-        <div
-          data-message-id={message.id}
-          className={[
-            'flex gap-2 animate-in fade-in-0 slide-in-from-bottom-0.5 duration-150',
-            isOwn ? 'flex-row-reverse' : 'flex-row',
-            sameAuthorAsNext ? 'mb-0.5' : 'mb-2.5',
-            highlightMessageId === message.id ? 'rounded-lg bg-amber-100/60 px-1 py-1 dark:bg-amber-300/15' : '',
-          ].join(' ')}
-        >
-          {!isOwn && (
-            <div className="flex w-7 shrink-0 items-end">
-              {!sameAuthorAsNext && (
-                <UserAvatar
-                  src={message.authorSub ? pickAvatarUrl(avatarBySub[message.authorSub]?.urls, '64') : null}
-                  name={getDisplayName(message)}
-                  userId={message.authorSub}
-                  size="sm"
-                  alt={`Avatar de ${getDisplayName(message)}`}
-                />
-              )}
-            </div>
-          )}
-          <div
-            className={[
-              'flex max-w-[75%] flex-col',
-              isOwn ? 'items-end' : 'items-start',
-              sameAuthorAsPrevious ? 'pt-0' : 'pt-0.5',
-            ].join(' ')}
-          >
-            {!isOwn && !sameAuthorAsPrevious && (
-              <span className="mb-0.5 px-3 text-[11px] font-semibold text-muted-foreground">
-                {getDisplayName(message)} · {getAuthorTag(message)}
-                {isMentioned && (
-                  <span
-                    className={[
-                      'ml-2 inline-flex items-center rounded-full border border-amber-300/70',
-                      'bg-amber-100/70 px-1.5 py-0.5 text-[10px] font-medium text-amber-800',
-                    ].join(' ')}
-                  >
-                    Te menciono
-                  </span>
-                )}
-              </span>
-            )}
-            <div
-              className={[
-                'break-words px-3.5 py-2 text-sm leading-relaxed transition-colors',
-                isOwn
-                  ? 'rounded-2xl rounded-br-xs bg-primary text-primary-foreground shadow-2xs'
-                  : 'rounded-2xl rounded-bl-xs bg-card border border-border/70 text-foreground shadow-2xs',
-                isMentioned && !isOwn
-                  ? 'bg-amber-500/10 border-amber-500/30 ring-1 ring-amber-500/20'
-                  : '',
-              ].join(' ')}
-            >
-              {message.body}
-            </div>
-            {!sameAuthorAsNext && (
-              <span
-                className="mt-0.5 inline-flex items-center gap-1 px-1 text-[10px] text-muted-foreground"
-                title={formatMessageDateTime(message.createdAt)}
-              >
-                {formatMessageTime(message.createdAt)}
-                {isOwn && renderReadReceipt(message)}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-    )
-  })}
-  <ChatMessageInfoDialog
-    open={Boolean(selectedMessageId)}
-    onOpenChange={(open) => {
-      if (!open) setSelectedMessageId(null)
-    }}
-    message={selectedMessageForInfo}
-    members={resolvedMembers}
-    avatarBySub={avatarBySub}
-  />
-</>
+        )
+      })}
+
+      <ChatMessageInfoDialog
+        open={Boolean(selectedMessageId)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedMessageId(null)
+        }}
+        message={selectedMessageForInfo}
+        members={resolvedMembers}
+        avatarBySub={avatarBySub}
+      />
+    </>
   )
 })

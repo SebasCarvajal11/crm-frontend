@@ -171,6 +171,7 @@ export const Cloud: LucideIcon = createIcon('Cloud');
 export const Crown: LucideIcon = createIcon('Crown');
 export const Database: LucideIcon = createIcon('Database');
 export const Download: LucideIcon = createIcon('Download');
+export const Copy: LucideIcon = createIcon('Copy');
 export const Edit2: LucideIcon = createIcon('Edit2');
 export const ExternalLink: LucideIcon = createIcon('ExternalLink');
 export const Eye: LucideIcon = createIcon('Eye');

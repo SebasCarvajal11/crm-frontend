@@ -38,10 +38,55 @@
   z-index: 59;
   pointer-events: none;
   border: 2px solid var(--primary);
-  border-radius: .5rem;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent);
+  border-radius: 0.75rem;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent),
+              0 0 16px color-mix(in srgb, var(--primary) 15%, transparent);
+  will-change: left, top, width, height, opacity;
+  opacity: 1;
 }
+
+.cima-tour-highlight.cima-tour-morphing,
+.cima-tour-guide.cima-tour-morphing {
+  transition: left 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              top 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              width 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              height 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 200ms ease;
+}
+
+.cima-tour-highlight[data-status="loading"] {
+  opacity: 0.45;
+  border-style: dashed;
+}
+
+.cima-tour-highlight[data-status="ready"] {
+  animation: cimaSpotlightPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes cimaSpotlightPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent),
+                0 0 16px color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 4.5px color-mix(in srgb, var(--primary) 38%, transparent),
+                0 0 24px color-mix(in srgb, var(--primary) 28%, transparent);
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .cima-tour-guide { animation: cima-guide-appear 150ms ease-out; }
   @keyframes cima-guide-appear { from { opacity: 0; } to { opacity: 1; } }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .cima-tour-highlight {
+    transition: none !important;
+    animation: none !important;
+  }
+  .cima-tour-highlight.cima-tour-morphing,
+  .cima-tour-guide.cima-tour-morphing {
+    transition: none !important;
+  }
+}
+

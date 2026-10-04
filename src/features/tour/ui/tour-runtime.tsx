@@ -8,6 +8,7 @@ import { useSessionStore } from '@/app/session/session-store'
 import { useTourContext } from '../hooks/use-tour-context'
 import { useTourStore } from '../model/tour-store'
 import { hasApplicationDialog, visibleElement, waitForTarget } from '../utils/tour-target'
+import { TourSpotlight } from './tour-spotlight'
 import './tour-popover-theme.css'
 
 type Prepared = { revision: number; target: HTMLElement | null; status: 'loading' | 'ready' | 'missing'; fallback: boolean }
@@ -28,7 +29,6 @@ export function TourRuntime() {
   const [interaction, setInteraction] = useState<number | null>(null)
   const [compactViewport, setCompactViewport] = useState(false)
   const panelRef = useRef<HTMLElement>(null)
-  const highlightRef = useRef<HTMLDivElement>(null)
   const revision = session?.revision
   const step = session?.steps[session.index]
   const commands = useTourStore.getState()
@@ -165,10 +165,23 @@ export function TourRuntime() {
     }
   }, [prepared.target, revision, step])
 
+  useEffect(() => {
+    if (revision === undefined) return
+    const el = panelRef.current
+    if (!el) return
+    el.classList.add('cima-tour-morphing')
+    const timer = setTimeout(() => {
+      el.classList.remove('cima-tour-morphing')
+    }, 300)
+    return () => {
+      clearTimeout(timer)
+      el.classList.remove('cima-tour-morphing')
+    }
+  }, [revision])
+
   const hidden = helpOpen || modalOpen
   useEffect(() => {
     const panel = panelRef.current
-    const highlight = highlightRef.current
     if (!panel || !session || hidden) return
     const target = prepared.revision === session.revision ? prepared.target : null
     let disposed = false
@@ -186,14 +199,6 @@ export function TourRuntime() {
       document.body.classList.toggle('cima-tour-docked', docked && !session.minimized)
       document.body.style.setProperty('--tour-guide-reserve', `${panel.offsetHeight + 24}px`)
       const rect = target?.getBoundingClientRect()
-      if (highlight && rect) {
-        const x = Math.max(left + 2, rect.left - 3)
-        const y = Math.max(top + 2, rect.top - 3)
-        highlight.style.left = `${x}px`
-        highlight.style.top = `${y}px`
-        highlight.style.width = `${Math.max(0, Math.min(rect.right + 3, left + width - 2) - x)}px`
-        highlight.style.height = `${Math.max(0, Math.min(rect.bottom + 3, top + height - 2) - y)}px`
-      }
       if (width < 768 || !target || session.minimized) {
         panel.style.left = `${left + width - Math.min(360, width - 24) - 12}px`
         // A stable bottom dock keeps application navigation free. The dashboard reserves its height.
@@ -243,9 +248,20 @@ export function TourRuntime() {
   const isQuestion = session.tour.id.startsWith('question:')
   return createPortal(
     <>
-      {!session.minimized && !compactViewport && prepared.target && !loading &&
-        <div ref={highlightRef} className="cima-tour-highlight" aria-hidden="true" />}
-      <aside ref={panelRef} className="cima-tour-guide" aria-label="Tutorial guiado" data-testid="tour-guide" aria-busy={loading}>
+      <TourSpotlight
+        target={prepared.target}
+        status={prepared.status}
+        minimized={session.minimized}
+        compact={compactViewport}
+        revision={session.revision}
+      />
+      <aside
+        ref={panelRef}
+        className="cima-tour-guide"
+        aria-label="Tutorial guiado"
+        data-testid="tour-guide"
+        aria-busy={loading}
+      >
         <header className="cima-tour-guide-header">
           <span className="text-xs font-semibold text-primary">{isQuestion ? 'Ayuda contextual' : `Paso ${session.index + 1} de ${session.steps.length}`}</span>
           <div className="flex shrink-0">

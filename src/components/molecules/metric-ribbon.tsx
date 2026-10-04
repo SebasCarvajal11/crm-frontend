@@ -2,6 +2,8 @@ import { memo, type ReactNode } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/shared/lib/utils'
 
+import { AnimatedCounter } from '@/components/atoms/animated-counter'
+
 export type MetricAccent = 'primary' | 'emerald' | 'amber' | 'blue' | 'muted'
 
 export type MetricRibbonItem = {
@@ -15,6 +17,7 @@ export type MetricRibbonItem = {
   onClick?: () => void
   highlight?: boolean
   className?: string
+  animated?: boolean
 }
 
 export type MetricRibbonProps = {
@@ -24,6 +27,7 @@ export type MetricRibbonProps = {
   ariaLabel?: string
   isLoading?: boolean
   skeletonCount?: number
+  animated?: boolean
 }
 
 const ACCENT_STYLES: Record<MetricAccent, { icon: string; dot: string; text: string }> = {
@@ -71,11 +75,59 @@ function MetricCellSkeleton() {
   )
 }
 
-function MetricCell({ item }: { item: MetricRibbonItem }) {
-  const accent = item.accent ?? 'primary'
+function MetricIcon({ icon, accent }: { icon: ReactNode; accent: MetricAccent }) {
   const style = ACCENT_STYLES[accent]
+  return (
+    <div
+      className={cn(
+        'flex size-8 shrink-0 items-center justify-center rounded-xl shadow-2xs',
+        'transition-transform duration-200 ease-out',
+        'group-hover:scale-110 group-hover:-translate-y-0.5',
+        style.icon
+      )}
+      aria-hidden="true"
+    >
+      {icon}
+    </div>
+  )
+}
 
-  const content = (
+function MetricValueBlock({
+  value,
+  shouldAnimate,
+  hint,
+  subtext,
+}: {
+  value: ReactNode
+  shouldAnimate: boolean
+  hint?: ReactNode
+  subtext?: ReactNode
+}) {
+  return (
+    <div className="space-y-0.5">
+      <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground tabular-nums">
+        {shouldAnimate ? <AnimatedCounter value={value} /> : value}
+      </div>
+      {(hint || subtext) && (
+        <p className="text-xs text-muted-foreground truncate leading-snug">
+          {hint ?? subtext}
+        </p>
+      )}
+    </div>
+  )
+}
+
+function MetricCell({
+  item,
+  defaultAnimated = true,
+}: {
+  item: MetricRibbonItem
+  defaultAnimated?: boolean
+}) {
+  const isAnimated = item.animated ?? defaultAnimated
+  const shouldAnimate = isAnimated && (typeof item.value === 'string' || typeof item.value === 'number')
+
+  return (
     <div
       className={cn(
         'group relative flex flex-col justify-between gap-3 p-4 sm:p-5 transition-colors duration-150',
@@ -93,35 +145,50 @@ function MetricCell({ item }: { item: MetricRibbonItem }) {
         <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
           {item.label}
         </span>
-        {item.icon && (
-          <div
-            className={cn(
-              'flex size-8 shrink-0 items-center justify-center rounded-xl shadow-2xs',
-              'transition-transform duration-200 ease-out',
-              'group-hover:scale-110 group-hover:-translate-y-0.5',
-              style.icon
-            )}
-            aria-hidden="true"
-          >
-            {item.icon}
-          </div>
-        )}
+        {item.icon && <MetricIcon icon={item.icon} accent={item.accent ?? 'primary'} />}
       </div>
-
-      <div className="space-y-0.5">
-        <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground tabular-nums">
-          {item.value}
-        </div>
-        {(item.hint || item.subtext) && (
-          <p className="text-xs text-muted-foreground truncate leading-snug">
-            {item.hint ?? item.subtext}
-          </p>
-        )}
-      </div>
+      <MetricValueBlock
+        value={item.value}
+        shouldAnimate={shouldAnimate}
+        hint={item.hint}
+        subtext={item.subtext}
+      />
     </div>
   )
+}
 
-  return content
+function MetricRibbonContent({
+  items,
+  isLoading,
+  skeletonCount,
+  animated,
+}: {
+  items: MetricRibbonItem[]
+  isLoading: boolean
+  skeletonCount: number
+  animated: boolean
+}) {
+  if (isLoading) {
+    return (
+      <>
+        {Array.from({ length: skeletonCount }).map((_, i) => (
+          <MetricCellSkeleton key={i} />
+        ))}
+      </>
+    )
+  }
+
+  return (
+    <>
+      {items.map((item, idx) => (
+        <MetricCell
+          key={item.id ?? `${item.label}-${idx}`}
+          item={item}
+          defaultAnimated={animated}
+        />
+      ))}
+    </>
+  )
 }
 
 export const MetricRibbon = memo(function MetricRibbon({
@@ -131,6 +198,7 @@ export const MetricRibbon = memo(function MetricRibbon({
   ariaLabel = 'Métricas clave',
   isLoading = false,
   skeletonCount = 4,
+  animated = true,
 }: MetricRibbonProps) {
   const colsClass = GRID_COLS_MAP[columns] ?? 'grid-cols-2 lg:grid-cols-4'
 
@@ -144,19 +212,13 @@ export const MetricRibbon = memo(function MetricRibbon({
         className
       )}
     >
-      <div
-        className={cn(
-          'grid divide-y divide-x divide-border/60',
-          colsClass
-        )}
-      >
-        {isLoading
-          ? Array.from({ length: skeletonCount }).map((_, i) => (
-              <MetricCellSkeleton key={i} />
-            ))
-          : items.map((item, idx) => (
-              <MetricCell key={item.id ?? `${item.label}-${idx}`} item={item} />
-            ))}
+      <div className={cn('grid divide-y divide-x divide-border/60', colsClass)}>
+        <MetricRibbonContent
+          items={items}
+          isLoading={isLoading}
+          skeletonCount={skeletonCount}
+          animated={animated}
+        />
       </div>
     </div>
   )
