@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo } from 'react'
 import { isHTTPError } from 'ky'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -32,16 +32,6 @@ const MarketingPanel = lazy(() => import('@/features/marketing').then((m) => ({ 
 const DashboardAnalytics = lazy(() => import('@/components/organisms/dashboard-analytics').then((m) => ({ default: m.DashboardAnalytics })))
 const AdminConsole = lazy(() => import('@/features/admin/ui').then((m) => ({ default: m.AdminConsole })))
 const AccountPanel = lazy(() => import('@/components/organisms/account-panel').then((m) => ({ default: m.AccountPanel })))
-
-function tabPaneProps(isActive: boolean, isFlexFull = false) {
-  if (!isActive) return { style: { display: 'none' } }
-  return {
-    style: { display: isFlexFull ? 'flex' : 'block' },
-    className: isFlexFull
-      ? 'tab-pane-transition flex-1 min-h-0 flex-col h-full w-full'
-      : 'tab-pane-transition',
-  }
-}
 
 type Props = {
   tab?: DashboardTab
@@ -166,14 +156,6 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     return currentTab
   }, [tab, defaultTab, canViewOverview, isAdmin, canUseMarketing])
 
-  const [visitedTabs, setVisitedTabs] = useState<Set<DashboardTab>>(() => new Set([activeTab]))
-  const [prevActiveTab, setPrevActiveTab] = useState(activeTab)
-
-  if (activeTab !== prevActiveTab) {
-    setPrevActiveTab(activeTab)
-    setVisitedTabs((prev) => (prev.has(activeTab) ? prev : new Set(prev).add(activeTab)))
-  }
-
   const isReady = Boolean(identity && !dashboardQuery.isPending)
   useScrollToTop(`${activeTab}-${isReady}`)
 
@@ -226,8 +208,8 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
           </AlertDescription>
         </Alert>
       )}
-      {visitedTabs.has('overview') && canViewOverview && (
-        <div {...tabPaneProps(activeTab === 'overview')}>
+      {activeTab === 'overview' && canViewOverview && (
+        <div className="tab-pane-transition">
           <DashboardOverview
             identity={identity}
             avatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}
@@ -240,8 +222,8 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
         </div>
       )}
       <Suspense fallback={<DashboardTabSkeleton />}>
-        {visitedTabs.has('collab') && (
-          <div {...tabPaneProps(activeTab === 'collab', true)}>
+        {activeTab === 'collab' && (
+          <div className="tab-pane-transition flex-1 min-h-0 flex flex-col h-full w-full">
             <CollabPanel
               accessToken={token}
               identity={identity}
@@ -257,31 +239,31 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
             />
           </div>
         )}
-        {visitedTabs.has('marketing') && canUseMarketing && (
-          <div {...tabPaneProps(activeTab === 'marketing')}>
+        {activeTab === 'marketing' && canUseMarketing && (
+          <div className="tab-pane-transition">
             <MarketingPanel accessToken={token} />
           </div>
         )}
-        {visitedTabs.has('account') && (
-          <div {...tabPaneProps(activeTab === 'account')}>
+        {activeTab === 'account' && (
+          <div className="tab-pane-transition">
             <AccountPanel accessToken={token} identity={identity} />
           </div>
         )}
-        {visitedTabs.has('notifications') && (
-          <div {...tabPaneProps(activeTab === 'notifications')}>
+        {activeTab === 'notifications' && (
+          <div className="tab-pane-transition">
             <NotificationsPanel
               accessToken={token}
               onOpenNotification={openNotificationTarget}
             />
           </div>
         )}
-        {visitedTabs.has('admin') && isAdmin && (
-          <div {...tabPaneProps(activeTab === 'admin')}>
+        {activeTab === 'admin' && isAdmin && (
+          <div className="tab-pane-transition">
             <AdminConsole accessToken={token} />
           </div>
         )}
-        {visitedTabs.has('analytics') && canUseMarketing && (
-          <div {...tabPaneProps(activeTab === 'analytics')}>
+        {activeTab === 'analytics' && canUseMarketing && (
+          <div className="tab-pane-transition">
             <DashboardAnalytics accessToken={token} />
           </div>
         )}

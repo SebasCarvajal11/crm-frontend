@@ -30,21 +30,12 @@ const TABS: SectionTabItem<MarketingTab>[] = [
   { value: 'interactions', label: 'Interacciones', icon: <MessageSquare className="size-4" /> },
 ]
 
-function tabPaneProps(isActive: boolean) {
-  return {
-    style: { display: isActive ? 'block' : 'none' },
-    className: isActive ? 'tab-pane-transition' : undefined,
-  }
-}
-
 export function MarketingPanel({ accessToken }: Props) {
   const [activeTab, setActiveTab] = useState<MarketingTab>('clients')
-  const [visitedTabs, setVisitedTabs] = useState<Set<MarketingTab>>(() => new Set([activeTab]))
   const [preselectedCampaignId, setPreselectedCampaignId] = useState<number | null>(null)
 
   const handleTabChange = (nextTab: MarketingTab) => {
     setActiveTab(nextTab)
-    setVisitedTabs((prev) => (prev.has(nextTab) ? prev : new Set(prev).add(nextTab)))
   }
 
   const handleSelectCampaignForWorkflows = (campaignId: number) => {
@@ -85,14 +76,14 @@ export function MarketingPanel({ accessToken }: Props) {
       </div>
 
       <div>
-        {visitedTabs.has('clients') && (
-          <div {...tabPaneProps(activeTab === 'clients')}>
+        {activeTab === 'clients' && (
+          <div className="tab-pane-transition">
             <ClientPlansManager accessToken={accessToken} />
           </div>
         )}
 
-        {visitedTabs.has('campaigns') && (
-          <div {...tabPaneProps(activeTab === 'campaigns')}>
+        {activeTab === 'campaigns' && (
+          <div className="tab-pane-transition">
             <CampaignsManager
               accessToken={accessToken}
               onSelectCampaignForWorkflows={handleSelectCampaignForWorkflows}
@@ -100,14 +91,14 @@ export function MarketingPanel({ accessToken }: Props) {
           </div>
         )}
 
-        {visitedTabs.has('proposals') && (
-          <div {...tabPaneProps(activeTab === 'proposals')}>
+        {activeTab === 'proposals' && (
+          <div className="tab-pane-transition">
             <ProposalsManager accessToken={accessToken} />
           </div>
         )}
 
-        {visitedTabs.has('workflows') && (
-          <div {...tabPaneProps(activeTab === 'workflows')}>
+        {activeTab === 'workflows' && (
+          <div className="tab-pane-transition">
             <WorkflowsManager
               accessToken={accessToken}
               preselectedCampaignId={preselectedCampaignId}
@@ -115,14 +106,14 @@ export function MarketingPanel({ accessToken }: Props) {
           </div>
         )}
 
-        {visitedTabs.has('segments') && (
-          <div {...tabPaneProps(activeTab === 'segments')}>
+        {activeTab === 'segments' && (
+          <div className="tab-pane-transition">
             <SegmentsManager accessToken={accessToken} />
           </div>
         )}
 
-        {visitedTabs.has('interactions') && (
-          <div {...tabPaneProps(activeTab === 'interactions')}>
+        {activeTab === 'interactions' && (
+          <div className="tab-pane-transition">
             <InteractionsManager accessToken={accessToken} />
           </div>
         )}
