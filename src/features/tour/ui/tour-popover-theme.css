@@ -41,7 +41,6 @@
   border-radius: 0.75rem;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent),
               0 0 16px color-mix(in srgb, var(--primary) 15%, transparent);
-  will-change: left, top, width, height, opacity;
   opacity: 1;
 }
 
@@ -52,6 +51,7 @@
               width 280ms cubic-bezier(0.16, 1, 0.3, 1),
               height 280ms cubic-bezier(0.16, 1, 0.3, 1),
               opacity 200ms ease;
+  will-change: left, top, width, height, opacity;
 }
 
 .cima-tour-highlight[data-status="loading"] {

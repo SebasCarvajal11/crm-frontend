@@ -39,7 +39,7 @@ export const ChatMessageBubble = memo(function ChatMessageBubble({
       className={cn(
         'flex gap-2 transition-colors',
         isNewlyArrived
-          ? 'animate-chat-message-spring'
+          ? 'animate-chat-message-settle'
           : 'animate-in fade-in-0 duration-150',
         isOwn ? 'flex-row-reverse' : 'flex-row',
         sameAuthorAsNext ? 'mb-0.5' : 'mb-2.5',

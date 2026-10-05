@@ -33,6 +33,12 @@ export function waitForTarget(selector: string, signal: AbortSignal, timeout = 2
 }
 
 export function hasApplicationDialog(): boolean {
-  return [...document.querySelectorAll<HTMLElement>('[role="dialog"], [role="alertdialog"]')]
-    .some((element) => element.getAttribute('data-state') !== 'closed' && element.getClientRects().length > 0)
+  const dialogs = document.querySelectorAll<HTMLElement>('[role="dialog"], [role="alertdialog"]')
+  for (let i = 0; i < dialogs.length; i++) {
+    const el = dialogs[i]
+    if (el.getAttribute('data-state') !== 'closed' && el.getClientRects().length > 0) {
+      return true
+    }
+  }
+  return false
 }
