@@ -173,6 +173,9 @@
     scroll-behavior: smooth;
     overflow-x: clip;
     width: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   ::selection {

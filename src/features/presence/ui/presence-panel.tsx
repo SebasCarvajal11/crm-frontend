@@ -42,6 +42,7 @@ function Group({
             userId={user.subject}
             size="md"
             presenceStatus={user.is_online && !stale ? 'online' : 'offline'}
+            ringClass="ring-card"
             className="mt-0.5 shrink-0"
           />
           <div className="min-w-0 flex-1 space-y-1">
@@ -49,8 +50,15 @@ function Group({
             <p className="break-all text-xs leading-relaxed text-muted-foreground">{user.email}</p>
             {user.company_name && <p className="break-words text-xs text-muted-foreground">{user.company_name}</p>}
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-relaxed">
-              <span className={user.is_online && !stale ? 'inline-flex items-center gap-1.5 font-medium text-primary' : 'inline-flex items-center gap-1.5 text-muted-foreground'}>
-                <span aria-hidden="true" className={`size-1.5 rounded-full ${user.is_online && !stale ? 'bg-primary' : 'bg-muted-foreground/50'}`} />
+              <span className={user.is_online && !stale
+                ? 'inline-flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400'
+                : 'inline-flex items-center gap-1.5 text-muted-foreground'}>
+                <span
+                  aria-hidden="true"
+                  className={`size-2 shrink-0 rounded-full ${
+                    user.is_online && !stale ? 'bg-emerald-500' : 'bg-muted-foreground/50'
+                  }`}
+                />
                 {stale ? 'Sin confirmar' : user.is_online ? 'En línea' : 'Sin conexión'}
               </span>
               <time dateTime={user.last_activity_at} title={`Última actividad: ${new Date(user.last_activity_at).toLocaleString('es-CO')}`}>Actividad {activityAge(user.last_activity_at, now)}</time>

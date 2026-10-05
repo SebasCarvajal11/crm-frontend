@@ -14,6 +14,7 @@ export type UserAvatarProps = {
   presenceStatus?: 'online' | 'offline'
   className?: string
   alt?: string
+  ringClass?: string
 }
 
 const SIZE_CLASSES: Record<AvatarSize, { container: string; text: string; dot: string }> = {
@@ -33,6 +34,7 @@ export const UserAvatar = memo(function UserAvatar({
   presenceStatus,
   className,
   alt,
+  ringClass,
 }: UserAvatarProps) {
   const [loadError, setLoadError] = useState(false)
   const cfg = SIZE_CLASSES[size]
@@ -77,9 +79,10 @@ export const UserAvatar = memo(function UserAvatar({
       {presenceStatus && (
         <span
           className={cn(
-            'absolute bottom-0 right-0 z-10 rounded-full ring-2 ring-background',
+            'absolute bottom-0 right-0 z-10 shrink-0 rounded-full ring-2 ring-background',
             cfg.dot,
-            presenceStatus === 'online' ? 'bg-emerald-500' : 'bg-muted-foreground/40'
+            presenceStatus === 'online' ? 'bg-emerald-500' : 'bg-muted-foreground/40',
+            ringClass
           )}
           aria-label={presenceStatus === 'online' ? 'En línea' : 'Desconectado'}
         />
