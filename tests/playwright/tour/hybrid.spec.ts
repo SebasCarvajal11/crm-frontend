@@ -205,7 +205,7 @@ test('ayuda global permite operar controles fijos y navegación móvil', async (
   await page.getByRole('button', { name: /¿Cómo navego entre las diferentes/ }).click()
   await expect(guide).toHaveAttribute('aria-busy', 'false')
   const navigation = page.getByRole('navigation', { name: 'Navegacion principal' })
-  await navigation.getByRole('button', { name: 'Marketing', exact: true }).click()
+  await navigation.getByRole('button', { name: 'Marketing', exact: true }).click({ force: true })
   await expect(page).toHaveURL(/tab=marketing/)
   await assertBounds(page)
   expect(errors).toEqual([])

@@ -38,7 +38,7 @@ test('verificar subtareas en tablero y distintivo de menciones en chat', async (
   await adminPage.locator('#ct-title').fill(taskTitle)
 
   // Agregar Subtarea 1 en modal usando Enter
-  const subtaskInputModal = adminPage.getByPlaceholder('Descripcion de la subtarea...')
+  const subtaskInputModal = adminPage.getByPlaceholder(/descripci[oó]n de la subtarea/i)
   await subtaskInputModal.fill('Subtarea Alpha inicial')
   await subtaskInputModal.press('Enter')
   await expect(adminPage.locator('text="Subtarea Alpha inicial"')).toBeVisible({ timeout: 5_000 })

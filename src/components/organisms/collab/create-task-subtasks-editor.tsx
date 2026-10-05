@@ -94,6 +94,8 @@ export function CreateTaskSubtasksEditor({
 
           <div className="flex items-center gap-2">
             <Input
+              id="ct-subtask-input"
+              data-testid="task-subtask-input"
               placeholder="Descripción de la subtarea..."
               value={newSubtask}
               onChange={(event) => onNewSubtaskChange(event.target.value)}
