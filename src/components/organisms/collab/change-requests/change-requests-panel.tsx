@@ -60,7 +60,7 @@ export function ChangeRequestsPanel({
   }, [changeRequests, filter])
 
   return (
-    <div className="max-w-5xl mx-auto space-y-4">
+    <div className="w-full space-y-4">
       <div
         data-tour="workspace-change-requests-action"
         className={[
@@ -158,9 +158,13 @@ export function ChangeRequestsPanel({
 
       <div data-tour="workspace-change-requests-list">
         {isLoading ? (
-          <div className="space-y-3" role="status" aria-label="Cargando solicitudes de cambio">
-            <Skeleton className="h-32 w-full rounded-xl" />
-            <Skeleton className="h-32 w-full rounded-xl" />
+          <div
+            className="grid grid-cols-1 xl:grid-cols-2 gap-3.5"
+            role="status"
+            aria-label="Cargando solicitudes de cambio"
+          >
+            <Skeleton className="h-36 w-full rounded-xl" />
+            <Skeleton className="h-36 w-full rounded-xl" />
           </div>
         ) : filteredRequests.length === 0 ? (
           <div
@@ -198,7 +202,7 @@ export function ChangeRequestsPanel({
             )}
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3.5">
             {filteredRequests.map((req) => (
               <ChangeRequestCard
                 key={req.id}

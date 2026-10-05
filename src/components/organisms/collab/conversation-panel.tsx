@@ -9,7 +9,6 @@ import { ChatPanel } from './chat-panel'
 import { ConversationFilesTimeline } from './conversation-files-timeline'
 import { ConversationUploadForm } from './conversation-upload-form'
 import { ProjectFileRepositoryLink } from './project-file-repository-link'
-import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 import type { MeResponse } from '@/shared/types'
 import type { Project, ProjectMember, ProjectTask } from '@/features/collab/model'
 
@@ -50,7 +49,7 @@ function ConversationSupportPanel({
   return (
     <section
       data-tour={dataTour}
-      className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`}
+      className="flex h-full min-h-0 flex-1 min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm"
     >
       <div className="shrink-0 border-b bg-muted/20 px-4 py-3">
         <h3 className="text-sm font-semibold">{title}</h3>
@@ -89,12 +88,15 @@ export function ConversationPanel({
   const contract = contractQ.data?.data ?? null
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col min-h-0 flex-1 h-full space-y-3">
       {/* Selector responsivo para pantallas menores a 1280px (Tablet y Móvil) */}
       <div
         role="tablist"
         aria-label="Vistas de conversación"
-        className="flex items-center gap-1 rounded-2xl border border-border/80 bg-muted/40 p-1 min-[1280px]:hidden"
+        className={cn(
+          'flex items-center gap-1 rounded-2xl border border-border/80 bg-muted/40 p-1',
+          'min-[1280px]:hidden shrink-0'
+        )}
       >
         <button
           type="button"
@@ -149,10 +151,19 @@ export function ConversationPanel({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 min-[1280px]:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.9fr)_minmax(15rem,1fr)]">
+      <div
+        className={cn(
+          'grid flex-1 min-h-0 h-full grid-cols-1 gap-4',
+          'min-h-[520px] lg:min-h-[580px]',
+          'min-[1280px]:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.9fr)_minmax(15rem,1fr)]'
+        )}
+      >
         <div
           id="workspace-chat-section"
-          className={cn('min-w-0', mobileView !== 'chat' && 'hidden min-[1280px]:block')}
+          className={cn(
+            'min-w-0 flex flex-col min-h-0 h-full',
+            mobileView !== 'chat' && 'hidden min-[1280px]:flex'
+          )}
         >
           <ChatPanel
             key={`${initialChannel ?? 'external'}:${initialMessageId ?? ''}`}
@@ -171,7 +182,10 @@ export function ConversationPanel({
 
         <div
           id="workspace-files-section"
-          className={cn(mobileView !== 'files' && 'hidden min-[1280px]:block')}
+          className={cn(
+            'min-w-0 flex flex-col min-h-0 h-full',
+            mobileView !== 'files' && 'hidden min-[1280px]:flex'
+          )}
         >
           <ConversationSupportPanel
             dataTour="workspace-files-panel"
@@ -190,14 +204,19 @@ export function ConversationPanel({
             {canManageFiles ? (
               <ConversationUploadForm accessToken={accessToken} projectId={projectId} onError={onError} />
             ) : (
-              <p className="text-sm text-muted-foreground">Solo administradores y trabajadores pueden subir archivos.</p>
+              <p className="text-sm text-muted-foreground">
+                Solo administradores y trabajadores pueden subir archivos.
+              </p>
             )}
           </ConversationSupportPanel>
         </div>
 
         <div
           id="workspace-timeline-section"
-          className={cn(mobileView !== 'timeline' && 'hidden min-[1280px]:block')}
+          className={cn(
+            'min-w-0 flex flex-col min-h-0 h-full',
+            mobileView !== 'timeline' && 'hidden min-[1280px]:flex'
+          )}
         >
           <ConversationSupportPanel
             dataTour="workspace-timeline-panel"

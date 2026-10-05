@@ -125,11 +125,13 @@ export function AdminInviteForms({ accessToken }: Props) {
         description="Genera invitaciones y accesos de acuerdo a los privilegios requeridos por cada rol."
       />
 
-      <Card className="max-w-2xl mx-auto overflow-hidden rounded-2xl border-border/80 bg-card shadow-md shadow-black/[0.04]">
+      <Card className="w-full overflow-hidden rounded-2xl border-border/80 bg-card shadow-md shadow-black/[0.04]">
         <CardHeader className="border-b bg-muted/20 p-4 sm:p-6 space-y-3.5 sm:space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
-              <span className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${currentRoleMeta.iconClass}`}>
+              <span
+                className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${currentRoleMeta.iconClass}`}
+              >
                 <Icon className="size-5" />
               </span>
               <div>

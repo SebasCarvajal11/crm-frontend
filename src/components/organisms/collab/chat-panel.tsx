@@ -6,12 +6,17 @@ import { cn } from '@/shared/lib/utils'
 import { useProjectChatData, useProjectChatSend } from '@/features/collab/hooks'
 import type { ProjectMember } from '@/features/collab/model'
 import type { MeResponse } from '@/shared/types'
-import { buildMentionSuggestions, extractActiveMentionQuery, mentionHints, resolveMentionsFromBody } from './chat-mentions'
+import {
+  buildMentionSuggestions,
+  extractActiveMentionQuery,
+  mentionHints,
+  resolveMentionsFromBody,
+} from './chat-mentions'
 import { ChatExportDialog } from './chat-export-dialog'
+import { ChatMentionSuggestions } from './chat-mention-suggestions'
 import { ChatMessageList } from './chat-message-list'
 import { ChatPanelHeader } from './chat-panel-header'
 import { ChatTypingIndicator } from './chat-typing-indicator'
-import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 import { useChatScrollManager } from './use-chat-scroll-manager'
 import { useChatTypingSender } from './use-chat-typing-sender'
 
@@ -31,16 +36,8 @@ type Props = {
 }
 
 export function ChatPanel({
-  accessToken,
-  projectId,
-  projectName,
-  identity,
-  isClient,
-  initialChannel,
-  initialMessageId,
-  members,
-  onError,
-  isVisible = true,
+  accessToken, projectId, projectName, identity, isClient,
+  initialChannel, initialMessageId, members, onError, isVisible = true,
 }: Props) {
   const [channel, setChannel] = useState<Channel>(initialChannel ?? 'external')
   const [exportDialogOpen, setExportDialogOpen] = useState(false)
@@ -140,7 +137,7 @@ export function ChatPanel({
 
   return (
     <div
-      className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm`}
+      className="flex h-full min-h-0 flex-1 min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm"
       role="region"
       aria-label={channel === 'external' ? 'Chat con el cliente' : 'Chat interno del equipo'}
     >
@@ -154,7 +151,10 @@ export function ChatPanel({
 
       <div
         ref={logRef}
-        className="min-h-0 flex-1 space-y-1 overflow-y-auto scroll-auto scrollbar-thin px-3.5 sm:px-4 pr-14 sm:pr-4 py-4"
+        className={cn(
+          'min-h-0 flex-1 space-y-1 overflow-y-auto scroll-auto scrollbar-thin',
+          'px-3.5 sm:px-4 pr-14 sm:pr-4 py-4'
+        )}
         role="log"
         aria-live="polite"
         aria-label="Mensajes"
@@ -225,7 +225,10 @@ export function ChatPanel({
                   submitMessage()
                 }
               }}
-              className="min-h-[44px] max-h-28 resize-none rounded-xl border-border/80 bg-background py-2.5 px-3 text-sm leading-snug shadow-2xs focus-visible:ring-1 focus-visible:ring-primary"
+              className={cn(
+                'min-h-[44px] max-h-28 resize-none rounded-xl border-border/80 bg-background',
+                'py-2.5 px-3 text-sm leading-snug shadow-2xs focus-visible:ring-1 focus-visible:ring-primary'
+              )}
               rows={1}
               aria-label="Escribir mensaje"
               onSelect={(event) => {
@@ -250,28 +253,19 @@ export function ChatPanel({
             <Send className="size-4" />
           </Button>
 
-          {mentionSuggestions.length > 0 && (
-            <div className="absolute bottom-full left-0 right-[52px] z-20 mb-1 max-h-40 overflow-y-auto rounded-xl border bg-popover shadow-md">
-              {mentionSuggestions.map((suggestion, index) => (
-                <button
-                  key={suggestion.key}
-                  type="button"
-                  onMouseDown={(event) => {
-                    event.preventDefault()
-                    applyMention(suggestion.value)
-                  }}
-                  className={`w-full rounded-lg px-2.5 py-1.5 text-left text-xs ${index === activeIdx ? 'bg-accent text-accent-foreground font-medium' : 'hover:bg-muted'}`}
-                >
-                  @{suggestion.value} <span className="text-muted-foreground">{suggestion.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
+          <ChatMentionSuggestions
+            suggestions={mentionSuggestions}
+            activeIdx={activeIdx}
+            onApply={applyMention}
+          />
         </div>
 
         <div className="mt-2 flex items-center justify-between gap-2 px-1 text-[11px] text-muted-foreground/80">
           <span className="truncate">
-            Menciones: <span className="font-medium text-foreground/75">{mentionHints(identity.role).join(' · ')}</span>
+            Menciones:{' '}
+            <span className="font-medium text-foreground/75">
+              {mentionHints(identity.role).join(' · ')}
+            </span>
           </span>
           <span className="hidden sm:inline-block shrink-0 text-[10px] text-muted-foreground/60">
             Enter para enviar · Shift+Enter para nueva línea

@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ProjectChangeRequest } from '@/features/collab/model'
-import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 import { ChangeRequestItemCard } from './brief-change-request-card'
 import { formatBogotaDate } from '@/features/collab/utils/collab-date'
 import { BriefMarkdown } from './brief-markdown'
@@ -29,14 +28,11 @@ function BriefContentView({ brief }: { brief: BriefData }) {
   return (
     <div
       data-tour="workspace-brief-content"
-      className={[
-        'flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm',
-        COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS,
-      ].join(' ')}
+      className="flex h-full min-h-0 flex-1 min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm"
       role="region"
       aria-label="Brief del proyecto"
     >
-      <div className="flex items-center justify-between border-b px-4 py-3 bg-muted/20">
+      <div className="flex items-center justify-between border-b px-4 py-3 bg-muted/20 shrink-0">
         <div>
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-semibold text-foreground">Brief del Proyecto</h3>
@@ -59,9 +55,17 @@ function BriefContentView({ brief }: { brief: BriefData }) {
         {brief?.content ? (
           <BriefMarkdown content={brief.content} />
         ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
-            <FileText className="size-10 opacity-20" aria-hidden="true" />
-            <p>Sin brief configurado para este proyecto.</p>
+          <div
+            className={[
+              'flex h-full min-h-[300px] flex-col items-center justify-center',
+              'gap-2.5 p-6 text-center text-muted-foreground',
+            ].join(' ')}
+          >
+            <FileText className="size-12 opacity-25 text-muted-foreground" aria-hidden="true" />
+            <h4 className="text-sm font-semibold text-foreground">Sin brief configurado</h4>
+            <p className="text-xs text-muted-foreground max-w-sm leading-relaxed">
+              Este proyecto aún no cuenta con especificaciones o requerimientos registrados.
+            </p>
           </div>
         )}
       </div>
@@ -99,10 +103,7 @@ function ChangeRequestsSidebar({
   return (
     <div
       data-tour="workspace-brief-changes"
-      className={[
-        'flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm',
-        COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS,
-      ].join(' ')}
+      className="flex h-full min-h-0 flex-1 min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm"
       role="region"
       aria-label="Historial de cambios formales"
     >
@@ -177,12 +178,16 @@ function ChangeRequestsSidebar({
 function BriefSkeleton() {
   return (
     <div
-      className="grid gap-4 min-[1280px]:grid-cols-[minmax(0,1fr)_minmax(22rem,0.65fr)]"
+      className={[
+        'grid flex-1 min-h-0 h-full gap-4',
+        'min-h-[520px] lg:min-h-[580px]',
+        'min-[1280px]:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)]',
+      ].join(' ')}
       role="status"
       aria-label="Cargando brief"
     >
       <div
-        className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} flex-col rounded-xl border bg-card p-6 space-y-4`}
+        className="flex h-full min-h-[500px] flex-col rounded-xl border bg-card p-6 space-y-4"
       >
         <div className="flex items-center justify-between pb-3 border-b border-border/60">
           <Skeleton className="h-6 w-40 rounded-md" />
@@ -196,9 +201,7 @@ function BriefSkeleton() {
           <Skeleton className="h-24 w-full rounded-xl" />
         </div>
       </div>
-      <div
-        className={`flex ${COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS} flex-col rounded-xl border bg-card p-4 space-y-3`}
-      >
+      <div className="flex h-full min-h-[500px] flex-col rounded-xl border bg-card p-4 space-y-3">
         <div className="flex items-center justify-between pb-2 border-b border-border/60">
           <Skeleton className="h-5 w-32 rounded-md" />
           <Skeleton className="h-5 w-16 rounded-full" />
@@ -247,7 +250,13 @@ export function BriefPanel({ brief, changeRequests, formalChanges, isLoading }: 
   }
 
   return (
-    <div className="grid gap-4 min-[1280px]:grid-cols-[minmax(0,1fr)_minmax(22rem,0.65fr)]">
+    <div
+      className={[
+        'grid flex-1 min-h-0 h-full gap-4',
+        'min-h-[520px] lg:min-h-[580px]',
+        'min-[1280px]:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)]',
+      ].join(' ')}
+    >
       <BriefContentView brief={brief} />
       <ChangeRequestsSidebar
         items={normalizedItems}

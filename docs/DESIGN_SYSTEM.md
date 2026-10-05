@@ -152,3 +152,22 @@ Todos los modales y diálogos del sistema (`Dialog` y `AlertDialog`) se rigen ba
   - Gestión de áreas seguras (`safe-area-inset-top`, `safe-area-inset-bottom`) garantizando compatibilidad con Safari iOS y navegadores móviles.
   - Validación automatizada en 4 resoluciones (4K, 1080p, Tablet, Mobile) vía Playwright.
 
+---
+
+## 8. Distribución de Espacios y Paneles de Trabajo (Colaboración y Administración)
+
+- **Conversación y Chat de Proyecto**:
+  - Altura elástica fluida (`h-full min-h-0 flex-1 flex-col`) en escritorio y móvil.
+  - Contenedor de mensajes con scroll interno independiente (`overflow-y-auto scrollbar-thin`).
+  - Barra de entrada de texto fijada al pie con sugerencias de menciones flotantes accesibles.
+- **Solicitudes de Cambio**:
+  - Ancho completo adaptable (`w-full`) con distribución en cuadrícula (`grid-cols-1 xl:grid-cols-2`).
+  - Supresión de anchos fijos restrictivos (`max-w-5xl`) para evitar márgenes laterales vacíos en monitores amplios.
+- **Brief y Registro de Cambios Formales**:
+  - Cuadrícula asimétrica balanceada con altura mínima estandarizada (`min-h-[520px] lg:min-h-[580px]`).
+  - Estados vacíos con diseño editorial, iconos con opacidad sutil y tipografía equilibrada.
+- **Consola de Administración (Centro de Incorporación y Almacenamiento)**:
+  - Cuadrícula de 12 columnas en escritorio (`lg:grid-cols-12`): 7 columnas para el Centro de Incorporación
+    y 5 columnas para la tarjeta de Almacenamiento en la Nube, eliminando espacios muertos y unificando el flujo visual.
+
+

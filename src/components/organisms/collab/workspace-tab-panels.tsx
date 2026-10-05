@@ -148,7 +148,7 @@ export function WorkspaceTabPanels(props: WorkspaceTabPanelsProps) {
         activeTab={activeTab}
         isVisited={activeTab === 'brief'}
         ariaLabel="Brief del proyecto"
-        className="flex-1 min-h-0 overflow-y-auto scrollbar-thin"
+        className="flex-1 min-h-0 flex flex-col"
       >
         <BriefPanel
           brief={briefData?.brief ?? null}
