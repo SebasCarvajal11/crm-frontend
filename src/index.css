@@ -70,6 +70,11 @@
   --app-zoom: 1;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --status-online: #10b981;
+  --status-away: #f59e0b;
+  --status-busy: #ef4444;
+  --status-recent: #94a3b8;
+  --status-offline: #64748b;
 }
 .dark {
   --background: #1b1b1c;
@@ -112,9 +117,19 @@
   --shadow-lg: 0 12px 20px -5px rgb(0 0 0 / 0.4), 0 4px 8px -6px rgb(0 0 0 / 0.36);
   --shadow-xl: 0 20px 30px -8px rgb(0 0 0 / 0.45), 0 8px 12px -8px rgb(0 0 0 / 0.4);
   --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.55);
+  --status-online: #34d399;
+  --status-away: #fbbf24;
+  --status-busy: #f87171;
+  --status-recent: #94a3b8;
+  --status-offline: #64748b;
 }
 
 @theme inline {
+  --color-status-online: var(--status-online);
+  --color-status-away: var(--status-away);
+  --color-status-busy: var(--status-busy);
+  --color-status-recent: var(--status-recent);
+  --color-status-offline: var(--status-offline);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

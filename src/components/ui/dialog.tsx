@@ -56,6 +56,7 @@ function DialogOverlay({
 
 function DialogContent({
   className,
+  overlayClassName,
   children,
   size = "lg",
   showCloseButton = true,
@@ -63,10 +64,11 @@ function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   size?: DialogSize
   showCloseButton?: boolean
+  overlayClassName?: string
 }) {
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay className={overlayClassName} />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
@@ -197,7 +199,8 @@ function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="dialog-body"
       className={cn(
-        "flex-1 min-h-0 overflow-y-auto overscroll-contain px-5 py-4 sm:px-6 space-y-4 text-xs sm:text-sm scrollbar-thin",
+        "flex-1 min-h-0 overflow-y-auto overscroll-contain px-5 py-4 sm:px-6",
+        "space-y-4 text-xs sm:text-sm scrollbar-thin",
         className
       )}
       {...props}

@@ -43,9 +43,50 @@ describe('UserAvatar', () => {
     const markup = renderToStaticMarkup(
       <UserAvatar name="Ana Silva" presenceStatus="online" size="md" />
     )
-    expect(markup).toContain('bg-emerald-500')
+    expect(markup).toContain('bg-status-online')
     expect(markup).toContain('aria-label="En línea"')
+    expect(markup).toContain('role="status"')
     expect(markup).toContain('z-10')
     expect(markup).toContain('ring-2 ring-background')
+  })
+
+  it('agrega indicador de presencia ausente con media luna', () => {
+    const markup = renderToStaticMarkup(
+      <UserAvatar name="Carlos Mendoza" presenceStatus="away" size="md" />
+    )
+    expect(markup).toContain('bg-status-away')
+    expect(markup).toContain('aria-label="Ausente"')
+    expect(markup).toContain('role="status"')
+    expect(markup).toContain('<svg')
+  })
+
+  it('agrega indicador de ocupado no dependiente de color', () => {
+    const markup = renderToStaticMarkup(
+      <UserAvatar name="Diana Ruiz" presenceStatus="busy" size="md" />
+    )
+    expect(markup).toContain('bg-status-busy')
+    expect(markup).toContain('aria-label="Ocupado"')
+    expect(markup).toContain('role="status"')
+  })
+
+  it('agrega indicador de desconectado y reciente con etiquetas accesibles', () => {
+    const markupOffline = renderToStaticMarkup(
+      <UserAvatar name="Elena Torres" presenceStatus="offline" size="md" />
+    )
+    expect(markupOffline).toContain('bg-status-offline')
+    expect(markupOffline).toContain('aria-label="Desconectado"')
+    expect(markupOffline).toContain('role="status"')
+
+    const markupRecent = renderToStaticMarkup(
+      <UserAvatar
+        name="Felipe Castro"
+        presenceStatus="recent"
+        presenceLabel="Activo hace 10 min"
+        size="md"
+      />
+    )
+    expect(markupRecent).toContain('bg-status-recent')
+    expect(markupRecent).toContain('aria-label="Activo hace 10 min"')
+    expect(markupRecent).toContain('role="status"')
   })
 })

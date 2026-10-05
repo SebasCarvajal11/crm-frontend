@@ -120,7 +120,6 @@ export function AdminUserCard({
               name={displayName}
               userId={row.id}
               size="lg"
-              presenceStatus={row.deleted_at ? undefined : row.is_active ? 'online' : 'offline'}
               className="size-11 shrink-0 text-sm"
             />
             <div className="min-w-0 flex-1">
