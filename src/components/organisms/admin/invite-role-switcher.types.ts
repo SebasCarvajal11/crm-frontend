@@ -5,6 +5,7 @@ export type InviteRole = 'client' | 'worker' | 'admin'
 export type RoleMeta = {
   id: InviteRole
   label: string
+  shortLabel: string
   badgeText: string
   badgeClass: string
   icon: typeof UserPlus
@@ -16,6 +17,7 @@ export const ROLES: readonly RoleMeta[] = [
   {
     id: 'client',
     label: 'Cliente',
+    shortLabel: 'Cliente',
     badgeText: 'Portal',
     badgeClass: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
     icon: UserPlus,
@@ -25,6 +27,7 @@ export const ROLES: readonly RoleMeta[] = [
   {
     id: 'worker',
     label: 'Colaborador',
+    shortLabel: 'Colaborador',
     badgeText: 'Operación',
     badgeClass: 'border-cyan-500/20 bg-cyan-500/10 text-cyan-700 dark:text-cyan-400',
     icon: BriefcaseBusiness,
@@ -34,6 +37,7 @@ export const ROLES: readonly RoleMeta[] = [
   {
     id: 'admin',
     label: 'Administrador',
+    shortLabel: 'Admin',
     badgeText: 'Acceso Total',
     badgeClass: 'border-primary/20 bg-primary/10 text-primary',
     icon: ShieldPlus,

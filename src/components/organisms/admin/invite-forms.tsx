@@ -126,7 +126,7 @@ export function AdminInviteForms({ accessToken }: Props) {
       />
 
       <Card className="max-w-2xl mx-auto overflow-hidden rounded-2xl border-border/80 bg-card shadow-md shadow-black/[0.04]">
-        <CardHeader className="border-b bg-muted/20 p-5 sm:p-6 space-y-4">
+        <CardHeader className="border-b bg-muted/20 p-4 sm:p-6 space-y-3.5 sm:space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
               <span className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${currentRoleMeta.iconClass}`}>
@@ -149,7 +149,7 @@ export function AdminInviteForms({ accessToken }: Props) {
                 </CardDescription>
               </div>
             </div>
-            <Badge className={`rounded-full border text-[10px] font-semibold ${currentRoleMeta.badgeClass}`}>
+            <Badge className={`rounded-full border text-[10px] font-semibold shrink-0 ${currentRoleMeta.badgeClass}`}>
               {currentRoleMeta.badgeText}
             </Badge>
           </div>
@@ -157,7 +157,7 @@ export function AdminInviteForms({ accessToken }: Props) {
           <InviteRoleSwitcher activeRole={activeRole} onChange={setActiveRole} />
         </CardHeader>
 
-        <CardContent className="p-5 sm:p-6">
+        <CardContent className="p-4 sm:p-6">
           <form className="space-y-4" onSubmit={handleSubmit} noValidate>
             <div key={activeRole} className="space-y-4 animate-in fade-in duration-160">
               {activeRole === 'client' && (
