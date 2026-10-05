@@ -1,31 +1,17 @@
 import { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { PlusCircle, Send, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogMedia,
-  DialogBody,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import {
-  collabKeys,
-  type AmendmentType,
-  type AmendmentFeePaymentType,
-} from '@/features/collab/model'
-import {
-  saveProjectContractAmendmentDraftRequest,
-  requestClientContractAmendmentRequest,
-} from '@/features/collab/api'
-import { parseApiError } from '@/shared/lib'
+import { ContractAmendmentAdminForm } from './contract-amendment-admin-form'
+import { ContractAmendmentClientForm } from './contract-amendment-client-form'
 
 type Props = {
   accessToken: string
@@ -36,65 +22,10 @@ type Props = {
 
 export function ContractAmendmentModal({ accessToken, projectId, role, onError }: Props) {
   const [open, setOpen] = useState(false)
-  const queryClient = useQueryClient()
 
-  // Admin form state
-  const [title, setTitle] = useState('')
-  const [amendmentType, setAmendmentType] = useState<AmendmentType>('services')
-  const [serviceScope, setServiceScope] = useState('')
-  const [additionalFee, setAdditionalFee] = useState(0)
-  const [feePaymentType, setFeePaymentType] = useState<AmendmentFeePaymentType>('one_time')
-  const [extensionMonths, setExtensionMonths] = useState(0)
-  const [additionalTerms, setAdditionalTerms] = useState('')
-
-  // Client request state
-  const [clientDesc, setClientDesc] = useState('')
-
-  const adminCreate = useMutation({
-    mutationFn: () =>
-      saveProjectContractAmendmentDraftRequest(accessToken, projectId, {
-        title,
-        amendment_type: amendmentType,
-        service_scope: serviceScope,
-        additional_fee: additionalFee,
-        fee_payment_type: feePaymentType,
-        term_months_extension: extensionMonths,
-        additional_terms: additionalTerms || null,
-      }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: collabKeys.contractAmendments(projectId) })
-      setOpen(false)
-      resetForm()
-    },
-    onError: (err) =>
-      void parseApiError(err).then((msg) => onError(msg || 'No se pudo guardar el Otrosí')),
-  })
-
-  const clientRequest = useMutation({
-    mutationFn: () =>
-      requestClientContractAmendmentRequest(accessToken, projectId, {
-        title,
-        description: clientDesc,
-      }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: collabKeys.contractAmendments(projectId) })
-      setOpen(false)
-      resetForm()
-    },
-    onError: (err) =>
-      void parseApiError(err).then((msg) => onError(msg || 'No se pudo enviar la solicitud')),
-  })
-
-  const resetForm = () => {
-    setTitle('')
-    setServiceScope('')
-    setAdditionalFee(0)
-    setExtensionMonths(0)
-    setAdditionalTerms('')
-    setClientDesc('')
+  const handleClose = () => {
+    setOpen(false)
   }
-
-  const isSubmitting = adminCreate.isPending || clientRequest.isPending
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -140,167 +71,21 @@ export function ContractAmendmentModal({ accessToken, projectId, role, onError }
         </DialogHeader>
 
         {role === 'admin' ? (
-          <form
-            id="amendment-admin-form"
-            onSubmit={(e) => {
-              e.preventDefault()
-              adminCreate.mutate()
-            }}
-            className="flex flex-col flex-1 min-h-0"
-          >
-            <DialogBody className="space-y-3.5 max-h-[60vh]">
-              <div>
-                <Label className="mb-1 block text-xs font-semibold text-foreground/90">Título o Concepto de la Adición</Label>
-                <Input
-                  required
-                  placeholder="Ej: Adición de 2 videos publicitarios para Facebook"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  data-testid="amendment-title-input"
-                  className="text-xs h-9"
-                />
-              </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label className="mb-1 block font-medium">Tipo de Adición</Label>
-                <select
-                  value={amendmentType}
-                  onChange={(e) => setAmendmentType(e.target.value as AmendmentType)}
-                  className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs"
-                >
-                  <option value="services">Servicios Adicionales</option>
-                  <option value="economic">Ajuste de Valor</option>
-                  <option value="extension">Prórroga de Plazo</option>
-                  <option value="mixed">Mixta (Servicios + Valor)</option>
-                </select>
-              </div>
-
-              <div>
-                <Label className="mb-1 block font-medium">Forma de Cobro</Label>
-                <select
-                  value={feePaymentType}
-                  onChange={(e) => setFeePaymentType(e.target.value as AmendmentFeePaymentType)}
-                  className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs"
-                >
-                  <option value="one_time">Pago Único Adicional</option>
-                  <option value="monthly_recurring">Incremento Mensual</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label className="mb-1 block font-medium">Valor Adicional (COP)</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={additionalFee}
-                  onChange={(e) => setAdditionalFee(Number(e.target.value))}
-                  data-testid="amendment-fee-input"
-                />
-              </div>
-
-              <div>
-                <Label className="mb-1 block font-medium">Prórroga (Meses Adicionales)</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={extensionMonths}
-                  onChange={(e) => setExtensionMonths(Number(e.target.value))}
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label className="mb-1 block font-medium">Alcance y Entregables del Nuevo Servicio</Label>
-              <Textarea
-                required
-                rows={3}
-                placeholder="Describe con precisión qué piezas, entregables o servicios nuevos se compromete CIMA a prestar..."
-                value={serviceScope}
-                onChange={(e) => setServiceScope(e.target.value)}
-                data-testid="amendment-scope-input"
-              />
-            </div>
-
-            <div>
-              <Label className="mb-1 block font-medium">Condiciones Particulares (Opcional)</Label>
-              <Textarea
-                rows={2}
-                placeholder="Condiciones de entrega, fechas límite o excepciones particulares..."
-                value={additionalTerms}
-                onChange={(e) => setAdditionalTerms(e.target.value)}
-              />
-            </div>
-
-            </DialogBody>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" size="sm" onClick={() => setOpen(false)} className="text-xs">
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                disabled={isSubmitting || !title.trim() || !serviceScope.trim()}
-                data-testid="save-amendment-draft-btn"
-                className="text-xs font-semibold shadow-2xs"
-              >
-                {isSubmitting ? 'Guardando...' : 'Guardar Borrador de Otrosí'}
-              </Button>
-            </DialogFooter>
-          </form>
+          <ContractAmendmentAdminForm
+            accessToken={accessToken}
+            projectId={projectId}
+            onSuccess={handleClose}
+            onCancel={handleClose}
+            onError={onError}
+          />
         ) : (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              clientRequest.mutate()
-            }}
-            className="flex flex-col flex-1 min-h-0"
-          >
-            <DialogBody className="space-y-3.5 max-h-[60vh]">
-              <div>
-                <Label className="mb-1 block text-xs font-semibold text-foreground/90">¿Qué servicio nuevo necesitas?</Label>
-                <Input
-                  required
-                  placeholder="Ej: Requerimos agregar 2 videos adicionales este mes"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  data-testid="client-request-title-input"
-                  className="text-xs h-9"
-                />
-              </div>
-
-              <div>
-                <Label className="mb-1 block text-xs font-semibold text-foreground/90">Detalle del Requerimiento</Label>
-                <Textarea
-                  required
-                  rows={4}
-                  placeholder="Describe qué entregables necesitas, en qué formato y la fecha ideal..."
-                  value={clientDesc}
-                  onChange={(e) => setClientDesc(e.target.value)}
-                  data-testid="client-request-desc-input"
-                  className="text-xs resize-none rounded-xl"
-                />
-              </div>
-            </DialogBody>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" size="sm" onClick={() => setOpen(false)} className="text-xs">
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                disabled={isSubmitting || !title.trim() || !clientDesc.trim()}
-                data-testid="send-client-request-btn"
-                className="text-xs font-semibold shadow-2xs"
-              >
-                {isSubmitting ? 'Enviando...' : 'Enviar Solicitud al Administrador'}
-              </Button>
-            </DialogFooter>
-          </form>
+          <ContractAmendmentClientForm
+            accessToken={accessToken}
+            projectId={projectId}
+            onSuccess={handleClose}
+            onCancel={handleClose}
+            onError={onError}
+          />
         )}
       </DialogContent>
     </Dialog>

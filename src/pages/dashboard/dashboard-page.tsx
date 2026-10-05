@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { lazy, Suspense, useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { isHTTPError } from 'ky'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -8,7 +8,6 @@ import {
   DashboardLoadError,
   DashboardMissingIdentity,
   DashboardRedirecting,
-  DashboardTabSkeleton,
 } from './dashboard-feedback'
 import { useDashboardNavigation } from './use-dashboard-navigation'
 import { useDashboardSidebar } from './use-dashboard-sidebar'
@@ -17,21 +16,14 @@ import { AppShell } from '@/components/templates/app-shell'
 import { useSessionStore } from '@/app/session/session-store'
 import { logoutRequest } from '@/features/auth/api'
 import { useDashboardComposition } from '@/features/composition'
-import { DashboardOverview } from '@/features/composition/ui'
 import { useNotificationSync } from '@/features/collab/hooks'
 import { InAppNotificationToastContainer } from '@/components/molecules/in-app-notification-toast'
 import { getCurrentAvatarRequestOptional } from '@/shared/api'
 import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 import { getAccessTokenRole } from '@/shared/lib/access-token-role'
 import { useTourStore } from '@/features/tour'
+import { DashboardTabContent } from './dashboard-tab-content'
 import type { DashboardTab } from '@/routes/-dashboard.search'
-
-const CollabPanel = lazy(() => import('@/features/collab/ui').then((m) => ({ default: m.CollabPanel })))
-const NotificationsPanel = lazy(() => import('@/features/collab/ui').then((m) => ({ default: m.NotificationsPanel })))
-const MarketingPanel = lazy(() => import('@/features/marketing').then((m) => ({ default: m.MarketingPanel })))
-const DashboardAnalytics = lazy(() => import('@/components/organisms/dashboard-analytics').then((m) => ({ default: m.DashboardAnalytics })))
-const AdminConsole = lazy(() => import('@/features/admin/ui').then((m) => ({ default: m.AdminConsole })))
-const AccountPanel = lazy(() => import('@/components/organisms/account-panel').then((m) => ({ default: m.AccountPanel })))
 
 type Props = {
   tab?: DashboardTab
@@ -208,66 +200,26 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
           </AlertDescription>
         </Alert>
       )}
-      {activeTab === 'overview' && canViewOverview && (
-        <div className="tab-pane-transition">
-          <DashboardOverview
-            identity={identity}
-            avatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}
-            accessToken={token}
-            projects={projects?.data}
-            onOpenProfile={handleOpenProfile}
-            onOpenProject={openProject}
-            onOpenNotification={openNotificationTarget}
-          />
-        </div>
-      )}
-      <Suspense fallback={<DashboardTabSkeleton />}>
-        {activeTab === 'collab' && (
-          <div className="tab-pane-transition flex-1 min-h-0 flex flex-col h-full w-full">
-            <CollabPanel
-              accessToken={token}
-              identity={identity}
-              initialProjects={projects?.data}
-              openProjectId={project_id}
-              workspaceTab={workspace_tab}
-              chatChannel={chat_channel}
-              chatMessageId={chat_message_id}
-              taskId={task_id}
-              onOpenProject={openProject}
-              onCloseProject={closeProject}
-              onTabChange={changeWorkspaceTab}
-            />
-          </div>
-        )}
-        {activeTab === 'marketing' && canUseMarketing && (
-          <div className="tab-pane-transition">
-            <MarketingPanel accessToken={token} />
-          </div>
-        )}
-        {activeTab === 'account' && (
-          <div className="tab-pane-transition">
-            <AccountPanel accessToken={token} identity={identity} />
-          </div>
-        )}
-        {activeTab === 'notifications' && (
-          <div className="tab-pane-transition">
-            <NotificationsPanel
-              accessToken={token}
-              onOpenNotification={openNotificationTarget}
-            />
-          </div>
-        )}
-        {activeTab === 'admin' && isAdmin && (
-          <div className="tab-pane-transition">
-            <AdminConsole accessToken={token} />
-          </div>
-        )}
-        {activeTab === 'analytics' && canUseMarketing && (
-          <div className="tab-pane-transition">
-            <DashboardAnalytics accessToken={token} />
-          </div>
-        )}
-      </Suspense>
+      <DashboardTabContent
+        activeTab={activeTab}
+        canViewOverview={canViewOverview}
+        canUseMarketing={canUseMarketing}
+        isAdmin={isAdmin}
+        identity={identity}
+        avatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}
+        token={token}
+        projects={projects?.data}
+        project_id={project_id}
+        workspace_tab={workspace_tab}
+        chat_channel={chat_channel}
+        chat_message_id={chat_message_id}
+        task_id={task_id}
+        onOpenProfile={handleOpenProfile}
+        onOpenProject={openProject}
+        onCloseProject={closeProject}
+        onOpenNotification={openNotificationTarget}
+        onWorkspaceTabChange={changeWorkspaceTab}
+      />
     </AppShell>
   )
 }
