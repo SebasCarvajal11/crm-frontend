@@ -43,10 +43,10 @@ export interface WorkspaceTabPanelsProps {
   onError: (msg: string) => void
   chatChannel?: 'internal' | 'external'
   chatMessageId?: string
-  briefData?: any
+  briefData?: unknown
   isBriefLoading: boolean
-  contractData?: any
-  changeRequestsData?: any[]
+  contractData?: unknown
+  changeRequestsData?: unknown[]
   isChangeRequestsLoading: boolean
   onRefreshChangeRequests: () => void
 }

@@ -15,6 +15,7 @@ export const preloadAccount = () => (canPrefetch() ? import('@/components/organi
 /**
  * @deprecated Precarga masiva eager desaconsejada (FIND-FE-01). Usar pre-descarga por hover/focus intent.
  */
-export function warmDashboardChunks(_role?: string) {
+export function warmDashboardChunks(..._args: unknown[]) {
+  void _args
   // No-op intencional para erradicar la descarga eager incondicional de 2.15 MB.
 }
