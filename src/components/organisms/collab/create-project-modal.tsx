@@ -99,34 +99,36 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
             createProject.mutate()
           }}
         >
-          <DialogBody className="space-y-4 max-h-[65vh]">
-          <div className="space-y-1.5">
-            <Label htmlFor="cp-name" className="text-xs font-semibold text-foreground/90">
-              Nombre del proyecto <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="cp-name"
-              placeholder="Ej. Rediseño Web Corporativo 2026"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="h-9 rounded-lg border-border/70 text-xs focus-visible:ring-primary/20"
-            />
-          </div>
+          <DialogBody className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="cp-name" className="text-xs font-semibold text-foreground/90">
+                  Nombre del proyecto <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="cp-name"
+                  placeholder="Ej. Rediseño Web Corporativo 2026"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="h-9 rounded-lg border-border/70 text-xs focus-visible:ring-primary/20"
+                />
+              </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="cp-type" className="text-xs font-semibold text-foreground/90">
-              Tipo de proyecto <span className="text-destructive">*</span>
-            </Label>
-            <Select value={type} onValueChange={(v) => setType(v as ProjectType)}>
-              <SelectTrigger id="cp-type" className="h-9 rounded-lg border-border/70 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="campaign_service" className="text-xs">Campaña / Servicio</SelectItem>
-                <SelectItem value="product_order" className="text-xs">Pedido de Producto</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="cp-type" className="text-xs font-semibold text-foreground/90">
+                  Tipo de proyecto <span className="text-destructive">*</span>
+                </Label>
+                <Select value={type} onValueChange={(v) => setType(v as ProjectType)}>
+                  <SelectTrigger id="cp-type" className="h-9 rounded-lg border-border/70 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="campaign_service" className="text-xs">Campaña / Servicio</SelectItem>
+                    <SelectItem value="product_order" className="text-xs">Pedido de Producto</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
           <div className="space-y-1.5">
             <Label className="text-xs font-semibold text-foreground/90">
@@ -200,26 +202,28 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
             </p>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="cp-desc" className="text-xs font-semibold text-foreground/90">Descripción</Label>
-            <Textarea
-              id="cp-desc"
-              placeholder="Describe el alcance y contexto general del proyecto…"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="min-h-[80px] rounded-lg border-border/70 text-xs resize-none focus-visible:ring-primary/20"
-            />
-          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="cp-desc" className="text-xs font-semibold text-foreground/90">Descripción</Label>
+              <Textarea
+                id="cp-desc"
+                placeholder="Describe el alcance y contexto general del proyecto…"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="min-h-[80px] rounded-lg border-border/70 text-xs resize-none focus-visible:ring-primary/20"
+              />
+            </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="cp-brief" className="text-xs font-semibold text-foreground/90">Brief inicial</Label>
-            <Textarea
-              id="cp-brief"
-              placeholder="Objetivos, referencias, restricciones y entregables previstos…"
-              value={brief}
-              onChange={(e) => setBrief(e.target.value)}
-              className="min-h-[80px] rounded-lg border-border/70 text-xs resize-none focus-visible:ring-primary/20"
-            />
+            <div className="space-y-1.5">
+              <Label htmlFor="cp-brief" className="text-xs font-semibold text-foreground/90">Brief inicial</Label>
+              <Textarea
+                id="cp-brief"
+                placeholder="Objetivos, referencias, restricciones y entregables previstos…"
+                value={brief}
+                onChange={(e) => setBrief(e.target.value)}
+                className="min-h-[80px] rounded-lg border-border/70 text-xs resize-none focus-visible:ring-primary/20"
+              />
+            </div>
           </div>
 
           <div className="space-y-1.5">

@@ -51,7 +51,7 @@ export function ContractAmendmentClientForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-      <DialogBody className="space-y-3.5 max-h-[60vh]">
+      <DialogBody className="space-y-3.5">
         <div>
           <Label className="mb-1 block text-xs font-semibold text-foreground/90">
             ¿Qué servicio nuevo necesitas?

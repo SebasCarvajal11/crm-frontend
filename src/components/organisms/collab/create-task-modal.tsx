@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ListTodo, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
@@ -107,7 +108,7 @@ export function CreateTaskModal({
             createTask.mutate()
           }}
         >
-          <DialogBody className="space-y-4 max-h-[65vh]">
+          <DialogBody className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="ct-title" className="text-xs font-semibold text-foreground/90">
               Título <span className="text-destructive">*</span>
@@ -226,20 +227,21 @@ export function CreateTaskModal({
                 className="h-9 rounded-lg border-border/70 text-xs"
               />
             </div>
-            <label
+            <div
               className={
-                'flex items-center gap-2.5 cursor-pointer select-none px-3 py-2 rounded-lg ' +
-                'border border-border/70 hover:bg-muted/40 transition-colors bg-muted/10 h-9'
+                'flex items-center gap-2.5 px-3 py-2 rounded-lg ' +
+                'border border-border/70 bg-muted/10 h-9'
               }
             >
-              <input
-                type="checkbox"
-                className="rounded accent-primary size-4"
+              <Checkbox
+                id="ct-client-vis"
                 checked={clientVis}
-                onChange={(e) => setClientVis(e.target.checked)}
+                onCheckedChange={(checked) => setClientVis(Boolean(checked))}
               />
-              <span className="text-xs font-medium text-foreground">Visible para el cliente</span>
-            </label>
+              <Label htmlFor="ct-client-vis" className="text-xs font-medium text-foreground cursor-pointer select-none">
+                Visible para el cliente
+              </Label>
+            </div>
           </div>
 
           <CreateTaskSubtasksEditor

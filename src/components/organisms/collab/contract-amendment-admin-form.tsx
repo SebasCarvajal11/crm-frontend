@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DialogBody, DialogFooter } from '@/components/ui/dialog'
 import {
   collabKeys,
@@ -65,7 +66,7 @@ export function ContractAmendmentAdminForm({
 
   return (
     <form id="amendment-admin-form" onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-      <DialogBody className="space-y-3.5 max-h-[60vh]">
+      <DialogBody className="space-y-3.5">
         <div>
           <Label className="mb-1 block text-xs font-semibold text-foreground/90">
             Título o Concepto de la Adición
@@ -80,53 +81,63 @@ export function ContractAmendmentAdminForm({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <Label className="mb-1 block font-medium">Tipo de Adición</Label>
-            <select
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label className="block text-xs font-medium">Tipo de Adición</Label>
+            <Select
               value={amendmentType}
-              onChange={(e) => setAmendmentType(e.target.value as AmendmentType)}
-              className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs"
+              onValueChange={(val) => setAmendmentType(val as AmendmentType)}
             >
-              <option value="services">Servicios Adicionales</option>
-              <option value="economic">Ajuste de Valor</option>
-              <option value="extension">Prórroga de Plazo</option>
-              <option value="mixed">Mixta (Servicios + Valor)</option>
-            </select>
+              <SelectTrigger className="h-9 w-full text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="services" className="text-xs">Servicios Adicionales</SelectItem>
+                <SelectItem value="economic" className="text-xs">Ajuste de Valor</SelectItem>
+                <SelectItem value="extension" className="text-xs">Prórroga de Plazo</SelectItem>
+                <SelectItem value="mixed" className="text-xs">Mixta (Servicios + Valor)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div>
-            <Label className="mb-1 block font-medium">Forma de Cobro</Label>
-            <select
+          <div className="space-y-1">
+            <Label className="block text-xs font-medium">Forma de Cobro</Label>
+            <Select
               value={feePaymentType}
-              onChange={(e) => setFeePaymentType(e.target.value as AmendmentFeePaymentType)}
-              className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs"
+              onValueChange={(val) => setFeePaymentType(val as AmendmentFeePaymentType)}
             >
-              <option value="one_time">Pago Único Adicional</option>
-              <option value="monthly_recurring">Incremento Mensual</option>
-            </select>
+              <SelectTrigger className="h-9 w-full text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="one_time" className="text-xs">Pago Único Adicional</SelectItem>
+                <SelectItem value="monthly_recurring" className="text-xs">Incremento Mensual</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <Label className="mb-1 block font-medium">Valor Adicional (COP)</Label>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label className="block text-xs font-medium">Valor Adicional (COP)</Label>
             <Input
               type="number"
               min="0"
               value={additionalFee}
               onChange={(e) => setAdditionalFee(Number(e.target.value))}
               data-testid="amendment-fee-input"
+              className="text-xs h-9"
             />
           </div>
 
-          <div>
-            <Label className="mb-1 block font-medium">Prórroga (Meses Adicionales)</Label>
+          <div className="space-y-1">
+            <Label className="block text-xs font-medium">Prórroga (Meses Adicionales)</Label>
             <Input
               type="number"
               min="0"
               value={extensionMonths}
               onChange={(e) => setExtensionMonths(Number(e.target.value))}
+              className="text-xs h-9"
             />
           </div>
         </div>
