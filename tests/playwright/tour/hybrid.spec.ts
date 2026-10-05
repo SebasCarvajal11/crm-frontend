@@ -204,8 +204,14 @@ test('ayuda global permite operar controles fijos y navegación móvil', async (
   await page.getByLabel('Buscar guías y acciones').fill('navego')
   await page.getByRole('button', { name: /¿Cómo navego entre las diferentes/ }).click()
   await expect(guide).toHaveAttribute('aria-busy', 'false')
-  const navigation = page.getByRole('navigation', { name: 'Navegacion principal' })
-  const marketingBtn = navigation.getByRole('button', { name: 'Marketing', exact: true })
+  const isMobile = (page.viewportSize()?.width ?? 0) < 768
+  const sidebar = isMobile
+    ? page.getByRole('complementary', { name: 'Menu de navegacion' })
+    : page.getByRole('complementary', { name: 'Barra de navegacion lateral' })
+  if (isMobile && !(await sidebar.isVisible())) {
+    await page.getByRole('button', { name: 'Abrir menu', exact: true }).click()
+  }
+  const marketingBtn = sidebar.getByRole('button', { name: 'Marketing', exact: true })
   await expect(marketingBtn).toBeVisible()
   await marketingBtn.click({ force: true })
   await expect(page).toHaveURL(/tab=marketing/)
