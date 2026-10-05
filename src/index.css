@@ -78,8 +78,8 @@
   --card-foreground: var(--cima-white);
   --popover: #252526;
   --popover-foreground: var(--cima-white);
-  --primary: #df5a5f;
-  --primary-foreground: var(--cima-ink);
+  --primary: #c53a3f;
+  --primary-foreground: #ffffff;
   --secondary: #303032;
   --secondary-foreground: var(--cima-white);
   --muted: #303032;
@@ -90,8 +90,8 @@
   --destructive-foreground: #690005;
   --border: #464649;
   --input: #464649;
-  --ring: #df5a5f;
-  --chart-1: #df5a5f;
+  --ring: #c53a3f;
+  --chart-1: #c53a3f;
   --chart-2: #ffb3b6;
   --chart-3: #d5c2c2;
   --chart-4: #c9c5c6;
@@ -398,13 +398,16 @@
 
 @keyframes legalStampGlow {
   0% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45), 0 0 0 0 rgba(217, 119, 6, 0.35);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 45%, transparent),
+                0 0 0 0 color-mix(in srgb, var(--accent) 35%, transparent);
   }
   35% {
-    box-shadow: 0 0 24px 3px rgba(16, 185, 129, 0.28), 0 0 12px 1px rgba(217, 119, 6, 0.22);
+    box-shadow: 0 0 24px 3px color-mix(in srgb, var(--primary) 28%, transparent),
+                0 0 12px 1px color-mix(in srgb, var(--accent) 22%, transparent);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0), 0 0 0 0 rgba(217, 119, 6, 0);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 0%, transparent),
+                0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent);
   }
 }
 
@@ -518,10 +521,12 @@
   *,
   ::before,
   ::after {
+    scroll-behavior: auto !important;
+  }
+  *:not(.animate-spin):not([data-allow-motion="true"]):not(.kanban-task-card):not(.kanban-column-dropzone):not(.notification-collapse-row) {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
   .interactive-card:hover {
     transform: none !important;
