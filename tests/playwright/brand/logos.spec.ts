@@ -126,13 +126,22 @@ test('dashboard utiliza CIMAxis y conserva navegación expandida, compacta y mó
     await expect(menu).toHaveAttribute('aria-hidden', 'true')
   } else {
     const sidebar = page.getByRole('complementary', { name: 'Barra de navegacion lateral' })
-    await assertLogo(sidebar.getByRole('img', { name: 'CIMAxis', exact: true }))
-    await page.getByRole('button', { name: 'Colapsar barra lateral', exact: true }).click()
-    await assertLogo(sidebar.getByRole('img', { name: 'CIMA', exact: true }))
-    await sidebar.getByRole('link', { name: 'CRM CIMA', exact: true }).click()
-    await expect(page).toHaveURL(/dashboard/)
-    await page.getByRole('button', { name: /expandir barra lateral/i }).click()
-    await assertLogo(sidebar.getByRole('img', { name: 'CIMAxis', exact: true }))
+    const isTabletCollapsed = (page.viewportSize()?.width ?? 0) < 1024
+    if (isTabletCollapsed) {
+      await assertLogo(sidebar.getByRole('img', { name: 'CIMA', exact: true }))
+      await page.getByRole('button', { name: /expandir barra lateral/i }).click()
+      await assertLogo(sidebar.getByRole('img', { name: 'CIMAxis', exact: true }))
+      await page.getByRole('button', { name: 'Colapsar barra lateral', exact: true }).click()
+      await assertLogo(sidebar.getByRole('img', { name: 'CIMA', exact: true }))
+    } else {
+      await assertLogo(sidebar.getByRole('img', { name: 'CIMAxis', exact: true }))
+      await page.getByRole('button', { name: 'Colapsar barra lateral', exact: true }).click()
+      await assertLogo(sidebar.getByRole('img', { name: 'CIMA', exact: true }))
+      await sidebar.getByRole('link', { name: 'CRM CIMA', exact: true }).click()
+      await expect(page).toHaveURL(/dashboard/)
+      await page.getByRole('button', { name: /expandir barra lateral/i }).click()
+      await assertLogo(sidebar.getByRole('img', { name: 'CIMAxis', exact: true }))
+    }
   }
   await page.evaluate(() => document.documentElement.classList.add('dark'))
   await assertLogo(page.locator('main').getByRole('img', { name: 'CIMAxis', exact: true }))

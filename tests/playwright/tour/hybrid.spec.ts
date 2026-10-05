@@ -144,6 +144,7 @@ for (const role of ['admin', 'worker', 'client'] as const) {
         '[data-tour="admin-file-project-header"]', '[data-tour="admin-file-folder-tabs"]',
         '[data-tour="admin-file-table"]', '[data-tour="admin-user-actions"]',
         '[data-tour="account-sessions-revoke-btn"]',
+        '[data-tour="workspace-files-panel"]', '[data-tour="workspace-timeline-panel"]',
       ]
       expect([...new Set(unavailable)].filter((selector) => !conditionalTargets.includes(selector))).toEqual([])
       expect(mutations.filter((request) => !request.endsWith('/read'))).toEqual([])
