@@ -10,7 +10,6 @@ import {
   formatMessageTime,
   getAuthorDisplayName,
   getAuthorRoleTag,
-  isSameDay,
 } from './chat/chat-message-types'
 import { useNewlyArrivedMessages } from './chat/use-newly-arrived-messages'
 
@@ -79,6 +78,15 @@ export const ChatMessageList = memo(function ChatMessageList({
     return Array.from(memberBySub.values())
   }, [propMembers, memberBySub])
 
+  const messageDateKeys = useMemo(
+    () =>
+      messages.map((m) => {
+        const d = new Date(m.createdAt)
+        return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+      }),
+    [messages]
+  )
+
   if (messages.length === 0) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
@@ -98,20 +106,25 @@ export const ChatMessageList = memo(function ChatMessageList({
         const prev = index > 0 ? messages[index - 1] : null
         const next = index < messages.length - 1 ? messages[index + 1] : null
 
-        const showDaySeparator =
-          !prev || !isSameDay(new Date(prev.createdAt), new Date(message.createdAt))
+        const isSameDayAsPrev = Boolean(prev && messageDateKeys[index] === messageDateKeys[index - 1])
+        const isSameDayAsNext = Boolean(next && messageDateKeys[index] === messageDateKeys[index + 1])
+        const showDaySeparator = !prev || !isSameDayAsPrev
         const sameAuthorAsPrev =
-          !!prev &&
-          prev.messageType === message.messageType &&
-          prev.authorSub === message.authorSub &&
-          prev.authorEmail === message.authorEmail &&
-          isSameDay(new Date(prev.createdAt), new Date(message.createdAt))
+          Boolean(
+            prev &&
+            isSameDayAsPrev &&
+            prev.messageType === message.messageType &&
+            prev.authorSub === message.authorSub &&
+            prev.authorEmail === message.authorEmail
+          )
         const sameAuthorAsNext =
-          !!next &&
-          next.messageType === message.messageType &&
-          next.authorSub === message.authorSub &&
-          next.authorEmail === message.authorEmail &&
-          isSameDay(new Date(next.createdAt), new Date(message.createdAt))
+          Boolean(
+            next &&
+            isSameDayAsNext &&
+            next.messageType === message.messageType &&
+            next.authorSub === message.authorSub &&
+            next.authorEmail === message.authorEmail
+          )
 
         if (isSystem) {
           return <ChatSystemMessageItem key={message.id} message={message} />
