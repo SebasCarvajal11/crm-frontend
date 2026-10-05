@@ -17,6 +17,8 @@ import {
 import { InviteRoleSwitcher } from './invite-role-switcher'
 import { ROLES, type InviteRole } from './invite-role-switcher.types'
 import { AdminRoleFields, ClientRoleFields, WorkerRoleFields } from './invite-form-fields'
+import { RolePrivilegesCard } from './role-privileges-card'
+import { InviteSecurityCard } from './invite-security-card'
 
 type Props = {
   accessToken: string
@@ -125,7 +127,9 @@ export function AdminInviteForms({ accessToken }: Props) {
         description="Genera invitaciones y accesos de acuerdo a los privilegios requeridos por cada rol."
       />
 
-      <Card className="w-full overflow-hidden rounded-2xl border-border/80 bg-card shadow-md shadow-black/[0.04]">
+      <div className="grid grid-cols-1 gap-6 items-start lg:grid-cols-12">
+        <div className="lg:col-span-7">
+          <Card className="w-full overflow-hidden rounded-2xl border-border/80 bg-card shadow-md shadow-black/[0.04]">
         <CardHeader className="border-b bg-muted/20 p-4 sm:p-6 space-y-3.5 sm:space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
@@ -258,7 +262,14 @@ export function AdminInviteForms({ accessToken }: Props) {
             </div>
           </form>
         </CardContent>
-      </Card>
+          </Card>
+        </div>
+
+        <div className="lg:col-span-5 space-y-5">
+          <RolePrivilegesCard role={activeRole} />
+          <InviteSecurityCard />
+        </div>
+      </div>
     </section>
   )
 }

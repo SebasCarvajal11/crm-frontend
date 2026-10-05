@@ -166,8 +166,11 @@ Todos los modales y diálogos del sistema (`Dialog` y `AlertDialog`) se rigen ba
 - **Brief y Registro de Cambios Formales**:
   - Cuadrícula asimétrica balanceada con altura mínima estandarizada (`min-h-[520px] lg:min-h-[580px]`).
   - Estados vacíos con diseño editorial, iconos con opacidad sutil y tipografía equilibrada.
-- **Consola de Administración (Centro de Incorporación y Almacenamiento)**:
-  - Cuadrícula de 12 columnas en escritorio (`lg:grid-cols-12`): 7 columnas para el Centro de Incorporación
-    y 5 columnas para la tarjeta de Almacenamiento en la Nube, eliminando espacios muertos y unificando el flujo visual.
+- **Consola de Administración (Centro de Incorporación y Gobernanza)**:
+  - Arquitectura Master-Detail en cuadrícula de 12 columnas en escritorio (`lg:grid-cols-12 items-start gap-6`):
+    - Columna Principal (7 cols): Formulario de emisión de invitaciones (`AdminInviteForms`).
+    - Columna de Soporte (5 cols): Tarjeta de alcances y privilegios en vivo (`RolePrivilegesCard`), que
+      reacciona al cambio de rol, y tarjeta de protocolo de seguridad institucional (`InviteSecurityCard`).
+    - Elimina los espacios muertos laterales en 1080p/2K/4K y colapsa fluidamente en móviles y tablets.
 
 

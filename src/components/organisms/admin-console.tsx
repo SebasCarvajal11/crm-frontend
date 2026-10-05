@@ -65,7 +65,7 @@ function AdminConsoleSections({
 }) {
   const showUsers = activeTab === 'all' || activeTab === 'users'
   const showInvites = activeTab === 'all' || activeTab === 'invites'
-  const showStorageOnly = activeTab === 'storage'
+  const showStorage = activeTab === 'all' || activeTab === 'storage'
 
   return (
     <div key={activeTab} className="tab-pane-transition space-y-8">
@@ -77,25 +77,14 @@ function AdminConsoleSections({
       )}
 
       {showInvites && (
-        <div className="grid grid-cols-1 gap-6 items-start lg:grid-cols-12 animate-fade-up stagger-1">
-          <div className="lg:col-span-7">
-            <AdminInviteForms accessToken={accessToken} />
-          </div>
-          <div className="lg:col-span-5 space-y-4">
-            <AdminStorageCard accessToken={accessToken} />
-          </div>
+        <div className="animate-fade-up stagger-1">
+          <AdminInviteForms accessToken={accessToken} />
         </div>
       )}
 
-      {showStorageOnly && (
+      {showStorage && (
         <div className="space-y-6 animate-fade-up stagger-2">
           <AdminStorageCard accessToken={accessToken} />
-          <AdminFileManager accessToken={accessToken} />
-        </div>
-      )}
-
-      {activeTab === 'all' && (
-        <div className="space-y-6 animate-fade-up stagger-2">
           <AdminFileManager accessToken={accessToken} />
         </div>
       )}
