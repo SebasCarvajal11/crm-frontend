@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   push:
@@ -19,10 +19,9 @@ jobs:
     secrets: inherit
 
   ui:
+    needs: validate
     runs-on: ubuntu-latest
-    # Playwright instala Chromium y WebKit en cada shard; la descarga puede variar
-    # sin que la suite haya fallado. Reservar margen para completar las pruebas.
-    timeout-minutes: 35
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -38,10 +37,26 @@ jobs:
           cache: pnpm
       - name: Instalar dependencias
         run: pnpm install --frozen-lockfile
+      - name: Cache motores Playwright
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Instalar motores de navegador
-        run: pnpm exec playwright install --with-deps chromium webkit
+        run: |
+          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" = "true" ]; then
+            pnpm exec playwright install-deps chromium webkit
+          else
+            pnpm exec playwright install --with-deps chromium webkit
+          fi
+      - name: Descargar build compilado
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist
       - name: Verificar marca, presencia, tutorial híbrido y navegación adaptativa
-        run: pnpm test:ui --shard=${{ matrix.shard }}/3
+        run: pnpm exec playwright test --config tests/playwright/ui.config.ts --shard=${{ matrix.shard }}/3
       - name: Guardar reporte y capturas
         if: always()
         uses: actions/upload-artifact@v4
