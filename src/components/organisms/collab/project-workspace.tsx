@@ -112,8 +112,8 @@ export function ProjectWorkspace({
   }, [changeRequestsQ, queryClient, projectId])
 
   return (
-    <div className="flex min-h-0 flex-col gap-5 min-w-0 w-full max-w-full overflow-hidden">
-      <div className="flex flex-col gap-3">
+    <div className="flex min-h-0 flex-col gap-4 sm:gap-5 min-w-0 w-full max-w-full h-full flex-1 overflow-hidden">
+      <div className="flex flex-col gap-3 shrink-0">
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
@@ -133,14 +133,14 @@ export function ProjectWorkspace({
       </div>
 
       {errorMsg && (
-        <Alert variant="destructive" role="alert">
+        <Alert variant="destructive" role="alert" className="shrink-0">
           <AlertCircle className="size-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{errorMsg}</AlertDescription>
         </Alert>
       )}
 
-      <div data-tour="workspace-tabs">
+      <div data-tour="workspace-tabs" className="shrink-0">
         <SectionTabs
           items={tabs}
           value={activeTab}
@@ -150,14 +150,15 @@ export function ProjectWorkspace({
         />
       </div>
 
-      <div className="min-h-0">
+      <div className="min-h-0 flex-1 flex flex-col">
         <WorkspaceTabPanel
           tab="board"
           activeTab={activeTab}
           isVisited={true}
           ariaLabel="Tablero de tareas"
+          className="flex-1 min-h-0 flex flex-col"
         >
-          <div data-tour="workspace-task-search">
+          <div data-tour="workspace-task-search" className="shrink-0 mb-3">
             <TaskSearchBar
               searchableTasks={searchableTasks}
               isSearching={isSearching}
@@ -169,7 +170,7 @@ export function ProjectWorkspace({
           {boardData?.board.tasksTruncated ? (
             <Alert
               className={[
-                'mb-3 border-amber-200 bg-amber-50 text-amber-950',
+                'mb-3 shrink-0 border-amber-200 bg-amber-50 text-amber-950',
                 'dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100',
               ].join(' ')}
             >
@@ -202,6 +203,7 @@ export function ProjectWorkspace({
           activeTab={activeTab}
           isVisited={visitedTabs.has('chat')}
           ariaLabel="Conversación del proyecto"
+          className="flex-1 min-h-0 flex flex-col"
         >
           <ConversationPanel
             accessToken={accessToken}
@@ -223,6 +225,7 @@ export function ProjectWorkspace({
           activeTab={activeTab}
           isVisited={visitedTabs.has('brief')}
           ariaLabel="Brief del proyecto"
+          className="flex-1 min-h-0 overflow-y-auto scrollbar-thin"
         >
           <BriefPanel
             brief={briefQ.data?.brief ?? null}
@@ -236,6 +239,7 @@ export function ProjectWorkspace({
           activeTab={activeTab}
           isVisited={visitedTabs.has('contract')}
           ariaLabel="Contrato del proyecto"
+          className="flex-1 min-h-0 overflow-y-auto scrollbar-thin"
         >
           <ContractPanel
             accessToken={accessToken}
@@ -252,6 +256,7 @@ export function ProjectWorkspace({
           activeTab={activeTab}
           isVisited={visitedTabs.has('change-requests')}
           ariaLabel="Solicitudes de cambio"
+          className="flex-1 min-h-0 overflow-y-auto scrollbar-thin"
         >
           <ChangeRequestsPanel
             accessToken={accessToken}
@@ -271,6 +276,7 @@ export function ProjectWorkspace({
           activeTab={activeTab}
           isVisited={visitedTabs.has('members')}
           ariaLabel="Integrantes del proyecto"
+          className="flex-1 min-h-0 overflow-y-auto scrollbar-thin"
         >
           <ProjectMembers
             members={members}

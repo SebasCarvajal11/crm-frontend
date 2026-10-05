@@ -209,9 +209,9 @@
 
 @layer components {
   /*
-   * Las tres columnas de Conversación comparten esta altura. En escritorio
-   * llena el espacio útil del workspace; en resoluciones más estrechas queda
-   * acotada para que el apilamiento vertical siga siendo manejable.
+   * Las columnas del espacio de trabajo comparten esta altura. En escritorio
+   * llena el espacio útil del workspace de forma fluida; en resoluciones más estrechas
+   * queda acotada para un apilamiento vertical manejable.
    */
   .collab-workspace-panel {
     height: min(32rem, 62dvh);
@@ -223,10 +223,11 @@
     }
   }
 
-  @media (min-width: 1280px) {
+  @media (min-width: 1024px) {
     .collab-workspace-panel {
-      height: max(24rem, calc(100vh - 17rem));
-      height: max(24rem, calc(100dvh - 17rem));
+      height: 100%;
+      min-height: 0;
+      flex: 1 1 0%;
     }
   }
 }

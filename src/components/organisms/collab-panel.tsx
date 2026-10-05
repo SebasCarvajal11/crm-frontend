@@ -118,37 +118,39 @@ export function CollabPanel({
   const firstProjectId = projects[0]?.id
 
   return (
-    <div className="flex flex-col gap-6 min-h-0 min-w-0 w-full max-w-full overflow-hidden">
-      <PageHeader
-        eyebrow={<>Espacio de <span className="font-black text-primary">Colaboración</span></>}
-        title={<>Gestión de <span className="font-black tracking-tight text-foreground">Proyectos</span></>}
-        description="Vista Kanban por estado. Abre un proyecto para gestionar su espacio de trabajo."
-        icon={KanbanSquare}
-        actions={(
-          <div className="flex w-full flex-col gap-2 sm:items-end xl:w-auto">
-          {canCreate && (
-            <Button
-              size="sm"
-              className="shrink-0 self-start sm:self-auto"
-              data-tour="collab-create-btn"
-              onClick={() => setShowModal(true)}
-            >
-              <Plus className="size-4 mr-1.5" />
-              Nuevo proyecto
-            </Button>
+    <div className="flex flex-col gap-4 sm:gap-6 min-h-0 min-w-0 w-full max-w-full h-full flex-1 overflow-hidden">
+      <div className="shrink-0">
+        <PageHeader
+          eyebrow={<>Espacio de <span className="font-black text-primary">Colaboración</span></>}
+          title={<>Gestión de <span className="font-black tracking-tight text-foreground">Proyectos</span></>}
+          description="Vista Kanban por estado. Abre un proyecto para gestionar su espacio de trabajo."
+          icon={KanbanSquare}
+          actions={(
+            <div className="flex w-full flex-col gap-2 sm:items-end xl:w-auto">
+            {canCreate && (
+              <Button
+                size="sm"
+                className="shrink-0 self-start sm:self-auto"
+                data-tour="collab-create-btn"
+                onClick={() => setShowModal(true)}
+              >
+                <Plus className="size-4 mr-1.5" />
+                Nuevo proyecto
+              </Button>
+            )}
+            <div data-tour="collab-search" className="w-full sm:w-auto">
+              <ProjectSearchInput
+                canSearchByClient={canSearchByClient}
+                searchResults={projectSearchQ.data?.data ?? []}
+                isSearching={projectSearchQ.isLoading}
+                onDebouncedChange={handleDebouncedChange}
+                onSelectProject={onOpenProject}
+              />
+            </div>
+            </div>
           )}
-          <div data-tour="collab-search" className="w-full sm:w-auto">
-            <ProjectSearchInput
-              canSearchByClient={canSearchByClient}
-              searchResults={projectSearchQ.data?.data ?? []}
-              isSearching={projectSearchQ.isLoading}
-              onDebouncedChange={handleDebouncedChange}
-              onSelectProject={onOpenProject}
-            />
-          </div>
-          </div>
-        )}
-      />
+        />
+      </div>
 
       {canCreate && (
         <CreateProjectModal
@@ -163,17 +165,14 @@ export function CollabPanel({
       )}
 
       {!projectsQ.isLoading && total > 0 && (
-        <div data-tour="collab-summary">
+        <div data-tour="collab-summary" className="shrink-0">
           <ProjectStatsSummary total={total} active={active} reviewing={reviewing} done={done} />
         </div>
       )}
 
       {projectsQ.isLoading && (
-        <div className="overflow-x-auto pb-4" role="status" aria-label="Cargando tablero de proyectos">
-          <div
-            className="grid grid-cols-4 gap-4 min-w-[960px]"
-            style={{ height: 'max(480px, calc(100dvh - 13.5rem))' }}
-          >
+        <div className="flex-1 min-h-0 overflow-x-auto pb-2" role="status" aria-label="Cargando tablero de proyectos">
+          <div className="grid grid-cols-4 gap-4 min-w-[960px] h-full">
             {[1, 2, 3, 4].map((colIndex) => (
               <div
                 key={colIndex}
@@ -194,15 +193,10 @@ export function CollabPanel({
       )}
 
       {!projectsQ.isLoading && (
-        <div className="overflow-x-auto pb-4">
+        <div className="flex-1 min-h-0 overflow-x-auto pb-2">
           <div
-            className="grid grid-cols-4 gap-4 min-w-[960px]"
+            className="grid grid-cols-4 gap-4 min-w-[960px] h-full"
             data-tour="collab-columns-container"
-            style={{
-              height: total > 0
-                ? 'max(440px, calc(100dvh - 18.25rem))'
-                : 'max(480px, calc(100dvh - 13.5rem))',
-            }}
             role="main"
             aria-label="Tablero Kanban de proyectos"
           >

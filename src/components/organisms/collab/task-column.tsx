@@ -110,7 +110,7 @@ function TaskColumnEmptyState({
   ].join(' ')
 
   return (
-    <div className="flex h-full min-h-[200px] items-center justify-center p-2">
+    <div className="flex h-full min-h-[140px] items-center justify-center p-2">
       <div className={emptyClass}>
         <p className="text-xs font-medium text-muted-foreground/70">
           {canDrag ? 'Arrastra tareas aquí' : 'Sin tareas'}
@@ -211,7 +211,7 @@ function TaskColumnBody({ parentRef, props, isDragOver, virtualizer }: BodyProps
   return (
     <div
       ref={parentRef}
-      className="h-[min(62dvh,520px)] overflow-y-auto scroll-smooth scrollbar-thin p-2 relative"
+      className="flex-1 min-h-[260px] sm:min-h-0 overflow-y-auto scroll-smooth scrollbar-thin p-2 relative"
       aria-label={`Tareas de la columna ${column.title}`}
     >
       {tasks.length === 0 ? (
@@ -235,7 +235,7 @@ function getColumnSectionClass(isDragOver: boolean): string {
     : 'bg-muted/20 border-border/80 hover:border-border'
 
   return [
-    'flex flex-col rounded-2xl border transition-all duration-150',
+    'flex flex-col rounded-2xl border transition-all duration-150 h-full',
     'overflow-hidden shadow-2xs kanban-column-dropzone',
     dropzoneClass,
   ].join(' ')

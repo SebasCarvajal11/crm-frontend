@@ -30,18 +30,17 @@ import type { DashboardTab } from '@/routes/-dashboard.search'
 const CollabPanel = lazy(() => import('@/features/collab/ui').then((m) => ({ default: m.CollabPanel })))
 const NotificationsPanel = lazy(() => import('@/features/collab/ui').then((m) => ({ default: m.NotificationsPanel })))
 const MarketingPanel = lazy(() => import('@/features/marketing').then((m) => ({ default: m.MarketingPanel })))
-const DashboardAnalytics = lazy(() =>
-  import('@/components/organisms/dashboard-analytics').then((m) => ({ default: m.DashboardAnalytics }))
-)
+const DashboardAnalytics = lazy(() => import('@/components/organisms/dashboard-analytics').then((m) => ({ default: m.DashboardAnalytics })))
 const AdminConsole = lazy(() => import('@/features/admin/ui').then((m) => ({ default: m.AdminConsole })))
-const AccountPanel = lazy(() =>
-  import('@/components/organisms/account-panel').then((m) => ({ default: m.AccountPanel }))
-)
+const AccountPanel = lazy(() => import('@/components/organisms/account-panel').then((m) => ({ default: m.AccountPanel })))
 
-function tabPaneProps(isActive: boolean) {
+function tabPaneProps(isActive: boolean, isFlexFull = false) {
+  if (!isActive) return { style: { display: 'none' } }
   return {
-    style: { display: isActive ? 'block' : 'none' },
-    className: isActive ? 'tab-pane-transition' : undefined,
+    style: { display: isFlexFull ? 'flex' : 'block' },
+    className: isFlexFull
+      ? 'tab-pane-transition flex-1 min-h-0 flex-col h-full w-full'
+      : 'tab-pane-transition',
   }
 }
 
@@ -248,7 +247,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
       )}
       <Suspense fallback={<DashboardTabSkeleton />}>
         {visitedTabs.has('collab') && (
-          <div {...tabPaneProps(activeTab === 'collab')}>
+          <div {...tabPaneProps(activeTab === 'collab', true)}>
             <CollabPanel
               accessToken={token}
               identity={identity}

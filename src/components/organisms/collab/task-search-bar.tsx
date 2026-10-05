@@ -34,13 +34,13 @@ export function TaskSearchBar({ searchableTasks, isSearching, boardColumns, onDe
   const hasQuery = text.trim().length >= 2
 
   return (
-    <div className="mb-4 rounded-2xl border bg-card p-4 shadow-sm">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+    <div className="rounded-2xl border bg-card px-4 py-2.5 sm:py-3 shadow-2xs">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="min-w-0">
-        <h3 className="text-sm font-semibold">Buscar tareas</h3>
-        <p className="text-xs text-muted-foreground">Filtra por nombre, descripción o columna del tablero.</p>
+          <h3 className="text-xs sm:text-sm font-semibold">Buscar tareas</h3>
+          <p className="text-[11px] sm:text-xs text-muted-foreground truncate">Filtra por nombre, descripción o columna del tablero.</p>
         </div>
-      <div className="relative w-full lg:max-w-md lg:shrink-0">
+        <div className="relative w-full sm:max-w-xs md:max-w-sm lg:max-w-md sm:shrink-0">
         <Input
           value={text}
           onChange={(e) => setText(e.target.value)}

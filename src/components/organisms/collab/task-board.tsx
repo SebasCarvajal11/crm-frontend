@@ -51,7 +51,7 @@ export function TaskBoard({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col flex-1 min-h-0 gap-3">
       <CreateTaskModal
         accessToken={accessToken}
         projectId={projectId}
@@ -68,10 +68,10 @@ export function TaskBoard({
       <div
         role="region"
         aria-label={`Tablero de tareas con ${columns.length} columnas`}
-        className="overflow-x-auto scroll-smooth scrollbar-thin -mx-1 px-1 pb-2"
+        className="overflow-x-auto scroll-smooth scrollbar-thin -mx-1 px-1 pb-2 flex-1 min-h-0"
       >
         {columns.length > 1 ? (
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-2 mb-2 lg:hidden">
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-2 mb-2 lg:hidden shrink-0">
             {columns.map((col) => {
               const count = tasksByColumn[col.id]?.length ?? 0
               return (
@@ -100,7 +100,7 @@ export function TaskBoard({
           </div>
         ) : (
           <div
-            className="grid gap-3"
+            className="grid gap-3 h-full"
             data-tour="workspace-task-columns"
             style={{
               gridTemplateColumns: `repeat(${columns.length}, minmax(272px, 1fr))`,

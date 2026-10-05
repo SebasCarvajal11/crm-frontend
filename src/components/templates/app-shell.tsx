@@ -68,7 +68,7 @@ export function AppShell({
   }, [desktopCollapsed])
 
   return (
-    <div className={cn('relative flex min-h-screen bg-background', className)}>
+    <div className={cn('relative flex min-h-screen md:h-dvh md:max-h-dvh md:overflow-hidden bg-background', className)}>
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center md:bg-fixed transition-opacity duration-300 ease-out"
@@ -77,7 +77,7 @@ export function AppShell({
           opacity: isTextureLoaded ? 1 : 0,
         }}
       />
-      <div className="relative z-10 flex min-h-screen w-full flex-1">
+      <div className="relative z-10 flex min-h-screen md:min-h-0 md:h-full w-full flex-1">
       <DesktopSidebar
         title={title}
         items={sidebarItems}
@@ -114,7 +114,7 @@ export function AppShell({
 
       <div
         className={cn(
-          'flex min-w-0 flex-1 flex-col transition-[margin] duration-200 ease-out',
+          'flex min-w-0 flex-1 flex-col md:h-full md:min-h-0 md:overflow-hidden transition-[margin] duration-200 ease-out',
           desktopCollapsed ? collapsedSidebarOffset : shellSidebarOffset,
         )}
       >
@@ -144,8 +144,8 @@ export function AppShell({
 
         <main
           className={cn(
-            'min-w-0 flex-1 overflow-x-hidden overflow-y-auto',
-            'scrollbar-thin px-4 pt-6 pb-36 sm:px-6 sm:py-6 sm:pb-28 lg:px-8 scroll-pt-16 view-transition'
+            'min-w-0 flex-1 overflow-x-hidden overflow-y-auto md:flex md:flex-col md:min-h-0',
+            'scrollbar-thin px-4 pt-6 pb-36 sm:px-6 sm:py-6 md:pb-6 lg:px-8 scroll-pt-16 view-transition'
           )}
         >
           {children}
