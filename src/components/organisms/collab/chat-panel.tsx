@@ -125,12 +125,7 @@ export function ChatPanel({
   }
 
   const { send } = useProjectChatSend({
-    accessToken,
-    projectId,
-    channel,
-    identity,
-    onError,
-    setBody,
+    accessToken, projectId, channel, identity, onError, setBody,
   })
 
   const submitMessage = () => {
@@ -159,7 +154,7 @@ export function ChatPanel({
 
       <div
         ref={logRef}
-        className="min-h-0 flex-1 space-y-1 overflow-y-auto scroll-auto scrollbar-thin px-4 py-4"
+        className="min-h-0 flex-1 space-y-1 overflow-y-auto scroll-auto scrollbar-thin px-3.5 sm:px-4 pr-14 sm:pr-4 py-4"
         role="log"
         aria-live="polite"
         aria-label="Mensajes"
@@ -187,7 +182,7 @@ export function ChatPanel({
         />
       </div>
 
-      <div className="shrink-0 border-t bg-background/80 p-3">
+      <div className="shrink-0 border-t bg-muted/20 p-3 sm:p-4 pr-14 sm:pr-4 backdrop-blur-xs">
         <ChatTypingIndicator typers={activeTypers} />
         <div className="relative flex items-end gap-2">
           <div className="min-w-0 flex-1">
@@ -204,27 +199,24 @@ export function ChatPanel({
               }}
               onKeyDown={(event) => {
                 if (mentionSuggestions.length > 0) {
+                  const len = mentionSuggestions.length
                   if (event.key === 'ArrowDown') {
                     event.preventDefault()
-                    setActiveIdx((currentIndex) => (currentIndex + 1) % mentionSuggestions.length)
-                    return
+                    return setActiveIdx((i) => (i + 1) % len)
                   }
                   if (event.key === 'ArrowUp') {
                     event.preventDefault()
-                    setActiveIdx((currentIndex) => (currentIndex - 1 + mentionSuggestions.length) % mentionSuggestions.length)
-                    return
+                    return setActiveIdx((i) => (i - 1 + len) % len)
                   }
                   if (event.key === 'Tab' || (event.key === 'Enter' && !event.shiftKey)) {
                     event.preventDefault()
-                    const mentionIndex = activeIdx < mentionSuggestions.length ? activeIdx : 0
-                    applyMention(mentionSuggestions[mentionIndex]?.value ?? mentionSuggestions[0].value)
-                    return
+                    const idx = activeIdx < len ? activeIdx : 0
+                    return applyMention(mentionSuggestions[idx]?.value ?? mentionSuggestions[0].value)
                   }
                   if (event.key === 'Escape') {
                     event.preventDefault()
                     setMentionPickerSuppressed(true)
-                    setActiveIdx(0)
-                    return
+                    return setActiveIdx(0)
                   }
                 }
 
@@ -233,7 +225,7 @@ export function ChatPanel({
                   submitMessage()
                 }
               }}
-              className="min-h-[44px] max-h-28 resize-none py-2.5 text-sm leading-snug"
+              className="min-h-[44px] max-h-28 resize-none rounded-xl border-border/80 bg-background py-2.5 px-3 text-sm leading-snug shadow-2xs focus-visible:ring-1 focus-visible:ring-primary"
               rows={1}
               aria-label="Escribir mensaje"
               onSelect={(event) => {
@@ -246,10 +238,10 @@ export function ChatPanel({
           <Button
             size="icon"
             className={cn(
-              'h-[44px] w-[44px] shrink-0 rounded-lg transition-all duration-150',
+              'h-[44px] w-[44px] shrink-0 rounded-xl transition-all duration-150',
               body.trim().length > 0 && !send.isPending
-                ? 'bg-primary text-primary-foreground shadow-xs hover:bg-primary-hover active:scale-95'
-                : 'bg-muted text-muted-foreground/50 border border-border/60 cursor-not-allowed opacity-70'
+                ? 'bg-primary text-primary-foreground shadow-sm hover:bg-primary-hover active:scale-95'
+                : 'bg-muted text-muted-foreground/50 border border-border/60 cursor-not-allowed opacity-60'
             )}
             disabled={body.trim().length < 1 || send.isPending}
             onClick={submitMessage}
@@ -259,7 +251,7 @@ export function ChatPanel({
           </Button>
 
           {mentionSuggestions.length > 0 && (
-            <div className="absolute bottom-full left-0 right-[52px] z-20 mb-1 max-h-40 overflow-y-auto rounded-md border bg-popover shadow-md">
+            <div className="absolute bottom-full left-0 right-[52px] z-20 mb-1 max-h-40 overflow-y-auto rounded-xl border bg-popover shadow-md">
               {mentionSuggestions.map((suggestion, index) => (
                 <button
                   key={suggestion.key}
@@ -268,7 +260,7 @@ export function ChatPanel({
                     event.preventDefault()
                     applyMention(suggestion.value)
                   }}
-                  className={`w-full rounded px-2 py-1 text-left text-xs ${index === activeIdx ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'}`}
+                  className={`w-full rounded-lg px-2.5 py-1.5 text-left text-xs ${index === activeIdx ? 'bg-accent text-accent-foreground font-medium' : 'hover:bg-muted'}`}
                 >
                   @{suggestion.value} <span className="text-muted-foreground">{suggestion.label}</span>
                 </button>
@@ -277,7 +269,14 @@ export function ChatPanel({
           )}
         </div>
 
-        <p className="mt-1.5 text-[11px] text-muted-foreground/90">Menciones permitidas: {mentionHints(identity.role).join(' · ')}</p>
+        <div className="mt-2 flex items-center justify-between gap-2 px-1 text-[11px] text-muted-foreground/80">
+          <span className="truncate">
+            Menciones: <span className="font-medium text-foreground/75">{mentionHints(identity.role).join(' · ')}</span>
+          </span>
+          <span className="hidden sm:inline-block shrink-0 text-[10px] text-muted-foreground/60">
+            Enter para enviar · Shift+Enter para nueva línea
+          </span>
+        </div>
       </div>
 
       {identity.role === 'admin' && (

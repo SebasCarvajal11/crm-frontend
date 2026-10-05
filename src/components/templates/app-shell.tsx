@@ -147,7 +147,7 @@ export function AppShell({
         <main
           className={cn(
             'min-w-0 flex-1 overflow-x-hidden overflow-y-auto md:flex md:flex-col md:min-h-0',
-            'scrollbar-thin px-4 pt-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-6 md:pb-6 lg:px-8 scroll-pt-16 view-transition'
+            'scrollbar-thin px-4 pt-4 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-6 md:pb-6 lg:px-8 scroll-pt-16 view-transition'
           )}
         >
           <div className="mx-auto w-full max-w-[1920px] 2xl:max-w-[2400px] flex-1 md:flex md:flex-col md:min-h-0">
