@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { KanbanSquare } from 'lucide-react'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { TaskColumn } from './task-column'
@@ -31,6 +31,10 @@ export function TaskBoard({
 }: Props) {
   const [selectedTaskId,  setSelectedTaskId]  = useState<string | null>(focusedTaskId ?? null)
   const [createColumnId, setCreateColumnId] = useState<string | null>(null)
+
+  const handleSelectTask = useCallback((task: ProjectTask) => {
+    setSelectedTaskId(task.id)
+  }, [])
 
   useEffect(() => {
     if (focusedTaskId) {
@@ -111,13 +115,15 @@ export function TaskBoard({
               <TaskColumn
                 key={col.id}
                 column={col}
+                columns={columns}
                 tasks={tasksByColumn[col.id] ?? []}
                 selectedTaskId={selectedTaskId}
                 canDrag={canOperate}
                 canCreateTask={canOperate}
                 isFirstColumn={cIdx === 0}
-                onSelectTask={(task) => setSelectedTaskId(task.id)}
+                onSelectTask={handleSelectTask}
                 onDropTask={(taskId) => onMoveTask(taskId, col.id)}
+                onMoveTask={onMoveTask}
                 onCreateTask={() => setCreateColumnId(col.id)}
               />
             ))}

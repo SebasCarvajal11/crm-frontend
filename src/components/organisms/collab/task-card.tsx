@@ -1,13 +1,22 @@
 import { memo, useState } from 'react'
-import { AlertOctagon, Calendar, CheckSquare, Clock, GripVertical, User } from 'lucide-react'
+import { AlertOctagon, Calendar, CheckSquare, Clock, GripVertical, MoreVertical, User } from 'lucide-react'
 import { PriorityBadge } from '@/components/molecules/priority-badge'
-import type { ProjectTask } from '@/features/collab/model'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import type { ProjectTask, ProjectTaskColumn } from '@/features/collab/model'
 
 type Props = {
   task: ProjectTask
   isSelected: boolean
   canDrag: boolean
-  onClick: () => void
+  onClick?: () => void
+  onSelect?: (task: ProjectTask) => void
+  columns?: ProjectTaskColumn[]
+  onMoveTask?: (taskId: string, targetColumnId: string) => void
 }
 
 const fmt = (d: string) =>
@@ -121,7 +130,15 @@ function TaskCardFooter({ createdAt, updatedAt }: { createdAt: string; updatedAt
   )
 }
 
-function TaskCardHeader({ title, canDrag }: { title: string; canDrag: boolean }) {
+type HeaderProps = {
+  title: string
+  canDrag: boolean
+  task?: ProjectTask
+  columns?: ProjectTaskColumn[]
+  onMoveTask?: (taskId: string, targetColumnId: string) => void
+}
+
+function TaskCardHeader({ title, canDrag, task, columns, onMoveTask }: HeaderProps) {
   const titleClass = [
     'text-sm font-semibold tracking-tight leading-snug line-clamp-2',
     'text-foreground group-hover:text-primary transition-colors',
@@ -131,10 +148,49 @@ function TaskCardHeader({ title, canDrag }: { title: string; canDrag: boolean })
     'shrink-0 mt-0.5 cursor-grab transition-colors',
   ].join(' ')
 
+  const otherColumns = columns && task ? columns.filter((c) => c.id !== task.columnId) : []
+  const hasMoveOptions = canDrag && otherColumns.length > 0 && Boolean(onMoveTask)
+
   return (
     <div className="flex items-start justify-between gap-2 mb-1.5">
       <span className={titleClass}>{title}</span>
-      {canDrag && <GripVertical className={gripClass} aria-hidden="true" />}
+      <div className="flex items-center gap-1 shrink-0">
+        {hasMoveOptions && (
+          <span
+            className="inline-flex"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={`Mover tarea ${title}`}
+                  title="Mover tarea de columna"
+                  className="p-1 -m-1 rounded-md text-muted-foreground/40 hover:text-foreground hover:bg-muted/80 transition-colors cursor-pointer"
+                >
+                  <MoreVertical className="size-3.5" aria-hidden="true" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                  Mover a columna:
+                </div>
+                {otherColumns.map((col) => (
+                  <DropdownMenuItem
+                    key={col.id}
+                    onClick={() => onMoveTask?.(task!.id, col.id)}
+                    className="text-xs cursor-pointer"
+                  >
+                    {col.title}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </span>
+        )}
+        {canDrag && <GripVertical className={gripClass} aria-hidden="true" />}
+      </div>
     </div>
   )
 }
@@ -153,7 +209,15 @@ const baseCardClass = [
 ].join(' ')
 
 /** Organismo: tarjeta arrastrable de tarea en el tablero hijo. */
-export const TaskCard = memo(function TaskCard({ task, isSelected, canDrag, onClick }: Props) {
+export const TaskCard = memo(function TaskCard({
+  task,
+  isSelected,
+  canDrag,
+  onClick,
+  onSelect,
+  columns,
+  onMoveTask,
+}: Props) {
   const [isDragging, setIsDragging] = useState(false)
   const borderClass = getCardBorderClass(isDragging, isSelected, Boolean(task.blockType))
 
@@ -164,6 +228,14 @@ export const TaskCard = memo(function TaskCard({ task, isSelected, canDrag, onCl
     window.requestAnimationFrame(() => setIsDragging(true))
   }
 
+  const handleClick = () => {
+    if (onSelect) {
+      onSelect(task)
+    } else if (onClick) {
+      onClick()
+    }
+  }
+
   return (
     <button
       type="button"
@@ -172,12 +244,18 @@ export const TaskCard = memo(function TaskCard({ task, isSelected, canDrag, onCl
       data-testid={`task-card-${task.id}`}
       onDragStart={onDragStart}
       onDragEnd={() => setIsDragging(false)}
-      onClick={onClick}
+      onClick={handleClick}
       aria-pressed={isSelected}
       aria-label={`Tarea: ${task.title}. Prioridad: ${task.priority}.`}
       className={`${baseCardClass} ${borderClass}`}
     >
-      <TaskCardHeader title={task.title} canDrag={canDrag} />
+      <TaskCardHeader
+        title={task.title}
+        canDrag={canDrag}
+        task={task}
+        columns={columns}
+        onMoveTask={onMoveTask}
+      />
       {task.description && (
         <p className="text-xs text-muted-foreground line-clamp-2 mb-2 leading-relaxed">
           {task.description}

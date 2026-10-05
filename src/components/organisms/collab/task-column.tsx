@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { memo, useRef } from 'react'
 import { Plus, Users } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -14,8 +14,10 @@ type Props = {
   canDrag: boolean
   canCreateTask: boolean
   isFirstColumn?: boolean
+  columns?: ProjectTaskColumn[]
   onSelectTask: (t: ProjectTask) => void
   onDropTask: (taskId: string) => void
+  onMoveTask?: (taskId: string, targetColumnId: string) => void
   onCreateTask: () => void
 }
 
@@ -126,6 +128,8 @@ type ListProps = {
   canDrag: boolean
   virtualizer: Virtualizer<HTMLDivElement, Element>
   onSelectTask: (t: ProjectTask) => void
+  columns?: ProjectTaskColumn[]
+  onMoveTask?: (taskId: string, targetColumnId: string) => void
 }
 
 type VirtualItemProps = {
@@ -135,15 +139,19 @@ type VirtualItemProps = {
   canDrag: boolean
   measureElement: (node: Element | null) => void
   onSelectTask: (t: ProjectTask) => void
+  columns?: ProjectTaskColumn[]
+  onMoveTask?: (taskId: string, targetColumnId: string) => void
 }
 
-function TaskColumnVirtualItem({
+const TaskColumnVirtualItem = memo(function TaskColumnVirtualItem({
   virtualRow,
   task,
   isSelected,
   canDrag,
   measureElement,
   onSelectTask,
+  columns,
+  onMoveTask,
 }: VirtualItemProps) {
   return (
     <div
@@ -156,11 +164,13 @@ function TaskColumnVirtualItem({
         task={task}
         isSelected={isSelected}
         canDrag={canDrag}
-        onClick={() => onSelectTask(task)}
+        onSelect={onSelectTask}
+        columns={columns}
+        onMoveTask={onMoveTask}
       />
     </div>
   )
-}
+})
 
 function TaskColumnVirtualList({
   tasks,
@@ -168,6 +178,8 @@ function TaskColumnVirtualList({
   canDrag,
   virtualizer,
   onSelectTask,
+  columns,
+  onMoveTask,
 }: ListProps) {
   const virtualItems = virtualizer.getVirtualItems()
   const offset = virtualItems[0]?.start ?? 0
@@ -192,6 +204,8 @@ function TaskColumnVirtualList({
             canDrag={canDrag}
             measureElement={virtualizer.measureElement}
             onSelectTask={onSelectTask}
+            columns={columns}
+            onMoveTask={onMoveTask}
           />
         ))}
       </div>
@@ -207,7 +221,7 @@ type BodyProps = {
 }
 
 function TaskColumnBody({ parentRef, props, isDragOver, virtualizer }: BodyProps) {
-  const { column, tasks, selectedTaskId, canDrag, onSelectTask } = props
+  const { column, tasks, selectedTaskId, canDrag, onSelectTask, columns, onMoveTask } = props
   return (
     <div
       ref={parentRef}
@@ -223,6 +237,8 @@ function TaskColumnBody({ parentRef, props, isDragOver, virtualizer }: BodyProps
           canDrag={canDrag}
           virtualizer={virtualizer}
           onSelectTask={onSelectTask}
+          columns={columns}
+          onMoveTask={onMoveTask}
         />
       )}
     </div>

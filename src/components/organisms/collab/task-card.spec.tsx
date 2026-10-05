@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { TaskCard } from './task-card'
-import type { ProjectTask } from '@/features/collab/model'
+import type { ProjectTask, ProjectTaskColumn } from '@/features/collab/model'
 
 const baseTask: ProjectTask = {
   id: 'task-101',
@@ -96,5 +96,25 @@ describe('TaskCard', () => {
 
     expect(markup).toContain('Timeout 48h')
     expect(markup).toContain('border-rose-500/50')
+  })
+
+  it('renderiza botón accesible de mover columna cuando canDrag es true y se proveen columnas', () => {
+    const columns: ProjectTaskColumn[] = [
+      { id: 'col-1', projectId: 'proj-1', key: 'pending', title: 'Por Hacer', position: 0, isClientVisible: true, isDefault: true, createdAt: '', updatedAt: '' },
+      { id: 'col-2', projectId: 'proj-1', key: 'doing', title: 'En Progreso', position: 1, isClientVisible: true, isDefault: false, createdAt: '', updatedAt: '' },
+    ]
+
+    const markup = renderToStaticMarkup(
+      <TaskCard
+        task={baseTask}
+        isSelected={false}
+        canDrag={true}
+        columns={columns}
+        onMoveTask={vi.fn()}
+      />
+    )
+
+    expect(markup).toContain('Mover tarea de columna')
+    expect(markup).toContain('Mover tarea Diseñar interfaz de onboarding')
   })
 })
