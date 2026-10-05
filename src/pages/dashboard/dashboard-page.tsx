@@ -11,7 +11,6 @@ import {
   DashboardTabSkeleton,
 } from './dashboard-feedback'
 import { useDashboardNavigation } from './use-dashboard-navigation'
-import { warmDashboardChunks } from './dashboard-tab-preload'
 import { useDashboardSidebar } from './use-dashboard-sidebar'
 import { useScrollToTop } from './use-scroll-to-top'
 import { AppShell } from '@/components/templates/app-shell'
@@ -177,11 +176,6 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
 
   const isReady = Boolean(identity && !dashboardQuery.isPending)
   useScrollToTop(`${activeTab}-${isReady}`)
-
-  useEffect(() => {
-    if (!identity?.role) return
-    warmDashboardChunks(identity.role)
-  }, [identity?.role])
 
   const sidebarItems = useDashboardSidebar({
     activeTab,

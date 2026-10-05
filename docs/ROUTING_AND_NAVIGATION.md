@@ -66,3 +66,12 @@ Para evitar que usuarios sin autenticar accedan a áreas privadas o que usuarios
   });
   ```
 - **Control de Acceso por Rol**: Si un usuario con rol `cliente` intenta navegar a una ruta restringida a administradores (`/dashboard/admin`), el guard intercepta la navegación y redirige a su vista correspondiente.
+
+---
+
+## 4. Estrategia de Precarga de Chunks por Intención (*Hover/Focus Intent*)
+
+Para maximizar el rendimiento inicial de carga y evitar descargas masivas innecesarias (FIND-FE-01):
+- **Cero Descarga Eager al Montaje**: El dashboard no ejecuta precargas masivas incondicionales de módulos pesados (`collab`, `marketing`, `analytics`, `admin`).
+- **Pre-descarga por Intención**: Las pestañas de navegación vinculan `onMouseEnter` y `onFocus` a funciones de importación dinámica bajo demanda. Esto permite que el chunk comience a transferirse durante los ~200ms de intención previa al clic, garantizando transiciones instantáneas sin penalizar el First Meaningful Paint.
+- **Respeto a Save-Data y Redes Lentas**: La utilidad `canPrefetch` en `dashboard-tab-preload.ts` verifica `navigator.connection.saveData` y suprime la precarga automática si el usuario tiene activado el ahorro de datos móviles o se encuentra en redes de tipo 2G.
