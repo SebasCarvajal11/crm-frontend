@@ -43,7 +43,7 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-black/65 backdrop-blur-md",
+        "fixed inset-0 z-50 bg-black/75 backdrop-blur-md",
         "transition-all duration-250 ease-out",
         "data-open:animate-in data-open:fade-in-0",
         "data-closed:animate-out data-closed:fade-out-0",
@@ -75,9 +75,9 @@ function DialogContent({
           "max-h-[min(90dvh,calc(100dvh-2.5rem))] min-w-0",
           "-translate-x-1/2 -translate-y-1/2",
           "overflow-hidden rounded-2xl",
-          "border border-border/80 bg-card/98 p-0 text-card-foreground",
-          "shadow-2xl shadow-black/25 ring-1 ring-white/10 dark:ring-white/5",
-          "backdrop-blur-xl duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          "border border-border/80 bg-card p-0 text-card-foreground antialiased",
+          "shadow-2xl shadow-black/25 ring-1 ring-border/50",
+          "duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]",
           "data-open:animate-in data-open:fade-in-0 data-open:zoom-in-[0.98]",
           "sm:data-open:slide-in-from-bottom-2",
           "data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-[0.98]",
@@ -158,6 +158,7 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
       className={cn(
         "flex flex-col-reverse gap-2.5 px-5 py-3.5 sm:px-6 sm:flex-row sm:justify-end",
         "border-t border-border/50 bg-muted/25 dark:bg-muted/15 rounded-b-2xl shrink-0",
+        "pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] sm:pb-3.5",
         className
       )}
       {...props}
@@ -196,7 +197,7 @@ function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="dialog-body"
       className={cn(
-        "flex-1 overflow-y-auto px-5 py-4 sm:px-6 space-y-4 text-xs sm:text-sm scrollbar-thin",
+        "flex-1 min-h-0 overflow-y-auto overscroll-contain px-5 py-4 sm:px-6 space-y-4 text-xs sm:text-sm scrollbar-thin",
         className
       )}
       {...props}

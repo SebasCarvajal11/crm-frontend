@@ -35,7 +35,7 @@ function AlertDialogOverlay({
     <AlertDialogPrimitive.Overlay
       data-slot="alert-dialog-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-black/65 backdrop-blur-md",
+        "fixed inset-0 z-50 bg-black/75 backdrop-blur-md",
         "transition-all duration-250 ease-out",
         "data-open:animate-in data-open:fade-in-0",
         "data-closed:animate-out data-closed:fade-out-0",
@@ -64,9 +64,9 @@ function AlertDialogContent({
           "w-[calc(100%-2rem)] sm:w-full",
           "max-h-[min(90dvh,calc(100dvh-2.5rem))] -translate-x-1/2 -translate-y-1/2",
           "gap-4 overflow-y-auto overscroll-contain rounded-2xl",
-          "border border-border/80 bg-card/98 p-5 sm:p-6 text-card-foreground",
-          "shadow-2xl shadow-black/25 ring-1 ring-white/10 dark:ring-white/5",
-          "backdrop-blur-xl duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] outline-none scrollbar-thin",
+          "border border-border/80 bg-card p-5 sm:p-6 text-card-foreground antialiased",
+          "shadow-2xl shadow-black/25 ring-1 ring-border/50",
+          "duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] outline-none scrollbar-thin",
           "data-[size=sm]:max-w-sm data-[size=default]:max-w-md",
           "data-[size=lg]:max-w-lg data-[size=xl]:max-w-xl",
           "data-open:animate-in data-open:fade-in-0 data-open:zoom-in-[0.98]",
@@ -109,7 +109,7 @@ function AlertDialogFooter({
         "rounded-b-2xl border-t border-border/50 bg-muted/25 dark:bg-muted/15 p-4 sm:p-5",
         "group-data-[size=sm]/alert-dialog-content:grid",
         "group-data-[size=sm]/alert-dialog-content:grid-cols-2",
-        "sm:flex-row sm:justify-end",
+        "sm:flex-row sm:justify-end pb-[calc(1rem+env(safe-area-inset-bottom,0px))] sm:pb-5",
         className
       )}
       {...props}
