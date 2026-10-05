@@ -112,9 +112,9 @@ export function ChatExportDialog({
           </div>
         </DialogHeader>
 
-        <DialogBody className="space-y-4">
-          <div className="rounded-xl border border-border/80 bg-muted/25 p-3.5 space-y-2 text-xs">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-2 border-b border-border/40">
+        <DialogBody className="space-y-3.5">
+          <div className="rounded-xl border border-border/80 bg-muted/25 p-2.5 space-y-1.5 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-1.5 border-b border-border/40">
               <div className="space-y-0.5 min-w-0">
                 <span className="text-[11px] font-medium text-muted-foreground block">Proyecto</span>
                 <span className="font-semibold text-foreground text-xs break-words block">{projectName}</span>
@@ -135,44 +135,42 @@ export function ChatExportDialog({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="export-channel" className="text-xs font-medium text-foreground">Canal a exportar</Label>
-            <Select
-              value={selectedChannel}
-              onValueChange={(val) => setSelectedChannel(val as ChatExportChannel)}
-            >
-              <SelectTrigger id="export-channel" className="text-xs h-9">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="external">Canal con el Cliente (Externo)</SelectItem>
-                <SelectItem value="internal">Canal del Equipo (Interno)</SelectItem>
-                <SelectItem value="both">Ambos Canales (Histórico Completo)</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="space-y-1.5">
+              <Label htmlFor="export-channel" className="text-xs font-medium text-foreground">Canal a exportar</Label>
+              <Select
+                value={selectedChannel}
+                onValueChange={(val) => setSelectedChannel(val as ChatExportChannel)}
+              >
+                <SelectTrigger id="export-channel" className="text-xs h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="external">Cliente (Externo)</SelectItem>
+                  <SelectItem value="internal">Equipo (Interno)</SelectItem>
+                  <SelectItem value="both">Ambos Canales</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="export-format" className="text-xs font-medium text-foreground">Formato de salida</Label>
+              <Select
+                value={format}
+                onValueChange={(val) => setFormat(val as ChatExportFormat)}
+              >
+                <SelectTrigger id="export-format" className="text-xs h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="txt">Texto Forense (.txt)</SelectItem>
+                  <SelectItem value="json">Auditoría JSON (.json)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="export-format" className="text-xs font-medium text-foreground">Formato de salida</Label>
-            <Select
-              value={format}
-              onValueChange={(val) => setFormat(val as ChatExportFormat)}
-            >
-              <SelectTrigger id="export-format" className="text-xs h-9">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="txt">
-                  Texto Forense Estándar (.txt estilo WhatsApp con certificación)
-                </SelectItem>
-                <SelectItem value="json">
-                  Reporte Estructurado de Auditoría (.json con firmas y lecturas)
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="rounded-xl border border-primary/25 bg-primary/5 p-3.5 flex items-start gap-3">
+          <div className="rounded-xl border border-primary/25 bg-primary/5 p-2.5 flex items-start gap-3">
             <Checkbox
               id="custody-agreement"
               checked={custodyAgreed}
