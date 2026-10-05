@@ -91,59 +91,69 @@ export function ConversationPanel({
   return (
     <div className="space-y-3">
       {/* Selector responsivo para pantallas menores a 1280px (Tablet y Móvil) */}
-      <div className="flex items-center gap-1 rounded-xl border bg-muted/40 p-1 min-[1280px]:hidden">
+      <div
+        role="tablist"
+        aria-label="Vistas de conversación"
+        className="flex items-center gap-1 rounded-2xl border border-border/80 bg-muted/40 p-1 min-[1280px]:hidden"
+      >
         <button
           type="button"
-          onClick={() => {
-            setMobileView('chat')
-            document.getElementById('workspace-chat-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-          }}
+          role="tab"
+          aria-selected={mobileView === 'chat'}
+          aria-controls="workspace-chat-section"
+          onClick={() => setMobileView('chat')}
           className={cn(
-            'flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium rounded-lg transition-all',
+            'flex-1 flex min-h-[38px] items-center justify-center gap-1.5 py-2 px-3',
+            'text-xs font-semibold rounded-xl transition-all duration-150',
             mobileView === 'chat'
-              ? 'bg-background text-foreground shadow-xs'
+              ? 'bg-card text-foreground shadow-xs border border-border/80 font-bold'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >
-          <MessageSquare className="size-3.5" />
+          <MessageSquare className="size-3.5 shrink-0" />
           <span>Chat</span>
         </button>
         <button
           type="button"
-          onClick={() => {
-            setMobileView('files')
-            document.getElementById('workspace-files-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-          }}
+          role="tab"
+          aria-selected={mobileView === 'files'}
+          aria-controls="workspace-files-section"
+          onClick={() => setMobileView('files')}
           className={cn(
-            'flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium rounded-lg transition-all',
+            'flex-1 flex min-h-[38px] items-center justify-center gap-1.5 py-2 px-3',
+            'text-xs font-semibold rounded-xl transition-all duration-150',
             mobileView === 'files'
-              ? 'bg-background text-foreground shadow-xs'
+              ? 'bg-card text-foreground shadow-xs border border-border/80 font-bold'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >
-          <FolderArchive className="size-3.5" />
+          <FolderArchive className="size-3.5 shrink-0" />
           <span>Archivos</span>
         </button>
         <button
           type="button"
-          onClick={() => {
-            setMobileView('timeline')
-            document.getElementById('workspace-timeline-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-          }}
+          role="tab"
+          aria-selected={mobileView === 'timeline'}
+          aria-controls="workspace-timeline-section"
+          onClick={() => setMobileView('timeline')}
           className={cn(
-            'flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium rounded-lg transition-all',
+            'flex-1 flex min-h-[38px] items-center justify-center gap-1.5 py-2 px-3',
+            'text-xs font-semibold rounded-xl transition-all duration-150',
             mobileView === 'timeline'
-              ? 'bg-background text-foreground shadow-xs'
+              ? 'bg-card text-foreground shadow-xs border border-border/80 font-bold'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >
-          <History className="size-3.5" />
+          <History className="size-3.5 shrink-0" />
           <span>Trazabilidad</span>
         </button>
       </div>
 
       <div className="grid grid-cols-1 gap-4 min-[1280px]:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.9fr)_minmax(15rem,1fr)]">
-        <div id="workspace-chat-section" className="min-w-0">
+        <div
+          id="workspace-chat-section"
+          className={cn('min-w-0', mobileView !== 'chat' && 'hidden min-[1280px]:block')}
+        >
           <ChatPanel
             key={`${initialChannel ?? 'external'}:${initialMessageId ?? ''}`}
             accessToken={accessToken}
@@ -159,7 +169,10 @@ export function ConversationPanel({
           />
         </div>
 
-        <div id="workspace-files-section">
+        <div
+          id="workspace-files-section"
+          className={cn(mobileView !== 'files' && 'hidden min-[1280px]:block')}
+        >
           <ConversationSupportPanel
             dataTour="workspace-files-panel"
             title="Archivos"
@@ -182,7 +195,10 @@ export function ConversationPanel({
           </ConversationSupportPanel>
         </div>
 
-        <div id="workspace-timeline-section">
+        <div
+          id="workspace-timeline-section"
+          className={cn(mobileView !== 'timeline' && 'hidden min-[1280px]:block')}
+        >
           <ConversationSupportPanel
             dataTour="workspace-timeline-panel"
             title="Trazabilidad"
