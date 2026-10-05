@@ -32,9 +32,11 @@ const sidebarPreferenceKey = 'cima.sidebar.collapsed'
 
 function readSidebarPreference() {
   try {
-    return window.localStorage.getItem(sidebarPreferenceKey) === 'true'
+    const saved = window.localStorage.getItem(sidebarPreferenceKey)
+    if (saved !== null) return saved === 'true'
+    return typeof window !== 'undefined' && window.innerWidth < 1024
   } catch {
-    return false
+    return typeof window !== 'undefined' && window.innerWidth < 1024
   }
 }
 
@@ -68,7 +70,7 @@ export function AppShell({
   }, [desktopCollapsed])
 
   return (
-    <div className={cn('relative flex min-h-screen md:h-dvh md:max-h-dvh md:overflow-hidden bg-background', className)}>
+    <div className={cn('relative flex min-h-dvh md:h-dvh md:max-h-dvh md:overflow-hidden bg-background', className)}>
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center md:bg-fixed transition-opacity duration-300 ease-out"
@@ -77,7 +79,7 @@ export function AppShell({
           opacity: isTextureLoaded ? 1 : 0,
         }}
       />
-      <div className="relative z-10 flex min-h-screen md:min-h-0 md:h-full w-full flex-1">
+      <div className="relative z-10 flex min-h-dvh md:min-h-0 md:h-full w-full flex-1">
       <DesktopSidebar
         title={title}
         items={sidebarItems}
@@ -145,10 +147,12 @@ export function AppShell({
         <main
           className={cn(
             'min-w-0 flex-1 overflow-x-hidden overflow-y-auto md:flex md:flex-col md:min-h-0',
-            'scrollbar-thin px-4 pt-6 pb-36 sm:px-6 sm:py-6 md:pb-6 lg:px-8 scroll-pt-16 view-transition'
+            'scrollbar-thin px-4 pt-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-6 md:pb-6 lg:px-8 scroll-pt-16 view-transition'
           )}
         >
-          {children}
+          <div className="mx-auto w-full max-w-[1920px] 2xl:max-w-[2400px] flex-1 md:flex md:flex-col md:min-h-0">
+            {children}
+          </div>
         </main>
       </div>
       </div>

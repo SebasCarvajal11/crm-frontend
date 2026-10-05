@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/shared/lib/utils'
@@ -20,6 +20,30 @@ export function SignaturePad({ onChange, className }: SignaturePadProps) {
   const lastPointRef = useRef<TimedPoint | null>(null)
   const lastWidthRef = useRef<number>(DEFAULT_STROKE_WIDTH)
   const [hasSignature, setHasSignature] = useState(false)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas || typeof window === 'undefined') return
+
+    const syncResolution = () => {
+      const rect = canvas.getBoundingClientRect()
+      if (rect.width === 0 || rect.height === 0) return
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const targetWidth = Math.round(rect.width * dpr)
+      const targetHeight = Math.round(rect.height * dpr)
+      if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+        canvas.width = targetWidth
+        canvas.height = targetHeight
+      }
+    }
+
+    syncResolution()
+    if ('ResizeObserver' in window) {
+      const observer = new ResizeObserver(syncResolution)
+      observer.observe(canvas)
+      return () => observer.disconnect()
+    }
+  }, [])
 
   const getCanvasPoint = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>): TimedPoint => {

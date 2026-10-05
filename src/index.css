@@ -573,3 +573,13 @@
   }
 }
 
+/* Objetivos táctiles mínimos para pantallas táctiles (WCAG 2.1 AA Criterio 2.5.5) */
+@media (pointer: coarse) {
+  [data-slot="button"]:not([data-variant="link"]),
+  .cima-tour-icon {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+
