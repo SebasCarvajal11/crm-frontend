@@ -25,12 +25,18 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks(id) {
+            if (
+              id.includes('components/ui/cima-icon') ||
+              id.includes('components/ui/icons') ||
+              id.includes('lucide-react')
+            ) {
+              return 'vendor-icons'
+            }
             if (id.includes('node_modules')) {
               if (id.includes('recharts')) return 'vendor-charts'
               if (id.includes('pdf-lib')) return 'vendor-pdf'
               if (id.includes('react-easy-crop')) return 'vendor-crop'
               if (id.includes('@tanstack')) return 'vendor-tanstack'
-              if (id.includes('lucide-react')) return 'vendor-icons'
               if (id.includes('react') || id.includes('react-dom')) return 'vendor-core'
             }
           },
