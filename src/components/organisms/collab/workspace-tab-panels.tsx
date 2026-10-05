@@ -9,6 +9,8 @@ import { ChangeRequestsPanel } from './change-requests'
 import { WorkspaceTabPanel } from './workspace-tab-panel'
 import type {
   Project,
+  ProjectContract,
+  ProjectChangeRequest,
   ProjectMember,
   ProjectTask,
   ProjectTaskColumn,
@@ -43,10 +45,18 @@ export interface WorkspaceTabPanelsProps {
   onError: (msg: string) => void
   chatChannel?: 'internal' | 'external'
   chatMessageId?: string
-  briefData?: unknown
+  briefData?: {
+    brief: {
+      projectId: string
+      content: string
+      updatedBySub: string
+      updatedAt: string
+    } | null
+    changeRequests?: ProjectChangeRequest[]
+  } | null
   isBriefLoading: boolean
-  contractData?: unknown
-  changeRequestsData?: unknown[]
+  contractData?: ProjectContract | null
+  changeRequestsData?: ProjectChangeRequest[]
   isChangeRequestsLoading: boolean
   onRefreshChangeRequests: () => void
 }
@@ -157,7 +167,7 @@ export function WorkspaceTabPanels(props: WorkspaceTabPanelsProps) {
         <ContractPanel
           accessToken={accessToken}
           project={project}
-          contract={contractData}
+          contract={contractData ?? null}
           members={members}
           role={identity.role}
           onError={onError}
