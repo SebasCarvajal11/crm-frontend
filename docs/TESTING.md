@@ -31,11 +31,13 @@ Este documento describe la pirámide de pruebas, la suite de pruebas End-to-End 
 
 El tutorial híbrido se verifica con `pnpm test:tour`. `pnpm test:ui` reúne
 marca, tutorial y presencia en una sola compilación de producción y se ejecuta en GitHub
-Actions antes del despliegue. Ver [arquitectura y escenarios del tutorial](GUIDED_TUTORIAL.md).
+Actions antes del despliegue en 2 shards paralelos optimizados. Ver [arquitectura y escenarios del tutorial](GUIDED_TUTORIAL.md).
 El [panel de presencia](PRESENCE.md) añade autorización por rol, búsqueda y paginación,
 errores, pérdida de red, cancelación de polling y una séptima resolución ultrawide.
-Las antiguas suites acopladas al DOM de Driver.js se sustituyen por la cobertura
-del registro completo por roles y las interacciones adaptativas en `tests/playwright/tour/`.
+Las suites de prueba se estructuran por capas para garantizar máxima velocidad sin perder cobertura:
+- **`desktop-1080p`**: Ejecuta la suite funcional exhaustiva (marca, presencia y el recorrido completo de las 31 guías interactivas).
+- **Gran Escala (`2K`, `4K`, `Ultrawide`)**: Valida ausencia de desbordamiento horizontal, consistencia de indicadores KPI, renderizado de logotipos y presencia en ultra alta definición.
+- **Tablet (`iPad` WebKit) y Mobile (`Safari iOS` WebKit / `Chrome Android` Chromium)**: Valida compatibilidad crítica entre motores de renderizado, menús hamburguesa adaptativos, modales responsivos y controles táctiles.
 
 `pnpm test:brand` compila la SPA y ejecuta `tests/playwright/brand.config.ts` contra
 Vite Preview. La suite usa respuestas de API simuladas y una sesión sintética;

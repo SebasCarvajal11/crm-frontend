@@ -124,6 +124,10 @@ test('vacíos, reintento, ayuda superpuesta, rotación y modo oscuro', async ({ 
 for (const role of ['admin', 'worker', 'client'] as const) {
   for (const tour of ALL_TOURS.filter((tour) => tour.roles.includes(role))) {
     test(`recorrer guía autorizada y finalizar explícitamente: ${role} / ${tour.id}`, async ({ page }, info) => {
+      test.skip(
+        info.project.name !== 'desktop-1080p',
+        'El recorrido exhaustivo de las 31 guías se valida en desktop-1080p',
+      )
       const { errors, mutations } = await setupDashboard(page, role)
       const unavailable: string[] = []
       await page.goto('/dashboard?tab=collab')
