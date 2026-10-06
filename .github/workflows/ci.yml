@@ -21,11 +21,11 @@ jobs:
   ui:
     needs: validate
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -59,7 +59,7 @@ jobs:
           name: frontend-dist
           path: dist
       - name: Verificar marca, presencia, tutorial híbrido y navegación adaptativa
-        run: pnpm exec playwright test --config tests/playwright/ui.config.ts --shard=${{ matrix.shard }}/2
+        run: pnpm exec playwright test --config tests/playwright/ui.config.ts --shard=${{ matrix.shard }}/3
       - name: Guardar reporte y capturas
         if: always()
         uses: actions/upload-artifact@v4
