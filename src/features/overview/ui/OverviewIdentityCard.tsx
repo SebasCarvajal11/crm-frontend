@@ -48,11 +48,13 @@ function RoleBadge({ role }: { role: string }) {
 
 function UserAvatar({
   avatarUrl,
+  src,
   name,
   userId,
   onOpenProfile,
 }: {
   avatarUrl?: string | null
+  src?: string | null
   name?: string | null
   userId?: string | null
   onOpenProfile?: () => void
@@ -60,7 +62,7 @@ function UserAvatar({
   return (
     <div className="relative shrink-0">
       <AtomUserAvatar
-        src={avatarUrl}
+        src={src ?? avatarUrl}
         name={name}
         userId={userId}
         size="xl"

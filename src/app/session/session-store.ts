@@ -106,7 +106,8 @@ if (globalRef) {
 
 export function getApiBaseUrl(): string {
   const base = import.meta.env.VITE_API_BASE_URL ?? ''
-  return base.replace(/\/$/, '')
+  const trimmed = base.replace(/\/$/, '')
+  return trimmed === '/api' ? '' : trimmed
 }
 
 export function canUseSecureRefreshFlow(isDev: boolean = import.meta.env.DEV): boolean {

@@ -89,4 +89,21 @@ describe('UserAvatar', () => {
     expect(markupRecent).toContain('aria-label="Activo hace 10 min"')
     expect(markupRecent).toContain('role="status"')
   })
+
+  it('acepta avatarUrl como alias de src para compatibilidad total', () => {
+    const markup = renderToStaticMarkup(
+      <UserAvatar avatarUrl="/avatars/avatar-21.webp" name="Anderson Giraldo" size="md" />
+    )
+    expect(markup).toContain('src="/avatars/avatar-21.webp"')
+    expect(markup).toContain('alt="Avatar oficial de Anderson Giraldo"')
+  })
+
+  it('asigna atributos de accesibilidad e interacción cuando es interactivo', () => {
+    const markup = renderToStaticMarkup(
+      <UserAvatar name="Valeria Quintero" onOpenProfile={() => {}} size="lg" />
+    )
+    expect(markup).toContain('role="button"')
+    expect(markup).toContain('tabindex="0"')
+    expect(markup).toContain('cursor-pointer')
+  })
 })

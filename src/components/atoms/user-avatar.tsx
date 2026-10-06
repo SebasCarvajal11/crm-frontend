@@ -9,6 +9,7 @@ export type UserPresenceStatus = 'online' | 'away' | 'busy' | 'offline' | 'recen
 
 export type UserAvatarProps = {
   src?: string | null
+  avatarUrl?: string | null
   avatarId?: number | null
   color?: string | null
   name?: string | null
@@ -19,6 +20,8 @@ export type UserAvatarProps = {
   className?: string
   alt?: string
   ringClass?: string
+  onClick?: () => void
+  onOpenProfile?: () => void
 }
 
 const SIZE_CLASSES: Record<AvatarSize, { container: string; text: string; dot: string }> = {
@@ -173,6 +176,7 @@ function AvatarMedia({
 export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
   const {
     src,
+    avatarUrl,
     avatarId,
     color,
     name,
@@ -183,9 +187,12 @@ export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
     className,
     alt,
     ringClass,
+    onClick,
+    onOpenProfile,
   } = props
+  const effectiveSrc = src ?? avatarUrl
   const resolvedSrc =
-    src ?? (typeof avatarId === 'number' && avatarId >= 0 ? `/avatars/avatar-${avatarId}.webp` : null)
+    effectiveSrc ?? (typeof avatarId === 'number' && avatarId >= 0 ? `/avatars/avatar-${avatarId}.webp` : null)
   const [loadError, setLoadError] = useState(false)
   const [prevSrc, setPrevSrc] = useState(resolvedSrc)
   if (prevSrc !== resolvedSrc) {
@@ -199,10 +206,21 @@ export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
   const effectiveColor = color ?? extractColorFromSrc(resolvedSrc)
   const hasValidImage = Boolean(resolvedSrc && !loadError)
   const altText = alt ?? (name ? `Avatar oficial de ${name}` : 'Avatar oficial')
+  const handleClick = onClick ?? onOpenProfile
+  const isClickable = Boolean(handleClick)
 
   return (
     <div
-      className={cn('relative inline-flex shrink-0 select-none items-center justify-center', cfg.container, className)}
+      className={cn(
+        'relative inline-flex shrink-0 select-none items-center justify-center',
+        isClickable && 'cursor-pointer hover:opacity-90 active:scale-[0.98] transition-transform',
+        cfg.container,
+        className
+      )}
+      onClick={handleClick}
+      onKeyDown={isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick?.() } } : undefined}
+      role={isClickable ? 'button' : undefined}
+      tabIndex={isClickable ? 0 : undefined}
       title={name ?? undefined}
       data-testid="user-avatar"
     >
