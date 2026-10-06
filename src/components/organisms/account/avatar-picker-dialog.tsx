@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Check, Loader2, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -40,6 +40,13 @@ export function AvatarPickerDialog({
   const [selectedAvatarId, setSelectedAvatarId] = useState<number>(initialAvatarId)
   const [selectedColor, setSelectedColor] = useState<string>(initialColor)
   const [activeCategory, setActiveCategory] = useState<AvatarCategory>('todos')
+
+  useEffect(() => {
+    if (open) {
+      setSelectedAvatarId(initialAvatarId)
+      setSelectedColor(initialColor)
+    }
+  }, [open, initialAvatarId, initialColor])
 
   const filteredAvatars = useMemo(() => {
     if (activeCategory === 'todos') return AVATARS_CATALOG

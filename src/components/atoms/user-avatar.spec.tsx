@@ -19,7 +19,7 @@ describe('UserAvatar', () => {
       <UserAvatar src="https://storage.oracle.com/avatar.webp" name="Juan Pérez" size="md" />
     )
     expect(markup).toContain('src="https://storage.oracle.com/avatar.webp"')
-    expect(markup).toContain('alt="Foto de perfil de Juan Pérez"')
+    expect(markup).toContain('alt="Avatar oficial de Juan Pérez"')
     expect(markup).toContain('size-9')
   })
 

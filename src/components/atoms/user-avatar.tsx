@@ -184,16 +184,21 @@ export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
     alt,
     ringClass,
   } = props
+  const resolvedSrc =
+    src ?? (typeof avatarId === 'number' && avatarId >= 0 ? `/avatars/avatar-${avatarId}.webp` : null)
   const [loadError, setLoadError] = useState(false)
+  const [prevSrc, setPrevSrc] = useState(resolvedSrc)
+  if (prevSrc !== resolvedSrc) {
+    setPrevSrc(resolvedSrc)
+    setLoadError(false)
+  }
+
   const cfg = SIZE_CLASSES[size]
   const initials = extractUserInitials(name)
   const bgColor = getAvatarColor(userId)
-
-  const resolvedSrc =
-    src ?? (typeof avatarId === 'number' && avatarId >= 0 ? `/avatars/avatar-${avatarId}.webp` : null)
   const effectiveColor = color ?? extractColorFromSrc(resolvedSrc)
   const hasValidImage = Boolean(resolvedSrc && !loadError)
-  const altText = alt ?? (name ? `Foto de perfil de ${name}` : 'Foto de perfil')
+  const altText = alt ?? (name ? `Avatar oficial de ${name}` : 'Avatar oficial')
 
   return (
     <div

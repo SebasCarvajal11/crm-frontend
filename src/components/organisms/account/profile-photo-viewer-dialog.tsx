@@ -15,13 +15,18 @@ interface ProfilePhotoViewerDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   avatarUrl?: string | null
+  color?: string | null
 }
 
 export function ProfilePhotoViewerDialog({
   open,
   onOpenChange,
   avatarUrl,
+  color,
 }: ProfilePhotoViewerDialogProps) {
+  const urlColorMatch = avatarUrl?.match(/[?&]c=([0-9a-fA-F]{3,8})/)?.[1]
+  const effectiveBg = color ?? (urlColorMatch ? `#${urlColorMatch}` : undefined)
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="md">
@@ -38,12 +43,7 @@ export function ProfilePhotoViewerDialog({
           {avatarUrl ? (
             <div
               className="size-60 rounded-full border-4 border-card overflow-hidden shadow-xl ring-2 ring-primary/20 flex items-center justify-center transition-colors"
-              style={{
-                backgroundColor:
-                  avatarUrl.match(/[?&]c=([0-9a-fA-F]{3,8})/)?.[1]
-                    ? `#${avatarUrl.match(/[?&]c=([0-9a-fA-F]{3,8})/)?.[1]}`
-                    : undefined,
-              }}
+              style={{ backgroundColor: effectiveBg }}
             >
               <img
                 src={avatarUrl}

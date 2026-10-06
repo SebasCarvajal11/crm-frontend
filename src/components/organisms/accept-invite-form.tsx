@@ -190,6 +190,12 @@ export function AcceptInviteForm({ token }: AcceptInviteFormProps) {
       >
         <InvitePreviewBadge preview={previewQuery.data?.data} />
 
+        <AcceptInviteAvatarCard
+          avatarId={selectedAvatarId}
+          color={selectedColor}
+          onCustomize={() => setAvatarPickerOpen(true)}
+        />
+
         <FormField id="password" label="Nueva contraseña" error={errors.password?.message}>
           <div className="relative">
             <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />

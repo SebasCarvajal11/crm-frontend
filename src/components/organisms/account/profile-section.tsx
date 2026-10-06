@@ -21,6 +21,8 @@ export function ProfileSection({ accessToken, identity }: Props) {
   const displayName = fullName || toDisplayName(identity.email.split('@')[0])
 
   const {
+    avatarColor,
+    avatarId,
     avatarPickerOpen,
     avatarUrl,
     handleSaveAvatarPreset,
@@ -85,17 +87,20 @@ export function ProfileSection({ accessToken, identity }: Props) {
         )}
       </Card>
 
-      {/* Visor de foto en alta resolución */}
+      {/* Visor de avatar oficial en alta resolución */}
       <ProfilePhotoViewerDialog
         open={photoViewerOpen}
         onOpenChange={setPhotoViewerOpen}
         avatarUrl={avatarUrl}
+        color={avatarColor}
       />
 
       {/* Catálogo oficial de avatares predeterminados CIMA */}
       <AvatarPickerDialog
         open={avatarPickerOpen}
         onOpenChange={setAvatarPickerOpen}
+        initialAvatarId={avatarId ?? 0}
+        initialColor={avatarColor ?? undefined}
         isSaving={saveAvatarPresetMutation.isPending}
         onSave={handleSaveAvatarPreset}
       />
