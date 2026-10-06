@@ -1,6 +1,7 @@
 import { CheckCircle2, ShieldAlert, ShieldCheck } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { cn } from '@/shared/lib/utils'
 import type { InviteRole } from './invite-role-switcher.types'
 
 type RolePrivilegeData = {
@@ -65,68 +66,108 @@ const PRIVILEGES_BY_ROLE: Record<InviteRole, RolePrivilegeData> = {
 
 type Props = {
   role: InviteRole
+  embedded?: boolean
+  className?: string
+}
+
+function PrivilegesList({ permissions }: { permissions: string[] }) {
+  return (
+    <div className="space-y-2.5">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        Capacidades concedidas
+      </p>
+      <ul className="space-y-2">
+        {permissions.map((perm) => (
+          <li key={perm} className="flex items-start gap-2.5 text-xs text-foreground/90">
+            <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400 mt-0.5" />
+            <span className="leading-snug">{perm}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function RestrictionsList({ restrictions }: { restrictions: string[] }) {
+  if (restrictions.length === 0) return null
+  return (
+    <div className="space-y-2 pt-2 border-t border-border/60">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        Límites y restricciones
+      </p>
+      <ul className="space-y-1.5">
+        {restrictions.map((rest) => (
+          <li key={rest} className="flex items-start gap-2 text-xs text-muted-foreground">
+            <ShieldAlert className="size-3.5 shrink-0 text-amber-500/80 mt-0.5" />
+            <span className="leading-snug">{rest}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function PrivilegesHeader({ data }: { data: RolePrivilegeData }) {
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="size-4 text-primary" aria-hidden="true" />
+          <h3 className="text-xs sm:text-sm font-semibold tracking-tight text-foreground">
+            Alcances y Privilegios
+          </h3>
+        </div>
+        <Badge className={cn('rounded-full border text-[10px] font-semibold shrink-0', data.badgeVariant)}>
+          {data.badge}
+        </Badge>
+      </div>
+      <p className="text-xs text-muted-foreground leading-relaxed">
+        {data.description}
+      </p>
+    </div>
+  )
+}
+
+function PrivilegesContent({ data }: { data: RolePrivilegeData }) {
+  return (
+    <>
+      <PrivilegesHeader data={data} />
+      <PrivilegesList permissions={data.permissions} />
+      <RestrictionsList restrictions={data.restrictions} />
+    </>
+  )
 }
 
 /** Tarjeta lateral de gobernanza: desglosa privilegios y restricciones del rol activo. */
-export function RolePrivilegesCard({ role }: Props) {
+export function RolePrivilegesCard({ role, embedded = false, className }: Props) {
   const data = PRIVILEGES_BY_ROLE[role]
+
+  if (embedded) {
+    return (
+      <div key={role} className={cn('p-4 sm:p-5 space-y-3.5 animate-in fade-in duration-200', className)}>
+        <PrivilegesContent data={data} />
+      </div>
+    )
+  }
 
   return (
     <Card
       key={role}
-      className={[
+      className={cn(
         'w-full overflow-hidden rounded-2xl border-border/80 bg-card',
         'shadow-md shadow-black/[0.04] animate-in fade-in duration-200',
-      ].join(' ')}
+        className
+      )}
     >
       <CardHeader className="border-b bg-muted/20 p-4 sm:p-5 space-y-2">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="size-4.5 text-primary" aria-hidden="true" />
-            <CardTitle className="text-sm font-semibold tracking-tight text-foreground">
-              Alcances y Privilegios
-            </CardTitle>
-          </div>
-          <Badge className={`rounded-full border text-[10px] font-semibold shrink-0 ${data.badgeVariant}`}>
-            {data.badge}
-          </Badge>
-        </div>
-        <CardDescription className="text-xs text-muted-foreground leading-relaxed">
-          {data.description}
-        </CardDescription>
+        <PrivilegesHeader data={data} />
       </CardHeader>
 
       <CardContent className="p-4 sm:p-5 space-y-4">
-        <div className="space-y-2.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Capacidades concedidas
-          </p>
-          <ul className="space-y-2">
-            {data.permissions.map((perm) => (
-              <li key={perm} className="flex items-start gap-2.5 text-xs text-foreground/90">
-                <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400 mt-0.5" />
-                <span className="leading-snug">{perm}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {data.restrictions.length > 0 && (
-          <div className="space-y-2 pt-2 border-t border-border/60">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Límites y restricciones
-            </p>
-            <ul className="space-y-1.5">
-              {data.restrictions.map((rest) => (
-                <li key={rest} className="flex items-start gap-2 text-xs text-muted-foreground">
-                  <ShieldAlert className="size-3.5 shrink-0 text-amber-500/80 mt-0.5" />
-                  <span className="leading-snug">{rest}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <PrivilegesList permissions={data.permissions} />
+        <RestrictionsList restrictions={data.restrictions} />
       </CardContent>
     </Card>
   )
 }
+

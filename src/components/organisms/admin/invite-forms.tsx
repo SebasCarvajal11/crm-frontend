@@ -1,13 +1,10 @@
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { FormField } from '@/components/molecules/form-field'
 import { SectionIntro } from '@/components/molecules/section-intro'
+import { cn } from '@/shared/lib/utils'
 import {
   inviteAdminSchema,
   inviteClientSchema,
@@ -16,7 +13,11 @@ import {
 } from '@/features/admin/hooks'
 import { InviteRoleSwitcher } from './invite-role-switcher'
 import { ROLES, type InviteRole } from './invite-role-switcher.types'
-import { AdminRoleFields, ClientRoleFields, WorkerRoleFields } from './invite-form-fields'
+import {
+  AdminRoleBlock,
+  ClientRoleBlock,
+  WorkerRoleBlock,
+} from './invite-form-fields'
 import { RolePrivilegesCard } from './role-privileges-card'
 import { InviteSecurityCard } from './invite-security-card'
 
@@ -24,50 +25,26 @@ type Props = {
   accessToken: string
 }
 
-const inputClass = 'h-10 rounded-xl'
-const pairClass = 'grid grid-cols-1 gap-3 sm:grid-cols-2'
-
-function CommonIdentityFields({
-  emailLabel,
-  emailError,
-  firstError,
-  lastError,
-  registerEmail,
-  registerFirst,
-  registerLast,
-}: {
-  emailLabel: string
-  emailError?: string
-  firstError?: string
-  lastError?: string
-  registerEmail: ReturnType<UseFormReturnLike['register']>
-  registerFirst: ReturnType<UseFormReturnLike['register']>
-  registerLast: ReturnType<UseFormReturnLike['register']>
-}) {
-  return (
-    <>
-      <FormField id="invite-email" label={emailLabel} error={emailError}>
-        <Input type="email" autoComplete="email" className={inputClass} {...registerEmail} />
-      </FormField>
-      <div className={pairClass}>
-        <FormField id="invite-first" label="Nombres" error={firstError}>
-          <Input className={inputClass} {...registerFirst} />
-        </FormField>
-        <FormField id="invite-last" label="Apellidos" error={lastError}>
-          <Input className={inputClass} {...registerLast} />
-        </FormField>
-      </div>
-    </>
-  )
+function getSubmitLabel(role: InviteRole, isPending: boolean) {
+  if (isPending) return role === 'worker' ? 'Registrando...' : 'Creando...'
+  if (role === 'client') return 'Crear invitación'
+  if (role === 'worker') return 'Registrar colaborador'
+  return 'Invitar administrador'
 }
 
-type UseFormReturnLike = {
-  register: (name: string) => Record<string, unknown>
+function roleHeading(role: InviteRole) {
+  if (role === 'client') return 'Invitar cliente'
+  if (role === 'worker') return 'Registrar colaborador'
+  return 'Invitar administrador'
 }
 
-export function AdminInviteForms({ accessToken }: Props) {
-  const [activeRole, setActiveRole] = useState<InviteRole>('client')
+function roleSubheading(role: InviteRole) {
+  if (role === 'client') return 'Acceso al portal y seguimiento de proyectos.'
+  if (role === 'worker') return 'Colaborador interno para gestión de proyectos y tareas.'
+  return 'Gobernanza, auditoría y control total del sistema.'
+}
 
+function useRoleForms() {
   const inviteForm = useForm<import('zod').infer<typeof inviteClientSchema>>({
     resolver: zodResolver(inviteClientSchema),
     defaultValues: { email: '', first_name: '', last_name: '', client_kind: 'natural', company_name: '' },
@@ -84,9 +61,13 @@ export function AdminInviteForms({ accessToken }: Props) {
     defaultValues: { email: '', first_name: '', last_name: '' },
   })
 
+  return { inviteForm, clientKind, workerForm, adminForm }
+}
+
+function useAdminInviteManager(accessToken: string) {
+  const [activeRole, setActiveRole] = useState<InviteRole>('client')
+  const { inviteForm, clientKind, workerForm, adminForm } = useRoleForms()
   const { adminMutation, inviteMutation, workerMutation } = useAdminInvites(accessToken)
-  const currentRoleMeta = ROLES.find((r) => r.id === activeRole) ?? ROLES[0]
-  const Icon = currentRoleMeta.icon
 
   const isPending =
     activeRole === 'client'
@@ -95,13 +76,7 @@ export function AdminInviteForms({ accessToken }: Props) {
         ? workerMutation.isPending
         : adminMutation.isPending
 
-  const submitLabel = isPending
-    ? activeRole === 'worker' ? 'Registrando...' : 'Creando...'
-    : activeRole === 'client'
-      ? 'Crear invitación'
-      : activeRole === 'worker'
-        ? 'Registrar colaborador'
-        : 'Invitar administrador'
+  const submitLabel = getSubmitLabel(activeRole, isPending)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -120,6 +95,111 @@ export function AdminInviteForms({ accessToken }: Props) {
     }
   }
 
+  return {
+    activeRole, setActiveRole, inviteForm, clientKind, workerForm,
+    adminForm, inviteMutation, workerMutation, adminMutation,
+    isPending, submitLabel, handleSubmit,
+  }
+}
+
+function InviteFormHeader({
+  activeRole,
+  onRoleChange,
+}: {
+  activeRole: InviteRole
+  onRoleChange: (role: InviteRole) => void
+}) {
+  const meta = ROLES.find((r) => r.id === activeRole) ?? ROLES[0]
+  const Icon = meta.icon
+
+  return (
+    <div className="border-b border-border/60 bg-muted/20 p-4 sm:p-6 space-y-3.5 sm:space-y-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <span className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', meta.iconClass)}>
+            <Icon className="size-5" />
+          </span>
+          <div>
+            <h2 className="text-base font-semibold tracking-tight text-foreground">
+              {roleHeading(activeRole)}
+            </h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {roleSubheading(activeRole)}
+            </p>
+          </div>
+        </div>
+        <Badge className={cn('rounded-full border text-[10px] font-semibold shrink-0', meta.badgeClass)}>
+          {meta.badgeText}
+        </Badge>
+      </div>
+
+      <InviteRoleSwitcher activeRole={activeRole} onChange={onRoleChange} />
+    </div>
+  )
+}
+
+function InviteFormActions({ isPending, submitLabel }: { isPending: boolean; submitLabel: string }) {
+  return (
+    <div className="border-t border-border/60 bg-muted/10 p-4 sm:p-6 space-y-2 mt-auto">
+      <Button
+        className="h-10 w-full rounded-xl"
+        type="submit"
+        disabled={isPending}
+        data-testid="invite-submit-btn"
+      >
+        {submitLabel}
+      </Button>
+      <p className="text-center text-[11px] text-muted-foreground/80">
+        Se emitirá un enlace con vigencia de 72 horas para activación segura.
+      </p>
+    </div>
+  )
+}
+
+function InviteFormPanel({ state }: { state: ReturnType<typeof useAdminInviteManager> }) {
+  const { activeRole, setActiveRole, isPending, submitLabel, handleSubmit } = state
+
+  return (
+    <div className="flex flex-col justify-between lg:col-span-7">
+      <InviteFormHeader activeRole={activeRole} onRoleChange={setActiveRole} />
+
+      <form className="flex flex-col flex-1 justify-between" onSubmit={handleSubmit} noValidate>
+        <div className="p-4 sm:p-6 space-y-4">
+          <div key={activeRole} className="space-y-4 animate-in fade-in duration-160">
+            {activeRole === 'client' && (
+              <ClientRoleBlock
+                form={state.inviteForm}
+                clientKind={state.clientKind}
+                mutation={state.inviteMutation}
+              />
+            )}
+            {activeRole === 'worker' && (
+              <WorkerRoleBlock form={state.workerForm} mutation={state.workerMutation} />
+            )}
+            {activeRole === 'admin' && (
+              <AdminRoleBlock form={state.adminForm} mutation={state.adminMutation} />
+            )}
+          </div>
+        </div>
+
+        <InviteFormActions isPending={isPending} submitLabel={submitLabel} />
+      </form>
+    </div>
+  )
+}
+
+function InviteGovernancePanel({ role }: { role: InviteRole }) {
+  return (
+    <div className="flex flex-col justify-between bg-muted/15 lg:col-span-5 divide-y divide-border/60">
+      <RolePrivilegesCard role={role} embedded />
+      <InviteSecurityCard embedded />
+    </div>
+  )
+}
+
+export function AdminInviteForms({ accessToken }: Props) {
+  const state = useAdminInviteManager(accessToken)
+
   return (
     <section className="space-y-4" data-tour="admin-invites-section">
       <SectionIntro
@@ -127,147 +207,15 @@ export function AdminInviteForms({ accessToken }: Props) {
         description="Genera invitaciones y accesos de acuerdo a los privilegios requeridos por cada rol."
       />
 
-      <div className="grid grid-cols-1 gap-6 items-start lg:grid-cols-12">
-        <div className="lg:col-span-7">
-          <Card className="w-full overflow-hidden rounded-2xl border-border/80 bg-card shadow-md shadow-black/[0.04]">
-        <CardHeader className="border-b bg-muted/20 p-4 sm:p-6 space-y-3.5 sm:space-y-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3">
-              <span
-                className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${currentRoleMeta.iconClass}`}
-              >
-                <Icon className="size-5" />
-              </span>
-              <div>
-                <CardTitle className="text-base font-semibold tracking-tight text-foreground">
-                  {activeRole === 'client'
-                    ? 'Invitar cliente'
-                    : activeRole === 'worker'
-                      ? 'Registrar colaborador'
-                      : 'Invitar administrador'}
-                </CardTitle>
-                <CardDescription className="mt-0.5 text-xs text-muted-foreground">
-                  {activeRole === 'client'
-                    ? 'Acceso al portal y seguimiento de proyectos.'
-                    : activeRole === 'worker'
-                      ? 'Colaborador interno para gestión de proyectos y tareas.'
-                      : 'Gobernanza, auditoría y control total del sistema.'}
-                </CardDescription>
-              </div>
-            </div>
-            <Badge className={`rounded-full border text-[10px] font-semibold shrink-0 ${currentRoleMeta.badgeClass}`}>
-              {currentRoleMeta.badgeText}
-            </Badge>
-          </div>
-
-          <InviteRoleSwitcher activeRole={activeRole} onChange={setActiveRole} />
-        </CardHeader>
-
-        <CardContent className="p-4 sm:p-6">
-          <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-            <div key={activeRole} className="space-y-4 animate-in fade-in duration-160">
-              {activeRole === 'client' && (
-                <>
-                  <CommonIdentityFields
-                    emailLabel="Correo electrónico"
-                    emailError={inviteForm.formState.errors.email?.message}
-                    firstError={inviteForm.formState.errors.first_name?.message}
-                    lastError={inviteForm.formState.errors.last_name?.message}
-                    registerEmail={inviteForm.register('email')}
-                    registerFirst={inviteForm.register('first_name')}
-                    registerLast={inviteForm.register('last_name')}
-                  />
-                  <ClientRoleFields form={inviteForm} clientKind={clientKind} />
-                  {inviteMutation.isError && (
-                    <Alert variant="destructive">
-                      <AlertTitle>No se pudo crear la invitación</AlertTitle>
-                      <AlertDescription>{inviteMutation.error.message}</AlertDescription>
-                    </Alert>
-                  )}
-                  {inviteMutation.isSuccess && (
-                    <Alert>
-                      <AlertTitle>Invitación enviada</AlertTitle>
-                      <AlertDescription>{inviteMutation.data.message}</AlertDescription>
-                    </Alert>
-                  )}
-                </>
-              )}
-
-              {activeRole === 'worker' && (
-                <>
-                  <CommonIdentityFields
-                    emailLabel="Correo institucional"
-                    emailError={workerForm.formState.errors.email?.message}
-                    firstError={workerForm.formState.errors.first_name?.message}
-                    lastError={workerForm.formState.errors.last_name?.message}
-                    registerEmail={workerForm.register('email')}
-                    registerFirst={workerForm.register('first_name')}
-                    registerLast={workerForm.register('last_name')}
-                  />
-                  <WorkerRoleFields form={workerForm} />
-                  {workerMutation.isError && (
-                    <Alert variant="destructive">
-                      <AlertTitle>No se pudo registrar el colaborador</AlertTitle>
-                      <AlertDescription>{workerMutation.error.message}</AlertDescription>
-                    </Alert>
-                  )}
-                  {workerMutation.isSuccess && (
-                    <Alert>
-                      <AlertTitle>Invitación creada</AlertTitle>
-                      <AlertDescription>
-                        Se envió la invitación a {workerMutation.data.data.user.email} para activar su cuenta.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </>
-              )}
-
-              {activeRole === 'admin' && (
-                <>
-                  <CommonIdentityFields
-                    emailLabel="Correo institucional"
-                    emailError={adminForm.formState.errors.email?.message}
-                    firstError={adminForm.formState.errors.first_name?.message}
-                    lastError={adminForm.formState.errors.last_name?.message}
-                    registerEmail={adminForm.register('email')}
-                    registerFirst={adminForm.register('first_name')}
-                    registerLast={adminForm.register('last_name')}
-                  />
-                  <AdminRoleFields />
-                  {adminMutation.isError && (
-                    <Alert variant="destructive">
-                      <AlertTitle>No se pudo invitar al administrador</AlertTitle>
-                      <AlertDescription>{adminMutation.error.message}</AlertDescription>
-                    </Alert>
-                  )}
-                  {adminMutation.isSuccess && (
-                    <Alert>
-                      <AlertTitle>Invitación enviada</AlertTitle>
-                      <AlertDescription>{adminMutation.data.message}</AlertDescription>
-                    </Alert>
-                  )}
-                </>
-              )}
-            </div>
-
-            <div className="pt-2">
-              <Button
-                className="h-10 w-full rounded-xl"
-                type="submit"
-                disabled={isPending}
-                data-testid="invite-submit-btn"
-              >
-                {submitLabel}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-          </Card>
-        </div>
-
-        <div className="lg:col-span-5 space-y-5">
-          <RolePrivilegesCard role={activeRole} />
-          <InviteSecurityCard />
+      <div className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm">
+        <div
+          className={[
+            'grid grid-cols-1 lg:grid-cols-12',
+            'divide-y lg:divide-y-0 lg:divide-x divide-border/60 items-stretch',
+          ].join(' ')}
+        >
+          <InviteFormPanel state={state} />
+          <InviteGovernancePanel role={state.activeRole} />
         </div>
       </div>
     </section>
