@@ -1,9 +1,12 @@
-export type AvatarUploadResponse = {
+export type AvatarPresetResponse = {
   data: {
     version: number
     urls: Record<'64' | '256' | '512', string>
   }
 }
+
+/** @deprecated Usar AvatarPresetResponse */
+export type AvatarUploadResponse = AvatarPresetResponse
 
 export type CurrentAvatarResponse = {
   data: {

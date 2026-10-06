@@ -24,9 +24,9 @@ export const accountTour: CimaTourDefinition = {
     {
       element: '[data-tour="account-avatar-btn"]',
       fallbackElement: '[data-tour="account-hero"]',
-      title: 'Fotografía Oficial y Recorte',
-      description: 'Carga una fotografía nítida, recórtala con zoom o visualízala en alta definición para tus proyectos.',
-      actionHint: 'Haz clic en el icono de cámara para abrir el menú de opciones fotográficas.',
+      title: 'Avatar Oficial y Personalización',
+      description: 'Elige tu avatar institucional entre las 84 opciones disponibles y personaliza el color de fondo corporativo.',
+      actionHint: 'Haz clic en el icono de cámara para abrir el catálogo y personalizar tu avatar.',
       side: 'bottom',
     },
     {
@@ -84,8 +84,8 @@ export const accountQuestions: GuidedQuestion[] = [
   },
   {
     id: 'acc-q2',
-    question: '¿Dónde puedo actualizar o recortar mi foto de perfil?',
-    answer: 'En la cabecera de perfil, pulsa sobre la foto o el icono de cámara para subir un archivo, recortarlo con zoom o ver la foto actual.',
+    question: '¿Dónde puedo cambiar mi avatar o personalizar su color?',
+    answer: 'En la cabecera de perfil, pulsa sobre la foto o el icono de cámara para abrir el catálogo de 84 avatares oficiales y seleccionar tu color corporativo.',
     tab: 'account',
     roles: ['admin', 'worker', 'client'],
     category: 'gestion',

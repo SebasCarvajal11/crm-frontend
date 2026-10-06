@@ -2,12 +2,14 @@ import { api } from '@/shared/lib/api-client'
 import { bearer } from '@/shared/lib/bearer'
 import { MEDIA_ROUTES } from '@/shared/lib/gateway-routes'
 import type {
+  AvatarPresetResponse,
   AvatarUploadResponse,
   CurrentAvatarResponse,
   UserAvatarsResponse,
 } from '@/shared/types'
 
 export type {
+  AvatarPresetResponse,
   AvatarUploadResponse,
   CurrentAvatarResponse,
   UserAvatarsResponse,
@@ -16,25 +18,13 @@ export type {
 export async function setAvatarPresetRequest(
   accessToken: string,
   body: { avatarId: number; color: string }
-): Promise<AvatarUploadResponse> {
+): Promise<AvatarPresetResponse> {
   return api
     .post(MEDIA_ROUTES.avatarsPreset, {
       headers: bearer(accessToken),
       json: body,
     })
-    .json<AvatarUploadResponse>()
-}
-
-export async function uploadAvatarRequest(accessToken: string, file: File): Promise<AvatarUploadResponse> {
-  const form = new FormData()
-  form.append('file', file)
-
-  return api
-    .post(MEDIA_ROUTES.avatars, {
-      headers: bearer(accessToken),
-      body: form,
-    })
-    .json<AvatarUploadResponse>()
+    .json<AvatarPresetResponse>()
 }
 
 export async function getCurrentAvatarRequest(accessToken: string): Promise<CurrentAvatarResponse> {

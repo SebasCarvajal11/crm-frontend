@@ -3,9 +3,7 @@ import path from 'node:path'
 
 const root = process.cwd()
 const srcDir = path.join(root, 'src')
-const allowedLiteralFetchFiles = new Set([
-  'src/features/auth/workers/image-crop.worker.ts',
-])
+const allowedLiteralFetchFiles = new Set()
 
 const httpCallWithLiteralRoute =
   /\b(?:api\.(?:get|post|put|patch|delete|head)|fetch)\(\s*(['"`])((?:\\.|(?!\1).)+)\1/g
