@@ -33,13 +33,13 @@ test.describe('Captura Visual del Sistema de Avatares CIMA', () => {
     await page.goto('/dashboard?tab=account')
     await page.waitForLoadState('networkidle')
 
-    // 1. Abrir menú de foto de perfil
-    const avatarMenuBtn = page.getByLabel('Opciones de foto de perfil')
+    // 1. Abrir menú de foto de perfil / avatar
+    const avatarMenuBtn = page.getByRole('button', { name: /Opciones de (?:avatar|foto de perfil)/i })
     await expect(avatarMenuBtn).toBeVisible()
     await avatarMenuBtn.click()
 
-    // 2. Clic en "Cambiar foto de perfil"
-    const changePhotoOption = page.getByText('Cambiar foto de perfil')
+    // 2. Clic en "Cambiar avatar"
+    const changePhotoOption = page.getByText(/(?:Cambiar avatar|Cambiar foto de perfil)/i)
     await expect(changePhotoOption).toBeVisible()
     await changePhotoOption.click()
 
@@ -137,11 +137,11 @@ test.describe('Captura Visual del Sistema de Avatares CIMA', () => {
     await page.goto('/dashboard?tab=account')
     await page.waitForLoadState('networkidle')
 
-    const avatarMenuBtn = page.getByLabel('Opciones de foto de perfil')
+    const avatarMenuBtn = page.getByRole('button', { name: /Opciones de (?:avatar|foto de perfil)/i })
     await expect(avatarMenuBtn).toBeVisible()
     await avatarMenuBtn.click()
 
-    const changePhotoOption = page.getByText('Cambiar foto de perfil')
+    const changePhotoOption = page.getByText(/(?:Cambiar avatar|Cambiar foto de perfil)/i)
     await expect(changePhotoOption).toBeVisible()
     await changePhotoOption.click()
 

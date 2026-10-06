@@ -31,12 +31,12 @@ test.describe('Catálogo Oficial de Avatares CIMA', () => {
     await page.waitForLoadState('networkidle')
 
     // 1. Abrir menú de opciones de avatar
-    const avatarMenuBtn = page.getByLabel('Opciones de foto de perfil')
+    const avatarMenuBtn = page.getByRole('button', { name: /Opciones de (?:avatar|foto de perfil)/i })
     await expect(avatarMenuBtn).toBeVisible()
     await avatarMenuBtn.click()
 
-    // 2. Clic en "Cambiar foto de perfil"
-    const changePhotoOption = page.getByText('Cambiar foto de perfil')
+    // 2. Clic en "Cambiar avatar"
+    const changePhotoOption = page.getByText(/(?:Cambiar avatar|Cambiar foto de perfil)/i)
     await expect(changePhotoOption).toBeVisible()
     await changePhotoOption.click()
 
@@ -103,18 +103,18 @@ test.describe('Catálogo Oficial de Avatares CIMA', () => {
     await page.goto('/dashboard?tab=account')
     await page.waitForLoadState('networkidle')
 
-    const avatarMenuBtn = page.getByLabel('Opciones de foto de perfil')
+    const avatarMenuBtn = page.getByRole('button', { name: /Opciones de (?:avatar|foto de perfil)/i })
     await expect(avatarMenuBtn).toBeVisible()
     await avatarMenuBtn.click()
 
-    const viewPhotoOption = page.getByText('Ver foto')
+    const viewPhotoOption = page.getByText(/(?:Ver avatar|Ver foto)/i)
     await expect(viewPhotoOption).toBeVisible()
     await viewPhotoOption.click()
 
-    // Verificar modal del visor de foto
+    // Verificar modal del visor de foto / avatar
     const viewerDialog = page.getByRole('dialog')
     await expect(viewerDialog).toBeVisible()
-    await expect(page.getByText('Foto de perfil', { exact: true })).toBeVisible()
+    await expect(page.getByText(/(?:Avatar oficial|Foto de perfil)/i).first()).toBeVisible()
 
     const closeBtn = viewerDialog.getByRole('button', { name: 'Cerrar' }).first()
     await expect(closeBtn).toBeVisible()
