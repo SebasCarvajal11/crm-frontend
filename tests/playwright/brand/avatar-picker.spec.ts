@@ -180,4 +180,164 @@ test.describe('Catálogo Oficial de Avatares CIMA', () => {
     await expect(dialogTitle).not.toBeVisible()
     await expect(page.getByText('Fondo:')).toContainText('Verde Bosque')
   })
+
+  test('Flujo de invitación recurre a avatar aleatorio y emite advertencia en dashboard si la selección falla', async ({
+    page,
+  }) => {
+    let presetCallCount = 0
+
+    // Mock endpoints requeridos por Dashboard tras la redirección
+    await page.route('**/api/v1/identity/me', async (route) => {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          data: {
+            id: '11111111-1111-4111-8111-111111111111',
+            email: 'fallo.avatar@cima.dev',
+            role: 'worker',
+            first_name: 'Elena',
+            last_name: 'Vargas',
+            emailVerifiedAt: '2026-09-28T00:00:00Z',
+          },
+        },
+      })
+    })
+
+    await page.route('**/api/v1/identity/presence', async (route) => {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: { data: { heartbeat_interval_seconds: 60 } },
+      })
+    })
+
+    await page.route('**/api/v1/collab/projects', async (route) => {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: { data: { items: [], total: 0, page: 1, limit: 100, total_pages: 1 } },
+      })
+    })
+
+    await page.route('**/api/v1/notifications/unread/count', async (route) => {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: { data: { unread_count: 0 } },
+      })
+    })
+
+    await page.route('**/api/v1/media/avatars/current', async (route) => {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          data: {
+            version: 1,
+            urls: {
+              '512': '/avatars/avatar-10.webp',
+              '256': '/avatars/avatar-10.webp',
+              '64': '/avatars/avatar-10.webp',
+            },
+          },
+        },
+      })
+    })
+
+    // Sobrescribir rutas para flujo de invitación
+    await page.route(/\/api\/v1\/auth\/accept-invite/, async (route) => {
+      const method = route.request().method()
+      if (method === 'GET') {
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          json: {
+            data: {
+              email: 'fallo.avatar@cima.dev',
+              first_name: 'Elena',
+              last_name: 'Vargas',
+              company_name: 'CIMA Studio',
+            },
+          },
+        })
+      }
+      if (method === 'POST') {
+        const token = `fixture.${Buffer.from(JSON.stringify({ role: 'worker', sub: 'test-user' })).toString('base64url')}.fixture`
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          json: {
+            data: {
+              access_token: token,
+              user: {
+                id: '11111111-1111-4111-8111-111111111111',
+                email: 'fallo.avatar@cima.dev',
+                role: 'worker',
+              },
+            },
+          },
+        })
+      }
+      return route.continue()
+    })
+
+    // Simular que el primer guardado de avatar falla, pero el fallback aleatorio se intenta
+    await page.route(/\/api\/v1\/media\/avatars\/preset/, async (route) => {
+      presetCallCount++
+      if (presetCallCount === 1) {
+        return route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          json: { error: 'Error simulado al guardar preset original' },
+        })
+      }
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          data: {
+            version: 1,
+            urls: {
+              '512': '/avatars/avatar-10.webp',
+              '256': '/avatars/avatar-10.webp',
+              '64': '/avatars/avatar-10.webp',
+            },
+          },
+        },
+      })
+    })
+
+    await page.goto('/accept-invite/token-prueba-fallback')
+    await page.waitForLoadState('networkidle')
+
+    // Completar formulario de activación
+    await page.locator('input#password').fill('ClaveSegura123!')
+    await page.locator('input#confirm').fill('ClaveSegura123!')
+    await page.getByLabel('Aceptar términos y política de datos').check()
+
+    // Enviar formulario
+    const submitBtn = page.getByRole('button', { name: 'Activar cuenta y acceder' })
+    await expect(submitBtn).toBeVisible()
+    await submitBtn.click()
+
+    // Confirmar que llega a /dashboard
+    await page.waitForURL('**/dashboard**')
+
+    // Comprobar que se muestra la advertencia informando al usuario sobre el avatar provisional
+    const warningAlert = page.getByText('Aviso sobre tu avatar')
+    await expect(warningAlert).toBeVisible()
+    await expect(
+      page.getByText('Hubo un inconveniente al guardar tu avatar seleccionado. Se asignó uno provisional')
+    ).toBeVisible()
+
+    // Descartar aviso
+    const dismissBtn = page.getByRole('button', { name: 'Entendido' })
+    await expect(dismissBtn).toBeVisible()
+    await dismissBtn.click()
+
+    await expect(warningAlert).not.toBeVisible()
+    expect(presetCallCount).toBeGreaterThanOrEqual(2)
+  })
 })
+

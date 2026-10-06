@@ -14,7 +14,7 @@ import { strongPasswordSchema } from '@/features/auth/model'
 import { LegalTermsDialog, type LegalTab } from './legal-terms-dialog'
 import { AvatarPickerDialog } from './account/avatar-picker-dialog'
 import { AcceptInviteAvatarCard } from './accept-invite-avatar-card'
-import { CIMA_CORPORATE_COLORS } from '@/shared/lib/avatar-catalog'
+import { getRandomAvatarSelection } from '@/shared/lib/avatar-catalog'
 
 const schema = z
   .object({
@@ -124,8 +124,9 @@ export function AcceptInviteForm({ token }: AcceptInviteFormProps) {
   const [showConfirm, setShowConfirm] = useState(false)
   const [legalOpen, setLegalOpen] = useState(false)
   const [legalTab, setLegalTab] = useState<LegalTab>('terms')
-  const [selectedAvatarId, setSelectedAvatarId] = useState<number>(0)
-  const [selectedColor, setSelectedColor] = useState<string>(CIMA_CORPORATE_COLORS[0].hex)
+  const [initialPreset] = useState(() => getRandomAvatarSelection())
+  const [selectedAvatarId, setSelectedAvatarId] = useState<number>(initialPreset.avatarId)
+  const [selectedColor, setSelectedColor] = useState<string>(initialPreset.color)
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false)
   const { previewQuery, mutation } = useAcceptInviteFlow(token)
 

@@ -131,15 +131,19 @@ export function useAcceptInviteFlow(token: string) {
           await setAvatarPresetRequest(accessToken, data.chosenAvatar)
         } catch {
           const fallback = getRandomAvatarSelection()
+          let fallbackSaved = false
           try {
             await setAvatarPresetRequest(accessToken, fallback)
+            fallbackSaved = true
           } catch {
             // Silently allow activation even if secondary fallback encounters network issues
           }
           if (typeof window !== 'undefined' && window.sessionStorage) {
             window.sessionStorage.setItem(
               'cima_avatar_warning',
-              'Hubo un inconveniente al guardar tu avatar seleccionado. Se asignó uno provisional que puedes cambiar en cualquier momento desde tu perfil.'
+              fallbackSaved
+                ? 'Hubo un inconveniente al guardar tu avatar seleccionado. Se asignó uno provisional que puedes cambiar en cualquier momento desde tu perfil.'
+                : 'Hubo un inconveniente al configurar tu avatar. Puedes seleccionarlo en cualquier momento desde los ajustes de tu perfil.'
             )
           }
         }
