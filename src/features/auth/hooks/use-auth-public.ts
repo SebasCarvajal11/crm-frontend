@@ -11,6 +11,8 @@ import {
 import { parseApiError } from '@/features/auth/utils'
 import { useSessionStore } from '@/app/session/session-store'
 import type { LoginRequestValues } from '@/features/auth/model'
+import { setAvatarPresetRequest } from '@/shared/api'
+import { getRandomAvatarSelection } from '@/shared/lib/avatar-catalog'
 
 export function useLoginFlow() {
   const navigate = useNavigate({ from: '/login' })
@@ -96,20 +98,53 @@ export function useAcceptInviteFlow(token: string) {
   })
 
   const mutation = useMutation({
-    mutationFn: async (body: { password: string; terms_accepted?: boolean }) => {
+    mutationFn: async (body: {
+      password: string
+      terms_accepted?: boolean
+      avatarId?: number
+      color?: string
+    }) => {
       try {
-        return await acceptInviteRequest({
+        const acceptRes = await acceptInviteRequest({
           token,
           password: body.password,
           terms_accepted: body.terms_accepted,
         })
+        return {
+          ...acceptRes,
+          chosenAvatar:
+            body.avatarId !== undefined && body.color
+              ? { avatarId: body.avatarId, color: body.color }
+              : undefined,
+        }
       } catch (e) {
         throw new Error(await parseApiError(e), { cause: e })
       }
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       const email = previewQuery.data?.data.email ?? null
-      setSession(data.data.access_token, email)
+      const accessToken = data.data.access_token
+      setSession(accessToken, email)
+
+      if (data.chosenAvatar) {
+        try {
+          await setAvatarPresetRequest(accessToken, data.chosenAvatar)
+        } catch {
+          const fallback = getRandomAvatarSelection()
+          try {
+            await setAvatarPresetRequest(accessToken, fallback)
+          } catch {
+            // Silently allow activation even if secondary fallback encounters network issues
+          }
+          if (typeof window !== 'undefined' && window.sessionStorage) {
+            window.sessionStorage.setItem(
+              'cima_avatar_warning',
+              'Hubo un inconveniente al guardar tu avatar seleccionado. Se asignó uno provisional que puedes cambiar en cualquier momento desde tu perfil.'
+            )
+          }
+        }
+      }
+
       queryClient.removeQueries({ queryKey: ['invite-preview', token] })
       void queryClient.invalidateQueries({
         predicate: (query) => query.queryKey[0] !== 'invite-preview',

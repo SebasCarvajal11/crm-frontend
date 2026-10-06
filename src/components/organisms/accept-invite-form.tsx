@@ -12,6 +12,9 @@ import { FormField } from '@/components/molecules/form-field'
 import { useAcceptInviteFlow } from '@/features/auth/hooks'
 import { strongPasswordSchema } from '@/features/auth/model'
 import { LegalTermsDialog, type LegalTab } from './legal-terms-dialog'
+import { AvatarPickerDialog } from './account/avatar-picker-dialog'
+import { AcceptInviteAvatarCard } from './accept-invite-avatar-card'
+import { CIMA_CORPORATE_COLORS } from '@/shared/lib/avatar-catalog'
 
 const schema = z
   .object({
@@ -121,6 +124,9 @@ export function AcceptInviteForm({ token }: AcceptInviteFormProps) {
   const [showConfirm, setShowConfirm] = useState(false)
   const [legalOpen, setLegalOpen] = useState(false)
   const [legalTab, setLegalTab] = useState<LegalTab>('terms')
+  const [selectedAvatarId, setSelectedAvatarId] = useState<number>(0)
+  const [selectedColor, setSelectedColor] = useState<string>(CIMA_CORPORATE_COLORS[0].hex)
+  const [avatarPickerOpen, setAvatarPickerOpen] = useState(false)
   const { previewQuery, mutation } = useAcceptInviteFlow(token)
 
   const {
@@ -171,7 +177,14 @@ export function AcceptInviteForm({ token }: AcceptInviteFormProps) {
   return (
     <>
       <form
-        onSubmit={handleSubmit((v) => mutation.mutate({ password: v.password, terms_accepted: true }))}
+        onSubmit={handleSubmit((v) =>
+          mutation.mutate({
+            password: v.password,
+            terms_accepted: true,
+            avatarId: selectedAvatarId,
+            color: selectedColor,
+          })
+        )}
         className="space-y-4"
       >
         <InvitePreviewBadge preview={previewQuery.data?.data} />
@@ -220,6 +233,12 @@ export function AcceptInviteForm({ token }: AcceptInviteFormProps) {
           </div>
         </FormField>
 
+        <AcceptInviteAvatarCard
+          avatarId={selectedAvatarId}
+          color={selectedColor}
+          onCustomize={() => setAvatarPickerOpen(true)}
+        />
+
         <LegalConsentCheckbox
           control={control}
           error={errors.termsAccepted?.message}
@@ -256,6 +275,19 @@ export function AcceptInviteForm({ token }: AcceptInviteFormProps) {
         open={legalOpen}
         onOpenChange={setLegalOpen}
         initialTab={legalTab}
+      />
+
+      <AvatarPickerDialog
+        open={avatarPickerOpen}
+        onOpenChange={setAvatarPickerOpen}
+        initialAvatarId={selectedAvatarId}
+        initialColor={selectedColor}
+        isSaving={false}
+        onSave={async (sel) => {
+          setSelectedAvatarId(sel.avatarId)
+          setSelectedColor(sel.color)
+          setAvatarPickerOpen(false)
+        }}
       />
     </>
   )

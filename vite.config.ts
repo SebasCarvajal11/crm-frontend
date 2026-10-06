@@ -36,7 +36,6 @@ export default defineConfig(({ mode }) => {
               if (id.includes('recharts')) return 'vendor-charts'
               if (id.includes('pdf-lib')) return 'vendor-pdf'
               if (id.includes('jszip')) return 'vendor-zip'
-              if (id.includes('react-easy-crop')) return 'vendor-crop'
               if (id.includes('@tanstack')) return 'vendor-tanstack'
               if (
                 id.includes('ky') ||

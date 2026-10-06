@@ -13,6 +13,18 @@ export type {
   UserAvatarsResponse,
 }
 
+export async function setAvatarPresetRequest(
+  accessToken: string,
+  body: { avatarId: number; color: string }
+): Promise<AvatarUploadResponse> {
+  return api
+    .post(MEDIA_ROUTES.avatarsPreset, {
+      headers: bearer(accessToken),
+      json: body,
+    })
+    .json<AvatarUploadResponse>()
+}
+
 export async function uploadAvatarRequest(accessToken: string, file: File): Promise<AvatarUploadResponse> {
   const form = new FormData()
   form.append('file', file)

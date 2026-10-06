@@ -2,7 +2,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent } from '@/components/ui/card'
 import { useAccountProfileSection } from '@/features/auth/hooks'
 import type { MeResponse } from '@/features/auth/model'
-import { ProfileAvatarDialogs } from './profile-avatar-dialogs'
+import { AvatarPickerDialog } from './avatar-picker-dialog'
+import { ProfilePhotoViewerDialog } from './profile-photo-viewer-dialog'
 import { ProfileDetails } from './profile-details'
 import { ProfileHero } from './profile-hero'
 
@@ -20,21 +21,14 @@ export function ProfileSection({ accessToken, identity }: Props) {
   const displayName = fullName || toDisplayName(identity.email.split('@')[0])
 
   const {
-    avatarInputRef,
+    avatarPickerOpen,
     avatarUrl,
-    clearSelectedImage,
-    crop,
-    onAvatarFileSelect,
-    onCropComplete,
-    onSaveCroppedAvatar,
+    handleSaveAvatarPreset,
     photoViewerOpen,
-    selectedImageSrc,
-    setCrop,
+    saveAvatarPresetMutation,
+    setAvatarPickerOpen,
     setPhotoViewerOpen,
-    setZoom,
-    uploadAvatarMutation,
     verifyMutation,
-    zoom,
   } = useAccountProfileSection(accessToken)
 
   return (
@@ -45,9 +39,8 @@ export function ProfileSection({ accessToken, identity }: Props) {
         displayName={displayName}
         avatarUrl={avatarUrl}
         isVerified={isVerified}
-        isUploading={uploadAvatarMutation.isPending}
-        avatarInputRef={avatarInputRef}
-        onAvatarFileSelect={onAvatarFileSelect}
+        isUploading={saveAvatarPresetMutation.isPending}
+        onOpenAvatarPicker={() => setAvatarPickerOpen(true)}
         onOpenPhotoViewer={() => setPhotoViewerOpen(true)}
       />
 
@@ -62,11 +55,11 @@ export function ProfileSection({ accessToken, identity }: Props) {
           />
         </CardContent>
 
-        {uploadAvatarMutation.isError && (
+        {saveAvatarPresetMutation.isError && (
           <CardContent className="border-t pt-4">
             <Alert variant="destructive">
               <AlertTitle>No se pudo actualizar el avatar</AlertTitle>
-              <AlertDescription>{uploadAvatarMutation.error.message}</AlertDescription>
+              <AlertDescription>{saveAvatarPresetMutation.error.message}</AlertDescription>
             </Alert>
           </CardContent>
         )}
@@ -92,20 +85,19 @@ export function ProfileSection({ accessToken, identity }: Props) {
         )}
       </Card>
 
-      {/* Modales de visor y recorte de avatar */}
-      <ProfileAvatarDialogs
+      {/* Visor de foto en alta resolución */}
+      <ProfilePhotoViewerDialog
+        open={photoViewerOpen}
+        onOpenChange={setPhotoViewerOpen}
         avatarUrl={avatarUrl}
-        photoViewerOpen={photoViewerOpen}
-        setPhotoViewerOpen={setPhotoViewerOpen}
-        selectedImageSrc={selectedImageSrc}
-        clearSelectedImage={clearSelectedImage}
-        crop={crop}
-        setCrop={setCrop}
-        zoom={zoom}
-        setZoom={setZoom}
-        onCropComplete={onCropComplete}
-        onSaveCroppedAvatar={onSaveCroppedAvatar}
-        isUploading={uploadAvatarMutation.isPending}
+      />
+
+      {/* Catálogo oficial de avatares predeterminados CIMA */}
+      <AvatarPickerDialog
+        open={avatarPickerOpen}
+        onOpenChange={setAvatarPickerOpen}
+        isSaving={saveAvatarPresetMutation.isPending}
+        onSave={handleSaveAvatarPreset}
       />
     </section>
   )

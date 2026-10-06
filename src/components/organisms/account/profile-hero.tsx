@@ -1,4 +1,3 @@
-import type { RefObject } from 'react'
 import { Camera, CheckCircle2, Clock, Loader2, Mail, Shield } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/shared/lib/utils'
@@ -9,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
 import type { MeResponse } from '@/features/auth/model'
 
 type Role = MeResponse['data']['role']
@@ -26,8 +24,7 @@ interface ProfileHeroProps {
   avatarUrl?: string | null
   isVerified: boolean
   isUploading: boolean
-  avatarInputRef: RefObject<HTMLInputElement | null>
-  onAvatarFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onOpenAvatarPicker: () => void
   onOpenPhotoViewer: () => void
 }
 
@@ -37,8 +34,7 @@ export function ProfileHero({
   avatarUrl,
   isVerified,
   isUploading,
-  avatarInputRef,
-  onAvatarFileSelect,
+  onOpenAvatarPicker,
   onOpenPhotoViewer,
 }: ProfileHeroProps) {
   const roleName = ROLE_NAMES[identity.role] ?? identity.role
@@ -102,22 +98,13 @@ export function ProfileHero({
                     Ver foto
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => avatarInputRef.current?.click()}
+                    onClick={onOpenAvatarPicker}
                     disabled={isUploading}
                   >
                     Cambiar foto de perfil
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              <Input
-                ref={avatarInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                className="hidden"
-                onChange={onAvatarFileSelect}
-                disabled={isUploading}
-              />
             </div>
 
             {/* Bloque de identidad en flujo normal sobre fondo de tarjeta */}

@@ -145,6 +145,7 @@ export const NOTIFICATION_ROUTES = {
 // ── Media (autenticado) ─────────────────────────────────────────────────────
 export const MEDIA_ROUTES = {
   avatars: `${MEDIA_API}/media/avatars`,
+  avatarsPreset: `${MEDIA_API}/media/avatars/preset`,
   avatarsCurrent: `${MEDIA_API}/media/avatars/current`,
   avatarsUsers: `${MEDIA_API}/media/avatars/users`,
   documentsUploadUrl: `${MEDIA_API}/media/documents/upload-url`,

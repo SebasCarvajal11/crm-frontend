@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { isHTTPError } from 'ky'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -39,6 +39,16 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   const bootstrapped = useSessionStore((s) => s.bootstrapped)
   const emailStored = useSessionStore((s) => s.email)
   const clearSession = useSessionStore((s) => s.clearSession)
+  const [avatarWarning, setAvatarWarning] = useState<string | null>(() => {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      const val = window.sessionStorage.getItem('cima_avatar_warning')
+      if (val) {
+        window.sessionStorage.removeItem('cima_avatar_warning')
+        return val
+      }
+    }
+    return null
+  })
   const {
     navigate,
     goTo,
@@ -187,6 +197,22 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
         onOpen={handleOpenNotification}
         onDismiss={dismissToast}
       />
+      {avatarWarning && (
+        <Alert className="mb-6 border-amber-300/80 bg-amber-50/90 text-amber-950 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+          <AlertTitle className="font-semibold text-xs uppercase tracking-wider">Aviso sobre tu avatar</AlertTitle>
+          <AlertDescription className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs">
+            <span>{avatarWarning}</span>
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => setAvatarWarning(null)}
+              className="h-7 text-xs border-amber-300 bg-white/80 text-amber-950 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-900/50 dark:text-amber-100 shrink-0"
+            >
+              Entendido
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
       {hasRoleMismatch && (
         <Alert variant="destructive" className="mb-6">
           <AlertTitle>Tu sesión necesita actualizarse</AlertTitle>
