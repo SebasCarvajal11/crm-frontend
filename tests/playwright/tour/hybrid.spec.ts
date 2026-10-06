@@ -199,6 +199,10 @@ test('ayuda global permite operar controles fijos y navegación móvil', async (
   await expect(page.getByTestId('zoom-widget-toolbar')).toBeVisible()
   await assertBounds(page)
   await page.screenshot({ path: info.outputPath('global-zoom.png'), fullPage: true })
+  const zoomResetBtn = page.getByTestId('zoom-reset-btn')
+  if (await zoomResetBtn.isVisible()) {
+    await zoomResetBtn.click()
+  }
   await guide.getByRole('button', { name: 'Entendido', exact: true }).click()
   await openHelp(page)
   await page.getByLabel('Buscar guías y acciones').fill('navego')
@@ -210,9 +214,15 @@ test('ayuda global permite operar controles fijos y navegación móvil', async (
     : page.getByRole('complementary', { name: 'Barra de navegacion lateral' })
   if (isMobile && !(await sidebar.isVisible())) {
     await page.getByRole('button', { name: 'Abrir menu', exact: true }).click()
+  } else {
+    const expandBtn = sidebar.getByRole('button', { name: 'Expandir barra lateral' })
+    if (await expandBtn.isVisible()) {
+      await expandBtn.click({ force: true })
+    }
   }
   const marketingBtn = sidebar.getByRole('button', { name: 'Marketing', exact: true })
   await expect(marketingBtn).toBeVisible()
+  await marketingBtn.scrollIntoViewIfNeeded()
   await marketingBtn.click({ force: true })
   await expect(page).toHaveURL(/tab=marketing/)
   await assertBounds(page)
