@@ -142,7 +142,7 @@ function usePanelState(owner: string) {
   const result = usePresence(owner, query, pages)
   const groups = result.data?.groups
   const allSubs = useMemo(() => groups?.flatMap((g) => g.users.map((u) => u.subject)) ?? [], [groups])
-  const { getAvatarUrl } = useUserAvatars(token, allSubs)
+  const { getAvatarUrl, getAvatarColor } = useUserAvatars(token, allSubs)
   const busy = result.isFetching || search.trim() !== query
   const totalOnline = groups?.reduce((sum, g) => sum + g.online, 0) ?? 0
   const counts = usePresenceCounts(groups)
@@ -159,7 +159,7 @@ function usePanelState(owner: string) {
 
   return {
     search, setSearch, query, activeTab, setActiveTab, pages, setPages,
-    scrollRef, result, groups, busy, counts, visibleGroups, statusMessage, getAvatarUrl, onPage,
+    scrollRef, result, groups, busy, counts, visibleGroups, statusMessage, getAvatarUrl, getAvatarColor, onPage,
   }
 }
 
@@ -179,6 +179,7 @@ function VisibleGroupSections({
   stale,
   busy,
   getAvatarUrl,
+  getAvatarColor,
   onPage,
 }: {
   groups: PresenceGroup[]
@@ -186,6 +187,7 @@ function VisibleGroupSections({
   stale: boolean
   busy: boolean
   getAvatarUrl: (sub?: string | null) => string | null
+  getAvatarColor?: (sub?: string | null) => string | null
   onPage: (role: PresenceRole, page: number) => void
 }) {
   return (
@@ -198,6 +200,7 @@ function VisibleGroupSections({
           stale={stale}
           busy={busy}
           getAvatarUrl={getAvatarUrl}
+          getAvatarColor={getAvatarColor}
           onPage={(page) => onPage(group.role, page)}
         />
       ))}

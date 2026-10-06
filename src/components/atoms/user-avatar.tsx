@@ -1,7 +1,8 @@
 import { memo, useState } from 'react'
-import { UserRound } from 'lucide-react'
-import { getAvatarColor } from '@/shared/lib/avatar-color'
-import { extractUserInitials } from '@/shared/lib/avatar-utils'
+import {
+  getAvatarImageUrl,
+  resolveDeterministicAvatar,
+} from '@/shared/lib/avatar-catalog'
 import { cn } from '@/shared/lib/utils'
 
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
@@ -24,13 +25,13 @@ export type UserAvatarProps = {
   onOpenProfile?: () => void
 }
 
-const SIZE_CLASSES: Record<AvatarSize, { container: string; text: string; dot: string }> = {
-  xs: { container: 'size-6', text: 'text-[10px]', dot: 'size-1.5' },
-  sm: { container: 'size-7', text: 'text-[11px]', dot: 'size-2' },
-  md: { container: 'size-9', text: 'text-xs', dot: 'size-2.5' },
-  lg: { container: 'size-10', text: 'text-sm', dot: 'size-2.5' },
-  xl: { container: 'size-14', text: 'text-base', dot: 'size-3.5' },
-  '2xl': { container: 'size-28 sm:size-32', text: 'text-2xl sm:text-3xl', dot: 'size-5' },
+const SIZE_CLASSES: Record<AvatarSize, { container: string; dot: string }> = {
+  xs: { container: 'size-6', dot: 'size-1.5' },
+  sm: { container: 'size-7', dot: 'size-2' },
+  md: { container: 'size-9', dot: 'size-2.5' },
+  lg: { container: 'size-10', dot: 'size-2.5' },
+  xl: { container: 'size-14', dot: 'size-3.5' },
+  '2xl': { container: 'size-28 sm:size-32', dot: 'size-5' },
 }
 
 const PRESENCE_CONFIG: Record<
@@ -120,55 +121,30 @@ function extractColorFromSrc(src?: string | null): string | null {
 }
 
 type AvatarMediaProps = {
-  src?: string | null
-  initials: string
-  hasValidImage: boolean
-  bgColor: string
-  effectiveColor?: string | null
+  src: string
+  effectiveColor: string
   altText: string
-  textClass: string
   onError: () => void
 }
 
 function AvatarMedia({
   src,
-  initials,
-  hasValidImage,
-  bgColor,
   effectiveColor,
   altText,
-  textClass,
   onError,
 }: AvatarMediaProps) {
-  const hasCustomBg = Boolean(hasValidImage && effectiveColor)
-
   return (
     <div
-      className={cn(
-        'flex size-full items-center justify-center overflow-hidden rounded-full font-semibold',
-        hasValidImage
-          ? hasCustomBg
-            ? 'border border-border/40 shadow-xs'
-            : 'border border-border/60 bg-muted/20'
-          : `${bgColor} text-white shadow-2xs`
-      )}
-      style={hasCustomBg ? { backgroundColor: effectiveColor! } : undefined}
+      className="flex size-full items-center justify-center overflow-hidden rounded-full border border-border/40 shadow-xs"
+      style={{ backgroundColor: effectiveColor }}
     >
-      {hasValidImage ? (
-        <img
-          src={src!}
-          alt={altText}
-          className="size-full object-cover rounded-full"
-          onError={onError}
-          loading="lazy"
-        />
-      ) : initials ? (
-        <span className={cn('tracking-tight uppercase', textClass)} aria-hidden="true">
-          {initials}
-        </span>
-      ) : (
-        <UserRound className="size-1/2 opacity-90" aria-hidden="true" />
-      )}
+      <img
+        src={src}
+        alt={altText}
+        className="size-full object-cover rounded-full"
+        onError={onError}
+        loading="lazy"
+      />
     </div>
   )
 }
@@ -190,21 +166,32 @@ export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
     onClick,
     onOpenProfile,
   } = props
+
+  const deterministic = resolveDeterministicAvatar(userId ?? name)
   const effectiveSrc = src ?? avatarUrl
-  const resolvedSrc =
-    effectiveSrc ?? (typeof avatarId === 'number' && avatarId >= 0 ? `/avatars/avatar-${avatarId}.webp` : null)
-  const [loadError, setLoadError] = useState(false)
-  const [prevSrc, setPrevSrc] = useState(resolvedSrc)
-  if (prevSrc !== resolvedSrc) {
-    setPrevSrc(resolvedSrc)
-    setLoadError(false)
+  const initialResolvedSrc =
+    effectiveSrc ??
+    (typeof avatarId === 'number' && avatarId >= 0
+      ? getAvatarImageUrl(avatarId)
+      : deterministic.url)
+
+  const [currentSrc, setCurrentSrc] = useState(initialResolvedSrc)
+  const [prevInitialSrc, setPrevInitialSrc] = useState(initialResolvedSrc)
+
+  if (prevInitialSrc !== initialResolvedSrc) {
+    setPrevInitialSrc(initialResolvedSrc)
+    setCurrentSrc(initialResolvedSrc)
+  }
+
+  const handleImageError = () => {
+    if (currentSrc !== deterministic.url) {
+      setCurrentSrc(deterministic.url)
+    }
   }
 
   const cfg = SIZE_CLASSES[size]
-  const initials = extractUserInitials(name)
-  const bgColor = getAvatarColor(userId)
-  const effectiveColor = color ?? extractColorFromSrc(resolvedSrc)
-  const hasValidImage = Boolean(resolvedSrc && !loadError)
+  const effectiveColor =
+    (color && color.trim()) || extractColorFromSrc(effectiveSrc) || deterministic.color
   const altText = alt ?? (name ? `Avatar oficial de ${name}` : 'Avatar oficial')
   const handleClick = onClick ?? onOpenProfile
   const isClickable = Boolean(handleClick)
@@ -225,14 +212,10 @@ export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
       data-testid="user-avatar"
     >
       <AvatarMedia
-        src={resolvedSrc}
-        initials={initials}
-        hasValidImage={hasValidImage}
-        bgColor={bgColor}
+        src={currentSrc}
         effectiveColor={effectiveColor}
         altText={altText}
-        textClass={cfg.text}
-        onError={() => setLoadError(true)}
+        onError={handleImageError}
       />
 
       {presenceStatus && (

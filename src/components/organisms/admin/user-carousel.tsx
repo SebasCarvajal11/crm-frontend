@@ -12,6 +12,7 @@ type MutationHandle<T> = {
 type Props = {
   items: AdminUserRow[]
   getAvatarUrl?: (id?: string | null) => string | null
+  getAvatarColor?: (id?: string | null) => string | null
   patchStatus: MutationHandle<{ subject: string; is_active: boolean }>
   patchFlags: MutationHandle<{ subject: string; force_password_change: boolean }>
   softDelete: MutationHandle<string>
@@ -25,6 +26,7 @@ import { useCarouselAutoScroll } from './use-carousel-auto-scroll'
 export function UserCarousel({
   items,
   getAvatarUrl,
+  getAvatarColor,
   patchStatus,
   patchFlags,
   softDelete,
@@ -221,6 +223,7 @@ export function UserCarousel({
                 row={row}
                 index={index}
                 avatarUrl={getAvatarUrl?.(row.id)}
+                avatarColor={getAvatarColor?.(row.id)}
                 patchStatus={patchStatus}
                 patchFlags={patchFlags}
                 softDelete={softDelete}

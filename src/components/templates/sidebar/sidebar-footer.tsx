@@ -29,6 +29,7 @@ function UserProfileTrigger({
   userEmail,
   userRole,
   userAvatarUrl,
+  userAvatarColor,
   unreadCount,
   compact,
   open,
@@ -37,6 +38,7 @@ function UserProfileTrigger({
   userEmail: string
   userRole: string
   userAvatarUrl?: string | null
+  userAvatarColor?: string | null
   unreadCount: number
   compact: boolean
   open: boolean
@@ -62,7 +64,9 @@ function UserProfileTrigger({
       <div className="relative shrink-0">
         <UserAvatar
           src={userAvatarUrl}
+          color={userAvatarColor}
           name={userEmail}
+          userId={userEmail}
           size="sm"
           className="size-8"
         />
@@ -185,6 +189,7 @@ export interface SidebarFooterProps {
   userEmail: string
   userRole: string
   userAvatarUrl?: string | null
+  userAvatarColor?: string | null
   onOpenProfile: () => void
   onOpenNotifications: () => void
   unreadNotificationsCount: number
@@ -200,6 +205,7 @@ export function SidebarFooter({
   userEmail,
   userRole,
   userAvatarUrl,
+  userAvatarColor,
   onOpenProfile,
   onOpenNotifications,
   unreadNotificationsCount,
@@ -228,6 +234,7 @@ export function SidebarFooter({
           userEmail={userEmail}
           userRole={userRole}
           userAvatarUrl={userAvatarUrl}
+          userAvatarColor={userAvatarColor}
           unreadCount={unreadNotificationsCount}
           compact={compact}
           open={open}

@@ -133,6 +133,9 @@ export const ChatMessageList = memo(function ChatMessageList({
         const avatarUrl = message.authorSub
           ? pickAvatarUrl(avatarBySub[message.authorSub]?.urls, '64')
           : null
+        const avatarColor = message.authorSub
+          ? avatarBySub[message.authorSub]?.color
+          : null
 
         return (
           <div key={message.id}>
@@ -146,6 +149,7 @@ export const ChatMessageList = memo(function ChatMessageList({
               displayName={getAuthorDisplayName(message, memberBySub)}
               authorTag={getAuthorRoleTag(message, memberBySub)}
               avatarUrl={avatarUrl}
+              avatarColor={avatarColor}
               isNewlyArrived={isNewlyArrived(message.id)}
               highlightMessageId={highlightMessageId}
               onOpenDetails={setSelectedMessageId}

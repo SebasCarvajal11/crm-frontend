@@ -185,6 +185,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
       userEmail={identity.email ?? emailStored ?? ''}
       userRole={identity.role}
       userAvatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}
+      userAvatarColor={avatarQuery.data?.data.color}
       onOpenProfile={handleOpenProfile}
       onOpenNotifications={handleOpenNotifications}
       unreadNotificationsCount={unreadCount}

@@ -40,6 +40,7 @@ export function ProfileSection({ accessToken, identity }: Props) {
         identity={identity}
         displayName={displayName}
         avatarUrl={avatarUrl}
+        avatarColor={avatarColor}
         isVerified={isVerified}
         isSaving={saveAvatarPresetMutation.isPending}
         onOpenAvatarPicker={() => setAvatarPickerOpen(true)}

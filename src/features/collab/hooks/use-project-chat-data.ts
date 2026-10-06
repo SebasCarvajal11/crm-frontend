@@ -8,7 +8,7 @@ import {
   markInternalChatReadRequest,
 } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
-import { getUserAvatarsRequest } from '@/shared/api'
+import { useUserAvatars } from '@/shared/hooks'
 import type { ProjectChatMessage, ProjectMember } from '@/features/collab/model'
 
 type Channel = 'external' | 'internal'
@@ -90,14 +90,8 @@ export function useProjectChatData({
     return Array.from(subs)
   }, [members, messages])
 
-  const avatarsQ = useQuery({
-    queryKey: ['media', 'avatars', 'users', projectId, avatarSubjects.length],
-    queryFn: () => getUserAvatarsRequest(accessToken, avatarSubjects),
-    enabled: avatarSubjects.length > 0,
-    staleTime: 30_000,
-  })
-
-  const avatarBySub = avatarsQ.data?.data.items ?? {}
+  const { profileMap } = useUserAvatars(accessToken, avatarSubjects)
+  const avatarBySub = profileMap
 
   useEffect(() => {
     if (!isVisible || !readUpToMessageId) return

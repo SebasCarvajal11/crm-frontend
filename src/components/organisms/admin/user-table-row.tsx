@@ -9,6 +9,7 @@ type Props = {
   row: AdminUserRow
   virtualIndex: number
   avatarUrl?: string | null
+  avatarColor?: string | null
   measureElement?: (el: HTMLElement | null) => void
   patchStatus: { mutate: (arg: { subject: string; is_active: boolean }) => void; isPending: boolean }
   patchFlags: { mutate: (arg: { subject: string; force_password_change: boolean }) => void; isPending: boolean }
@@ -98,6 +99,7 @@ export function UserTableRow({
   row,
   virtualIndex,
   avatarUrl,
+  avatarColor,
   measureElement,
   patchStatus,
   patchFlags,
@@ -119,6 +121,7 @@ export function UserTableRow({
         <div className="flex items-center gap-3">
           <UserAvatar
             src={avatarUrl}
+            color={avatarColor}
             name={displayName}
             userId={row.id}
             size="md"

@@ -29,7 +29,7 @@ export function TaskComments({ accessToken, projectId, taskId, onError }: Props)
   })
 
   const authorSubs = useMemo(() => comments.map((c) => c.authorSub), [comments])
-  const { getAvatarUrl } = useUserAvatars(accessToken, authorSubs)
+  const { getAvatarUrl, getAvatarColor } = useUserAvatars(accessToken, authorSubs)
 
   useEffect(() => {
     const el = containerRef.current
@@ -54,6 +54,7 @@ export function TaskComments({ accessToken, projectId, taskId, onError }: Props)
                 <div className="flex items-center gap-2.5 min-w-0">
                   <UserAvatar
                     src={getAvatarUrl(c.authorSub)}
+                    color={getAvatarColor(c.authorSub)}
                     name={c.authorEmail}
                     userId={c.authorSub}
                     size="xs"

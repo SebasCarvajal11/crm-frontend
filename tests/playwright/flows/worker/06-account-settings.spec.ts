@@ -46,7 +46,7 @@ test.describe('Worker - Configuracion de Cuenta', () => {
     const logger = new ConsoleLogger('worker-06-opciones-avatar')
     logger.attachToPage(workerPage)
 
-    const avatarMenu = workerPage.getByLabel('Opciones de foto de perfil')
+    const avatarMenu = workerPage.getByLabel('Opciones de avatar')
     await expect(avatarMenu).toBeVisible()
 
     await logger.persist(false)

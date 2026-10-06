@@ -52,7 +52,7 @@ export function AdminUserTable({ accessToken }: Props) {
   } = useAdminUsersTable(accessToken)
 
   const userIds = useMemo(() => items.map((u) => u.id), [items])
-  const { getAvatarUrl } = useUserAvatars(accessToken, userIds)
+  const { getAvatarUrl, getAvatarColor } = useUserAvatars(accessToken, userIds)
 
   const parentRef = useRef<HTMLDivElement>(null)
 
@@ -134,6 +134,7 @@ export function AdminUserTable({ accessToken }: Props) {
             <UserCarousel
               items={items}
               getAvatarUrl={getAvatarUrl}
+              getAvatarColor={getAvatarColor}
               patchStatus={patchStatus}
               patchFlags={patchFlags}
               softDelete={softDelete}
@@ -172,6 +173,7 @@ export function AdminUserTable({ accessToken }: Props) {
                         row={row}
                         virtualIndex={virtualRow.index}
                         avatarUrl={getAvatarUrl(row.id)}
+                        avatarColor={getAvatarColor(row.id)}
                         measureElement={virtualizer.measureElement}
                         patchStatus={patchStatus}
                         patchFlags={patchFlags}

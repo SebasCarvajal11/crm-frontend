@@ -8,6 +8,7 @@ export type PresenceUserRowProps = {
   now: number
   stale: boolean
   avatarUrl: string | null
+  avatarColor?: string | null
 }
 
 function buildUserRowTitle(
@@ -114,7 +115,7 @@ function UserRowMeta(props: UserRowMetaProps) {
 }
 
 export const PresenceUserRow = memo(function PresenceUserRow(props: PresenceUserRowProps) {
-  const { user, now, stale, avatarUrl } = props
+  const { user, now, stale, avatarUrl, avatarColor } = props
   const displayName = presenceName(user)
   const isOnline = user.is_online && !stale
   const activityText = activityAge(user.last_activity_at, now)
@@ -131,6 +132,7 @@ export const PresenceUserRow = memo(function PresenceUserRow(props: PresenceUser
     >
       <UserAvatar
         src={avatarUrl}
+        color={avatarColor}
         name={displayName}
         userId={user.subject}
         size="md"

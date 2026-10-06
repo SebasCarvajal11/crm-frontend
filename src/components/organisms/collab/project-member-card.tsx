@@ -10,6 +10,7 @@ type Props = {
   member: ProjectMember
   displayName: string
   avatarUrl: string | null
+  avatarColor?: string | null
   roleLabel: string
   roleDetail: string
 }
@@ -18,6 +19,7 @@ export function ProjectMemberCard({
   member,
   displayName,
   avatarUrl,
+  avatarColor,
   roleLabel,
   roleDetail,
 }: Props) {
@@ -34,6 +36,7 @@ export function ProjectMemberCard({
       <div className="flex items-start gap-3">
         <UserAvatar
           src={avatarUrl}
+          color={avatarColor}
           name={displayName}
           userId={member.userSub}
           size="lg"

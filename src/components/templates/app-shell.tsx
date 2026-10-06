@@ -15,6 +15,7 @@ type AppShellProps = {
   userEmail: string
   userRole: string
   userAvatarUrl?: string | null
+  userAvatarColor?: string | null
   onOpenProfile: () => void
   onOpenNotifications: () => void
   unreadNotificationsCount?: number
@@ -46,6 +47,7 @@ export function AppShell({
   userEmail,
   userRole,
   userAvatarUrl,
+  userAvatarColor,
   onOpenProfile,
   onOpenNotifications,
   unreadNotificationsCount = 0,
@@ -86,6 +88,7 @@ export function AppShell({
         userEmail={userEmail}
         userRole={userRole}
         userAvatarUrl={userAvatarUrl}
+        userAvatarColor={userAvatarColor}
         onOpenProfile={onOpenProfile}
         onOpenNotifications={onOpenNotifications}
         unreadNotificationsCount={unreadNotificationsCount}
@@ -105,6 +108,7 @@ export function AppShell({
         userEmail={userEmail}
         userRole={userRole}
         userAvatarUrl={userAvatarUrl}
+        userAvatarColor={userAvatarColor}
         onOpenProfile={onOpenProfile}
         onOpenNotifications={onOpenNotifications}
         unreadNotificationsCount={unreadNotificationsCount}

@@ -4,8 +4,7 @@ import { listProjectMembersRequest, upsertProjectMemberRequest } from '@/feature
 import { collabKeys } from '@/features/collab/model'
 import type { ClientSearchResult } from '@/shared/types'
 import type { ProjectMember } from '@/features/collab/model'
-import { getCurrentAvatarRequestOptional, getUserAvatarsRequest } from '@/shared/api'
-import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
+import { useUserAvatars } from '@/shared/hooks'
 
 type Params = {
   accessToken: string
@@ -23,7 +22,6 @@ export function useProjectMembers({
   members,
   selectedWorkers,
   setSelectedWorkers,
-  identityEmail,
   onError,
 }: Params) {
   const queryClient = useQueryClient()
@@ -38,26 +36,10 @@ export function useProjectMembers({
   const resolvedMembers = Array.isArray(membersQ.data?.data)
     ? membersQ.data.data
     : Array.isArray(members) ? members : []
-  const avatarSubjects = Array.from(new Set(resolvedMembers.map((m) => m.userSub)))
-
-  const avatarsQ = useQuery({
-    queryKey: ['media', 'avatars', 'users', projectId],
-    queryFn: () => getUserAvatarsRequest(accessToken, avatarSubjects),
-    enabled: avatarSubjects.length > 0,
-    staleTime: 60_000,
-  })
-
-  const avatarBySub = avatarsQ.data?.data.items ?? {}
-
-  const currentAvatarQ = useQuery({
-    queryKey: ['media', 'avatar', 'current', accessToken],
-    queryFn: () => getCurrentAvatarRequestOptional(accessToken),
-    enabled: Boolean(accessToken),
-    retry: false,
-    staleTime: 60_000,
-  })
-
-  const currentUserAvatarUrl = pickAvatarUrl(currentAvatarQ.data?.data.urls, '64')
+  const avatarSubjects = Array.from(
+    new Set(resolvedMembers.map((m) => m.userSub).filter(Boolean))
+  )
+  const { getAvatarUrl, getAvatarColor } = useUserAvatars(accessToken, avatarSubjects)
 
   const addWorker = useMutation({
     mutationFn: async () => {
@@ -82,14 +64,15 @@ export function useProjectMembers({
     },
   })
 
-  const memberAvatarUrl = (memberSub: string, memberEmail?: string | null) =>
-    pickAvatarUrl(avatarBySub[memberSub]?.urls, '64') ??
-    (memberEmail === identityEmail ? currentUserAvatarUrl : null)
+  const memberAvatarUrl = (memberSub: string) => getAvatarUrl(memberSub)
+
+  const memberAvatarColor = (memberSub: string) => getAvatarColor(memberSub)
 
   return {
     membersQ,
     resolvedMembers,
     addWorker,
     memberAvatarUrl,
+    memberAvatarColor,
   }
 }

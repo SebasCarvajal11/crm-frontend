@@ -14,6 +14,7 @@ export function DesktopSidebar({
   userEmail,
   userRole,
   userAvatarUrl,
+  userAvatarColor,
   onOpenProfile,
   onOpenNotifications,
   unreadNotificationsCount,
@@ -29,6 +30,7 @@ export function DesktopSidebar({
   userEmail: string
   userRole: string
   userAvatarUrl?: string | null
+  userAvatarColor?: string | null
   onOpenProfile: () => void
   onOpenNotifications: () => void
   unreadNotificationsCount: number
@@ -117,6 +119,7 @@ export function DesktopSidebar({
         userEmail={userEmail}
         userRole={userRole}
         userAvatarUrl={userAvatarUrl}
+        userAvatarColor={userAvatarColor}
         onOpenProfile={onOpenProfile}
         onOpenNotifications={onOpenNotifications}
         unreadNotificationsCount={unreadNotificationsCount}

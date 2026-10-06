@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getCurrentAvatarRequestOptional, setAvatarPresetRequest } from '@/shared/api'
 import { parseApiError } from '@/features/auth/utils'
+import { getAccessTokenSubject } from '@/shared/lib/access-token-role'
+import { AvatarDirectoryService } from '@/shared/lib/avatar-directory-service'
 import { useEmailVerificationRequest } from './use-email-verification'
 
 const avatarQueryKey = (token: string) => ['media', 'avatar', 'current', token] as const
@@ -30,8 +32,15 @@ export function useAccountProfileSection(accessToken: string) {
         throw new Error(await parseApiError(e), { cause: e })
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      const sub = getAccessTokenSubject(accessToken)
+      if (sub && variables) {
+        AvatarDirectoryService.updateUserPreset(sub, variables)
+      } else {
+        AvatarDirectoryService.invalidate(queryClient)
+      }
       void queryClient.invalidateQueries({ queryKey: avatarQueryKey(accessToken) })
+      void queryClient.invalidateQueries({ queryKey: ['media'] })
       setAvatarPickerOpen(false)
     },
   })

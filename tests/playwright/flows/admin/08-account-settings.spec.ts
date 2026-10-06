@@ -55,14 +55,14 @@ test.describe('Admin - Configuracion de Cuenta', () => {
     const logger = new ConsoleLogger('admin-08-opciones-avatar')
     logger.attachToPage(adminPage)
 
-    const avatarMenu = adminPage.getByLabel('Opciones de foto de perfil')
+    const avatarMenu = adminPage.getByLabel('Opciones de avatar')
     await expect(avatarMenu).toBeVisible()
 
     await avatarMenu.click()
     await adminPage.waitForTimeout(500)
 
-    const viewPhoto = adminPage.getByText('Ver foto')
-    const changePhoto = adminPage.getByText('Cambiar foto de perfil')
+    const viewPhoto = adminPage.getByText('Ver avatar')
+    const changePhoto = adminPage.getByText('Cambiar avatar')
     await expect(viewPhoto).toBeVisible()
     await expect(changePhoto).toBeVisible()
 

@@ -5,6 +5,7 @@ import {
   CIMA_CORPORATE_COLORS,
   getAvatarImageUrl,
   getRandomAvatarSelection,
+  resolveDeterministicAvatar,
 } from './avatar-catalog'
 
 describe('avatar-catalog', () => {
@@ -47,5 +48,21 @@ describe('avatar-catalog', () => {
       const allowedHexes = CIMA_CORPORATE_COLORS.map((c) => c.hex)
       expect(allowedHexes).toContain(selection.color)
     }
+  })
+
+  it('resolves deterministic avatar predictably without nulls', () => {
+    const userA = resolveDeterministicAvatar('user-abc-123')
+    const userA2 = resolveDeterministicAvatar('user-abc-123')
+    expect(userA).toEqual(userA2)
+    expect(userA.avatarId).toBeGreaterThanOrEqual(0)
+    expect(userA.avatarId).toBeLessThan(84)
+    expect(userA.url).toBe(`/avatars/avatar-${userA.avatarId}.webp`)
+    const allowedHexes = CIMA_CORPORATE_COLORS.map((c) => c.hex)
+    expect(allowedHexes).toContain(userA.color)
+
+    const fallback = resolveDeterministicAvatar(null)
+    expect(fallback.avatarId).toBeGreaterThanOrEqual(0)
+    expect(fallback.avatarId).toBeLessThan(84)
+    expect(allowedHexes).toContain(fallback.color)
   })
 })

@@ -172,4 +172,50 @@ describe('ChatMessageList', () => {
     expect(getAuthorDisplayName(message, mockMemberMap)).toBe('Carlos Gómez')
     expect(getAuthorRoleTag(message, mockMemberMap)).toBe('Cliente')
   })
+
+  it('renderiza UserAvatar tanto en mensajes propios como en mensajes ajenos con color corporativo', () => {
+    const messages: ProjectChatMessage[] = [
+      createMockMessage({
+        id: 'msg-foreign',
+        authorSub: 'user-other-2',
+        body: 'Mensaje de otro usuario',
+      }),
+      createMockMessage({
+        id: 'msg-own',
+        authorSub: 'user-me-1',
+        body: 'Mensaje propio',
+      }),
+    ]
+
+    const avatarsWithColor: UserAvatarsResponse['data']['items'] = {
+      'user-other-2': {
+        version: 1,
+        avatarId: 10,
+        color: '#1e3a8a',
+        urls: { '64': '/avatars/avatar-10.webp' },
+      },
+      'user-me-1': {
+        version: 1,
+        avatarId: 4,
+        color: '#86070c',
+        urls: { '64': '/avatars/avatar-4.webp' },
+      },
+    }
+
+    const markup = renderToStaticMarkup(
+      <ChatMessageList
+        messages={messages}
+        identity={mockIdentity}
+        memberBySub={mockMemberMap}
+        avatarBySub={avatarsWithColor}
+        highlightMessageId={null}
+      />
+    )
+
+    expect(markup).toContain('data-testid="user-avatar"')
+    expect(markup).toContain('background-color:#1e3a8a')
+    expect(markup).toContain('background-color:#86070c')
+    expect(markup).toContain('src="/avatars/avatar-10.webp"')
+    expect(markup).toContain('src="/avatars/avatar-4.webp"')
+  })
 })

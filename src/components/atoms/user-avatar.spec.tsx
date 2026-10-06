@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { UserAvatar } from './user-avatar'
 import { extractUserInitials } from '@/shared/lib/avatar-utils'
+import { CIMA_CORPORATE_COLORS } from '@/shared/lib/avatar-catalog'
 
 describe('extractUserInitials', () => {
   it('extrae iniciales de nombre y apellido correctamente', () => {
@@ -16,27 +17,56 @@ describe('extractUserInitials', () => {
 describe('UserAvatar', () => {
   it('renderiza la imagen cuando se provee src válido', () => {
     const markup = renderToStaticMarkup(
-      <UserAvatar src="https://storage.oracle.com/avatar.webp" name="Juan Pérez" size="md" />
+      <UserAvatar src="/avatars/avatar-12.webp" name="Juan Pérez" size="md" />
     )
-    expect(markup).toContain('src="https://storage.oracle.com/avatar.webp"')
+    expect(markup).toContain('src="/avatars/avatar-12.webp"')
     expect(markup).toContain('alt="Avatar oficial de Juan Pérez"')
     expect(markup).toContain('size-9')
   })
 
-  it('renderiza iniciales en fallback cuando no hay src', () => {
+  it('cumple Garantía Cero-Nulos: renderiza avatar oficial y color corporativo sin iniciales cuando no hay src', () => {
     const markup = renderToStaticMarkup(
       <UserAvatar name="Juan Pérez" userId="123e4567-e89b-12d3-a456-426614174000" size="lg" />
     )
-    expect(markup).toContain('JP')
     expect(markup).toContain('size-10')
-    expect(markup).not.toContain('<img')
+    expect(markup).toContain('<img')
+    expect(markup).toMatch(/src="\/avatars\/avatar-\d+\.webp"/)
+    const colorMatch = markup.match(/background-color:\s*(#[0-9a-fA-F]{6})/)
+    expect(colorMatch).not.toBeNull()
+    const allowedHexes = CIMA_CORPORATE_COLORS.map((c) => c.hex.toLowerCase())
+    expect(allowedHexes).toContain(colorMatch![1].toLowerCase())
+    expect(markup).not.toContain('JP')
+    expect(markup).not.toContain('lucide-user-round')
   })
 
-  it('renderiza silueta cuando no hay nombre ni src', () => {
+  it('cumple Garantía Cero-Nulos: renderiza avatar oficial y color corporativo sin silueta cuando no hay nombre ni src', () => {
     const markup = renderToStaticMarkup(<UserAvatar size="sm" />)
-    expect(markup).toContain('lucide-user-round')
     expect(markup).toContain('size-7')
-    expect(markup).not.toContain('<img')
+    expect(markup).toContain('<img')
+    expect(markup).toMatch(/src="\/avatars\/avatar-\d+\.webp"/)
+    const colorMatch = markup.match(/background-color:\s*(#[0-9a-fA-F]{6})/)
+    expect(colorMatch).not.toBeNull()
+    const allowedHexes = CIMA_CORPORATE_COLORS.map((c) => c.hex.toLowerCase())
+    expect(allowedHexes).toContain(colorMatch![1].toLowerCase())
+    expect(markup).not.toContain('lucide-user-round')
+  })
+
+  it('aplica color corporativo explícito en estilo de fondo', () => {
+    const markup = renderToStaticMarkup(
+      <UserAvatar color="#86070c" avatarId={5} name="Sebas" size="md" />
+    )
+    expect(markup).toContain('background-color:#86070c')
+    expect(markup).toContain('src="/avatars/avatar-5.webp"')
+  })
+
+  it('reemplaza color vacío por color corporativo CIMA determinista', () => {
+    const markup = renderToStaticMarkup(
+      <UserAvatar color="" userId="user-custom-1" size="md" />
+    )
+    const colorMatch = markup.match(/background-color:\s*(#[0-9a-fA-F]{6})/)
+    expect(colorMatch).not.toBeNull()
+    const allowedHexes = CIMA_CORPORATE_COLORS.map((c) => c.hex.toLowerCase())
+    expect(allowedHexes).toContain(colorMatch![1].toLowerCase())
   })
 
   it('agrega indicador de presencia en línea', () => {

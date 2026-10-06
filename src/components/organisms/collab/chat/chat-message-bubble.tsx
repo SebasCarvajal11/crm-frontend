@@ -14,6 +14,7 @@ type ChatMessageBubbleProps = {
   displayName: string
   authorTag: string
   avatarUrl: string | null
+  avatarColor?: string | null
   isNewlyArrived: boolean
   highlightMessageId: string | null
   onOpenDetails: (messageId: string) => void
@@ -28,6 +29,7 @@ export const ChatMessageBubble = memo(function ChatMessageBubble({
   displayName,
   authorTag,
   avatarUrl,
+  avatarColor,
   isNewlyArrived,
   highlightMessageId,
   onOpenDetails,
@@ -48,19 +50,18 @@ export const ChatMessageBubble = memo(function ChatMessageBubble({
           : ''
       )}
     >
-      {!isOwn && (
-        <div className="flex w-7 shrink-0 items-end">
-          {!sameAuthorAsNext && (
-            <UserAvatar
-              src={avatarUrl}
-              name={displayName}
-              userId={message.authorSub}
-              size="sm"
-              alt={`Avatar de ${displayName}`}
-            />
-          )}
-        </div>
-      )}
+      <div className="flex w-7 shrink-0 items-end">
+        {!sameAuthorAsNext && (
+          <UserAvatar
+            src={avatarUrl}
+            color={avatarColor}
+            name={displayName}
+            userId={message.authorSub}
+            size="sm"
+            alt={`Avatar de ${displayName}`}
+          />
+        )}
+      </div>
 
       <div
         className={cn(

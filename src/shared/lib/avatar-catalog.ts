@@ -62,3 +62,27 @@ export const getRandomAvatarSelection = (): { avatarId: number; color: string } 
     color: CIMA_CORPORATE_COLORS[colorIndex].hex,
   }
 }
+
+export function hashStringFnv1a(str: string): number {
+  let hash = 0x811c9dc5
+  for (let i = 0; i < str.length; i += 1) {
+    hash ^= str.charCodeAt(i)
+    hash = Math.imul(hash, 0x01000193)
+  }
+  return hash >>> 0
+}
+
+export function resolveDeterministicAvatar(userId?: string | null): {
+  avatarId: number
+  color: string
+  url: string
+} {
+  const seed = (typeof userId === 'string' ? userId.trim() : '') || 'cima-default-user'
+  const h1 = hashStringFnv1a(seed)
+  const h2 = hashStringFnv1a(`${seed}:color`)
+  const avatarId = h1 % (AVATARS_CATALOG.length || 84)
+  const colorIndex = h2 % CIMA_CORPORATE_COLORS.length
+  const color = CIMA_CORPORATE_COLORS[colorIndex].hex
+  const url = getAvatarImageUrl(avatarId)
+  return { avatarId, color, url }
+}

@@ -17,7 +17,7 @@ export class AccountPage {
     this.profileSection = page.locator('text=Nombres').locator('..')
     this.sessionsSection = page.locator('text=Sesiones activas').locator('..')
     this.changePasswordSection = page.locator('text=Contraseña actual').locator('..')
-    this.avatarDropdown = page.getByLabel('Opciones de foto de perfil')
+    this.avatarDropdown = page.getByLabel('Opciones de avatar')
     this.emailDisplay = page.getByRole('main').getByText(/Correoadmin@cima\.dev|admin@cima\.dev/).first()
     this.roleDisplay = page.locator('text=Rol').locator('..')
     this.verifiedBadge = page.getByText('Verificado')

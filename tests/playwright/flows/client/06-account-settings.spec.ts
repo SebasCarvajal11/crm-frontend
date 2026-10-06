@@ -61,7 +61,7 @@ test.describe('Client - Configuracion de Cuenta', () => {
     const logger = new ConsoleLogger('client-06-opciones-avatar')
     logger.attachToPage(clientPage)
 
-    const avatarMenu = clientPage.getByLabel('Opciones de foto de perfil')
+    const avatarMenu = clientPage.getByLabel('Opciones de avatar')
     await expect(avatarMenu).toBeVisible()
 
     await logger.persist(false)

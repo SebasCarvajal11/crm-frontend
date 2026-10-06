@@ -32,7 +32,7 @@ export function ProjectMembers({
   onError,
 }: Props) {
   const [selectedWorkers, setSelectedWorkers] = useState<ClientSearchResult[]>([])
-  const { membersQ, resolvedMembers, addWorker, memberAvatarUrl } = useProjectMembers({
+  const { membersQ, resolvedMembers, addWorker, memberAvatarUrl, memberAvatarColor } = useProjectMembers({
     accessToken,
     projectId,
     members,
@@ -254,7 +254,8 @@ export function ProjectMembers({
                   key={member.userSub}
                   member={member}
                   displayName={getDisplayName(member)}
-                  avatarUrl={memberAvatarUrl(member.userSub, member.email)}
+                  avatarUrl={memberAvatarUrl(member.userSub)}
+                  avatarColor={memberAvatarColor(member.userSub)}
                   roleLabel={cfg.label}
                   roleDetail={getRoleDetail(member)}
                 />

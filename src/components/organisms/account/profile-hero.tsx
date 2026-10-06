@@ -22,6 +22,7 @@ interface ProfileHeroProps {
   identity: MeResponse['data']
   displayName: string
   avatarUrl?: string | null
+  avatarColor?: string | null
   isVerified: boolean
   isSaving: boolean
   onOpenAvatarPicker: () => void
@@ -32,6 +33,7 @@ export function ProfileHero({
   identity,
   displayName,
   avatarUrl,
+  avatarColor,
   isVerified,
   isSaving,
   onOpenAvatarPicker,
@@ -77,6 +79,7 @@ export function ProfileHero({
                   >
                     <UserAvatar
                       src={avatarUrl}
+                      color={avatarColor}
                       name={displayName}
                       userId={identity.id}
                       size="2xl"

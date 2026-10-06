@@ -10,6 +10,7 @@ export type PresenceGroupSectionProps = {
   stale: boolean
   busy: boolean
   getAvatarUrl: (sub?: string | null) => string | null
+  getAvatarColor?: (sub?: string | null) => string | null
   onPage: (page: number) => void
 }
 
@@ -60,12 +61,14 @@ function GroupUserList({
   now,
   stale,
   getAvatarUrl,
+  getAvatarColor,
 }: {
   roleLabel: string
   group: PresenceGroup
   now: number
   stale: boolean
   getAvatarUrl: (sub?: string | null) => string | null
+  getAvatarColor?: (sub?: string | null) => string | null
 }) {
   if (!group.users.length) {
     return <p className="px-3 py-3.5 text-xs text-muted-foreground">Sin actividad reciente para este perfil.</p>
@@ -79,6 +82,7 @@ function GroupUserList({
           now={now}
           stale={stale}
           avatarUrl={getAvatarUrl(user.subject)}
+          avatarColor={getAvatarColor?.(user.subject)}
         />
       ))}
     </ul>
@@ -100,13 +104,14 @@ export const PresenceGroupSection = memo(function PresenceGroupSection({
   stale,
   busy,
   getAvatarUrl,
+  getAvatarColor,
   onPage,
 }: PresenceGroupSectionProps) {
   const roleLabel = PRESENCE_ROLE_LABELS[group.role]
   const pages = Math.max(1, Math.ceil(group.total / group.page_size))
   const countText = stale
-    ? `${group.total} recientes`
-    : `${group.online} en línea · ${group.total - group.online} recientes`
+  ? `${group.total} recientes`
+  : `${group.online} en línea · ${group.total - group.online} recientes`
 
   return (
     <section
@@ -115,7 +120,14 @@ export const PresenceGroupSection = memo(function PresenceGroupSection({
       className="overflow-hidden rounded-xl border border-border/50 bg-card/40"
     >
       <GroupHeader roleLabel={roleLabel} countText={countText} />
-      <GroupUserList roleLabel={roleLabel} group={group} now={now} stale={stale} getAvatarUrl={getAvatarUrl} />
+      <GroupUserList
+        roleLabel={roleLabel}
+        group={group}
+        now={now}
+        stale={stale}
+        getAvatarUrl={getAvatarUrl}
+        getAvatarColor={getAvatarColor}
+      />
       {group.total > group.page_size && (
         <GroupPagination roleLabel={roleLabel} page={group.page} pages={pages} busy={busy} onPage={onPage} />
       )}

@@ -15,6 +15,7 @@ type Props = {
   row: AdminUserRow
   index: number
   avatarUrl?: string | null
+  avatarColor?: string | null
   patchStatus: MutationHandle<{ subject: string; is_active: boolean }>
   patchFlags: MutationHandle<{ subject: string; force_password_change: boolean }>
   softDelete: MutationHandle<string>
@@ -94,6 +95,7 @@ export function AdminUserCard({
   row,
   index,
   avatarUrl,
+  avatarColor,
   patchStatus,
   patchFlags,
   softDelete,
@@ -117,6 +119,7 @@ export function AdminUserCard({
           <div className="flex items-center gap-3">
             <UserAvatar
               src={avatarUrl}
+              color={avatarColor}
               name={displayName}
               userId={row.id}
               size="lg"
