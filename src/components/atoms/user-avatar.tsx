@@ -9,6 +9,8 @@ export type UserPresenceStatus = 'online' | 'away' | 'busy' | 'offline' | 'recen
 
 export type UserAvatarProps = {
   src?: string | null
+  avatarId?: number | null
+  color?: string | null
   name?: string | null
   userId?: string | null
   size?: AvatarSize
@@ -107,23 +109,47 @@ function PresenceIndicator({
   )
 }
 
+function extractColorFromSrc(src?: string | null): string | null {
+  if (!src) return null
+  const match = src.match(/[?&]c=([0-9a-fA-F]{3,8})/)
+  if (match) return `#${match[1]}`
+  return null
+}
+
 type AvatarMediaProps = {
   src?: string | null
   initials: string
   hasValidImage: boolean
   bgColor: string
+  effectiveColor?: string | null
   altText: string
   textClass: string
   onError: () => void
 }
 
-function AvatarMedia({ src, initials, hasValidImage, bgColor, altText, textClass, onError }: AvatarMediaProps) {
+function AvatarMedia({
+  src,
+  initials,
+  hasValidImage,
+  bgColor,
+  effectiveColor,
+  altText,
+  textClass,
+  onError,
+}: AvatarMediaProps) {
+  const hasCustomBg = Boolean(hasValidImage && effectiveColor)
+
   return (
     <div
       className={cn(
         'flex size-full items-center justify-center overflow-hidden rounded-full font-semibold',
-        hasValidImage ? 'border border-border/60 bg-muted/20' : `${bgColor} text-white shadow-2xs`
+        hasValidImage
+          ? hasCustomBg
+            ? 'border border-border/40 shadow-xs'
+            : 'border border-border/60 bg-muted/20'
+          : `${bgColor} text-white shadow-2xs`
       )}
+      style={hasCustomBg ? { backgroundColor: effectiveColor! } : undefined}
     >
       {hasValidImage ? (
         <img
@@ -145,12 +171,28 @@ function AvatarMedia({ src, initials, hasValidImage, bgColor, altText, textClass
 }
 
 export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
-  const { src, name, userId, size = 'md', presenceStatus, presenceLabel, className, alt, ringClass } = props
+  const {
+    src,
+    avatarId,
+    color,
+    name,
+    userId,
+    size = 'md',
+    presenceStatus,
+    presenceLabel,
+    className,
+    alt,
+    ringClass,
+  } = props
   const [loadError, setLoadError] = useState(false)
   const cfg = SIZE_CLASSES[size]
   const initials = extractUserInitials(name)
   const bgColor = getAvatarColor(userId)
-  const hasValidImage = Boolean(src && !loadError)
+
+  const resolvedSrc =
+    src ?? (typeof avatarId === 'number' && avatarId >= 0 ? `/avatars/avatar-${avatarId}.webp` : null)
+  const effectiveColor = color ?? extractColorFromSrc(resolvedSrc)
+  const hasValidImage = Boolean(resolvedSrc && !loadError)
   const altText = alt ?? (name ? `Foto de perfil de ${name}` : 'Foto de perfil')
 
   return (
@@ -160,10 +202,11 @@ export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
       data-testid="user-avatar"
     >
       <AvatarMedia
-        src={src}
+        src={resolvedSrc}
         initials={initials}
         hasValidImage={hasValidImage}
         bgColor={bgColor}
+        effectiveColor={effectiveColor}
         altText={altText}
         textClass={cfg.text}
         onError={() => setLoadError(true)}

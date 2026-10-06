@@ -42,7 +42,13 @@ export function useAccountProfileSection(accessToken: string) {
     await saveAvatarPresetMutation.mutateAsync(selection)
   }
 
+  const avatarData = avatarQ.data?.data
+  const avatarId = avatarData?.avatarId ?? null
+  const avatarColor = avatarData?.color ?? null
+
   return {
+    avatarColor,
+    avatarId,
     avatarPickerOpen,
     avatarQ,
     avatarUrl,

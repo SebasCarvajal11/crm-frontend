@@ -30,17 +30,27 @@ export function ProfilePhotoViewerDialog({
             <UserCircle2 className="size-5" />
           </DialogMedia>
           <div className="flex flex-col gap-1 text-left min-w-0">
-            <DialogTitle>Foto de perfil</DialogTitle>
-            <DialogDescription>Vista previa de tu avatar actual.</DialogDescription>
+            <DialogTitle>Avatar oficial</DialogTitle>
+            <DialogDescription>Vista previa de tu avatar oficial CIMA.</DialogDescription>
           </div>
         </DialogHeader>
         <DialogBody className="flex items-center justify-center py-6">
           {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt="Foto de perfil actual"
-              className="size-60 rounded-full border-4 border-card object-cover shadow-xl ring-2 ring-primary/20"
-            />
+            <div
+              className="size-60 rounded-full border-4 border-card overflow-hidden shadow-xl ring-2 ring-primary/20 flex items-center justify-center transition-colors"
+              style={{
+                backgroundColor:
+                  avatarUrl.match(/[?&]c=([0-9a-fA-F]{3,8})/)?.[1]
+                    ? `#${avatarUrl.match(/[?&]c=([0-9a-fA-F]{3,8})/)?.[1]}`
+                    : undefined,
+              }}
+            >
+              <img
+                src={avatarUrl}
+                alt="Avatar actual"
+                className="size-full object-cover rounded-full"
+              />
+            </div>
           ) : (
             <div
               className={[

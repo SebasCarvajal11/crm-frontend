@@ -1,4 +1,4 @@
-import { Camera, CheckCircle2, Clock, Loader2, Mail, Shield } from 'lucide-react'
+import { CheckCircle2, Clock, Loader2, Mail, Shield, Sparkles } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/shared/lib/utils'
 import { UserAvatar } from '@/components/atoms/user-avatar'
@@ -66,7 +66,7 @@ export function ProfileHero({
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    aria-label="Opciones de foto de perfil"
+                    aria-label="Opciones de avatar"
                     data-tour="account-avatar-btn"
                     className={cn(
                       'group relative flex size-28 cursor-pointer items-center justify-center',
@@ -89,19 +89,19 @@ export function ProfileHero({
                         'shadow-md transition-transform group-hover:scale-110',
                       )}
                     >
-                      <Camera className="size-3.5" />
+                      <Sparkles className="size-3.5" />
                     </span>
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="min-w-52">
                   <DropdownMenuItem onClick={onOpenPhotoViewer} disabled={!avatarUrl}>
-                    Ver foto
+                    Ver avatar
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={onOpenAvatarPicker}
                     disabled={isSaving}
                   >
-                    Cambiar foto de perfil
+                    Cambiar avatar
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

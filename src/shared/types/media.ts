@@ -1,6 +1,8 @@
 export type AvatarPresetResponse = {
   data: {
     version: number
+    avatarId: number
+    color: string
     urls: Record<'64' | '256' | '512', string>
   }
 }
@@ -8,6 +10,8 @@ export type AvatarPresetResponse = {
 export type CurrentAvatarResponse = {
   data: {
     version: number
+    avatarId?: number | null
+    color?: string | null
     urls: Partial<Record<'64' | '256' | '512', string>>
   }
 }
@@ -24,6 +28,8 @@ export type UserAvatarsResponse = {
       string,
       {
         version: number
+        avatarId?: number | null
+        color?: string | null
         urls: Partial<Record<'64' | '256' | '512', string>>
       }
     >

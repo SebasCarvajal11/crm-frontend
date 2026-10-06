@@ -4,7 +4,7 @@ export const accountTour: CimaTourDefinition = {
   id: 'tour-account',
   tab: 'account',
   title: 'Recorrido de Mi Cuenta',
-  description: 'Gestiona tus datos de acceso, foto de perfil, sesiones abiertas y credenciales de seguridad.',
+  description: 'Gestiona tus datos de acceso, avatar oficial, sesiones abiertas y credenciales de seguridad.',
   roles: ['admin', 'worker', 'client'],
   steps: [
     {
@@ -26,7 +26,7 @@ export const accountTour: CimaTourDefinition = {
       fallbackElement: '[data-tour="account-hero"]',
       title: 'Avatar Oficial y Personalización',
       description: 'Elige tu avatar institucional entre las 84 opciones disponibles y personaliza el color de fondo corporativo.',
-      actionHint: 'Haz clic en el icono de cámara para abrir el catálogo y personalizar tu avatar.',
+      actionHint: 'Haz clic en el botón de avatar para abrir el catálogo y personalizar tu avatar.',
       side: 'bottom',
     },
     {
@@ -85,7 +85,7 @@ export const accountQuestions: GuidedQuestion[] = [
   {
     id: 'acc-q2',
     question: '¿Dónde puedo cambiar mi avatar o personalizar su color?',
-    answer: 'En la cabecera de perfil, pulsa sobre la foto o el icono de cámara para abrir el catálogo de 84 avatares oficiales y seleccionar tu color corporativo.',
+    answer: 'En la cabecera de perfil, pulsa sobre tu avatar para abrir el catálogo de 84 avatares oficiales y seleccionar tu color corporativo.',
     tab: 'account',
     roles: ['admin', 'worker', 'client'],
     category: 'gestion',

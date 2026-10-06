@@ -65,8 +65,11 @@ export function calculateStorageSegments(cloud: CloudStorageStats): StorageSegme
 
   const segments: StorageSegment[] = [
     buildSegment('projects', cloud.projectFilesBytes, quota, cloud.projectFilesCount),
-    buildSegment('avatars', cloud.avatarsBytes, quota, cloud.avatarsCount),
   ]
+
+  if (cloud.avatarsCount > 0 || cloud.avatarsBytes > 0) {
+    segments.push(buildSegment('avatars', cloud.avatarsBytes, quota, cloud.avatarsCount))
+  }
 
   if (cloud.documentsCount > 0 || cloud.documentsBytes > 0) {
     segments.push(buildSegment('documents', cloud.documentsBytes, quota, cloud.documentsCount))
