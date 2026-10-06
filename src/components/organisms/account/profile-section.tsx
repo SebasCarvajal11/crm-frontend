@@ -39,7 +39,7 @@ export function ProfileSection({ accessToken, identity }: Props) {
         displayName={displayName}
         avatarUrl={avatarUrl}
         isVerified={isVerified}
-        isUploading={saveAvatarPresetMutation.isPending}
+        isSaving={saveAvatarPresetMutation.isPending}
         onOpenAvatarPicker={() => setAvatarPickerOpen(true)}
         onOpenPhotoViewer={() => setPhotoViewerOpen(true)}
       />

@@ -3,14 +3,12 @@ import { bearer } from '@/shared/lib/bearer'
 import { MEDIA_ROUTES } from '@/shared/lib/gateway-routes'
 import type {
   AvatarPresetResponse,
-  AvatarUploadResponse,
   CurrentAvatarResponse,
   UserAvatarsResponse,
 } from '@/shared/types'
 
 export type {
   AvatarPresetResponse,
-  AvatarUploadResponse,
   CurrentAvatarResponse,
   UserAvatarsResponse,
 }

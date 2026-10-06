@@ -23,7 +23,7 @@ interface ProfileHeroProps {
   displayName: string
   avatarUrl?: string | null
   isVerified: boolean
-  isUploading: boolean
+  isSaving: boolean
   onOpenAvatarPicker: () => void
   onOpenPhotoViewer: () => void
 }
@@ -33,7 +33,7 @@ export function ProfileHero({
   displayName,
   avatarUrl,
   isVerified,
-  isUploading,
+  isSaving,
   onOpenAvatarPicker,
   onOpenPhotoViewer,
 }: ProfileHeroProps) {
@@ -99,7 +99,7 @@ export function ProfileHero({
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={onOpenAvatarPicker}
-                    disabled={isUploading}
+                    disabled={isSaving}
                   >
                     Cambiar foto de perfil
                   </DropdownMenuItem>
@@ -157,13 +157,13 @@ export function ProfileHero({
               )}
             </Badge>
 
-            {isUploading && (
+            {isSaving && (
               <p
                 className="inline-flex items-center gap-1.5 text-xs text-muted-foreground"
                 aria-live="polite"
               >
                 <Loader2 className="size-3 animate-spin text-primary" />
-                Subiendo foto...
+                Guardando avatar...
               </p>
             )}
           </div>

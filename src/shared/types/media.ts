@@ -5,9 +5,6 @@ export type AvatarPresetResponse = {
   }
 }
 
-/** @deprecated Usar AvatarPresetResponse */
-export type AvatarUploadResponse = AvatarPresetResponse
-
 export type CurrentAvatarResponse = {
   data: {
     version: number
