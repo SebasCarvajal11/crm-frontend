@@ -48,6 +48,7 @@ jobs:
       - name: Instalar motores de navegador
         run: |
           if [ "${{ steps.playwright-cache.outputs.cache-hit }}" = "true" ]; then
+            pnpm exec playwright install-deps webkit
             pnpm exec playwright install chromium webkit
           else
             pnpm exec playwright install --with-deps chromium webkit
