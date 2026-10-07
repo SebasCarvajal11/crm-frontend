@@ -25,14 +25,6 @@ export async function setAvatarPresetRequest(
     .json<AvatarPresetResponse>()
 }
 
-export async function getCurrentAvatarRequest(accessToken: string): Promise<CurrentAvatarResponse> {
-  return api
-    .get(MEDIA_ROUTES.avatarsCurrent, {
-      headers: bearer(accessToken),
-    })
-    .json<CurrentAvatarResponse>()
-}
-
 export async function getCurrentAvatarRequestOptional(
   accessToken: string,
 ): Promise<CurrentAvatarResponse | null> {

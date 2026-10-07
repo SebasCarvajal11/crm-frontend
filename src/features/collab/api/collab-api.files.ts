@@ -50,8 +50,6 @@ export async function listProjectTimelineRequest(
     .json<DataResponse<ProjectTimelineItem[]>>()
 }
 
-export const listProjectFilesTimelineRequest = listProjectTimelineRequest
-
 export async function uploadProjectConversationFileRequest(
   accessToken: string,
   projectId: string,

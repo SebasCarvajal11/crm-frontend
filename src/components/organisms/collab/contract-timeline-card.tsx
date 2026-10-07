@@ -2,6 +2,7 @@ import { Download, FileSignature, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { ProjectContract } from '@/features/collab/model'
 import { downloadSignedContractPdf } from '@/features/collab/lib/contract-pdf-downloader'
+import { formatBogotaDate } from '@/features/collab/utils'
 
 type Props = {
   contract: ProjectContract
@@ -16,21 +17,6 @@ const formatMoney = (amount: number) =>
     maximumFractionDigits: 0,
   }).format(amount)
 
-const formatBogotaDate = (iso: string | null | undefined): string => {
-  if (!iso) return '—'
-  const ts = Date.parse(iso)
-  if (!Number.isFinite(ts)) return '—'
-  try {
-    return new Date(ts).toLocaleString('es-CO', {
-      timeZone: 'America/Bogota',
-      dateStyle: 'medium',
-      timeStyle: 'short',
-      hour12: false,
-    })
-  } catch {
-    return '—'
-  }
-}
 
 export function ContractTimelineCard({ contract, projectName, onError }: Props) {
   const isSigned = contract.status === 'signed'

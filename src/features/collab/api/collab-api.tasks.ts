@@ -224,4 +224,3 @@ export async function uploadTaskFileRequest(
     .json<DataResponse<ProjectFile>>()
 }
 
-export { getProjectFileAccessRequest as getFileAccessRequest } from './collab-api.projects'

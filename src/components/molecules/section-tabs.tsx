@@ -5,8 +5,8 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
-  useSyncExternalStore,
 } from 'react'
+import { usePrefersReducedMotion } from '@/shared/hooks'
 import {
   type PillGeometry,
   measurePillGeometry,
@@ -34,29 +34,6 @@ export type SectionTabsProps<T extends string> = {
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
-function subscribeReducedMotion(callback: () => void): () => void {
-  if (typeof window === 'undefined' || !window.matchMedia) return () => {}
-  const mql = window.matchMedia('(prefers-reduced-motion: reduce)')
-  mql.addEventListener('change', callback)
-  return () => mql.removeEventListener('change', callback)
-}
-
-function getReducedMotionSnapshot(): boolean {
-  if (typeof window === 'undefined' || !window.matchMedia) return false
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-}
-
-function getReducedMotionServerSnapshot(): boolean {
-  return false
-}
-
-function usePrefersReducedMotion(): boolean {
-  return useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotionSnapshot,
-    getReducedMotionServerSnapshot,
-  )
-}
 
 interface UseSlidingPillOptions<T extends string> {
   containerRef: React.RefObject<HTMLDivElement | null>

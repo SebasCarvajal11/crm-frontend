@@ -12,7 +12,7 @@ import {
   type ExportFormat,
 } from '@/features/analytics/api'
 import { analyticsKeys } from '@/features/analytics/model'
-import { triggerDownload } from '@/features/analytics/utils'
+import { triggerBlobDownload } from '@/shared/lib'
 
 export function useDashboardAnalytics(accessToken: string) {
   const summaryQuery = useQuery({
@@ -68,7 +68,7 @@ export function useDashboardAnalytics(accessToken: string) {
       const blob = await exportCampaignsRequest(accessToken, format)
       return { blob, format }
     },
-    onSuccess: ({ blob, format }) => triggerDownload(blob, `campanas-cimaxis.${format}`),
+    onSuccess: ({ blob, format }) => triggerBlobDownload(blob, `campanas-cimaxis.${format}`),
     onSettled: () => setCampaignsFormat(null),
   })
 
@@ -79,7 +79,7 @@ export function useDashboardAnalytics(accessToken: string) {
       const blob = await exportLowStockRequest(accessToken, format)
       return { blob, format }
     },
-    onSuccess: ({ blob, format }) => triggerDownload(blob, `inventario-cimaxis.${format}`),
+    onSuccess: ({ blob, format }) => triggerBlobDownload(blob, `inventario-cimaxis.${format}`),
     onSettled: () => setLowStockFormat(null),
   })
 
@@ -90,7 +90,7 @@ export function useDashboardAnalytics(accessToken: string) {
       const blob = await exportKpisRequest(accessToken, format)
       return { blob, format }
     },
-    onSuccess: ({ blob, format }) => triggerDownload(blob, `kpis-cimaxis.${format}`),
+    onSuccess: ({ blob, format }) => triggerBlobDownload(blob, `kpis-cimaxis.${format}`),
     onSettled: () => setKpisFormat(null),
   })
 

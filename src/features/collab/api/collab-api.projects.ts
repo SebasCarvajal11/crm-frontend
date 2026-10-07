@@ -94,8 +94,6 @@ export async function getProjectBriefRequest(
     .json<DataResponse<ProjectBrief | null>>()
 }
 
-export const getBriefRequest = getProjectBriefRequest
-
 export async function updateProjectBriefRequest(
   accessToken: string,
   projectId: string,

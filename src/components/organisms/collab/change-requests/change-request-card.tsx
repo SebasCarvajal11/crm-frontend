@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { formatBogotaDate } from '@/features/collab/utils'
 import type { ProjectChangeRequest, ProjectMember, ProjectTask } from '@/features/collab/model'
 
 type Props = {
@@ -21,21 +22,6 @@ type Props = {
   onReject: (request: ProjectChangeRequest) => void
 }
 
-const formatBogotaDate = (iso: string | null | undefined): string => {
-  if (!iso) return '—'
-  const ts = Date.parse(iso)
-  if (!Number.isFinite(ts)) return '—'
-  try {
-    return new Date(ts).toLocaleString('es-CO', {
-      timeZone: 'America/Bogota',
-      dateStyle: 'medium',
-      timeStyle: 'short',
-      hour12: false,
-    })
-  } catch {
-    return '—'
-  }
-}
 
 const priorityConfig: Record<
   string,

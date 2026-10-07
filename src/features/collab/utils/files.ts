@@ -1,11 +1,7 @@
 import { getProjectFileAccessRequest } from '@/features/collab/api/collab-api.files'
-import { parseApiError, triggerBlobDownload } from '@/shared/lib'
+import { formatBytes, parseApiError, triggerBlobDownload } from '@/shared/lib'
 
-export function formatFileSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
+export const formatFileSize = formatBytes
 
 export { triggerBlobDownload }
 

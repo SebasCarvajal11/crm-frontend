@@ -10,14 +10,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { uploadProjectFileWithMetadataRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
 import type { DataResponse, ProjectFileEnriched, ProjectTimelineItem } from '@/features/collab/model'
+import { formatFileSize } from '@/features/collab/utils'
 import { isBlockedByExtension, SAFE_FILE_ACCEPT } from '@/shared/lib'
 import { cn } from '@/shared/lib/utils'
-
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
 
 type Props = {
   accessToken: string

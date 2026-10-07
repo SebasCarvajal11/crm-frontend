@@ -11,7 +11,7 @@ import {
   extractActiveMentionQuery,
   mentionHints,
   resolveMentionsFromBody,
-} from './chat-mentions'
+} from '@/features/collab/utils'
 import { ChatExportDialog } from './chat-export-dialog'
 import { ChatMentionSuggestions } from './chat-mention-suggestions'
 import { ChatMessageList } from './chat-message-list'

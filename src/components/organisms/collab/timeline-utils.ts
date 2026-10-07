@@ -31,21 +31,7 @@ export const supportsPreview = (mimeType: string) =>
   mimeType === 'application/pdf' ||
   mimeType.startsWith('text/')
 
-export const formatBogotaDate = (iso: string | null | undefined): string => {
-  if (!iso) return '—'
-  const ts = Date.parse(iso)
-  if (!Number.isFinite(ts)) return '—'
-  try {
-    return new Date(ts).toLocaleString('es-CO', {
-      timeZone: 'America/Bogota',
-      dateStyle: 'medium',
-      timeStyle: 'short',
-      hour12: false,
-    })
-  } catch {
-    return '—'
-  }
-}
+export { formatBogotaDate } from '@/features/collab/utils'
 
 export const badgeClassByKind: Record<ProjectTimelineItem['kind'], string> = {
   file: 'bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800',

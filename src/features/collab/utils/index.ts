@@ -6,6 +6,7 @@ export {
 } from './chat-mentions'
 export { downloadGatewayFile, formatFileSize, previewGatewayFile, triggerBlobDownload } from './files'
 export * from './chat-export.types'
+export * from './collab-date'
 export {
   calculateSha256Hex,
   fetchFullChatChannelMessages,

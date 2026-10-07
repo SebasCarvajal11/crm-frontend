@@ -79,16 +79,6 @@ export interface WorkflowExecution {
   errorDetail?: string | null
 }
 
-// ── Tipos de Analítica y Reportes (Re-exportados desde @/features/analytics/model) ──
-export type {
-  AnalyticsSummaryDto as AnalyticsSummary,
-  ClientPlanDistributionDto as ClientPlanDistribution,
-  ClientActivityDto as ClientActivity,
-  CampaignStatusReportDto as CampaignStatusReport,
-  InventoryAlertDto as InventoryAlert,
-  KpiSnapshotDto as KpiSnapshot,
-} from '@/features/analytics/model'
-
 // ── Peticiones API: Campañas ───────────────────────────────────────────────
 export async function listCampaignsRequest(accessToken: string): Promise<Campaign[]> {
   return api.get(MARKETING_ROUTES.campaigns, { headers: bearer(accessToken) }).json<Campaign[]>()
@@ -176,12 +166,3 @@ export async function getExecutionsByClientRequest(accessToken: string, clientId
   return api.get(MARKETING_ROUTES.executionsByClient(clientId), { headers: bearer(accessToken) }).json<WorkflowExecution[]>()
 }
 
-// ── Peticiones API: Analítica (Re-exportadas desde @/features/analytics/api) ─
-export {
-  getAnalyticsSummaryRequest,
-  getClientPlanDistributionRequest,
-  getClientActivityRequest,
-  getCampaignStatusReportRequest,
-  getLowStockAlertsRequest,
-  getKpiSnapshotsRequest,
-} from '@/features/analytics/api'

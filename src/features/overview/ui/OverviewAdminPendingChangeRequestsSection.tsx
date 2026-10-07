@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/shared/lib/utils'
+import { formatBogotaDate } from '@/features/collab/utils'
 import type { AdminPendingChangeRequestItem } from '../model/overview.types'
 
 type Props = {
@@ -12,18 +13,6 @@ type Props = {
   onOpenProject?: (projectId: string) => void
 }
 
-function formatBogotaDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleString('es-CO', {
-      timeZone: 'America/Bogota',
-      dateStyle: 'medium',
-      timeStyle: 'short',
-      hour12: false,
-    })
-  } catch {
-    return '—'
-  }
-}
 
 const priorityConfig: Record<string, { label: string; className: string }> = {
   urgent: {
