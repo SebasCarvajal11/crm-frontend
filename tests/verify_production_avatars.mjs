@@ -43,16 +43,10 @@ async function runVerification() {
 
   // 3.1 Abrir selector de avatares (AvatarPickerDialog)
   console.log('3.1 Abriendo Selector de Avatares desde ProfileHero...');
-  const avatarDropdownTrigger = page.locator('button[data-tour="account-avatar-btn"]');
-  if (await avatarDropdownTrigger.isVisible()) {
-    await avatarDropdownTrigger.click();
-    await page.waitForTimeout(600);
-
-    const changeAvatarItem = page.getByRole('menuitem', { name: /cambiar avatar/i });
-    if (await changeAvatarItem.isVisible()) {
-      await changeAvatarItem.click();
-      await page.waitForTimeout(1000);
-    }
+  const avatarBtn = page.locator('button[data-tour="account-avatar-btn"]');
+  if (await avatarBtn.isVisible()) {
+    await avatarBtn.click();
+    await page.waitForTimeout(800);
   }
 
   // 3.2 Categoría "Todos"
@@ -115,25 +109,20 @@ async function runVerification() {
 
   // Restaurar avatar canónico #0 con Rojo CIMA para mantener consistencia ejecutiva
   console.log('3.7 Restaurando avatar canónico #0...');
-  if (await avatarDropdownTrigger.isVisible()) {
-    await avatarDropdownTrigger.click();
-    await page.waitForTimeout(600);
-    const changeAvatarItem = page.getByRole('menuitem', { name: /cambiar avatar/i });
-    if (await changeAvatarItem.isVisible()) {
-      await changeAvatarItem.click();
-      await page.waitForTimeout(1000);
-      const tabTodos = page.getByRole('button', { name: 'Todos', exact: true });
-      if (await tabTodos.isVisible()) await tabTodos.click();
-      await page.waitForTimeout(400);
+  if (await avatarBtn.isVisible()) {
+    await avatarBtn.click();
+    await page.waitForTimeout(1000);
+    const tabTodos = page.getByRole('button', { name: 'Todos', exact: true });
+    if (await tabTodos.isVisible()) await tabTodos.click();
+    await page.waitForTimeout(400);
 
-      const avatar0 = page.locator('button[aria-label="Seleccionar avatar #0"]').first();
-      if (await avatar0.isVisible()) await avatar0.click();
-      const colorRed = page.locator('button[aria-label="Rojo CIMA"]').first();
-      if (await colorRed.isVisible()) await colorRed.click();
-      await page.getByRole('button', { name: /guardar|aplicar/i }).first().click();
-      await page.waitForTimeout(1500);
-      console.log('✓ Avatar canónico #0 restaurado');
-    }
+    const avatar0 = page.locator('button[aria-label="Seleccionar avatar #0"]').first();
+    if (await avatar0.isVisible()) await avatar0.click();
+    const colorRed = page.locator('button[aria-label="Rojo CIMA"]').first();
+    if (await colorRed.isVisible()) await colorRed.click();
+    await page.getByRole('button', { name: /guardar|aplicar/i }).first().click();
+    await page.waitForTimeout(1500);
+    console.log('✓ Avatar canónico #0 restaurado');
   }
 
   // 4. Administración de Usuarios

@@ -10,7 +10,6 @@ const avatarQueryKey = (token: string) => ['media', 'avatar', 'current', token] 
 
 export function useAccountProfileSection(accessToken: string) {
   const queryClient = useQueryClient()
-  const [photoViewerOpen, setPhotoViewerOpen] = useState(false)
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false)
 
   const avatarQ = useQuery({
@@ -62,10 +61,8 @@ export function useAccountProfileSection(accessToken: string) {
     avatarQ,
     avatarUrl,
     handleSaveAvatarPreset,
-    photoViewerOpen,
     saveAvatarPresetMutation,
     setAvatarPickerOpen,
-    setPhotoViewerOpen,
     verifyMutation,
   }
 }

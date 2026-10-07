@@ -2,12 +2,6 @@ import { CheckCircle2, Clock, Loader2, Mail, Shield, Sparkles } from 'lucide-rea
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/shared/lib/utils'
 import { UserAvatar } from '@/components/atoms/user-avatar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import type { MeResponse } from '@/features/auth/model'
 
 type Role = MeResponse['data']['role']
@@ -26,7 +20,6 @@ interface ProfileHeroProps {
   isVerified: boolean
   isSaving: boolean
   onOpenAvatarPicker: () => void
-  onOpenPhotoViewer: () => void
 }
 
 export function ProfileHero({
@@ -37,7 +30,6 @@ export function ProfileHero({
   isVerified,
   isSaving,
   onOpenAvatarPicker,
-  onOpenPhotoViewer,
 }: ProfileHeroProps) {
   const roleName = ROLE_NAMES[identity.role] ?? identity.role
 
@@ -64,50 +56,40 @@ export function ProfileHero({
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-end">
             {/* Solo el avatar se traslapa sobre el banner con margen negativo */}
             <div className="-mt-14 shrink-0 sm:-mt-16">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label="Opciones de avatar"
-                    data-tour="account-avatar-btn"
-                    className={cn(
-                      'group relative flex size-28 cursor-pointer items-center justify-center',
-                      'rounded-full border-4 border-background bg-card shadow-lg ring-1 ring-black/5',
-                      'transition-all duration-150 hover:scale-[1.03] active:scale-[0.98]',
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:size-32',
-                    )}
-                  >
-                    <UserAvatar
-                      src={avatarUrl}
-                      color={avatarColor}
-                      name={displayName}
-                      userId={identity.id}
-                      size="2xl"
-                      className="size-full shadow-none border-0"
-                    />
-                    <span
-                      className={cn(
-                        'absolute bottom-0 right-0 flex size-8 items-center justify-center',
-                        'rounded-full border-2 border-background bg-primary text-primary-foreground',
-                        'shadow-md transition-transform group-hover:scale-110',
-                      )}
-                    >
-                      <Sparkles className="size-3.5" />
-                    </span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="min-w-52">
-                  <DropdownMenuItem onClick={onOpenPhotoViewer} disabled={!avatarUrl}>
-                    Ver avatar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={onOpenAvatarPicker}
-                    disabled={isSaving}
-                  >
-                    Cambiar avatar
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <button
+                type="button"
+                onClick={onOpenAvatarPicker}
+                disabled={isSaving}
+                title="Cambiar avatar"
+                aria-label="Cambiar avatar"
+                data-tour="account-avatar-btn"
+                className={cn(
+                  'group relative flex size-28 cursor-pointer items-center justify-center',
+                  'rounded-full border-4 border-background bg-card shadow-lg ring-1 ring-black/5',
+                  'transition-all duration-150 hover:scale-[1.03] active:scale-[0.98]',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:size-32',
+                  isSaving && 'cursor-not-allowed opacity-80',
+                )}
+              >
+                <UserAvatar
+                  src={avatarUrl}
+                  color={avatarColor}
+                  name={displayName}
+                  userId={identity.id}
+                  size="2xl"
+                  className="size-full shadow-none border-0"
+                />
+                <span
+                  className={cn(
+                    'absolute bottom-0 right-0 flex size-8 items-center justify-center',
+                    'rounded-full border-2 border-background bg-primary text-primary-foreground',
+                    'shadow-md transition-transform group-hover:scale-110',
+                  )}
+                  title="Personalizar avatar"
+                >
+                  <Sparkles className="size-3.5" />
+                </span>
+              </button>
             </div>
 
             {/* Bloque de identidad en flujo normal sobre fondo de tarjeta */}

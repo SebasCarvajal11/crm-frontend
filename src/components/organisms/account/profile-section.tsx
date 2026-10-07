@@ -3,7 +3,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useAccountProfileSection } from '@/features/auth/hooks'
 import type { MeResponse } from '@/features/auth/model'
 import { AvatarPickerDialog } from './avatar-picker-dialog'
-import { ProfilePhotoViewerDialog } from './profile-photo-viewer-dialog'
 import { ProfileDetails } from './profile-details'
 import { ProfileHero } from './profile-hero'
 
@@ -26,10 +25,8 @@ export function ProfileSection({ accessToken, identity }: Props) {
     avatarPickerOpen,
     avatarUrl,
     handleSaveAvatarPreset,
-    photoViewerOpen,
     saveAvatarPresetMutation,
     setAvatarPickerOpen,
-    setPhotoViewerOpen,
     verifyMutation,
   } = useAccountProfileSection(accessToken)
 
@@ -44,7 +41,6 @@ export function ProfileSection({ accessToken, identity }: Props) {
         isVerified={isVerified}
         isSaving={saveAvatarPresetMutation.isPending}
         onOpenAvatarPicker={() => setAvatarPickerOpen(true)}
-        onOpenPhotoViewer={() => setPhotoViewerOpen(true)}
       />
 
       {/* Tarjeta de detalles y datos de perfil */}
@@ -87,14 +83,6 @@ export function ProfileSection({ accessToken, identity }: Props) {
           </CardContent>
         )}
       </Card>
-
-      {/* Visor de avatar oficial en alta resolución */}
-      <ProfilePhotoViewerDialog
-        open={photoViewerOpen}
-        onOpenChange={setPhotoViewerOpen}
-        avatarUrl={avatarUrl}
-        color={avatarColor}
-      />
 
       {/* Catálogo oficial de avatares predeterminados CIMA */}
       <AvatarPickerDialog
