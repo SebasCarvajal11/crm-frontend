@@ -32,7 +32,7 @@ function getClientDisplayName(client: AdminUserRow) {
 export function OverviewAdminRecentClientsSection({ clients, isLoading }: Props) {
   const token = useSessionStore((state) => state.token)
   const clientIds = useMemo(() => clients.slice(0, 5).map((c) => c.id), [clients])
-  const { getAvatarUrl } = useUserAvatars(token, clientIds)
+  const { getAvatarUrl, getAvatarColor } = useUserAvatars(token, clientIds)
 
   return (
     <Card
@@ -90,6 +90,7 @@ export function OverviewAdminRecentClientsSection({ clients, isLoading }: Props)
                   <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
                     <UserAvatar
                       src={getAvatarUrl(client.id)}
+                      color={getAvatarColor(client.id)}
                       name={name}
                       userId={client.id}
                       size="sm"

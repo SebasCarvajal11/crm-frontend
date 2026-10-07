@@ -173,4 +173,19 @@ describe('UserAvatar', () => {
     expect(markupOutOfBounds).toMatch(/src="\/avatars\/avatar-\d+\.webp"/)
     expect(markupOutOfBounds).not.toContain('/avatars/avatar-999.webp')
   })
+
+  it('garantiza consistencia: genera srcset y color correspondientes al src aunque userId sea arbitrario', () => {
+    const markup = renderToStaticMarkup(
+      <UserAvatar
+        src="/avatars/avatar-31.webp?c=003d52"
+        userId="usuario-con-hash-distinto-99"
+        name="Valeria Quintero"
+        size="md"
+      />
+    )
+    expect(markup).toContain('src="/avatars/avatar-31.webp?c=003d52"')
+    expect(markup).toContain('/avatars/avatar-31-64.webp 64w')
+    expect(markup).toContain('/avatars/avatar-31-1024.webp 1024w')
+    expect(markup).toContain('background-color:#003d52')
+  })
 })

@@ -182,6 +182,7 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     <AppShell
       title="CRM CIMA"
       sidebarItems={sidebarItems}
+      userId={identity.id}
       userEmail={identity.email ?? emailStored ?? ''}
       userRole={identity.role}
       userAvatarUrl={pickAvatarUrl(avatarQuery.data?.data.urls, '64')}

@@ -1,5 +1,6 @@
 import { memo, useState } from 'react'
 import {
+  extractAvatarIdFromSrc,
   getAvatarImageUrl,
   resolveAvatarSrcSet,
   resolveDeterministicAvatar,
@@ -172,6 +173,7 @@ function useResolvedAvatar(props: UserAvatarProps) {
   const trimmedAvatarUrl = avatarUrl?.trim()
   const effectiveSrc = (trimmedSrc || trimmedAvatarUrl) || undefined
 
+  const srcAvatarId = extractAvatarIdFromSrc(effectiveSrc)
   const isValidAvatarId =
     typeof avatarId === 'number' &&
     Number.isInteger(avatarId) &&
@@ -199,6 +201,7 @@ function useResolvedAvatar(props: UserAvatarProps) {
   const effectiveColor =
     (color && color.trim()) ||
     extractColorFromSrc(effectiveSrc) ||
+    extractColorFromSrc(currentSrc) ||
     deterministic.color
 
   const isCustomSrc = Boolean(
@@ -206,9 +209,7 @@ function useResolvedAvatar(props: UserAvatarProps) {
   )
   const computedAvatarId = isCustomSrc
     ? null
-    : isValidAvatarId
-      ? avatarId
-      : deterministic.avatarId
+    : srcAvatarId ?? (isValidAvatarId ? avatarId : deterministic.avatarId)
   const computedSrcSet = resolveAvatarSrcSet(currentSrc, computedAvatarId)
 
   return {

@@ -236,11 +236,12 @@ type PanelDataViewProps = {
   stale: boolean
   available: boolean
   getAvatarUrl: (sub?: string | null) => string | null
+  getAvatarColor?: (sub?: string | null) => string | null
   onPage: (role: PresenceRole, page: number) => void
 }
 
 function PanelDataView(props: PanelDataViewProps) {
-  const { data, busy, query, groups, now, stale, available, getAvatarUrl, onPage } = props
+  const { data, busy, query, groups, now, stale, available, getAvatarUrl, getAvatarColor, onPage } = props
   return (
     <>
       {!busy && data.groups.every((g) => g.total === 0) && (
@@ -252,6 +253,7 @@ function PanelDataView(props: PanelDataViewProps) {
         stale={stale}
         busy={busy || !available}
         getAvatarUrl={getAvatarUrl}
+        getAvatarColor={getAvatarColor}
         onPage={onPage}
       />
       <PresenceFooterNotice
@@ -264,7 +266,7 @@ function PanelDataView(props: PanelDataViewProps) {
 
 function PanelContent({ owner }: { owner: string }) {
   const state = usePanelState(owner)
-  const { query, scrollRef, result, busy, visibleGroups, getAvatarUrl, onPage } = state
+  const { query, scrollRef, result, busy, visibleGroups, getAvatarUrl, getAvatarColor, onPage } = state
 
   return (
     <div
@@ -293,6 +295,7 @@ function PanelContent({ owner }: { owner: string }) {
           stale={result.stale}
           available={result.available}
           getAvatarUrl={getAvatarUrl}
+          getAvatarColor={getAvatarColor}
           onPage={onPage}
         />
       )}

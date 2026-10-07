@@ -3,9 +3,11 @@ import {
   AVATARS_CATALOG,
   AVATAR_CATEGORY_TABS,
   CIMA_CORPORATE_COLORS,
+  extractAvatarIdFromSrc,
   getAvatarImageUrl,
   getAvatarSrcSet,
   getRandomAvatarSelection,
+  resolveAvatarSrcSet,
   resolveDeterministicAvatar,
 } from './avatar-catalog'
 
@@ -83,5 +85,27 @@ describe('avatar-catalog', () => {
     expect(fallback.avatarId).toBeGreaterThanOrEqual(0)
     expect(fallback.avatarId).toBeLessThan(84)
     expect(allowedHexes).toContain(fallback.color)
+  })
+
+  it('extracts avatar id from src correctly', () => {
+    expect(extractAvatarIdFromSrc('/avatars/avatar-31.webp')).toBe(31)
+    expect(extractAvatarIdFromSrc('/avatars/avatar-0-64.webp?c=86070c')).toBe(0)
+    expect(extractAvatarIdFromSrc('/avatars/avatar-83.png')).toBe(83)
+    expect(extractAvatarIdFromSrc('/avatars/avatar-999.webp')).toBeNull()
+    expect(extractAvatarIdFromSrc('https://example.com/photo.png')).toBeNull()
+    expect(extractAvatarIdFromSrc('')).toBeNull()
+    expect(extractAvatarIdFromSrc(null)).toBeNull()
+  })
+
+  it('prioritizes avatar id from src in resolveAvatarSrcSet', () => {
+    const srcset = resolveAvatarSrcSet('/avatars/avatar-42.webp', 5)
+    expect(srcset).toContain('/avatars/avatar-42-64.webp 64w')
+    expect(srcset).not.toContain('/avatars/avatar-5-64.webp')
+
+    const fallbackSrcset = resolveAvatarSrcSet(null, 7)
+    expect(fallbackSrcset).toContain('/avatars/avatar-7-64.webp 64w')
+
+    const customSrcset = resolveAvatarSrcSet('https://example.com/photo.png', 7)
+    expect(customSrcset).toBeUndefined()
   })
 })

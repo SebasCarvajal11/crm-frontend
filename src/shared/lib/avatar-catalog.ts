@@ -79,20 +79,27 @@ export const getAvatarSrcSet = (avatarId: number): string => {
   ].join(', ')
 }
 
+export function extractAvatarIdFromSrc(src?: string | null): number | null {
+  if (!src) return null
+  const match = src.match(/\/avatars\/avatar-(\d+)(?:-\d+)?\.(?:webp|png)/)
+  if (!match) return null
+  const id = parseInt(match[1], 10)
+  return !Number.isNaN(id) && id >= 0 && id < 84 ? id : null
+}
+
 export function resolveAvatarSrcSet(
   src?: string | null,
   avatarId?: number | null
 ): string | undefined {
+  const fromSrc = extractAvatarIdFromSrc(src)
+  if (fromSrc !== null) {
+    return getAvatarSrcSet(fromSrc)
+  }
+  if (src && !src.includes('/avatars/avatar-')) {
+    return undefined
+  }
   if (typeof avatarId === 'number' && avatarId >= 0 && avatarId < 84) {
     return getAvatarSrcSet(avatarId)
-  }
-  if (!src) return undefined
-  const match = src.match(/\/avatars\/avatar-(\d+)(?:-\d+)?\.(?:webp|png)/)
-  if (match) {
-    const id = parseInt(match[1], 10)
-    if (!Number.isNaN(id) && id >= 0 && id < 84) {
-      return getAvatarSrcSet(id)
-    }
   }
   return undefined
 }

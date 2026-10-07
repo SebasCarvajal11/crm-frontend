@@ -12,6 +12,7 @@ export type { SidebarItem }
 type AppShellProps = {
   title: string
   sidebarItems: SidebarItem[]
+  userId?: string | null
   userEmail: string
   userRole: string
   userAvatarUrl?: string | null
@@ -44,6 +45,7 @@ function readSidebarPreference() {
 export function AppShell({
   title,
   sidebarItems,
+  userId,
   userEmail,
   userRole,
   userAvatarUrl,
@@ -85,6 +87,7 @@ export function AppShell({
       <DesktopSidebar
         title={title}
         items={sidebarItems}
+        userId={userId}
         userEmail={userEmail}
         userRole={userRole}
         userAvatarUrl={userAvatarUrl}
@@ -105,6 +108,7 @@ export function AppShell({
         setOpen={setMobileOpen}
         title={title}
         items={sidebarItems}
+        userId={userId}
         userEmail={userEmail}
         userRole={userRole}
         userAvatarUrl={userAvatarUrl}

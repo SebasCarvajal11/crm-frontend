@@ -12,6 +12,7 @@ export function MobileSidebar({
   setOpen,
   title,
   items,
+  userId,
   userEmail,
   userRole,
   userAvatarUrl,
@@ -28,6 +29,7 @@ export function MobileSidebar({
   setOpen: (open: boolean) => void
   title: string
   items: SidebarItem[]
+  userId?: string | null
   userEmail: string
   userRole: string
   userAvatarUrl?: string | null
@@ -87,6 +89,7 @@ export function MobileSidebar({
         </div>
         <SidebarNav items={items} onItemClick={() => setOpen(false)} />
         <SidebarFooter
+          userId={userId}
           userEmail={userEmail}
           userRole={userRole}
           userAvatarUrl={userAvatarUrl}

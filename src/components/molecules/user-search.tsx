@@ -60,7 +60,7 @@ export function UserSearch({ accessToken, role, selected, excludedSubjects = [],
     () => suggestions.map((user) => user.subject),
     [suggestions],
   )
-  const { getAvatarUrl } = useUserAvatars(accessToken, suggestionSubjects)
+  const { getAvatarUrl, getAvatarColor } = useUserAvatars(accessToken, suggestionSubjects)
 
   const listOpen = show && query.length >= 2
   const resolvedActiveIndex =
@@ -186,6 +186,7 @@ export function UserSearch({ accessToken, role, selected, excludedSubjects = [],
                 >
                   <UserAvatar
                     src={getAvatarUrl(u.subject)}
+                    color={getAvatarColor(u.subject)}
                     name={u.email}
                     userId={u.subject}
                     size="xs"

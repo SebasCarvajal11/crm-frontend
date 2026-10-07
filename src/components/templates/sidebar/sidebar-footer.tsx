@@ -26,6 +26,7 @@ function useOutsideClick(
 }
 
 function UserProfileTrigger({
+  userId,
   userEmail,
   userRole,
   userAvatarUrl,
@@ -35,6 +36,7 @@ function UserProfileTrigger({
   open,
   onClick,
 }: {
+  userId?: string | null
   userEmail: string
   userRole: string
   userAvatarUrl?: string | null
@@ -66,7 +68,7 @@ function UserProfileTrigger({
           src={userAvatarUrl}
           color={userAvatarColor}
           name={userEmail}
-          userId={userEmail}
+          userId={userId ?? userEmail}
           size="sm"
           className="size-8"
         />
@@ -186,6 +188,7 @@ function UserMenuActions({
 }
 
 export interface SidebarFooterProps {
+  userId?: string | null
   userEmail: string
   userRole: string
   userAvatarUrl?: string | null
@@ -202,6 +205,7 @@ export interface SidebarFooterProps {
 }
 
 export function SidebarFooter({
+  userId,
   userEmail,
   userRole,
   userAvatarUrl,
@@ -231,6 +235,7 @@ export function SidebarFooter({
     <div className="relative border-t border-primary-foreground/10 p-3" ref={rootRef} data-tour="sidebar-footer">
       <div className={cn('rounded-xl bg-primary-foreground/[0.08] p-3 transition-colors duration-150 hover:bg-primary-foreground/[0.11]', compact && 'p-2')}>
         <UserProfileTrigger
+          userId={userId}
           userEmail={userEmail}
           userRole={userRole}
           userAvatarUrl={userAvatarUrl}

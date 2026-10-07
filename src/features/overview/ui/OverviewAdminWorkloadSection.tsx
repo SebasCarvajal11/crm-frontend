@@ -16,13 +16,22 @@ type Props = {
 
 const PAGE_SIZE = 3
 
-function WorkloadWorkerCard({ worker, avatarUrl }: { worker: WorkerWorkloadItem; avatarUrl?: string | null }) {
+function WorkloadWorkerCard({
+  worker,
+  avatarUrl,
+  avatarColor,
+}: {
+  worker: WorkerWorkloadItem
+  avatarUrl?: string | null
+  avatarColor?: string | null
+}) {
   return (
     <div className="overview-row p-3.5 min-w-0 w-full max-w-full overflow-hidden">
       <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center min-w-0 w-full">
         <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
           <UserAvatar
             src={avatarUrl}
+            color={avatarColor}
             name={worker.workerName}
             userId={worker.workerSub}
             size="sm"
@@ -133,7 +142,7 @@ export function OverviewAdminWorkloadSection({ workload, isLoading }: Props) {
   }, [workload, currentPage])
 
   const workerSubs = useMemo(() => pagedWorkload.map((w) => w.workerSub), [pagedWorkload])
-  const { getAvatarUrl } = useUserAvatars(token, workerSubs)
+  const { getAvatarUrl, getAvatarColor } = useUserAvatars(token, workerSubs)
 
   return (
     <Card className="overview-panel h-full flex flex-col justify-between min-w-0 w-full max-w-full overflow-hidden">
@@ -167,6 +176,7 @@ export function OverviewAdminWorkloadSection({ workload, isLoading }: Props) {
                   key={worker.workerSub}
                   worker={worker}
                   avatarUrl={getAvatarUrl(worker.workerSub)}
+                  avatarColor={getAvatarColor(worker.workerSub)}
                 />
               ))}
             </div>

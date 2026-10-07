@@ -11,6 +11,7 @@ import { BRAND_TEXTURES, useTextureLoaded } from '@/shared/lib/brand-textures'
 export function DesktopSidebar({
   title,
   items,
+  userId,
   userEmail,
   userRole,
   userAvatarUrl,
@@ -27,6 +28,7 @@ export function DesktopSidebar({
 }: {
   title: string
   items: SidebarItem[]
+  userId?: string | null
   userEmail: string
   userRole: string
   userAvatarUrl?: string | null
@@ -116,6 +118,7 @@ export function DesktopSidebar({
       </div>
       <SidebarNav items={items} compact={collapsed} onItemClick={() => {}} />
       <SidebarFooter
+        userId={userId}
         userEmail={userEmail}
         userRole={userRole}
         userAvatarUrl={userAvatarUrl}
