@@ -3,7 +3,7 @@ export type AvatarPresetResponse = {
     version: number
     avatarId: number
     color: string
-    urls: Record<'64' | '256' | '512', string>
+    urls: Record<'64' | '256' | '512' | '1024', string> | Record<string, string>
   }
 }
 
@@ -12,7 +12,7 @@ export type CurrentAvatarResponse = {
     version: number
     avatarId?: number | null
     color?: string | null
-    urls: Partial<Record<'64' | '256' | '512', string>>
+    urls: Partial<Record<'64' | '256' | '512' | '1024', string>>
   }
 }
 
@@ -30,7 +30,7 @@ export type UserAvatarsResponse = {
         version: number
         avatarId?: number | null
         color?: string | null
-        urls: Partial<Record<'64' | '256' | '512', string>>
+        urls: Partial<Record<'64' | '256' | '512' | '1024', string>>
       }
     >
   }

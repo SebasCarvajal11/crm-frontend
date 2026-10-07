@@ -173,4 +173,21 @@ Todos los modales y diálogos del sistema (`Dialog` y `AlertDialog`) se rigen ba
       reacciona al cambio de rol, y tarjeta de protocolo de seguridad institucional (`InviteSecurityCard`).
     - Elimina los espacios muertos laterales en 1080p/2K/4K y colapsa fluidamente en móviles y tablets.
 
+---
 
+## 9. Sistema de Avatares Oficiales y Entrega Gráfica de Alta Fidelidad
+
+El sistema de avatares corporativos (`UserAvatar`, `AvatarPickerDialog`, `AcceptInviteAvatarCard`) garantiza máxima nitidez visual y coherencia estética en todas las densidades de pantalla:
+
+- **Encuadre Cuadrado 1:1 y Zona de Seguridad**:
+  - Máster generado en lienzo 1024x1024 con margen superior de seguridad (8-10%) y centrado anatómico.
+  - Elimina la mutilación de cabelleras y coronillas al renderizar dentro de contenedores circulares CSS (`rounded-full`, `object-cover`).
+- **Antialiasing Subpíxel Analógico y Defringing**:
+  - Máscara alpha continua de 256 niveles de opacidad mediante gradiente euclidiano, eliminando bordes dentados ("serrucho") sobre fondos corporativos CIMA.
+  - Inpainting perimetral Navier-Stokes para suprimir halos de fringe/spill de compresión.
+- **Entrega Responsiva Multinivel (`srcSet` / Mipmaps)**:
+  - Generación de activos escalonados en `64px`, `256px`, `512px` y `1024px` tanto en WebP como en PNG.
+  - Atributos `srcSet` y `sizes` automáticos en `AvatarMedia` adaptados a viewports móviles (`sizes="32px"` a `"48px"`), paneles de escritorio (`sizes="64px"`) y modales de previsualización 2K/4K (`sizes="128px"` a `"256px"`).
+- **Garantía Zero-Null y Fondos Corporativos**:
+  - Determinismo universal en ausencia de avatar explícito (`getAvatarColor`, iniciales legibles).
+  - Integración nativa con los 12 tonos oficiales CIMA.

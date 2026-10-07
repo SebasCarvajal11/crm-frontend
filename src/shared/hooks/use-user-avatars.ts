@@ -9,7 +9,7 @@ import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 export function useUserAvatars(
   accessToken: string | null | undefined,
   userIds: (string | null | undefined)[],
-  preferredSize: '64' | '256' | '512' = '64'
+  preferredSize: '64' | '256' | '512' | '1024' = '64'
 ) {
   useSyncExternalStore(
     AvatarDirectoryService.subscribe,

@@ -136,4 +136,41 @@ describe('UserAvatar', () => {
     expect(markup).toContain('tabindex="0"')
     expect(markup).toContain('cursor-pointer')
   })
+
+  it('renderiza srcset con resoluciones escalonadas 64w/256w/512w/1024w y sizes responsivo', () => {
+    const markup = renderToStaticMarkup(
+      <UserAvatar avatarId={7} name="Carlos CIMA" size="md" />
+    )
+    expect(markup).toContain('srcSet="/avatars/avatar-7-64.webp 64w, /avatars/avatar-7-256.webp 256w, /avatars/avatar-7-512.webp 512w, /avatars/avatar-7-1024.webp 1024w"')
+    expect(markup).toContain('sizes="36px"')
+  })
+
+  it('asigna sizes de alta densidad en tamaños 2xl para nitidez en pantallas 2K/4K', () => {
+    const markup = renderToStaticMarkup(
+      <UserAvatar avatarId={12} name="Admin CIMA" size="2xl" />
+    )
+    expect(markup).toContain('sizes="(min-width: 640px) 128px, 112px"')
+    expect(markup).toContain('/avatars/avatar-12-1024.webp 1024w')
+  })
+
+  it('sanea src vacío o con espacios y recurre limpiamente al avatar determinista sin warnings', () => {
+    const markupEmpty = renderToStaticMarkup(
+      <UserAvatar src="" name="Santiago" size="md" />
+    )
+    expect(markupEmpty).toMatch(/src="\/avatars\/avatar-\d+\.webp"/)
+    expect(markupEmpty).not.toContain('src=""')
+
+    const markupSpaces = renderToStaticMarkup(
+      <UserAvatar src="   " name="Santiago" size="md" />
+    )
+    expect(markupSpaces).toMatch(/src="\/avatars\/avatar-\d+\.webp"/)
+  })
+
+  it('controla avatarId fuera de rango recurriendo al avatar determinista de forma segura', () => {
+    const markupOutOfBounds = renderToStaticMarkup(
+      <UserAvatar avatarId={999} name="Sebas" size="md" />
+    )
+    expect(markupOutOfBounds).toMatch(/src="\/avatars\/avatar-\d+\.webp"/)
+    expect(markupOutOfBounds).not.toContain('/avatars/avatar-999.webp')
+  })
 })

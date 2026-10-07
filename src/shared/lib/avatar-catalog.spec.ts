@@ -4,6 +4,7 @@ import {
   AVATAR_CATEGORY_TABS,
   CIMA_CORPORATE_COLORS,
   getAvatarImageUrl,
+  getAvatarSrcSet,
   getRandomAvatarSelection,
   resolveDeterministicAvatar,
 } from './avatar-catalog'
@@ -35,9 +36,27 @@ describe('avatar-catalog', () => {
     ])
   })
 
-  it('generates correct avatar image webp url', () => {
+  it('generates correct avatar image webp url with optional resolutions and boundary safety', () => {
     expect(getAvatarImageUrl(0)).toBe('/avatars/avatar-0.webp')
     expect(getAvatarImageUrl(42)).toBe('/avatars/avatar-42.webp')
+    expect(getAvatarImageUrl(5, 64)).toBe('/avatars/avatar-5-64.webp')
+    expect(getAvatarImageUrl(5, 256)).toBe('/avatars/avatar-5-256.webp')
+    expect(getAvatarImageUrl(5, 512)).toBe('/avatars/avatar-5-512.webp')
+    expect(getAvatarImageUrl(5, 1024)).toBe('/avatars/avatar-5-1024.webp')
+    // Saneamiento de límites fuera de rango
+    expect(getAvatarImageUrl(-5)).toBe('/avatars/avatar-5.webp')
+    expect(getAvatarImageUrl(84)).toBe('/avatars/avatar-0.webp')
+  })
+
+  it('generates correct avatar srcset with 4 tiered resolutions and boundary safety', () => {
+    const srcset = getAvatarSrcSet(5)
+    expect(srcset).toContain('/avatars/avatar-5-64.webp 64w')
+    expect(srcset).toContain('/avatars/avatar-5-256.webp 256w')
+    expect(srcset).toContain('/avatars/avatar-5-512.webp 512w')
+    expect(srcset).toContain('/avatars/avatar-5-1024.webp 1024w')
+
+    const outOfBoundsSrcset = getAvatarSrcSet(-1)
+    expect(outOfBoundsSrcset).toContain('/avatars/avatar-1-1024.webp 1024w')
   })
 
   it('generates valid random avatar selection', () => {

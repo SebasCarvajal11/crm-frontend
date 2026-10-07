@@ -12,7 +12,7 @@ export interface UserAvatarEntity {
   avatarId: number
   color: string
   url: string
-  urls: Partial<Record<'64' | '256' | '512', string>>
+  urls: Partial<Record<'64' | '256' | '512' | '1024', string>>
   version: number
   isFallback: boolean
 }
@@ -59,7 +59,12 @@ class AvatarDirectoryServiceImpl {
       avatarId: det.avatarId,
       color: det.color,
       url,
-      urls: { '64': url, '256': url, '512': url },
+      urls: {
+        '64': getAvatarImageUrl(det.avatarId, 64),
+        '256': getAvatarImageUrl(det.avatarId, 256),
+        '512': getAvatarImageUrl(det.avatarId, 512),
+        '1024': getAvatarImageUrl(det.avatarId, 1024),
+      },
       version: 1,
       isFallback: true,
     }
@@ -91,7 +96,12 @@ class AvatarDirectoryServiceImpl {
       avatarId: selection.avatarId,
       color: selection.color,
       url,
-      urls: { '64': url, '256': url, '512': url },
+      urls: {
+        '64': getAvatarImageUrl(selection.avatarId, 64),
+        '256': getAvatarImageUrl(selection.avatarId, 256),
+        '512': getAvatarImageUrl(selection.avatarId, 512),
+        '1024': getAvatarImageUrl(selection.avatarId, 1024),
+      },
       version: Date.now(),
       isFallback: false,
     }

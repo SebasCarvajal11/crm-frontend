@@ -50,8 +50,51 @@ export interface CatalogAvatar {
 
 export const AVATARS_CATALOG: CatalogAvatar[] = manifestData.avatars as CatalogAvatar[]
 
-export const getAvatarImageUrl = (avatarId: number): string => {
-  return `/avatars/avatar-${avatarId}.webp`
+export type AvatarResolution = 64 | 256 | 512 | 1024
+
+export const getAvatarImageUrl = (
+  avatarId: number,
+  resolution?: AvatarResolution
+): string => {
+  const safeId =
+    typeof avatarId === 'number' && Number.isInteger(avatarId) && avatarId >= 0 && avatarId < 84
+      ? avatarId
+      : Math.abs(Math.trunc(avatarId || 0)) % 84
+  if (resolution) {
+    return `/avatars/avatar-${safeId}-${resolution}.webp`
+  }
+  return `/avatars/avatar-${safeId}.webp`
+}
+
+export const getAvatarSrcSet = (avatarId: number): string => {
+  const safeId =
+    typeof avatarId === 'number' && Number.isInteger(avatarId) && avatarId >= 0 && avatarId < 84
+      ? avatarId
+      : Math.abs(Math.trunc(avatarId || 0)) % 84
+  return [
+    `/avatars/avatar-${safeId}-64.webp 64w`,
+    `/avatars/avatar-${safeId}-256.webp 256w`,
+    `/avatars/avatar-${safeId}-512.webp 512w`,
+    `/avatars/avatar-${safeId}-1024.webp 1024w`,
+  ].join(', ')
+}
+
+export function resolveAvatarSrcSet(
+  src?: string | null,
+  avatarId?: number | null
+): string | undefined {
+  if (typeof avatarId === 'number' && avatarId >= 0 && avatarId < 84) {
+    return getAvatarSrcSet(avatarId)
+  }
+  if (!src) return undefined
+  const match = src.match(/\/avatars\/avatar-(\d+)(?:-\d+)?\.(?:webp|png)/)
+  if (match) {
+    const id = parseInt(match[1], 10)
+    if (!Number.isNaN(id) && id >= 0 && id < 84) {
+      return getAvatarSrcSet(id)
+    }
+  }
+  return undefined
 }
 
 export const getRandomAvatarSelection = (): { avatarId: number; color: string } => {

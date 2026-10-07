@@ -1,6 +1,7 @@
 import { memo, useState } from 'react'
 import {
   getAvatarImageUrl,
+  resolveAvatarSrcSet,
   resolveDeterministicAvatar,
 } from '@/shared/lib/avatar-catalog'
 import { cn } from '@/shared/lib/utils'
@@ -120,8 +121,19 @@ function extractColorFromSrc(src?: string | null): string | null {
   return null
 }
 
+const SIZES_MEDIA_QUERIES: Record<AvatarSize, string> = {
+  xs: '24px',
+  sm: '28px',
+  md: '36px',
+  lg: '40px',
+  xl: '56px',
+  '2xl': '(min-width: 640px) 128px, 112px',
+}
+
 type AvatarMediaProps = {
   src: string
+  srcSet?: string
+  sizes?: string
   effectiveColor: string
   altText: string
   onError: () => void
@@ -129,6 +141,8 @@ type AvatarMediaProps = {
 
 function AvatarMedia({
   src,
+  srcSet,
+  sizes,
   effectiveColor,
   altText,
   onError,
@@ -140,6 +154,8 @@ function AvatarMedia({
     >
       <img
         src={src}
+        srcSet={srcSet}
+        sizes={sizes}
         alt={altText}
         className="size-full object-cover rounded-full"
         onError={onError}
@@ -149,31 +165,22 @@ function AvatarMedia({
   )
 }
 
-export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
-  const {
-    src,
-    avatarUrl,
-    avatarId,
-    color,
-    name,
-    userId,
-    size = 'md',
-    presenceStatus,
-    presenceLabel,
-    className,
-    alt,
-    ringClass,
-    onClick,
-    onOpenProfile,
-  } = props
-
+function useResolvedAvatar(props: UserAvatarProps) {
+  const { src, avatarUrl, avatarId, color, name, userId } = props
   const deterministic = resolveDeterministicAvatar(userId ?? name)
-  const effectiveSrc = src ?? avatarUrl
+  const trimmedSrc = src?.trim()
+  const trimmedAvatarUrl = avatarUrl?.trim()
+  const effectiveSrc = (trimmedSrc || trimmedAvatarUrl) || undefined
+
+  const isValidAvatarId =
+    typeof avatarId === 'number' &&
+    Number.isInteger(avatarId) &&
+    avatarId >= 0 &&
+    avatarId < 84
+
   const initialResolvedSrc =
     effectiveSrc ??
-    (typeof avatarId === 'number' && avatarId >= 0
-      ? getAvatarImageUrl(avatarId)
-      : deterministic.url)
+    (isValidAvatarId ? getAvatarImageUrl(avatarId) : deterministic.url)
 
   const [currentSrc, setCurrentSrc] = useState(initialResolvedSrc)
   const [prevInitialSrc, setPrevInitialSrc] = useState(initialResolvedSrc)
@@ -189,23 +196,74 @@ export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
     }
   }
 
-  const cfg = SIZE_CLASSES[size]
   const effectiveColor =
-    (color && color.trim()) || extractColorFromSrc(effectiveSrc) || deterministic.color
+    (color && color.trim()) ||
+    extractColorFromSrc(effectiveSrc) ||
+    deterministic.color
+
+  const isCustomSrc = Boolean(
+    effectiveSrc && !effectiveSrc.includes('/avatars/avatar-')
+  )
+  const computedAvatarId = isCustomSrc
+    ? null
+    : isValidAvatarId
+      ? avatarId
+      : deterministic.avatarId
+  const computedSrcSet = resolveAvatarSrcSet(currentSrc, computedAvatarId)
+
+  return {
+    currentSrc,
+    computedSrcSet,
+    effectiveColor,
+    handleImageError,
+  }
+}
+
+export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
+  const {
+    name,
+    size = 'md',
+    presenceStatus,
+    presenceLabel,
+    className,
+    alt,
+    ringClass,
+    onClick,
+    onOpenProfile,
+  } = props
+
+  const {
+    currentSrc,
+    computedSrcSet,
+    effectiveColor,
+    handleImageError,
+  } = useResolvedAvatar(props)
+
+  const cfg = SIZE_CLASSES[size]
   const altText = alt ?? (name ? `Avatar oficial de ${name}` : 'Avatar oficial')
   const handleClick = onClick ?? onOpenProfile
   const isClickable = Boolean(handleClick)
+
+  const handleKeyDown = isClickable
+    ? (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleClick?.()
+        }
+      }
+    : undefined
 
   return (
     <div
       className={cn(
         'relative inline-flex shrink-0 select-none items-center justify-center',
-        isClickable && 'cursor-pointer hover:opacity-90 active:scale-[0.98] transition-transform',
+        isClickable &&
+          'cursor-pointer hover:opacity-90 active:scale-[0.98] transition-transform',
         cfg.container,
         className
       )}
       onClick={handleClick}
-      onKeyDown={isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick?.() } } : undefined}
+      onKeyDown={handleKeyDown}
       role={isClickable ? 'button' : undefined}
       tabIndex={isClickable ? 0 : undefined}
       title={name ?? undefined}
@@ -213,6 +271,8 @@ export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
     >
       <AvatarMedia
         src={currentSrc}
+        srcSet={computedSrcSet}
+        sizes={SIZES_MEDIA_QUERIES[size]}
         effectiveColor={effectiveColor}
         altText={altText}
         onError={handleImageError}

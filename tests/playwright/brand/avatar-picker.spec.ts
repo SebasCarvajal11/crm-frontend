@@ -167,7 +167,7 @@ test.describe('Catálogo Oficial de Avatares CIMA', () => {
     await casualTab.click()
 
     // Seleccionar avatar #1
-    const avatar0Btn = page.getByLabel('Seleccionar avatar #1')
+    const avatar0Btn = page.getByLabel('Seleccionar avatar #1', { exact: true })
     await expect(avatar0Btn).toBeVisible()
     await avatar0Btn.click()
 

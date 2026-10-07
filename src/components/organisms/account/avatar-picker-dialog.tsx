@@ -17,6 +17,7 @@ import {
   AVATAR_CATEGORY_TABS,
   CIMA_CORPORATE_COLORS,
   getAvatarImageUrl,
+  getAvatarSrcSet,
   type AvatarCategory,
 } from '@/shared/lib/avatar-catalog'
 
@@ -92,6 +93,8 @@ export function AvatarPickerDialog({
               >
                 <img
                   src={getAvatarImageUrl(selectedAvatarId)}
+                  srcSet={getAvatarSrcSet(selectedAvatarId)}
+                  sizes="(min-width: 640px) 112px, 96px"
                   alt="Avatar seleccionado"
                   className="size-full object-cover"
                 />
@@ -183,7 +186,9 @@ export function AvatarPickerDialog({
                       style={{ backgroundColor: isSelected ? selectedColor : 'transparent' }}
                     >
                       <img
-                        src={getAvatarImageUrl(avatar.id)}
+                        src={getAvatarImageUrl(avatar.id, 256)}
+                        srcSet={getAvatarSrcSet(avatar.id)}
+                        sizes="(min-width: 768px) 80px, 64px"
                         alt={`Avatar ${avatar.id}`}
                         loading="lazy"
                         className="size-full object-cover"

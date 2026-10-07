@@ -1,6 +1,6 @@
 import { Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { CIMA_CORPORATE_COLORS, getAvatarImageUrl } from '@/shared/lib/avatar-catalog'
+import { CIMA_CORPORATE_COLORS, getAvatarImageUrl, getAvatarSrcSet } from '@/shared/lib/avatar-catalog'
 
 interface AcceptInviteAvatarCardProps {
   avatarId: number
@@ -48,6 +48,8 @@ export function AcceptInviteAvatarCard({
         >
           <img
             src={getAvatarImageUrl(avatarId)}
+            srcSet={getAvatarSrcSet(avatarId)}
+            sizes="48px"
             alt={`Avatar #${avatarId}`}
             className="size-full object-cover"
           />
