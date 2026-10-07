@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { CimaLogo } from '@/components/ui/cima-logo'
 import { cn } from '@/shared/lib/utils'
 import type { SidebarItem } from './sidebar'
-import { DesktopSidebar, MobileSidebar } from './sidebar'
+import { DesktopSidebar, MobileSidebar, shellSidebarOffset } from './sidebar'
 import { BRAND_TEXTURES, useTextureLoaded } from '@/shared/lib/brand-textures'
 
 export type { SidebarItem }
@@ -28,7 +28,6 @@ type AppShellProps = {
   className?: string
 }
 
-const shellSidebarOffset = 'md:ml-64 lg:ml-72'
 const collapsedSidebarOffset = 'md:ml-20'
 const sidebarPreferenceKey = 'cima.sidebar.collapsed'
 

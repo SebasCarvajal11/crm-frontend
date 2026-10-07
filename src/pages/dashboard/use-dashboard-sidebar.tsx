@@ -29,7 +29,7 @@ export function useDashboardSidebar({
       {
         key: 'overview',
         label: 'Resumen',
-        icon: <BarChart3 className="size-4" />,
+        icon: <BarChart3 className="size-5 lg:size-6 xl:size-[1.625rem] shrink-0" />,
         onClick: () => goTo('overview'),
         isActive: activeTab === 'overview',
         hidden: !canViewOverview,
@@ -37,7 +37,7 @@ export function useDashboardSidebar({
       {
         key: 'collab',
         label: 'Colaboración',
-        icon: <KanbanSquare className="size-4" />,
+        icon: <KanbanSquare className="size-5 lg:size-6 xl:size-[1.625rem] shrink-0" />,
         onClick: () => goTo('collab'),
         onMouseEnter: preloadCollab,
         isActive: activeTab === 'collab',
@@ -45,7 +45,7 @@ export function useDashboardSidebar({
       {
         key: 'marketing',
         label: 'Marketing',
-        icon: <Megaphone className="size-4" />,
+        icon: <Megaphone className="size-5 lg:size-6 xl:size-[1.625rem] shrink-0" />,
         onClick: () => goTo('marketing'),
         onMouseEnter: preloadMarketing,
         isActive: activeTab === 'marketing',
@@ -54,7 +54,7 @@ export function useDashboardSidebar({
       {
         key: 'analytics',
         label: 'Analítica',
-        icon: <ChartAreaIcon className="size-4" />,
+        icon: <ChartAreaIcon className="size-5 lg:size-6 xl:size-[1.625rem] shrink-0" />,
         onClick: () => goTo('analytics'),
         onMouseEnter: preloadAnalytics,
         isActive: activeTab === 'analytics',
@@ -63,7 +63,7 @@ export function useDashboardSidebar({
       {
         key: 'admin',
         label: 'Administración',
-        icon: <ShieldCheck className="size-4" />,
+        icon: <ShieldCheck className="size-5 lg:size-6 xl:size-[1.625rem] shrink-0" />,
         onClick: () => goTo('admin'),
         onMouseEnter: preloadAdmin,
         isActive: activeTab === 'admin',
