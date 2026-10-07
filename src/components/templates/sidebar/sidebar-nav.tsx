@@ -16,7 +16,7 @@ export function SidebarNav({
 
   return (
     <nav
-      className="flex-1 space-y-2 lg:space-y-2.5 overflow-y-auto px-3.5 py-4 scrollbar-thin"
+      className="flex-1 space-y-1.5 overflow-y-auto px-3 py-4 scrollbar-thin"
       aria-label="Navegacion principal"
       data-tour="sidebar-nav"
     >
@@ -38,8 +38,8 @@ export function SidebarNav({
             navItemBaseClass,
             item.isActive
               ? cn(
-                  'bg-white/18 text-white backdrop-blur-xs font-bold',
-                  'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_2px_6px_rgba(0,0,0,0.28)]',
+                  'bg-white/18 text-white backdrop-blur-xs font-semibold',
+                  'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22),0_2px_4px_rgba(0,0,0,0.25)]',
                 )
               : 'text-white/75 hover:bg-white/10 hover:text-white',
             compact && 'justify-center px-2.5'
@@ -55,8 +55,8 @@ export function SidebarNav({
           {item.isActive && (
             <span
               className={cn(
-                'ml-auto inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-white',
-                'shadow-[0_0_10px_rgba(255,255,255,0.95)] ring-2 ring-white/35',
+                'ml-auto inline-block h-2 w-2 shrink-0 rounded-full bg-white',
+                'shadow-[0_0_8px_rgba(255,255,255,0.9)] ring-2 ring-white/30',
                 compact && 'absolute -right-1 top-1/2 -translate-y-1/2'
               )}
               aria-hidden="true"
