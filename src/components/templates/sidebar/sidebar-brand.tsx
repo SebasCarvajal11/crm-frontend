@@ -14,14 +14,11 @@ export function SidebarBrand({
   closeOnNavigate: () => void
 }) {
   return (
-    <div className={cn('flex items-center gap-3', compact && 'w-full justify-center')}>
+    <div className={cn('flex w-full items-center justify-center', !compact && 'pl-2')}>
       <Link
         to="/dashboard"
         aria-label={title || 'Inicio'}
-        className={cn(
-          'flex items-center gap-2.5 min-w-0 transition-opacity hover:opacity-90',
-          compact && 'justify-center'
-        )}
+        className="flex w-full items-center justify-center min-w-0 transition-opacity hover:opacity-90"
         onClick={closeOnNavigate}
       >
         <CimaLogo variant={compact ? 'emblem' : 'cimaxis'} tone="inverse" />

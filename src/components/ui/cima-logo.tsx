@@ -14,7 +14,7 @@ const logos = {
     displayWidth: 220,
   },
   emblem: { src: emblemLogo, alt: 'CIMA', width: 276, height: 287, displayWidth: 32 },
-  cimaxis: { src: cimaxisLogo, alt: 'CIMAxis', width: 1149, height: 217, displayWidth: 160 },
+  cimaxis: { src: cimaxisLogo, alt: 'CIMAxis', width: 1149, height: 217, displayWidth: 208 },
 } as const
 
 type CimaLogoProps = {

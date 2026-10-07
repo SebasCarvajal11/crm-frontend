@@ -94,7 +94,7 @@ export function DesktopSidebar({
           </>
         ) : (
           <>
-            <div className="min-w-0 flex-1 px-1">
+            <div className="min-w-0 flex-1 flex items-center justify-center">
               <SidebarBrand
                 title={title}
                 compact={false}

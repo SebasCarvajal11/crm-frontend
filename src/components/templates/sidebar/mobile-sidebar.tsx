@@ -73,8 +73,8 @@ export function MobileSidebar({
           }}
         />
         <div className="relative z-10 flex h-full flex-col">
-        <div className="flex items-center justify-between border-b border-primary-foreground/10 px-4 py-4">
-          <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between border-b border-primary-foreground/10 px-3 py-3">
+          <div className="min-w-0 flex-1 flex items-center justify-center">
             <SidebarBrand title={title} headerExtras={headerExtras} closeOnNavigate={() => setOpen(false)} />
           </div>
           <Button

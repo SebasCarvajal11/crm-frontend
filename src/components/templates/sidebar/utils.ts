@@ -6,8 +6,8 @@ export const ROLE_LABEL: Record<string, string> = {
   client: 'Cliente',
 }
 
-export const shellSidebarWidth = 'md:w-64 lg:w-72 xl:w-[18.5rem]'
-export const shellSidebarOffset = 'md:ml-64 lg:ml-72 xl:ml-[18.5rem]'
+export const shellSidebarWidth = 'md:w-72 lg:w-72 xl:w-[18.5rem]'
+export const shellSidebarOffset = 'md:ml-72 lg:ml-72 xl:ml-[18.5rem]'
 
 export const navItemBaseClass = [
   'group relative flex w-full items-center gap-3',
