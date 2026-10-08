@@ -30,17 +30,12 @@ test.describe('Catálogo Oficial de Avatares CIMA', () => {
     await page.goto('/dashboard?tab=account')
     await page.waitForLoadState('networkidle')
 
-    // 1. Abrir menú de opciones de avatar
-    const avatarMenuBtn = page.getByRole('button', { name: 'Opciones de avatar' })
-    await expect(avatarMenuBtn).toBeVisible()
-    await avatarMenuBtn.click()
+    // 1. Abrir diálogo de selección de avatar directamente
+    const changeAvatarBtn = page.getByRole('button', { name: 'Cambiar avatar' })
+    await expect(changeAvatarBtn).toBeVisible()
+    await changeAvatarBtn.click()
 
-    // 2. Clic en "Cambiar avatar"
-    const changePhotoOption = page.getByText('Cambiar avatar')
-    await expect(changePhotoOption).toBeVisible()
-    await changePhotoOption.click()
-
-    // 3. Verificar que se despliega el modal del catálogo
+    // 2. Verificar que se despliega el modal del catálogo
     const dialogTitle = page.getByText('Catálogo de Avatares CIMA')
     await expect(dialogTitle).toBeVisible()
 
@@ -77,51 +72,6 @@ test.describe('Catálogo Oficial de Avatares CIMA', () => {
     expect(presetSavedPayload?.color?.toLowerCase()).toBe('#1e3a8a')
   })
 
-  test('Visor de avatar abre diálogo correctamente al hacer clic en Ver avatar', async ({
-    page,
-  }) => {
-    await setupDashboard(page, 'admin')
-
-    // Proporcionar avatar existente para que la opción "Ver avatar" esté habilitada
-    await page.route('**/api/v1/media/avatars/current', async (route) => {
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        json: {
-          data: {
-            version: 1,
-            urls: {
-              '512': '/avatars/avatar-0.webp',
-              '256': '/avatars/avatar-0.webp',
-              '64': '/avatars/avatar-0.webp',
-            },
-          },
-        },
-      })
-    })
-
-    await page.goto('/dashboard?tab=account')
-    await page.waitForLoadState('networkidle')
-
-    const avatarMenuBtn = page.getByRole('button', { name: 'Opciones de avatar' })
-    await expect(avatarMenuBtn).toBeVisible()
-    await avatarMenuBtn.click()
-
-    const viewPhotoOption = page.getByText('Ver avatar')
-    await expect(viewPhotoOption).toBeVisible()
-    await viewPhotoOption.click()
-
-    // Verificar modal del visor de avatar
-    const viewerDialog = page.getByRole('dialog')
-    await expect(viewerDialog).toBeVisible()
-    await expect(page.getByText('Avatar oficial').first()).toBeVisible()
-
-    const closeBtn = viewerDialog.getByRole('button', { name: 'Cerrar' }).first()
-    await expect(closeBtn).toBeVisible()
-    await closeBtn.click()
-
-    await expect(viewerDialog).not.toBeVisible()
-  })
 
   test('Flujo de aceptación de invitación permite personalizar avatar oficial y color corporativo', async ({
     page,

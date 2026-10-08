@@ -32,11 +32,16 @@ function messageFromZodValidatorBody(data: unknown): string | null {
 function messageFromStructuredIssues(data: unknown): string | null {
   if (!data || typeof data !== 'object') return null
   const o = data as Record<string, unknown>
-  const candidates = [o.issues, o.errors]
+  const details =
+    o.details && typeof o.details === 'object' ? (o.details as Record<string, unknown>) : null
+  const candidates = [o.issues, o.errors, details?.issues, details?.errors]
   for (const candidate of candidates) {
     if (!Array.isArray(candidate) || candidate.length === 0) continue
-    const first = candidate[0] as { message?: string }
+    const first = candidate[0] as { message?: string; path?: string }
     if (typeof first?.message === 'string' && first.message.length > 0) {
+      if (first.message.toLowerCase() === 'required' && first.path) {
+        return `${first.path}: requerido`
+      }
       return first.message
     }
   }
