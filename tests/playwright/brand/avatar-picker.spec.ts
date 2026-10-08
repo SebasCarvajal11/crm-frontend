@@ -53,7 +53,7 @@ test.describe('Catálogo Oficial de Avatares CIMA', () => {
     await conGafasTab.click()
 
     // Comprobar contador filtrado de disponibles
-    await expect(page.getByText('10 disponibles')).toBeVisible()
+    await expect(page.getByText('14 disponibles')).toBeVisible()
 
     // 6. Seleccionar un avatar específico dentro del catálogo con gafas (#11)
     const avatarSelectBtn = page.getByLabel('Seleccionar avatar #11')
