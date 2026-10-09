@@ -2,7 +2,7 @@ import { chromium } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
 
-const BASE_URL = 'http://127.0.0.1:4175'
+const BASE_URL = 'http://127.0.0.1:4180'
 const SCREENSHOT_DIR = 'C:/Users/27seb/.gemini/antigravity/brain/0248656a-86db-4252-bbe8-5d7b942cbae3/screenshots'
 
 // 8 Viewports representativos que cubren todos los breakpoints de diseño
@@ -115,6 +115,9 @@ const mockBoard = {
         dueDate: '2026-10-09T00:00:00Z',
       },
     ],
+    tasksTruncated: false,
+    tasksTotal: 3,
+    tasksLimit: 2000,
   },
 }
 
@@ -183,6 +186,40 @@ async function setupMockRoutes(page, role) {
             first_name: role === 'admin' ? 'Valeria' : role === 'worker' ? 'Carlos' : 'Mauricio',
             last_name: role === 'admin' ? 'Quintero' : role === 'worker' ? 'Mendoza' : 'Gómez',
             emailVerifiedAt: '2026-09-28T00:00:00Z',
+          },
+        },
+      })
+    }
+    if (path.includes('/composition/dashboard')) {
+      return route.fulfill({
+        json: {
+          identity: {
+            id: '11111111-1111-4111-8111-111111111111',
+            email: role === 'admin' ? 'gerente@cima.dev' : role === 'worker' ? 'carlos@cima.dev' : 'cliente@andino.com',
+            role,
+            first_name: role === 'admin' ? 'Valeria' : role === 'worker' ? 'Carlos' : 'Mauricio',
+            last_name: role === 'admin' ? 'Quintero' : role === 'worker' ? 'Mendoza' : 'Gómez',
+            emailVerifiedAt: '2026-09-28T00:00:00Z',
+          },
+          projects: {
+            data: [
+              {
+                id: projectId,
+                name: 'Campaña Lanzamiento CIMA 2026',
+                clientName: 'Grupo Inversionista Andino',
+                type: 'campaign_service',
+                status: 'in_progress',
+                progressPercent: 65,
+              },
+              {
+                id: project2Id,
+                name: 'Automatización CRM y KrakenD Gateway',
+                clientName: 'Soluciones Tecnológicas Alfa',
+                type: 'product_order',
+                status: 'todo',
+                progressPercent: 25,
+              },
+            ],
           },
         },
       })
