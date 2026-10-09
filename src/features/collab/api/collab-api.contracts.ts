@@ -1,13 +1,15 @@
 import { api } from '@/shared/lib'
 import { bearer } from '@/shared/lib/bearer'
 import { PROJECT_ROUTES } from '@/shared/lib/gateway-routes'
-import type {
-  CreateAmendmentDraftInput,
-  DataResponse,
-  ProjectContract,
-  ProjectContractAmendment,
-  RequestClientAmendmentInput,
-  SignAmendmentInput,
+import {
+  parseProjectContractResponse,
+  parseProjectAmendmentsResponse,
+  type CreateAmendmentDraftInput,
+  type DataResponse,
+  type ProjectContract,
+  type ProjectContractAmendment,
+  type RequestClientAmendmentInput,
+  type SignAmendmentInput,
 } from '@/features/collab/model'
 
 export type ProjectContractDraftInput = {
@@ -39,9 +41,10 @@ export async function getProjectContractRequest(
   accessToken: string,
   projectId: string
 ): Promise<DataResponse<ProjectContract | null>> {
-  return api
+  const json = await api
     .get(PROJECT_ROUTES.contract(projectId), { headers: bearer(accessToken) })
     .json<DataResponse<ProjectContract | null>>()
+  return parseProjectContractResponse(json) as DataResponse<ProjectContract | null>
 }
 
 export async function saveProjectContractDraftRequest(
@@ -80,9 +83,10 @@ export async function listProjectContractAmendmentsRequest(
   accessToken: string,
   projectId: string
 ): Promise<DataResponse<ProjectContractAmendment[]>> {
-  return api
+  const json = await api
     .get(PROJECT_ROUTES.contractAmendments(projectId), { headers: bearer(accessToken) })
     .json<DataResponse<ProjectContractAmendment[]>>()
+  return parseProjectAmendmentsResponse(json) as DataResponse<ProjectContractAmendment[]>
 }
 
 export async function saveProjectContractAmendmentDraftRequest(
