@@ -19,7 +19,9 @@ export function PlanDistributionChart({ data, loading }: Props) {
     return <div className="text-center text-sm text-muted-foreground">Cargando gráfico...</div>
   }
 
-  if (!data || data.length === 0) {
+  const safeData = Array.isArray(data) ? data : Array.isArray((data as unknown as { data: unknown })?.data) ? (data as unknown as { data: typeof data }).data : []
+
+  if (!safeData || safeData.length === 0) {
     return <div className="py-10 text-center text-sm text-muted-foreground">Aún no hay clientes con plan. Asígnelos en Marketing → Clientes.</div>
   }
 
@@ -27,7 +29,7 @@ export function PlanDistributionChart({ data, loading }: Props) {
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
         <Pie
-          data={data}
+          data={safeData}
           dataKey="clientCount"
           nameKey="plan"
           cx="50%"

@@ -14,9 +14,11 @@ import {
   assignClientPlansBulkRequest,
   syncCrmRequest,
   type ClientPlan,
+  type MarketingClient,
 } from '../api/clients-api'
 import { PLANS, clientLabel } from './client-plans.constants'
 import { ClientPlansTable } from './client-plans-table'
+import { ensureArray } from '@/shared/lib'
 
 interface ClientPlansManagerProps {
   accessToken: string
@@ -68,7 +70,7 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
       setFeedback('No se pudo sincronizar. Verifique que el CRM base esté disponible.'),
   })
 
-  const clients = useMemo(() => clientsQuery.data ?? [], [clientsQuery.data])
+  const clients = useMemo(() => ensureArray<MarketingClient>(clientsQuery.data), [clientsQuery.data])
 
   const sinPlan = useMemo(() => clients.filter((c) => !c.plan), [clients])
 

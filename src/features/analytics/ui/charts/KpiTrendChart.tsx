@@ -24,7 +24,9 @@ export function KpiTrendChart({ data, loading }: Props) {
     )
   }
 
-  if (!data || data.length === 0) {
+  const safeData = Array.isArray(data) ? data : Array.isArray((data as unknown as { data: unknown })?.data) ? (data as unknown as { data: typeof data }).data : []
+
+  if (!safeData || safeData.length === 0) {
     return (
       <div className="py-12 text-center text-sm text-muted-foreground">
         Aún no hay períodos consolidados. Use «Consolidar período» en los indicadores del mes.
@@ -32,7 +34,7 @@ export function KpiTrendChart({ data, loading }: Props) {
     )
   }
 
-  const sortedData = [...data].sort((a, b) =>
+  const sortedData = [...safeData].sort((a, b) =>
     (a.period ?? '').localeCompare(b.period ?? '')
   )
 

@@ -29,11 +29,13 @@ export function CampaignStatusChart({ data, loading }: Props) {
     return <div className="text-center text-sm text-muted-foreground">Cargando gráfico...</div>
   }
 
-  if (!data || data.length === 0) {
+  const safeData = Array.isArray(data) ? data : Array.isArray((data as unknown as { data: unknown })?.data) ? (data as unknown as { data: CampaignStatusReportDto[] }).data : []
+
+  if (!safeData || safeData.length === 0) {
     return <div className="text-center text-sm text-muted-foreground">Sin datos disponibles</div>
   }
 
-  const rows = data.map((d) => ({ ...d, label: STATUS_LABELS[d.status] ?? d.status }))
+  const rows = safeData.map((d) => ({ ...d, label: STATUS_LABELS[d.status] ?? d.status }))
 
   return (
     <ResponsiveContainer width="100%" height={300}>

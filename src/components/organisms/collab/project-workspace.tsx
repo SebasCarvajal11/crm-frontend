@@ -57,7 +57,7 @@ export function ProjectWorkspace({
   const boardData = boardQ.data?.data
   const project = boardData?.project ?? projectMeta
   const members = boardData?.members ?? []
-  const isTruncated = boardData?.board.tasksTruncated ?? false
+  const isTruncated = boardData?.board?.tasksTruncated ?? false
 
   const { boardColumns, boardTasks, tasksByColumn, taskIndexMap } = useBoardData(boardData?.board)
 
@@ -150,8 +150,8 @@ export function ProjectWorkspace({
         taskIndexMap={taskIndexMap}
         isBoardLoading={boardQ.isLoading}
         isTruncated={isTruncated}
-        tasksTotal={boardData?.board.tasksTotal}
-        tasksLimit={boardData?.board.tasksLimit}
+        tasksTotal={boardData?.board?.tasksTotal}
+        tasksLimit={boardData?.board?.tasksLimit}
         searchableTasks={searchableTasks}
         isSearching={isSearching}
         focusedTaskId={focusedTaskId}

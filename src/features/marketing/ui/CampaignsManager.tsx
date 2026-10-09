@@ -13,10 +13,11 @@ import {
   type Campaign,
   type CreateCampaignInput,
 } from '../api/marketing-api'
-import { listClientsRequest } from '../api/clients-api'
+import { listClientsRequest, type MarketingClient } from '../api/clients-api'
 import { CAMPAIGN_STATUSES, CAMPAIGN_TYPES, clientLabel } from './campaign.constants'
 import { CampaignCard } from './campaign-card'
 import { CampaignFormDialog } from './campaign-form-dialog'
+import { ensureArray } from '@/shared/lib'
 
 interface CampaignsManagerProps {
   accessToken: string
@@ -109,8 +110,8 @@ export function CampaignsManager({
     }
   }
 
-  const campaigns = campaignsQuery.data || []
-  const clients = useMemo(() => clientsQuery.data ?? [], [clientsQuery.data])
+  const campaigns = useMemo(() => ensureArray<Campaign>(campaignsQuery.data), [campaignsQuery.data])
+  const clients = useMemo(() => ensureArray<MarketingClient>(clientsQuery.data), [clientsQuery.data])
   const clientNames = useMemo(
     () => new Map(clients.map((cl) => [cl.clientId, clientLabel(cl)])),
     [clients],
