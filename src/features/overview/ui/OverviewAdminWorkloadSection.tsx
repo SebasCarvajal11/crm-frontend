@@ -26,9 +26,9 @@ function WorkloadWorkerCard({
   avatarColor?: string | null
 }) {
   return (
-    <div className="overview-row p-3.5 min-w-0 w-full max-w-full overflow-hidden">
+    <div className="overview-row p-3.5 min-w-0 w-full max-w-full">
       <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center min-w-0 w-full">
-        <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
           <UserAvatar
             src={avatarUrl}
             color={avatarColor}

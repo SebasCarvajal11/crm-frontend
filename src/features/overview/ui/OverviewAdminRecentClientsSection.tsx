@@ -76,7 +76,7 @@ export function OverviewAdminRecentClientsSection({ clients, isLoading }: Props)
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-border/60 min-w-0 w-full max-w-full overflow-hidden flex-1">
+          <div className="divide-y divide-border/60 min-w-0 w-full max-w-full flex-1">
             {clients.slice(0, 5).map((client) => {
               const name = getClientDisplayName(client)
               return (
@@ -84,10 +84,10 @@ export function OverviewAdminRecentClientsSection({ clients, isLoading }: Props)
                   key={client.id}
                   className={cn(
                     "flex items-center justify-between gap-2.5 py-2.5 px-2",
-                    "rounded-md interactive-row min-w-0 w-full overflow-hidden"
+                    "rounded-md interactive-row min-w-0 w-full"
                   )}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     <UserAvatar
                       src={getAvatarUrl(client.id)}
                       color={getAvatarColor(client.id)}
