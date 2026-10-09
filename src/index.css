@@ -214,6 +214,12 @@
     text-rendering: optimizeLegibility;
   }
 
+  @media (min-width: 2560px) {
+    html {
+      font-size: 18px;
+    }
+  }
+
   ::selection {
     background-color: var(--primary);
     color: var(--primary-foreground);

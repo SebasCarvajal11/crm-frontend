@@ -158,7 +158,7 @@ export function CampaignsManager({
             setFormData(INITIAL_FORM_DATA)
             setIsCreateOpen(true)
           }}
-          className="h-9 gap-2 rounded-lg font-semibold shadow-2xs shrink-0"
+          className="h-9 gap-2 rounded-lg font-semibold shadow-2xs shrink-0 w-full sm:w-auto"
         >
           <Plus className="size-4" />
           Nueva Campaña
