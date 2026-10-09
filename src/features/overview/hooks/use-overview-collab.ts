@@ -16,17 +16,19 @@ export function useOverviewCollab({
   projects,
   role,
   userSub,
+  enabled = true,
 }: {
   accessToken: string
   projects: ProjectListItem[]
   role?: string
   userSub?: string
+  enabled?: boolean
 }) {
   const isAdmin = role === 'admin'
   const isWorker = role === 'worker'
 
   const activeProjects = useMemo(
-    () => projects.filter((p) => p.status !== 'completed'),
+    () => projects.filter((p) => p.status !== 'completed').slice(0, 12),
     [projects]
   )
 
@@ -34,30 +36,30 @@ export function useOverviewCollab({
     queries: activeProjects.map((p) => ({
       queryKey: collabKeys.projectBoard(p.id),
       queryFn: () => getProjectBoardRequest(accessToken, p.id),
-      enabled: Boolean(accessToken && p.id),
-      staleTime: 60_000,
+      enabled: Boolean(accessToken && p.id && enabled),
+      staleTime: 120_000,
     })),
     combine: (results) => ({
       boardResults: results.map((r, idx) => ({
         board: r.data?.data?.board,
         project: activeProjects[idx],
       })),
-      isBoardsLoading: results.some((r) => r.isLoading),
+      isBoardsLoading: enabled ? results.some((r) => r.isLoading) : false,
     }),
   })
 
   const workersQ = useQuery({
     queryKey: ['admin-users', 'workers-directory'],
     queryFn: () => adminListUsersRequest(accessToken, { role: 'worker', limit: 100 }),
-    enabled: Boolean(accessToken && isAdmin),
+    enabled: Boolean(accessToken && isAdmin && enabled),
     staleTime: 120_000,
   })
 
   const pendingChangeRequestsQ = useQuery({
     queryKey: collabKeys.pendingChangeRequests(),
     queryFn: () => listPendingChangeRequestsRequest(accessToken),
-    enabled: Boolean(accessToken && isAdmin),
-    staleTime: 30_000,
+    enabled: Boolean(accessToken && isAdmin && enabled),
+    staleTime: 120_000,
   })
 
   // ── Worker: Tareas pendientes (no hechas) de más antigua a más reciente ────

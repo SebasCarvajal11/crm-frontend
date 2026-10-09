@@ -17,14 +17,16 @@ type OpenNotificationPayload = {
 
 export function useOverviewNotifications(
   accessToken: string,
-  onOpenNotification?: (payload: OpenNotificationPayload) => void
+  onOpenNotification?: (payload: OpenNotificationPayload) => void,
+  enabled = true
 ) {
   const queryClient = useQueryClient()
 
   const query = useQuery({
     queryKey: collabKeys.notifications(),
     queryFn: () => listUnreadNotificationsRequest(accessToken),
-    enabled: Boolean(accessToken?.trim()),
+    enabled: Boolean(accessToken?.trim()) && enabled,
+    staleTime: 60_000,
     select: (d) => d.data,
   })
 

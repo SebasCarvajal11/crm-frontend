@@ -6,6 +6,7 @@ import { cn } from '@/shared/lib/utils'
 import type { ProjectListItem } from '@/features/collab/model'
 import type { WorkspaceTab } from '@/pages/dashboard/use-dashboard-navigation'
 import '@/features/overview/ui/overview.css'
+import { useStaggeredHydration } from '@/shared/hooks'
 import {
   useOverviewCollab,
   useOverviewMarketing,
@@ -65,12 +66,15 @@ export function DashboardOverview({
   const isAdmin = identity.role === 'admin'
   const isWorker = identity.role === 'worker'
 
+  const { tier2, tier3 } = useStaggeredHydration()
+
   const { notifications, isLoading: isNotifLoading, handleOpen } = useOverviewNotifications(
     accessToken,
-    onOpenNotification
+    onOpenNotification,
+    tier2
   )
 
-  const { metrics, isLoading: isMarketingLoading } = useOverviewMarketing(accessToken)
+  const { metrics, isLoading: isMarketingLoading } = useOverviewMarketing(accessToken, tier3)
 
   const {
     isLoading: isCollabLoading,
@@ -86,9 +90,10 @@ export function DashboardOverview({
     projects,
     role: identity.role,
     userSub: identity.id,
+    enabled: tier2,
   })
 
-  const recentClientsQ = useOverviewRecentClients(accessToken, isAdmin)
+  const recentClientsQ = useOverviewRecentClients(accessToken, isAdmin && tier3)
 
   return (
     <div className="overview-stage space-y-8 w-full max-w-full overflow-x-clip min-w-0">

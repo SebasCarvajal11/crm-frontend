@@ -6,7 +6,7 @@ export function useOverviewRecentClients(accessToken: string, enabled = true) {
     queryKey: ['admin-users', 'recent-clients'],
     queryFn: () => adminListUsersRequest(accessToken, { page: 1, limit: 5, role: 'client' }),
     enabled: Boolean(accessToken && enabled),
-    staleTime: 60_000,
+    staleTime: 120_000,
     select: (res) => res.data.items,
   })
 }

@@ -7,20 +7,20 @@ import {
 import { analyticsKeys } from '@/features/analytics/model'
 import type { OverviewMarketingMetrics } from '../model/overview.types'
 
-export function useOverviewMarketing(accessToken: string) {
+export function useOverviewMarketing(accessToken: string, enabled = true) {
   const summaryQ = useQuery({
     queryKey: analyticsKeys.summary(),
     queryFn: () => getAnalyticsSummaryRequest(accessToken),
-    enabled: Boolean(accessToken?.trim()),
-    staleTime: 60_000,
+    enabled: Boolean(accessToken?.trim()) && enabled,
+    staleTime: 120_000,
     retry: 1,
   })
 
   const kpisQ = useQuery({
     queryKey: analyticsKeys.kpis(''),
     queryFn: () => getCurrentKpisRequest(accessToken),
-    enabled: Boolean(accessToken?.trim()),
-    staleTime: 60_000,
+    enabled: Boolean(accessToken?.trim()) && enabled,
+    staleTime: 120_000,
     retry: 1,
   })
 
