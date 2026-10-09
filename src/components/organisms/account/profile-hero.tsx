@@ -2,6 +2,7 @@ import { CheckCircle2, Clock, Loader2, Mail, Shield, Sparkles } from 'lucide-rea
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/shared/lib/utils'
 import { UserAvatar } from '@/components/atoms/user-avatar'
+import { ProfileHeroBanner } from './profile-hero-banner'
 import type { MeResponse } from '@/features/auth/model'
 
 type Role = MeResponse['data']['role']
@@ -35,21 +36,8 @@ export function ProfileHero({
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
-      {/* Banner de marca CIMA con degradado ejecutivo */}
-      <div
-        className={cn(
-          'relative h-28 w-full overflow-hidden sm:h-32',
-          'bg-gradient-to-r from-primary via-primary/90 to-primary/80',
-        )}
-      >
-        <div
-          className={cn(
-            'absolute inset-0',
-            'bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.2),transparent_70%)]',
-          )}
-        />
-        <div className="absolute -bottom-8 -right-8 size-40 rounded-full bg-white/5 blur-2xl" />
-      </div>
+      {/* Banner de marca CIMA con degradado ejecutivo y malla fluida de orbes atmosféricos */}
+      <ProfileHeroBanner />
 
       <div className="px-4 pb-6 sm:px-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -76,6 +64,7 @@ export function ProfileHero({
                   color={avatarColor}
                   name={displayName}
                   userId={identity.id}
+                  role={identity.role}
                   size="2xl"
                   className="size-full shadow-none border-0"
                 />

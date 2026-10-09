@@ -547,6 +547,67 @@
   --role-halo-width: 2.5px;
 }
 
+/* Malla Fluida de Orbes Atmosféricos CIMA (Perfil Hero) */
+@keyframes auroraOrb1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translate3d(-18%, 12%, 0) scale(1.18);
+    opacity: 0.92;
+  }
+  100% {
+    transform: translate3d(12%, -8%, 0) scale(0.92);
+    opacity: 0.7;
+  }
+}
+
+@keyframes auroraOrb2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(22%, -14%, 0) scale(1.22);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(-12%, 16%, 0) scale(0.88);
+    opacity: 0.6;
+  }
+}
+
+@keyframes auroraOrb3 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate3d(-14%, 18%, 0) scale(1.12);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate3d(16%, -12%, 0) scale(0.94);
+    opacity: 0.5;
+  }
+}
+
+.animate-aurora-orb-1 {
+  animation: auroraOrb1 16s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+  will-change: transform, opacity;
+}
+
+.animate-aurora-orb-2 {
+  animation: auroraOrb2 22s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+  will-change: transform, opacity;
+}
+
+.animate-aurora-orb-3 {
+  animation: auroraOrb3 18s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+  will-change: transform, opacity;
+}
+
 /* Descarte con colapso suave en CSS Grid (Notificaciones) */
 .notification-collapse-row {
   display: grid;
@@ -664,6 +725,12 @@
   }
   .role-halo-animated {
     animation: none !important;
+  }
+  .animate-aurora-orb-1,
+  .animate-aurora-orb-2,
+  .animate-aurora-orb-3 {
+    animation: none !important;
+    transform: none !important;
   }
   .notification-collapse-row {
     transition: none !important;
