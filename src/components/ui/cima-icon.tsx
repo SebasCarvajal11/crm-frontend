@@ -159,6 +159,7 @@ export const CheckCircle2: LucideIcon = createIcon('CheckCircle2');
 export const CheckIcon: LucideIcon = createIcon('CheckIcon');
 export const CheckSquare: LucideIcon = createIcon('CheckSquare');
 export const CheckSquare2: LucideIcon = createIcon('CheckSquare2');
+export const ChevronDown: LucideIcon = createIcon('ChevronDownIcon');
 export const ChevronDownIcon: LucideIcon = createIcon('ChevronDownIcon');
 export const ChevronLeft: LucideIcon = createIcon('ChevronLeft');
 export const ChevronRight: LucideIcon = createIcon('ChevronRight');

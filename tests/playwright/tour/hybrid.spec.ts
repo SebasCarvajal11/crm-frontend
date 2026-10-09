@@ -49,9 +49,9 @@ test('buscar desde otra sección y cambiar subpestañas conservadas de Marketing
   await assertBounds(page)
   await guide.getByRole('button', { name: 'Cerrar tutorial' }).click()
   await startTour(page, 'Recorrido del Módulo de Marketing')
-  for (let index = 0; index < 8; index++) {
+  for (let index = 0; index < 10; index++) {
     await expect(guide).toHaveAttribute('aria-busy', 'false')
-    await expect(guide).toContainText(`Paso ${index + 1} de 8`)
+    await expect(guide).toContainText(`Paso ${index + 1} de 10`)
     await expect(guide).not.toContainText('Este elemento no está disponible')
     await assertBounds(page)
     if (index === 5) {
@@ -60,7 +60,7 @@ test('buscar desde otra sección y cambiar subpestañas conservadas de Marketing
       await guide.getByRole('button', { name: 'Volver al paso' }).click()
       await expect(page.locator('[data-tour="marketing-campaigns-filters"]')).toBeVisible()
     }
-    await guide.getByRole('button', { name: index === 7 ? 'Finalizar' : 'Siguiente', exact: true }).click()
+    await guide.getByRole('button', { name: index === 9 ? 'Finalizar' : 'Siguiente', exact: true }).click()
   }
   await openHelp(page)
   await page.screenshot({ path: info.outputPath('help-center.png'), fullPage: true })
@@ -232,3 +232,42 @@ test('ayuda global permite operar controles fijos y navegación móvil', async (
   await assertBounds(page)
   expect(errors).toEqual([])
 })
+
+test('bienvenida proactiva por rol en primer ingreso y captura de pantalla', async ({ page }, info) => {
+  const { errors } = await setupDashboard(page, 'client', false, false)
+  await page.goto('/dashboard?tab=collab')
+  const welcomeDialog = page.getByRole('dialog').filter({ hasText: '¡Te damos la bienvenida a CIMA CRM!' })
+  await expect(welcomeDialog).toBeVisible()
+  await expect(welcomeDialog).toContainText('Tu portal transparente para aprobar cotizaciones')
+  await expect(welcomeDialog.getByTestId('welcome-checklist-preview')).toBeVisible()
+  await page.screenshot({ path: info.outputPath('onboarding-welcome.png'), fullPage: true })
+  await welcomeDialog.getByRole('button', { name: 'Comenzar recorrido' }).click()
+  await expect(page.getByTestId('tour-guide')).toBeVisible()
+  await expect(page.getByTestId('tour-guide')).toHaveAttribute('aria-busy', 'false')
+  expect(await page.evaluate(() => localStorage.getItem('cima_welcome_v2:tutorial%40example.com'))).toBe('true')
+  expect(errors).toEqual([])
+})
+
+test('faq acordeon con feedback binario y atajo kbd ctrl k', async ({ page }, info) => {
+  const { errors } = await setupDashboard(page, 'worker')
+  await page.goto('/dashboard?tab=collab')
+  await openHelp(page)
+  const helpDialog = page.getByRole('dialog', { name: 'Centro de ayuda' })
+  await expect(helpDialog).toBeVisible()
+  await expect(helpDialog.locator('kbd')).toContainText('Ctrl K')
+
+  const questionItem = helpDialog.getByTestId('help-question-item').first()
+  await expect(questionItem).toBeVisible()
+  const expandBtn = questionItem.getByRole('button', { name: /ver respuesta completa/i })
+  await expandBtn.click()
+  await expect(questionItem).toContainText('¿Te fue útil?')
+
+  const helpfulBtn = questionItem.getByRole('button', { name: 'Sí' })
+  await helpfulBtn.click()
+  await expect(questionItem).toContainText('¡Gracias por tu valoración!')
+
+  await page.screenshot({ path: info.outputPath('faq-feedback-shortcut.png'), fullPage: true })
+  expect(errors).toEqual([])
+})
+
+

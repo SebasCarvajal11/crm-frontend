@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { useTourStore, parseCompleted } from './tour-store'
+import { useTourStore, parseCompleted, parseSeenWelcome } from './tour-store'
 import { createTourSession, moveSession, visitSession, canCompleteSession } from './tour-session'
 import type { CimaTourDefinition } from './types'
 
@@ -100,6 +100,10 @@ describe('Estado único del tutorial', () => {
   it('validar almacenamiento corrupto o con tipos incorrectos', () => {
     for (const value of ['null', '{}', '123', '{bad', null]) expect(parseCompleted(value)).toEqual([])
     expect(parseCompleted('["tour",false,{},null,"tour",""]')).toEqual(['tour'])
+    expect(parseSeenWelcome('true')).toBe(true)
+    expect(parseSeenWelcome('false')).toBe(false)
+    expect(parseSeenWelcome(null)).toBe(false)
+    expect(parseSeenWelcome('invalid')).toBe(false)
   })
   it('aislar el historial y cancelar la guía al cambiar de cuenta', () => {
     const store = useTourStore.getState()
@@ -110,4 +114,58 @@ describe('Estado único del tutorial', () => {
     expect(useTourStore.getState().completedTourIds).toEqual([])
     store.setHistoryOwner(null)
   })
+  it('gestionar estado de bienvenida, persistencia y descarte por usuario', () => {
+    const store = useTourStore.getState()
+    store.setHistoryOwner('nuevo@example.com')
+    expect(useTourStore.getState().hasSeenWelcome).toBe(false)
+    expect(useTourStore.getState().isWelcomeOpen).toBe(false)
+
+    store.openWelcome()
+    expect(useTourStore.getState().isWelcomeOpen).toBe(true)
+
+    store.closeWelcome()
+    expect(useTourStore.getState().isWelcomeOpen).toBe(false)
+    expect(useTourStore.getState().hasSeenWelcome).toBe(false)
+
+    store.openWelcome()
+    store.dismissWelcome()
+    expect(useTourStore.getState().isWelcomeOpen).toBe(false)
+    expect(useTourStore.getState().hasSeenWelcome).toBe(true)
+
+    // Al volver a cargar el mismo usuario, debe recordar que ya lo vio
+    store.setHistoryOwner('otro@example.com')
+    expect(useTourStore.getState().hasSeenWelcome).toBe(false)
+    store.setHistoryOwner('nuevo@example.com')
+    expect(useTourStore.getState().hasSeenWelcome).toBe(true)
+
+    // Resetear limpia la bienvenida
+    store.resetAllTours()
+    expect(useTourStore.getState().hasSeenWelcome).toBe(false)
+    store.setHistoryOwner(null)
+  })
+  it('gestionar feedback de preguntas frecuentes y persistencia aislada', () => {
+    const store = useTourStore.getState()
+    store.setHistoryOwner('feedback@example.com')
+    expect(useTourStore.getState().feedbackByQuestionId).toEqual({})
+
+    store.setFeedback('collab-q1', 'helpful')
+    expect(useTourStore.getState().feedbackByQuestionId['collab-q1']).toBe('helpful')
+
+    store.setFeedback('collab-q2', 'unhelpful')
+    expect(useTourStore.getState().feedbackByQuestionId['collab-q2']).toBe('unhelpful')
+
+    // Aislamiento por usuario
+    store.setHistoryOwner('otro-user@example.com')
+    expect(useTourStore.getState().feedbackByQuestionId).toEqual({})
+
+    store.setHistoryOwner('feedback@example.com')
+    expect(useTourStore.getState().feedbackByQuestionId['collab-q1']).toBe('helpful')
+    expect(useTourStore.getState().feedbackByQuestionId['collab-q2']).toBe('unhelpful')
+
+    // Resetear limpia feedback
+    store.resetAllTours()
+    expect(useTourStore.getState().feedbackByQuestionId).toEqual({})
+    store.setHistoryOwner(null)
+  })
 })
+

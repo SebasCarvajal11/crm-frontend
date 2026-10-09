@@ -10,15 +10,23 @@ const project = {
 }
 const pageOf = (items: unknown[]) => ({ items, total: items.length, page: 1, limit: 100, total_pages: 1 })
 
-export async function setupDashboard(page: Page, role: 'admin' | 'worker' | 'client' = 'admin', empty = false) {
+export async function setupDashboard(
+  page: Page,
+  role: 'admin' | 'worker' | 'client' = 'admin',
+  empty = false,
+  welcomeSeen = true,
+) {
   const errors: string[] = []
   const mutations: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
   const token = `fixture.${Buffer.from(JSON.stringify({ role, sub: 'test-user' })).toString('base64url')}.fixture`
-  await page.addInitScript(({ token }) => {
+  await page.addInitScript(({ token, welcomeSeen }) => {
     sessionStorage.setItem('cima_access_token', token)
     sessionStorage.setItem('cima_user_email', 'tutorial@example.com')
-  }, { token })
+    if (welcomeSeen) {
+      localStorage.setItem('cima_welcome_v2:tutorial%40example.com', 'true')
+    }
+  }, { token, welcomeSeen })
   await page.route('**/api/**', async (route) => {
     const path = new URL(route.request().url()).pathname
     const method = route.request().method()

@@ -2,6 +2,7 @@ import type {
   CimaTourDefinition,
   GuidedQuestion,
   TourContextState,
+  TourUserRole,
 } from '../model/types'
 import { overviewTour, overviewQuestions } from './overview.tour'
 import {
@@ -11,6 +12,7 @@ import {
   collabTasksMission,
   collabDocsMission,
   collabChangesMission,
+  collabClientApprovalsMission,
   COLLAB_MISSIONS,
   collabQuestions,
 } from './collab.tour'
@@ -29,6 +31,7 @@ export const ALL_TOURS: CimaTourDefinition[] = [
   collabTasksMission,
   collabDocsMission,
   collabChangesMission,
+  collabClientApprovalsMission,
   marketingTour,
   adminTour,
   analyticsTour,
@@ -70,16 +73,33 @@ export function getMissionsForContext(ctx: TourContextState): CimaTourDefinition
   )
 }
 
+export function getOnboardingChecklistForRole(role: TourUserRole): CimaTourDefinition[] {
+  if (role === 'client') {
+    return [collabKanbanMission, collabClientApprovalsMission, accountTour]
+  }
+  if (role === 'worker') {
+    return [collabTasksMission, collabDocsMission, accountTour]
+  }
+  return [collabKanbanMission, adminTour, marketingTour, analyticsTour]
+}
+
 export function searchMissions(query: string, ctx: TourContextState): CimaTourDefinition[] {
   const norm = normalizeSearch(query)
   if (!norm) return []
-  return ALL_TOURS.filter(
-    (t) =>
-      t.roles.includes(ctx.role) &&
-      (normalizeSearch(t.title).includes(norm) ||
-        normalizeSearch(t.description).includes(norm) ||
-        (t.badgeLabel && normalizeSearch(t.badgeLabel).includes(norm)))
-  )
+  const tokens = norm.split(/\s+/).filter(Boolean)
+  const minMatches = tokens.length > 1 ? Math.ceil(tokens.length * 0.6) : 1
+  return ALL_TOURS
+    .map((t) => {
+      if (!t.roles.includes(ctx.role)) return null
+      const corpus = normalizeSearch(`${t.title} ${t.description} ${t.badgeLabel ?? ''}`)
+      if (corpus.includes(norm)) return { t, score: tokens.length + 2 }
+      const matched = tokens.filter((token) => corpus.includes(token)).length
+      if (matched >= minMatches) return { t, score: matched }
+      return null
+    })
+    .filter((item): item is { t: CimaTourDefinition; score: number } => item !== null)
+    .sort((a, b) => b.score - a.score)
+    .map((item) => item.t)
 }
 
 export function getQuestionsForContext(ctx: TourContextState): GuidedQuestion[] {
@@ -105,11 +125,20 @@ export function searchQuestions(
       : getQuestionsForContext(ctx)
 
   if (!norm) return baseList
-  return baseList.filter(
-    (q) =>
-      (scopeMode === 'all' ? true : q.tab === ctx.activeTab || q.id.startsWith('global-')) &&
-      q.roles.includes(ctx.role) &&
-      (normalizeSearch(q.question).includes(norm) ||
-        normalizeSearch(q.answer).includes(norm))
-  )
+  const tokens = norm.split(/\s+/).filter(Boolean)
+  const minMatches = tokens.length > 1 ? Math.ceil(tokens.length * 0.6) : 1
+  return baseList
+    .map((q) => {
+      const roleOk = q.roles.includes(ctx.role)
+      const scopeOk = scopeMode === 'all' ? true : q.tab === ctx.activeTab || q.id.startsWith('global-')
+      if (!roleOk || !scopeOk) return null
+      const corpus = normalizeSearch(`${q.question} ${q.answer}`)
+      if (corpus.includes(norm)) return { q, score: tokens.length + 2 }
+      const matched = tokens.filter((t) => corpus.includes(t)).length
+      if (matched >= minMatches) return { q, score: matched }
+      return null
+    })
+    .filter((item): item is { q: GuidedQuestion; score: number } => item !== null)
+    .sort((a, b) => b.score - a.score)
+    .map((item) => item.q)
 }

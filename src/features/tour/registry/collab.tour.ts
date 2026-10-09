@@ -6,10 +6,19 @@ import {
   CONTRACT_STEPS,
   CHANGE_STEPS,
   WORKSPACE_ALL_STEPS,
+  CLIENT_APPROVAL_STEPS,
 } from './collab-steps'
 
 export { collabQuestions } from './collab.questions'
-export { KANBAN_STEPS, TASK_STEPS, DOC_STEPS, CONTRACT_STEPS, CHANGE_STEPS, WORKSPACE_ALL_STEPS }
+export {
+  KANBAN_STEPS,
+  TASK_STEPS,
+  DOC_STEPS,
+  CONTRACT_STEPS,
+  CHANGE_STEPS,
+  WORKSPACE_ALL_STEPS,
+  CLIENT_APPROVAL_STEPS,
+}
 
 export const collabKanbanMission: CimaTourDefinition = {
   id: 'mission-collab-kanban',
@@ -62,6 +71,19 @@ export const collabChangesMission: CimaTourDefinition = {
   steps: CHANGE_STEPS,
 }
 
+export const collabClientApprovalsMission: CimaTourDefinition = {
+  id: 'mission-collab-client-approvals',
+  tab: 'collab',
+  workspaceTab: 'contract',
+  title: 'Misión: Aprobaciones y Contratos del Cliente',
+  description: 'Aprende a revisar entregables, firmar el contrato digital y solicitar ajustes formalmente.',
+  roles: ['client', 'admin'],
+  category: 'onboarding',
+  badgeLabel: 'Aprobaciones y Firma',
+  estimatedMinutes: 2,
+  steps: CLIENT_APPROVAL_STEPS,
+}
+
 export const collabKanbanTour: CimaTourDefinition = {
   id: 'tour-collab-kanban',
   tab: 'collab',
@@ -91,4 +113,5 @@ export const COLLAB_MISSIONS: CimaTourDefinition[] = [
   collabTasksMission,
   collabDocsMission,
   collabChangesMission,
+  collabClientApprovalsMission,
 ]

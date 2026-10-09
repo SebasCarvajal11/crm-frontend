@@ -172,4 +172,28 @@ export const collabQuestions: GuidedQuestion[] = [
     category: 'flujo',
     targetElement: '[data-tour="workspace-back-btn"]',
   },
+  {
+    id: 'collab-q17',
+    question: 'Como reviso y firmo digitalmente el contrato del proyecto?',
+    answer:
+      'En la pestana Contrato puedes leer el documento legal y plasmar tu firma electronica con validez juridica.',
+    tab: 'collab',
+    scope: 'workspace',
+    workspaceTab: 'contract',
+    roles: ['client', 'admin'],
+    category: 'gestion',
+    targetElement: '[data-tour="workspace-tab-contract"]',
+  },
+  {
+    id: 'collab-q18',
+    question: 'Como formulo una solicitud formal de cambio de alcance o tiempo?',
+    answer:
+      'En la pestana Solicitud de cambios pulsa en formular peticion detallando la justificacion para revision administrativa.',
+    tab: 'collab',
+    scope: 'workspace',
+    workspaceTab: 'change-requests',
+    roles: ['client', 'admin'],
+    category: 'gestion',
+    targetElement: '[data-tour="workspace-tab-change-requests"]',
+  },
 ]

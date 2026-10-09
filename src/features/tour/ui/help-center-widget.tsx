@@ -4,6 +4,7 @@ import { useTourStore } from '../model/tour-store'
 import { useTourContext } from '../hooks/use-tour-context'
 import { getMissionsForContext } from '../registry'
 import { HelpCenterModal } from './help-center-modal'
+import { OnboardingWelcomeDialog } from './onboarding-welcome-dialog'
 import { TourRuntime } from './tour-runtime'
 import { useSessionStore } from '@/app/session/session-store'
 import { useRouterState } from '@tanstack/react-router'
@@ -13,6 +14,11 @@ export function HelpCenterWidget() {
   const toggleHelpCenter = useTourStore((s) => s.toggleHelpCenter)
   const focusHelpCenterWithQuery = useTourStore((s) => s.focusHelpCenterWithQuery)
   const isHelpCenterOpen = useTourStore((s) => s.isHelpCenterOpen)
+  const isWelcomeOpen = useTourStore((s) => s.isWelcomeOpen)
+  const hasSeenWelcome = useTourStore((s) => s.hasSeenWelcome)
+  const historyOwner = useTourStore((s) => s.historyOwner)
+  const session = useTourStore((s) => s.session)
+  const openWelcome = useTourStore((s) => s.openWelcome)
   const completed = useTourStore((s) => s.completedTourIds)
   const token = useSessionStore((state) => state.token)
   const pathname = useRouterState({ select: (state) => state.location.pathname })
@@ -24,6 +30,13 @@ export function HelpCenterWidget() {
     () => missions.some((m) => !completed.includes(m.id)),
     [missions, completed]
   )
+
+  useEffect(() => {
+    if (available && historyOwner && !hasSeenWelcome && !isWelcomeOpen && !session && !isHelpCenterOpen) {
+      openWelcome()
+    }
+  }, [available, historyOwner, hasSeenWelcome, isWelcomeOpen, session, isHelpCenterOpen, openWelcome])
+
 
   useEffect(() => {
     if (!available) return
@@ -80,10 +93,18 @@ export function HelpCenterWidget() {
               <span className="relative inline-flex size-2.5 rounded-full bg-primary" />
             </span>
           )}
+          <span
+            aria-hidden="true"
+            className="absolute -bottom-1 -right-1 hidden md:flex size-4 items-center justify-center
+              rounded-full bg-muted border border-border text-[9px] font-mono font-semibold text-muted-foreground shadow-2xs"
+          >
+            ?
+          </span>
         </button>
       </FloatingActionContainer>
 
       <HelpCenterModal />
+      <OnboardingWelcomeDialog />
       </>}
     </>
   )

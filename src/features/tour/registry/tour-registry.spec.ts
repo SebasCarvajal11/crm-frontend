@@ -5,9 +5,11 @@ import {
   searchMissions,
   getQuestionsForContext,
   searchQuestions,
+  getOnboardingChecklistForRole,
   ALL_TOURS,
   ALL_QUESTIONS,
 } from './index'
+import { collabClientApprovalsMission } from './collab.tour'
 
 describe('Tour Registry Facade', () => {
   it('conservar IDs únicos y destinos autorizados en toda la ayuda', () => {
@@ -209,7 +211,7 @@ describe('Tour Registry Facade', () => {
   it('retorna el tour de marketing para admin y worker con selectores verificados y 0 emojis', () => {
     const tour = getActiveTourForContext({ activeTab: 'marketing', role: 'admin' })
     expect(tour?.id).toBe('tour-marketing')
-    expect(tour?.steps.length).toBe(8)
+    expect(tour?.steps.length).toBe(10)
     const elements = tour!.steps.map((s) => s.element)
     expect(elements).toContain('[data-tour="marketing-header"]')
     expect(elements).toContain('[data-tour="marketing-tabs"]')
@@ -219,6 +221,8 @@ describe('Tour Registry Facade', () => {
     expect(elements).toContain('[data-tour="marketing-campaigns-filters"]')
     expect(elements).toContain('[data-tour="marketing-new-proposal-btn"]')
     expect(elements).toContain('[data-tour="marketing-new-workflow-btn"]')
+    expect(elements).toContain('[data-tour="marketing-tab-segments"]')
+    expect(elements).toContain('[data-tour="marketing-tab-interactions"]')
 
     const emojiRegex = /\p{Extended_Pictographic}/u
     for (const step of tour!.steps) {
@@ -291,14 +295,56 @@ describe('Tour Registry Facade', () => {
     }
   })
 
-  it('retorna las 4 micro-misiones modulares para el contexto de colaboracion', () => {
+  it('retorna las 5 micro-misiones modulares para colaboracion incluyendo cliente', () => {
     const missions = getMissionsForContext({ activeTab: 'collab', role: 'admin' })
-    expect(missions).toHaveLength(4)
+    expect(missions).toHaveLength(5)
     const missionIds = missions.map((m) => m.id)
     expect(missionIds).toContain('mission-collab-kanban')
     expect(missionIds).toContain('mission-collab-tasks')
     expect(missionIds).toContain('mission-collab-docs')
     expect(missionIds).toContain('mission-collab-changes')
+    expect(missionIds).toContain('mission-collab-client-approvals')
+    expect(collabClientApprovalsMission.roles).toContain('client')
+  })
+
+  it('proporciona un checklist de onboarding estructurado por rol (Opción B)', () => {
+    const clientChecklist = getOnboardingChecklistForRole('client')
+    expect(clientChecklist).toHaveLength(3)
+    expect(clientChecklist.map((m) => m.id)).toEqual([
+      'mission-collab-kanban',
+      'mission-collab-client-approvals',
+      'tour-account',
+    ])
+
+    const workerChecklist = getOnboardingChecklistForRole('worker')
+    expect(workerChecklist).toHaveLength(3)
+    expect(workerChecklist.map((m) => m.id)).toEqual([
+      'mission-collab-tasks',
+      'mission-collab-docs',
+      'tour-account',
+    ])
+
+    const adminChecklist = getOnboardingChecklistForRole('admin')
+    expect(adminChecklist).toHaveLength(4)
+    expect(adminChecklist.map((m) => m.id)).toEqual([
+      'mission-collab-kanban',
+      'tour-admin',
+      'tour-marketing',
+      'tour-analytics',
+    ])
+  })
+
+  it('soporta busqueda multitoken tolerante al orden de palabras en misiones y preguntas', () => {
+    const ctx = { activeTab: 'collab', role: 'admin' } as const
+    // Búsqueda con palabras fuera de orden ("kanban exploracion" debe hallar "Exploración del Tablero Kanban")
+    const missionMatches = searchMissions('kanban exploracion', ctx)
+    expect(missionMatches.length).toBeGreaterThan(0)
+    expect(missionMatches.some((m) => m.id === 'mission-collab-kanban')).toBe(true)
+
+    // Búsqueda de preguntas multitoken fuera de orden
+    const questionMatches = searchQuestions('crear proyecto nuevo', ctx)
+    expect(questionMatches.length).toBeGreaterThan(0)
+    expect(questionMatches.some((q) => q.id === 'collab-q3')).toBe(true)
   })
 
   it('permite buscar micro-misiones por termino clave', () => {

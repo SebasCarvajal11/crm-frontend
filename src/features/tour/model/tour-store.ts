@@ -3,6 +3,7 @@ import type { CimaTourDefinition, TourUserRole } from './types'
 import { canCompleteSession, createTourSession, moveSession, visitSession, type TourSession } from './tour-session'
 
 export const completionStorageKey = (owner: string) => `cima_tour_v2:${encodeURIComponent(owner.toLocaleLowerCase('es'))}`
+export const welcomeStorageKey = (owner: string) => `cima_welcome_v2:${encodeURIComponent(owner.toLocaleLowerCase('es'))}`
 
 export function parseCompleted(raw: string | null): string[] {
   try {
@@ -11,18 +12,73 @@ export function parseCompleted(raw: string | null): string[] {
   } catch { return [] }
 }
 
+export function parseSeenWelcome(raw: string | null): boolean {
+  return raw === 'true'
+}
+
+const memoryStorageFallback = new Map<string, string>()
+
+function getStorage() {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) return window.localStorage
+    if (typeof localStorage !== 'undefined') return localStorage
+  } catch { /* Storage access may be restricted */ }
+  return {
+    getItem: (key: string) => memoryStorageFallback.get(key) ?? null,
+    setItem: (key: string, val: string) => { memoryStorageFallback.set(key, val) },
+    removeItem: (key: string) => { memoryStorageFallback.delete(key) },
+  }
+}
+
 function readCompleted(owner: string): string[] {
-  try { return parseCompleted(window.localStorage.getItem(completionStorageKey(owner))) } catch { return [] }
+  try { return parseCompleted(getStorage()?.getItem(completionStorageKey(owner)) ?? null) } catch { return [] }
+}
+
+function readSeenWelcome(owner: string): boolean {
+  try { return parseSeenWelcome(getStorage()?.getItem(welcomeStorageKey(owner)) ?? null) } catch { return false }
 }
 
 function persist(owner: string | null, ids: string[]) {
   if (!owner) return
-  try { window.localStorage.setItem(completionStorageKey(owner), JSON.stringify(ids)) } catch { /* Storage may be restricted. */ }
+  try { getStorage()?.setItem(completionStorageKey(owner), JSON.stringify(ids)) } catch { /* Storage may be restricted. */ }
 }
+
+export const feedbackStorageKey = (owner: string) => `cima_feedback_v2:${encodeURIComponent(owner.toLocaleLowerCase('es'))}`
+
+export type QuestionFeedbackMap = Record<string, 'helpful' | 'unhelpful'>
+
+export function parseFeedback(raw: string | null): QuestionFeedbackMap {
+  try {
+    const value: unknown = JSON.parse(raw ?? '{}')
+    return typeof value === 'object' && value !== null && !Array.isArray(value)
+      ? (value as QuestionFeedbackMap)
+      : {}
+  } catch { return {} }
+}
+
+function persistSeenWelcome(owner: string | null, seen: boolean) {
+  if (!owner) return
+  try { getStorage()?.setItem(welcomeStorageKey(owner), seen ? 'true' : 'false') } catch { /* Storage may be restricted. */ }
+}
+
+function readFeedback(owner: string): QuestionFeedbackMap {
+  try { return parseFeedback(getStorage()?.getItem(feedbackStorageKey(owner)) ?? null) } catch { return {} }
+}
+
+function persistFeedback(owner: string | null, feedback: QuestionFeedbackMap) {
+  if (!owner) return
+  try { getStorage()?.setItem(feedbackStorageKey(owner), JSON.stringify(feedback)) } catch { /* Storage may be restricted. */ }
+}
+
+
+
 
 type TourStoreState = {
   isHelpCenterOpen: boolean
+  isWelcomeOpen: boolean
+  hasSeenWelcome: boolean
   completedTourIds: string[]
+  feedbackByQuestionId: QuestionFeedbackMap
   initialSearchQuery?: string
   session: TourSession | null
   sequence: number
@@ -31,6 +87,10 @@ type TourStoreState = {
   openHelpCenter: () => void
   closeHelpCenter: () => void
   toggleHelpCenter: () => void
+  openWelcome: () => void
+  closeWelcome: () => void
+  dismissWelcome: () => void
+  setFeedback: (questionId: string, value: 'helpful' | 'unhelpful') => void
   focusHelpCenterWithQuery: (query?: string) => void
   start: (tour: CimaTourDefinition, role: TourUserRole) => void
   stop: () => void
@@ -43,19 +103,50 @@ type TourStoreState = {
 }
 
 export const useTourStore = create<TourStoreState>((set, get) => ({
-  isHelpCenterOpen: false, completedTourIds: [], initialSearchQuery: undefined,
+  isHelpCenterOpen: false, isWelcomeOpen: false, hasSeenWelcome: false,
+  completedTourIds: [], feedbackByQuestionId: {}, initialSearchQuery: undefined,
   session: null, sequence: 0, historyOwner: null,
   setHistoryOwner: (owner) => {
     if (owner === get().historyOwner) return
-    set({ historyOwner: owner, completedTourIds: owner ? readCompleted(owner) : [], session: null, isHelpCenterOpen: false })
+    const seen = owner ? readSeenWelcome(owner) : false
+    set({
+      historyOwner: owner,
+      completedTourIds: owner ? readCompleted(owner) : [],
+      feedbackByQuestionId: owner ? readFeedback(owner) : {},
+      hasSeenWelcome: seen,
+      isWelcomeOpen: false,
+      session: null,
+      isHelpCenterOpen: false,
+    })
   },
-  openHelpCenter: () => set({ isHelpCenterOpen: true, initialSearchQuery: undefined }),
+  openHelpCenter: () => set({ isHelpCenterOpen: true, isWelcomeOpen: false, initialSearchQuery: undefined }),
   closeHelpCenter: () => set({ isHelpCenterOpen: false, initialSearchQuery: undefined }),
-  toggleHelpCenter: () => set((state) => ({ isHelpCenterOpen: !state.isHelpCenterOpen, initialSearchQuery: undefined })),
-  focusHelpCenterWithQuery: (query = '') => set({ isHelpCenterOpen: true, initialSearchQuery: query }),
+  toggleHelpCenter: () => set((state) => ({
+    isHelpCenterOpen: !state.isHelpCenterOpen,
+    isWelcomeOpen: false,
+    initialSearchQuery: undefined,
+  })),
+  openWelcome: () => set({ isWelcomeOpen: true, isHelpCenterOpen: false }),
+  closeWelcome: () => set({ isWelcomeOpen: false }),
+  dismissWelcome: () => {
+    persistSeenWelcome(get().historyOwner, true)
+    set({ isWelcomeOpen: false, hasSeenWelcome: true })
+  },
+  setFeedback: (questionId, value) => {
+    const feedbackByQuestionId = { ...get().feedbackByQuestionId, [questionId]: value }
+    persistFeedback(get().historyOwner, feedbackByQuestionId)
+    set({ feedbackByQuestionId })
+  },
+  focusHelpCenterWithQuery: (query = '') => set({ isHelpCenterOpen: true, isWelcomeOpen: false, initialSearchQuery: query }),
   start: (tour, role) => {
     const sequence = get().sequence + 1
-    set({ session: createTourSession(tour, role, sequence), sequence, isHelpCenterOpen: false, initialSearchQuery: undefined })
+    set({
+      session: createTourSession(tour, role, sequence),
+      sequence,
+      isHelpCenterOpen: false,
+      isWelcomeOpen: false,
+      initialSearchQuery: undefined,
+    })
   },
   stop: () => set((state) => ({ session: null, sequence: state.sequence + 1 })),
   move: (index) => set((state) => {
@@ -76,5 +167,10 @@ export const useTourStore = create<TourStoreState>((set, get) => ({
     persist(get().historyOwner, ids)
     set({ completedTourIds: ids, session: null })
   },
-  resetAllTours: () => { persist(get().historyOwner, []); set({ completedTourIds: [], session: null }) },
+  resetAllTours: () => {
+    persist(get().historyOwner, [])
+    persistSeenWelcome(get().historyOwner, false)
+    persistFeedback(get().historyOwner, {})
+    set({ completedTourIds: [], feedbackByQuestionId: {}, hasSeenWelcome: false, isWelcomeOpen: false, session: null })
+  },
 }))
