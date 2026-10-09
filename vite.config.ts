@@ -25,28 +25,37 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks(id) {
+            const normalized = id.replace(/\\/g, '/')
             if (
-              id.includes('components/ui/cima-icon') ||
-              id.includes('components/ui/icons') ||
-              id.includes('lucide-react')
+              normalized.includes('components/ui/cima-icon') ||
+              normalized.includes('components/ui/icons') ||
+              normalized.includes('lucide-react')
             ) {
               return 'vendor-icons'
             }
-            if (id.includes('node_modules')) {
-              if (id.includes('recharts')) return 'vendor-charts'
-              if (id.includes('pdf-lib')) return 'vendor-pdf'
-              if (id.includes('jszip')) return 'vendor-zip'
-              if (id.includes('@tanstack')) return 'vendor-tanstack'
+            if (normalized.includes('/node_modules/')) {
+              const pkg = normalized.split('/node_modules/').pop() || ''
+              if (pkg.startsWith('react/') || pkg.startsWith('react-dom/') || pkg.startsWith('scheduler/')) {
+                return 'vendor-core'
+              }
+              if (pkg.startsWith('pdf-lib/')) {
+                return 'vendor-pdf'
+              }
+              if (pkg.startsWith('jszip/')) {
+                return 'vendor-zip'
+              }
+              if (pkg.startsWith('@tanstack/')) {
+                return 'vendor-tanstack'
+              }
               if (
-                id.includes('ky') ||
-                id.includes('zod') ||
-                id.includes('tailwind-merge') ||
-                id.includes('clsx') ||
-                id.includes('class-variance-authority')
+                pkg.startsWith('ky/') ||
+                pkg.startsWith('zod/') ||
+                pkg.startsWith('tailwind-merge/') ||
+                pkg.startsWith('clsx/') ||
+                pkg.startsWith('class-variance-authority/')
               ) {
                 return 'vendor-utils'
               }
-              if (id.includes('react') || id.includes('react-dom')) return 'vendor-core'
             }
           },
         },

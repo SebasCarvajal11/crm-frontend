@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { authPages } from '@/pages'
+import { ResetPasswordPage } from '@/pages/auth'
 
 type ResetSearch = { token?: string }
 
@@ -12,6 +12,6 @@ export const Route = createFileRoute('/reset-password')({
 
 function ResetPasswordRoute() {
   const { token } = Route.useSearch()
-  return <authPages.ResetPasswordPage token={token} />
+  return <ResetPasswordPage token={token} />
 }
 

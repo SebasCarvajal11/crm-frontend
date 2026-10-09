@@ -1,6 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { DashboardPage } from '@/pages'
+import { createFileRoute, lazyRouteComponent } from '@tanstack/react-router'
 import { parseDashboardSearch } from './-dashboard.search'
+
+const LazyDashboardPage = lazyRouteComponent(
+  () => import('@/pages/dashboard/dashboard-page'),
+  'DashboardPage',
+)
 
 export const Route = createFileRoute('/dashboard')({
   validateSearch: parseDashboardSearch,
@@ -9,6 +13,6 @@ export const Route = createFileRoute('/dashboard')({
 
 function DashboardRoute() {
   const search = Route.useSearch()
-  return <DashboardPage {...search} />
+  return <LazyDashboardPage {...search} />
 }
 

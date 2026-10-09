@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { authPages } from '@/pages'
+import { VerifyEmailPage } from '@/pages/auth'
 
 type VerifySearch = { token?: string }
 
@@ -12,6 +12,6 @@ export const Route = createFileRoute('/verify-email')({
 
 function VerifyEmailRoute() {
   const { token } = Route.useSearch()
-  return <authPages.VerifyEmailPage token={token} />
+  return <VerifyEmailPage token={token} />
 }
 

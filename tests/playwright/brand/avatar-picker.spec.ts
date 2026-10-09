@@ -162,11 +162,27 @@ test.describe('Catálogo Oficial de Avatares CIMA', () => {
       })
     })
 
-    await page.route('**/api/v1/collab/projects', async (route) => {
+    await page.route(/\/api\/v1\/collab\/projects/, async (route) => {
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
         json: { data: { items: [], total: 0, page: 1, limit: 100, total_pages: 1 } },
+      })
+    })
+
+    await page.route(/\/api\/v1\/collab\/notifications/, async (route) => {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: { data: [] },
+      })
+    })
+
+    await page.route(/\/api\/v1\/analytics/, async (route) => {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: { data: {} },
       })
     })
 

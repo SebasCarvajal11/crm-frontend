@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { authPages } from '@/pages'
+import { AcceptInvitePage } from '@/pages/auth'
 
 export const Route = createFileRoute('/accept-invite/$token')({
   component: AcceptInviteRoute,
@@ -7,6 +7,6 @@ export const Route = createFileRoute('/accept-invite/$token')({
 
 function AcceptInviteRoute() {
   const { token } = Route.useParams()
-  return <authPages.AcceptInvitePage token={token} />
+  return <AcceptInvitePage token={token} />
 }
 
