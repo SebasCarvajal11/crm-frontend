@@ -59,11 +59,24 @@ function useCounterRafLoop(params: RafLoopParams): string {
   const currentNumRef = useRef<number>(initialNum)
   const rafIdRef = useRef<number | null>(null)
   const onCompleteRef = useRef(onComplete)
+  const hasAnimatedRef = useRef<boolean>(false)
   useEffect(() => { onCompleteRef.current = onComplete }, [onComplete])
 
   useEffect(() => {
     if (isBypassed) { currentNumRef.current = spec.target; return }
-    if (!isInViewport || currentNumRef.current === spec.target) return
+    if (currentNumRef.current === spec.target) return
+
+    const finalize = () => {
+      currentNumRef.current = spec.target
+      setDisplayValue(formatAnimatedValue(spec.target, spec))
+      hasAnimatedRef.current = true
+    }
+
+    if (!isInViewport) {
+      if (hasAnimatedRef.current) finalize()
+      return
+    }
+
     const startVal = currentNumRef.current
     let startTime: number | null = null
 
@@ -75,15 +88,18 @@ function useCounterRafLoop(params: RafLoopParams): string {
       if (!isDone) {
         rafIdRef.current = requestAnimationFrame(tick)
       } else {
-        currentNumRef.current = spec.target
-        setDisplayValue(formatAnimatedValue(spec.target, spec))
+        finalize()
         rafIdRef.current = null
         onCompleteRef.current?.()
       }
     }
     rafIdRef.current = requestAnimationFrame(tick)
     return () => {
-      if (rafIdRef.current !== null) { cancelAnimationFrame(rafIdRef.current); rafIdRef.current = null }
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current)
+        rafIdRef.current = null
+        finalize()
+      }
     }
   }, [spec, isBypassed, isInViewport, duration, easeFn])
   return displayValue
