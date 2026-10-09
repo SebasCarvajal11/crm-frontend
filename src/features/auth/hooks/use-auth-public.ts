@@ -13,6 +13,7 @@ import { useSessionStore } from '@/app/session/session-store'
 import type { LoginRequestValues } from '@/features/auth/model'
 import { setAvatarPresetRequest } from '@/shared/api'
 import { getRandomAvatarSelection } from '@/shared/lib/avatar-catalog'
+import { BRAND_TEXTURES, preloadTexture } from '@/shared/lib/brand-textures'
 
 export function useLoginFlow() {
   const navigate = useNavigate({ from: '/login' })
@@ -38,6 +39,7 @@ export function useLoginFlow() {
         document.body.scrollTop = 0
       }
       setSession(data.data.access_token, variables.email)
+      preloadTexture(BRAND_TEXTURES.sidebar)
       navigate({ to: '/dashboard' })
     },
   })
@@ -153,6 +155,7 @@ export function useAcceptInviteFlow(token: string) {
       void queryClient.invalidateQueries({
         predicate: (query) => query.queryKey[0] !== 'invite-preview',
       })
+      preloadTexture(BRAND_TEXTURES.sidebar)
       navigate({ to: '/dashboard' })
     },
   })

@@ -8,6 +8,16 @@ export const BRAND_TEXTURES = {
 export type BrandTextureKey = keyof typeof BRAND_TEXTURES
 
 /**
+ * Precarga de forma asíncrona una textura de marca en el background
+ * para asegurar disponibilidad en cache antes de renderizados pesados.
+ */
+export function preloadTexture(src: string): void {
+  if (typeof window === 'undefined') return
+  const img = new Image()
+  img.src = src
+}
+
+/**
  * Hook que detecta de manera sincrónica si la textura ya se encuentra decodificada
  * en la memoria caché del navegador (memory-cache / disk-cache).
  * Evita cualquier retraso si ya está en caché, y provee estado de carga para fade-in suave.
