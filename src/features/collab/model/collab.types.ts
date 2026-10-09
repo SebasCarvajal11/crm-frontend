@@ -1,4 +1,8 @@
-import type { ProjectType as _ProjectType, ParentProjectStatus as _ParentProjectStatus, ProjectListItem as _ProjectListItem } from '@/shared/types'
+import type {
+  ProjectType as _ProjectType,
+  ParentProjectStatus as _ParentProjectStatus,
+  ProjectListItem as _ProjectListItem,
+} from '@/shared/types'
 import type { DataResponse, PaginatedData } from '@sebascarvajal11/cima-contracts'
 export type { DataResponse, PaginatedData }
 export type ProjectType = _ProjectType
@@ -8,23 +12,12 @@ export type ProjectListItem = _ProjectListItem
 export type ProjectMemberRole = 'admin' | 'worker' | 'client'
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
 /** Columnas canónicas del tablero kanban (aplican a todos los proyectos). */
-export type CanonicalTaskColumnKey =
-  | 'pending'
-  | 'doing'
-  | 'internal_review'
-  | 'client_approval'
-  | 'blocked'
-  | 'done'
+export type CanonicalTaskColumnKey = 'pending' | 'doing' | 'internal_review' | 'client_approval' | 'blocked' | 'done'
 
 /** Claves de columna admitidas (incluye valores legacy para retrocompatibilidad). */
 export type TaskColumnKey =
   | CanonicalTaskColumnKey
-  | 'art_approved'
-  | 'in_production'
-  | 'quality_control'
-  | 'shipped'
-  | 'completed'
-  | 'waiting_material'
+  | 'art_approved' | 'in_production' | 'quality_control' | 'shipped' | 'completed' | 'waiting_material'
 
 export type ProjectSearchResult = {
   id: string
@@ -146,12 +139,7 @@ export type ProjectWorkspaceResponse = {
     updatedBySub: string
     updatedAt: string
   } | null
-  formalChanges: Array<{
-    id: string
-    status: string
-    title: string
-    createdAt: string
-  }>
+  formalChanges: ProjectChangeRequest[]
 }
 
 export type ProjectBoardPayload = {

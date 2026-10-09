@@ -8,7 +8,6 @@ import {
   type ProjectMember,
 } from '@/features/collab/model'
 import { listProjectContractAmendmentsRequest } from '@/features/collab/api'
-import { generateContractPreviewText } from '@/features/collab/lib/contract-parser'
 import { COLLAB_WORKSPACE_PANEL_HEIGHT_CLASS } from './collab-workspace-layout'
 import { ContractClientSignature } from './contract-client-signature'
 import { ContractDocumentReader } from './contract-document-reader'
@@ -204,10 +203,7 @@ export function ContractPanel({
         >
           <div className="h-[24rem] lg:h-full min-h-0 overflow-y-auto pr-1">
             <ContractDocumentReader
-              content={
-                contract.contentSnapshot ||
-                generateContractPreviewText(contract, project.name)
-              }
+              content={contract.contentSnapshot || ''}
             />
           </div>
 

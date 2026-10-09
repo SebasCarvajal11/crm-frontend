@@ -18,7 +18,7 @@ type BriefData = {
 type Props = {
   brief: BriefData
   changeRequests?: ProjectChangeRequest[]
-  formalChanges?: Array<{ id: string; status: string; title: string; createdAt: string }>
+  formalChanges?: ProjectChangeRequest[]
   isLoading: boolean
 }
 
@@ -224,26 +224,9 @@ export function BriefPanel({ brief, changeRequests, formalChanges, isLoading }: 
 
   const normalizedItems: ProjectChangeRequest[] = useMemo(() => {
     if (changeRequests && changeRequests.length > 0) return changeRequests
-    if (formalChanges && formalChanges.length > 0) {
-      return formalChanges.map((fc) => ({
-        id: fc.id,
-        projectId: brief?.projectId ?? '',
-        taskId: null,
-        type: 'formal' as const,
-        status: fc.status === 'approved' ? ('accepted' as const) : ('open' as const),
-        priority: 'medium' as const,
-        requestedBySub: '',
-        resolvedBySub: null,
-        title: fc.title,
-        description: fc.title,
-        justification: null,
-        resolutionComment: null,
-        createdAt: fc.createdAt,
-        resolvedAt: null,
-      }))
-    }
+    if (formalChanges && formalChanges.length > 0) return formalChanges
     return []
-  }, [changeRequests, formalChanges, brief?.projectId])
+  }, [changeRequests, formalChanges])
 
   if (isLoading) {
     return <BriefSkeleton />

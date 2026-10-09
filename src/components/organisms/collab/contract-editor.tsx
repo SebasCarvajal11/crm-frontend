@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Button } from '@/components/ui/button'
 import { collabKeys, type Project, type ProjectContract, type ProjectMember } from '@/features/collab/model'
 import {
   requestProjectContractSignatureRequest,
@@ -7,7 +8,6 @@ import {
   type ProjectContractDraftInput,
 } from '@/features/collab/api'
 import { parseApiError } from '@/shared/lib'
-import { generateContractPreviewText } from '@/features/collab/lib/contract-parser'
 import { ContractDocumentReader } from './contract-document-reader'
 import { ContractEditorForm } from './contract-editor-form'
 import { ContractEditorSummary } from './contract-editor-summary'
@@ -94,7 +94,7 @@ export function ContractEditor({
   })
 
   const busy = save.isPending || send.isPending
-  const previewText = generateContractPreviewText(values, project.name)
+  const previewText = contract?.contentSnapshot || ''
 
   return (
     <div className="grid gap-4 min-[1280px]:grid-cols-[minmax(0,1fr)_minmax(20rem,0.55fr)]">
@@ -134,7 +134,26 @@ export function ContractEditor({
 
         {activeTab === 'preview' ? (
           <div className="p-4 max-h-[calc(100vh-20rem)] overflow-y-auto">
-            <ContractDocumentReader content={previewText} />
+            {previewText ? (
+              <ContractDocumentReader content={previewText} />
+            ) : (
+              <div className="flex h-64 flex-col items-center justify-center gap-2 text-center text-muted-foreground">
+                <p className="text-sm font-medium">Sin vista previa disponible</p>
+                <p className="text-xs text-muted-foreground max-w-sm">
+                  Guarda el borrador para generar la vista previa oficial con validación SHA-256.
+                </p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => save.mutate()}
+                  disabled={busy}
+                  className="mt-2 text-xs"
+                >
+                  Guardar borrador para previsualizar
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <ContractEditorForm

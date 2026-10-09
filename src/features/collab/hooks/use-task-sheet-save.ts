@@ -38,9 +38,7 @@ export function useTaskSheetSave({ accessToken, projectId, task, onSaved, onErro
         client_visible: input.editVisible,
         column_id: input.editColumnId !== task.columnId ? input.editColumnId : undefined,
         due_date: input.editDeadline || null,
-        assignees: input.editWorkers.length > 0
-          ? input.editWorkers.map((w) => ({ user_sub: w.subject, user_email: w.email }))
-          : undefined,
+        assignees: input.editWorkers.map((w) => ({ user_sub: w.subject, user_email: w.email })),
         subtasks: input.subtasks,
       }),
     onSuccess: (_result, variables) => {

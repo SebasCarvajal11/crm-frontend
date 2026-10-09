@@ -100,7 +100,7 @@ export const ChatMessageList = memo(function ChatMessageList({
     <>
       {messages.map((message, index) => {
         const isOwn = message.authorSub === identity.id
-        const isSystem = message.messageType !== 'text'
+        const isSystem = !message.authorSub
         const isMentioned =
           Array.isArray(message.mentionedSubs) && message.mentionedSubs.includes(identity.id)
         const prev = index > 0 ? messages[index - 1] : null

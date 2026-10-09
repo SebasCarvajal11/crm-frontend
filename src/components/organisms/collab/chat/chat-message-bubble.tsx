@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import { Sparkles } from 'lucide-react'
 import type { ProjectChatMessage } from '@/features/collab/model'
 import { UserAvatar } from '@/components/atoms/user-avatar'
 import { cn } from '@/shared/lib/utils'
@@ -34,6 +35,8 @@ export const ChatMessageBubble = memo(function ChatMessageBubble({
   highlightMessageId,
   onOpenDetails,
 }: ChatMessageBubbleProps) {
+  const isMilestone = message.messageType === 'milestone'
+
   return (
     <div
       data-message-id={message.id}
@@ -86,13 +89,24 @@ export const ChatMessageBubble = memo(function ChatMessageBubble({
           </span>
         )}
 
+        {isMilestone && (
+          <div className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+            <Sparkles className="h-3 w-3 shrink-0" />
+            <span>Hito del proyecto</span>
+          </div>
+        )}
+
         <div
           className={cn(
             'break-words px-3.5 py-2 text-sm leading-relaxed transition-all duration-150',
-            isOwn
-              ? 'rounded-2xl rounded-br-xs bg-primary text-primary-foreground shadow-2xs'
-              : 'rounded-2xl rounded-bl-xs bg-card border border-border/70 text-foreground shadow-2xs',
-            isMentioned && !isOwn
+            isMilestone
+              ? isOwn
+                ? 'rounded-2xl rounded-br-xs bg-emerald-600 text-white ring-2 ring-emerald-400/40 shadow-sm'
+                : 'rounded-2xl rounded-bl-xs bg-emerald-500/5 border border-emerald-500/30 text-foreground ring-1 ring-emerald-500/20 shadow-sm'
+              : isOwn
+                ? 'rounded-2xl rounded-br-xs bg-primary text-primary-foreground shadow-2xs'
+                : 'rounded-2xl rounded-bl-xs bg-card border border-border/70 text-foreground shadow-2xs',
+            isMentioned && !isOwn && !isMilestone
               ? 'bg-amber-500/10 border-amber-500/30 ring-1 ring-amber-500/20'
               : ''
           )}

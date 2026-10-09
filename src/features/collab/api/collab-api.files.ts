@@ -5,6 +5,7 @@ import { PROJECT_ROUTES, FILE_ROUTES } from '@/shared/lib/gateway-routes'
 import { isRetryableUploadRegistrationError, withUploadRegistrationRetries } from './upload-registration'
 import type {
   DataResponse,
+  FileFolder,
   PaginatedData,
   ProjectFileEnriched,
   ProjectTimelineItem,
@@ -26,6 +27,7 @@ export type ProjectFileMetadataInput = {
   sizeBytes: number
   isClientVisible: boolean
   origin: 'internal_chat' | 'external_chat' | 'manual_upload'
+  folder?: FileFolder
 }
 
 export async function listProjectFilesEnrichedRequest(
@@ -48,27 +50,6 @@ export async function listProjectTimelineRequest(
   return api
     .get(PROJECT_ROUTES.timeline(projectId), { headers: bearer(accessToken) })
     .json<DataResponse<ProjectTimelineItem[]>>()
-}
-
-export async function uploadProjectConversationFileRequest(
-  accessToken: string,
-  projectId: string,
-  body: {
-    file: File
-    title: string
-    description?: string
-    isClientVisible: boolean
-  }
-): Promise<DataResponse<ProjectFileEnriched>> {
-  const form = new FormData()
-  form.append('file', body.file)
-  form.append('title', body.title)
-  if (body.description?.trim()) form.append('description', body.description.trim())
-  form.append('is_client_visible', String(body.isClientVisible))
-  form.append('channel', body.isClientVisible ? 'external' : 'internal')
-  return api
-    .post(PROJECT_ROUTES.filesUpload(projectId), { headers: bearer(accessToken), body: form })
-    .json<DataResponse<ProjectFileEnriched>>()
 }
 
 export async function uploadProjectFilePresignedRequest(
@@ -117,6 +98,7 @@ export async function createProjectFileMetadataRequest(
     sizeBytes: number
     isClientVisible: boolean
     origin: 'internal_chat' | 'external_chat' | 'manual_upload'
+    folder?: FileFolder
   }
 ): Promise<DataResponse<ProjectFileEnriched>> {
   return api.post(PROJECT_ROUTES.files(projectId), {
@@ -128,7 +110,7 @@ export async function createProjectFileMetadataRequest(
       storage_path: body.storagePath,
       mime_type: body.mimeType,
       size_bytes: body.sizeBytes,
-      folder: 'shared_deliverables',
+      folder: body.folder ?? 'shared_deliverables',
       is_client_visible: body.isClientVisible,
       origin: body.origin,
     },

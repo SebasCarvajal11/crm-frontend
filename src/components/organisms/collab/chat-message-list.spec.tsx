@@ -149,6 +149,31 @@ describe('ChatMessageList', () => {
     expect(markup).toContain('rounded-full border bg-muted/60')
   })
 
+  it('renderiza mensaje tipo milestone con distintivo CIMA y estilo esmeralda', () => {
+    const messages: ProjectChatMessage[] = [
+      createMockMessage({
+        id: 'msg-milestone-1',
+        authorSub: 'user-me-1',
+        body: 'Fase 1 completada y aprobada por el cliente.',
+        messageType: 'milestone',
+      }),
+    ]
+
+    const markup = renderToStaticMarkup(
+      <ChatMessageList
+        messages={messages}
+        identity={mockIdentity}
+        memberBySub={mockMemberMap}
+        avatarBySub={mockAvatars}
+        highlightMessageId={null}
+      />
+    )
+
+    expect(markup).toContain('Hito del proyecto')
+    expect(markup).toContain('bg-emerald-600')
+    expect(markup).toContain('Fase 1 completada y aprobada por el cliente.')
+  })
+
   it('formatea correctamente días y horas mediante utilidades de chat', () => {
     const date1 = new Date('2026-04-01T10:00:00Z')
     const date2 = new Date('2026-04-01T15:30:00Z')

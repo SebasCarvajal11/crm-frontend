@@ -38,7 +38,7 @@ export async function searchTasksRequest(
   limit = 8
 ): Promise<DataResponse<ProjectTask[]>> {
   return api
-    .get(`${PROJECT_ROUTES.tasks(projectId)}/search`, {
+    .get(PROJECT_ROUTES.tasksSearch(projectId), {
       headers: bearer(accessToken),
       searchParams: { q, limit: String(limit) },
     })

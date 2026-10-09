@@ -81,12 +81,11 @@ export const PROJECT_ROUTES = {
   columns: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/columns`,
   // Files
   files: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/files`,
-  filesTimeline: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/files/timeline`,
-  filesUpload: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/files/upload`,
   filesUploadUrl: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/files/upload-url`,
   filesUploadedObject: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/files/uploaded-object`,
   // Tasks
   tasks: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/tasks`,
+  tasksSearch: (projectId: string) => `${COLLAB_API}/collab/projects/${projectId}/tasks/search`,
   taskComments: (projectId: string, taskId: string) =>
     `${COLLAB_API}/collab/projects/${projectId}/tasks/${taskId}/comments`,
   taskFiles: (projectId: string, taskId: string) =>
