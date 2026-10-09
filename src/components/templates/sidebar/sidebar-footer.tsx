@@ -65,7 +65,7 @@ function UserProfileTrigger({
         'text-left transition-all duration-150 cursor-pointer active:scale-[0.98]',
         'hover:border-primary-foreground/15 hover:bg-primary-foreground/10',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground/50',
-        compact && 'justify-center px-0'
+        compact && 'justify-center items-center px-0'
       )}
     >
       <div className="relative shrink-0">

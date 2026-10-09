@@ -16,10 +16,10 @@ type Props = {
 type AdminSubTab = 'all' | 'users' | 'storage' | 'invites'
 
 const TABS: SectionTabItem<AdminSubTab>[] = [
-  { value: 'all', label: 'Vista General', icon: <Layers className="size-4" /> },
-  { value: 'users', label: 'Usuarios y Roles', icon: <Users className="size-4" /> },
-  { value: 'storage', label: 'Almacenamiento y Archivos', icon: <HardDrive className="size-4" /> },
-  { value: 'invites', label: 'Centro de Incorporación', icon: <UserPlus className="size-4" /> },
+  { value: 'all', label: 'Vista General', shortLabel: 'General', icon: <Layers className="size-4" /> },
+  { value: 'users', label: 'Usuarios y Roles', shortLabel: 'Usuarios', icon: <Users className="size-4" /> },
+  { value: 'storage', label: 'Almacenamiento y Archivos', shortLabel: 'Archivos', icon: <HardDrive className="size-4" /> },
+  { value: 'invites', label: 'Centro de Incorporación', shortLabel: 'Incorporación', icon: <UserPlus className="size-4" /> },
 ]
 
 function AdminConsoleHeader({ onNewInvite }: { onNewInvite: () => void }) {

@@ -25,7 +25,7 @@ const TABS: SectionTabItem<MarketingTab>[] = [
   { value: 'clients', label: 'Clientes', icon: <Users className="size-4" /> },
   { value: 'campaigns', label: 'Campañas', icon: <Megaphone className="size-4" /> },
   { value: 'proposals', label: 'Propuestas', icon: <FileText className="size-4" /> },
-  { value: 'workflows', label: 'Automatizaciones', icon: <Zap className="size-4" /> },
+  { value: 'workflows', label: 'Automatizaciones', shortLabel: 'Flujos', icon: <Zap className="size-4" /> },
   { value: 'segments', label: 'Segmentos', icon: <Target className="size-4" /> },
   { value: 'interactions', label: 'Interacciones', icon: <MessageSquare className="size-4" /> },
 ]

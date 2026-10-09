@@ -215,7 +215,7 @@ export function UserCarousel({
               data-track-copy={index === 0 ? copyIndex : undefined}
               aria-hidden={copyIndex === 1}
               className={[
-                'w-[85vw] max-w-[340px] shrink-0 snap-start sm:w-[calc(50%-0.6rem)]',
+                'w-[85vw] max-w-[320px] shrink-0 snap-start sm:w-[calc(50%-0.75rem)]',
                 'sm:max-w-none lg:w-[calc(33.333%-0.75rem)] 2xl:w-[calc(25%-0.75rem)]',
               ].join(' ')}
             >

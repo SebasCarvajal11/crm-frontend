@@ -17,6 +17,7 @@ import {
 export type SectionTabItem<T extends string> = {
   value: T
   label: string
+  shortLabel?: string
   icon: ReactNode
   badge?: ReactNode
 }
@@ -229,8 +230,8 @@ export function SectionTabs<T extends string>({
               })
             }
             className={[
-              'relative z-10 flex shrink-0 items-center gap-2 whitespace-nowrap',
-              'rounded-xl px-3.5 py-2 text-sm font-medium',
+              'relative z-10 flex shrink-0 items-center gap-1.5 sm:gap-2 whitespace-nowrap',
+              'rounded-xl px-2.5 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-medium',
               'transition-colors duration-200 ease-out cursor-pointer active:scale-[0.98]',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
               isActive
@@ -239,7 +240,16 @@ export function SectionTabs<T extends string>({
             ].join(' ')}
           >
             <span aria-hidden="true" className="shrink-0">{tab.icon}</span>
-            <span>{tab.label}</span>
+            <span>
+              {tab.shortLabel ? (
+                <>
+                  <span className="hidden lg:inline">{tab.label}</span>
+                  <span className="lg:hidden">{tab.shortLabel}</span>
+                </>
+              ) : (
+                tab.label
+              )}
+            </span>
             {tab.badge && <span className="ml-1 inline-flex items-center">{tab.badge}</span>}
           </button>
         )

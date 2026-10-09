@@ -61,8 +61,8 @@ const ACCENT_STYLES: Record<MetricAccent, { icon: string; dot: string; text: str
 const GRID_COLS_MAP: Record<number, string> = {
   2: 'grid-cols-1 sm:grid-cols-2',
   3: 'grid-cols-1 sm:grid-cols-3',
-  4: 'grid-cols-2 lg:grid-cols-4',
-  6: 'grid-cols-2 md:grid-cols-3 xl:grid-cols-6',
+  4: 'grid-cols-1 min-[440px]:grid-cols-2 lg:grid-cols-4',
+  6: 'grid-cols-1 min-[440px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-6',
 }
 
 function MetricCellSkeleton() {
@@ -109,7 +109,10 @@ function MetricValueBlock({
         {shouldAnimate ? <AnimatedCounter value={value} /> : value}
       </div>
       {(hint || subtext) && (
-        <p className="text-xs text-muted-foreground truncate leading-snug">
+        <p
+          className="text-xs text-muted-foreground leading-snug sm:truncate"
+          title={typeof (hint ?? subtext) === 'string' ? String(hint ?? subtext) : undefined}
+        >
           {hint ?? subtext}
         </p>
       )}

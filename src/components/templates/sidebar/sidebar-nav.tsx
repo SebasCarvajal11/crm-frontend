@@ -55,9 +55,11 @@ export function SidebarNav({
           {item.isActive && (
             <span
               className={cn(
-                'ml-auto inline-block h-2 w-2 shrink-0 rounded-full bg-white',
+                'inline-block shrink-0 rounded-full bg-white',
                 'shadow-[0_0_8px_rgba(255,255,255,0.9)] ring-2 ring-white/30',
-                compact && 'absolute -right-1 top-1/2 -translate-y-1/2'
+                compact
+                  ? 'absolute right-1.5 top-1/2 -translate-y-1/2 h-1.5 w-1.5'
+                  : 'ml-auto h-2 w-2'
               )}
               aria-hidden="true"
             />

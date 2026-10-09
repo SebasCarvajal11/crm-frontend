@@ -122,11 +122,11 @@ export function UserTableToolbar({
 
       <div
         className={[
-          'grid grid-cols-1 items-end gap-3 rounded-2xl border border-border/70',
-          'bg-background/90 p-3.5 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_13rem_13rem]',
+          'grid grid-cols-1 items-end gap-2.5 sm:gap-3 rounded-2xl border border-border/70',
+          'bg-background/90 p-3 sm:p-3.5 min-[360px]:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_13rem_13rem]',
         ].join(' ')}
       >
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 min-[360px]:col-span-2 lg:col-span-1">
           <Label htmlFor="admin-search" className="text-xs font-semibold text-muted-foreground">
             Búsqueda rápida
           </Label>

@@ -40,11 +40,11 @@ export function PageHeader({
     >
       <div className="min-w-0 space-y-1">
         {eyebrow && (
-          <p className="text-2xl font-medium text-muted-foreground sm:text-3xl">
+          <p className="text-xl font-medium text-muted-foreground sm:text-2xl md:text-3xl">
             {eyebrow}
           </p>
         )}
-        <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+        <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl md:text-3xl">
           {renderedTitle}
         </h1>
         {description && (
