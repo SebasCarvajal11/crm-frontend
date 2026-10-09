@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button } from '@/components/ui/button'
+import { FileText, Pencil } from 'lucide-react'
 import { collabKeys, type Project, type ProjectContract, type ProjectMember } from '@/features/collab/model'
 import {
   requestProjectContractSignatureRequest,
@@ -8,9 +8,9 @@ import {
   type ProjectContractDraftInput,
 } from '@/features/collab/api'
 import { parseApiError } from '@/shared/lib'
-import { ContractDocumentReader } from './contract-document-reader'
 import { ContractEditorForm } from './contract-editor-form'
 import { ContractEditorSummary } from './contract-editor-summary'
+import { ContractLiveSheet } from './contract-live-sheet'
 import {
   SERVICE_PLANS,
   CIMA_PROVIDER,
@@ -38,7 +38,7 @@ export function ContractEditor({
   const [values, setValues] = useState<ProjectContractDraftInput>(() =>
     contract ? toDraft(contract) : defaultDraft(project, members),
   )
-  const [activeTab, setActiveTab] = useState<'form' | 'preview'>('form')
+  const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form')
 
   const set = <K extends keyof ProjectContractDraftInput>(
     key: K,
@@ -94,87 +94,97 @@ export function ContractEditor({
   })
 
   const busy = save.isPending || send.isPending
-  const previewText = contract?.contentSnapshot || ''
 
   return (
-    <div className="grid gap-4 min-[1280px]:grid-cols-[minmax(0,1fr)_minmax(20rem,0.55fr)]">
-      <section className="rounded-xl border bg-card shadow-xs">
+    <div className="grid gap-4 min-[1280px]:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-start">
+      {/* Contenedor Izquierdo: Formulario de Preparación */}
+      <section
+        className={`rounded-xl border border-border/80 bg-card shadow-xs ${
+          mobileTab === 'preview' ? 'hidden min-[1280px]:block' : 'block'
+        }`}
+      >
         <div className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3">
           <div>
-            <h3 className="text-sm font-semibold">Preparar contrato</h3>
+            <h3 className="text-sm font-semibold text-foreground">Preparar contrato</h3>
             <p className="mt-0.5 text-xs text-muted-foreground">
               Completa los datos que quedarán congelados al habilitar la firma.
             </p>
           </div>
-          <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
+
+          {/* Toggle solo visible en pantallas menores a 1280px */}
+          <div className="flex items-center gap-1 rounded-lg bg-muted p-1 min-[1280px]:hidden">
             <button
               type="button"
               className={`cursor-pointer rounded-md px-2.5 py-1 text-xs font-semibold transition-all ${
-                activeTab === 'form'
+                mobileTab === 'form'
                   ? 'bg-card text-foreground shadow-2xs'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
-              onClick={() => setActiveTab('form')}
+              onClick={() => setMobileTab('form')}
             >
+              <Pencil className="mr-1 inline-block size-3" />
               Formulario
             </button>
             <button
               type="button"
               className={`cursor-pointer rounded-md px-2.5 py-1 text-xs font-semibold transition-all ${
-                activeTab === 'preview'
+                mobileTab === 'preview'
                   ? 'bg-card text-foreground shadow-2xs'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
-              onClick={() => setActiveTab('preview')}
+              onClick={() => setMobileTab('preview')}
             >
-              Vista previa
+              <FileText className="mr-1 inline-block size-3" />
+              Ver Hoja
             </button>
           </div>
         </div>
 
-        {activeTab === 'preview' ? (
-          <div className="p-4 max-h-[calc(100vh-20rem)] overflow-y-auto">
-            {previewText ? (
-              <ContractDocumentReader content={previewText} />
-            ) : (
-              <div className="flex h-64 flex-col items-center justify-center gap-2 text-center text-muted-foreground">
-                <p className="text-sm font-medium">Sin vista previa disponible</p>
-                <p className="text-xs text-muted-foreground max-w-sm">
-                  Guarda el borrador para generar la vista previa oficial con validación SHA-256.
-                </p>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => save.mutate()}
-                  disabled={busy}
-                  className="mt-2 text-xs"
-                >
-                  Guardar borrador para previsualizar
-                </Button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <ContractEditorForm
-            values={values}
-            onChange={set}
-            onProviderChange={setProvider}
-            onPlanChange={choosePlan}
-          />
-        )}
+        <ContractEditorForm
+          values={values}
+          onChange={set}
+          onProviderChange={setProvider}
+          onPlanChange={choosePlan}
+        />
       </section>
 
-      <ContractEditorSummary
-        projectName={project.name}
-        values={values}
-        hasContract={Boolean(contract)}
-        busy={busy}
-        isSaving={save.isPending}
-        isSending={send.isPending}
-        onSave={() => save.mutate()}
-        onSend={() => send.mutate()}
-      />
+      {/* Contenedor Derecho: Resumen Ejecutivo + Hoja de Contrato en Vivo */}
+      <div
+        className={`space-y-4 ${
+          mobileTab === 'form' ? 'hidden min-[1280px]:block' : 'block'
+        }`}
+      >
+        {/* Toggle para móvil en vista previa para regresar al formulario */}
+        <div className="flex items-center justify-between rounded-lg bg-muted p-1.5 min-[1280px]:hidden">
+          <p className="text-xs font-semibold text-foreground px-2">Hoja y Resumen</p>
+          <button
+            type="button"
+            className="cursor-pointer rounded-md bg-card px-3 py-1 text-xs font-semibold text-foreground shadow-2xs"
+            onClick={() => setMobileTab('form')}
+          >
+            ← Volver al formulario
+          </button>
+        </div>
+
+        <ContractEditorSummary
+          projectName={project.name}
+          values={values}
+          hasContract={Boolean(contract)}
+          busy={busy}
+          isSaving={save.isPending}
+          isSending={send.isPending}
+          onSave={() => save.mutate()}
+          onSend={() => send.mutate()}
+        />
+
+        <ContractLiveSheet
+          projectName={project.name}
+          values={values}
+          hasContract={Boolean(contract)}
+          contentSnapshot={contract?.contentSnapshot}
+        />
+      </div>
     </div>
   )
 }
+
