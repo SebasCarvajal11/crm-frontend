@@ -80,7 +80,10 @@ function AvatarMedia({
 }: AvatarMediaProps) {
   return (
     <div
-      className="flex size-full items-center justify-center overflow-hidden rounded-full border border-border/40 shadow-xs"
+      className={cn(
+        'flex size-full items-center justify-center',
+        'overflow-hidden rounded-full border border-border/40 shadow-xs'
+      )}
       style={{ backgroundColor: effectiveColor }}
     >
       <img

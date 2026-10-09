@@ -25,6 +25,10 @@ function useOutsideClick(
   }, [active, ref, onClose])
 }
 
+function isUserRole(role: string): role is 'admin' | 'worker' | 'client' {
+  return role === 'admin' || role === 'worker' || role === 'client'
+}
+
 function UserProfileTrigger({
   userId,
   userEmail,
@@ -47,6 +51,7 @@ function UserProfileTrigger({
   onClick: () => void
 }) {
   const roleLabel = ROLE_LABEL[userRole] ?? userRole
+  const role = isUserRole(userRole) ? userRole : undefined
 
   return (
     <button
@@ -69,7 +74,7 @@ function UserProfileTrigger({
           color={userAvatarColor}
           name={userEmail}
           userId={userId ?? userEmail}
-          role={userRole as any}
+          role={role}
           size="sm"
           className="size-8"
         />

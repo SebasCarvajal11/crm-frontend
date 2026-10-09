@@ -58,7 +58,7 @@ function UserAvatar({
   src?: string | null
   name?: string | null
   userId?: string | null
-  role?: string
+  role?: 'admin' | 'worker' | 'client'
   onOpenProfile?: () => void
 }) {
   return (
@@ -67,7 +67,7 @@ function UserAvatar({
         src={src ?? avatarUrl}
         name={name}
         userId={userId}
-        role={role as any}
+        role={role}
         size="xl"
         className="size-14 shadow-sm"
       />
