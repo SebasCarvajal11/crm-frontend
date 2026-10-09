@@ -413,14 +413,17 @@ async function runAudit() {
   const browser = await chromium.launch({ headless: true })
   const report = []
 
-  for (const role of ['admin', 'worker', 'client']) {
+  const rolesToAudit = process.env.AUDIT_ROLES ? process.env.AUDIT_ROLES.split(',') : ['admin', 'worker', 'client']
+  const vpsToAudit = process.env.AUDIT_VPS ? VIEWPORTS.filter(v => process.env.AUDIT_VPS.split(',').includes(v.id)) : VIEWPORTS
+
+  for (const role of rolesToAudit) {
     console.log(`\n========================================`)
     console.log(` AUDITANDO ROL: ${role.toUpperCase()}`)
     console.log(`========================================`)
 
     const views = VIEWS_BY_ROLE[role]
 
-    for (const vp of VIEWPORTS) {
+    for (const vp of vpsToAudit) {
       console.log(`  -> Dispositivo: ${vp.label} (${vp.width}x${vp.height})`)
 
       const context = await browser.newContext({
