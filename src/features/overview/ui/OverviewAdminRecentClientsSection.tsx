@@ -93,6 +93,7 @@ export function OverviewAdminRecentClientsSection({ clients, isLoading }: Props)
                       color={getAvatarColor(client.id)}
                       name={name}
                       userId={client.id}
+                      role="client"
                       size="sm"
                       className="size-8 shrink-0"
                     />

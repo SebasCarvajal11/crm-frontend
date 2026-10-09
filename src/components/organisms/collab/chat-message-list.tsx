@@ -137,6 +137,10 @@ export const ChatMessageList = memo(function ChatMessageList({
           ? avatarBySub[message.authorSub]?.color
           : null
 
+        const authorRole = message.authorSub
+          ? (memberBySub.get(message.authorSub)?.role ?? null)
+          : null
+
         return (
           <div key={message.id}>
             {showDaySeparator && <ChatDaySeparatorItem isoDate={message.createdAt} />}
@@ -148,6 +152,7 @@ export const ChatMessageList = memo(function ChatMessageList({
               sameAuthorAsNext={sameAuthorAsNext}
               displayName={getAuthorDisplayName(message, memberBySub)}
               authorTag={getAuthorRoleTag(message, memberBySub)}
+              authorRole={authorRole}
               avatarUrl={avatarUrl}
               avatarColor={avatarColor}
               isNewlyArrived={isNewlyArrived(message.id)}

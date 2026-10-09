@@ -14,6 +14,7 @@ type ChatMessageBubbleProps = {
   sameAuthorAsNext: boolean
   displayName: string
   authorTag: string
+  authorRole?: 'admin' | 'worker' | 'client' | null
   avatarUrl: string | null
   avatarColor?: string | null
   isNewlyArrived: boolean
@@ -29,6 +30,7 @@ export const ChatMessageBubble = memo(function ChatMessageBubble({
   sameAuthorAsNext,
   displayName,
   authorTag,
+  authorRole,
   avatarUrl,
   avatarColor,
   isNewlyArrived,
@@ -60,6 +62,7 @@ export const ChatMessageBubble = memo(function ChatMessageBubble({
             color={avatarColor}
             name={displayName}
             userId={message.authorSub}
+            role={authorRole}
             size="sm"
             alt={`Avatar de ${displayName}`}
           />

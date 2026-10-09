@@ -52,8 +52,17 @@ function getMemberDisplayName(
   return member?.email || (fallbackSub ? `Usuario (${fallbackSub.slice(0, 6)})` : 'Usuario')
 }
 
+function resolveMemberRole(
+  member?: ProjectMember,
+  receipt?: ChatMessageReadReceipt
+): 'admin' | 'worker' | 'client' | undefined {
+  const r = member?.role ?? receipt?.role
+  if (r === 'admin' || r === 'worker' || r === 'client') return r
+  return undefined
+}
+
 function getMemberRoleText(member?: ProjectMember, receipt?: ChatMessageReadReceipt): string {
-  const role = member?.role ?? receipt?.role
+  const role = resolveMemberRole(member, receipt)
   const profession = member?.profession?.trim() || receipt?.profession?.trim()
   if (role === 'worker') return profession || 'Trabajador'
   if (role === 'client') return 'Cliente'
@@ -133,6 +142,7 @@ export function ChatMessageInfoDialog({ open, onOpenChange, message, members, av
                           src={avatarUrl}
                           name={name}
                           userId={sub}
+                          role={resolveMemberRole(member, receipt)}
                           size="md"
                           className="shrink-0"
                         />
@@ -178,6 +188,7 @@ export function ChatMessageInfoDialog({ open, onOpenChange, message, members, av
                           src={avatarUrl}
                           name={name}
                           userId={sub}
+                          role={member.role}
                           size="md"
                           className="shrink-0"
                         />

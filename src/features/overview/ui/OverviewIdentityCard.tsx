@@ -51,12 +51,14 @@ function UserAvatar({
   src,
   name,
   userId,
+  role,
   onOpenProfile,
 }: {
   avatarUrl?: string | null
   src?: string | null
   name?: string | null
   userId?: string | null
+  role?: string
   onOpenProfile?: () => void
 }) {
   return (
@@ -65,8 +67,9 @@ function UserAvatar({
         src={src ?? avatarUrl}
         name={name}
         userId={userId}
+        role={role as any}
         size="xl"
-        className="size-14 ring-2 ring-primary/30 ring-offset-2 ring-offset-card shadow-sm"
+        className="size-14 shadow-sm"
       />
       {onOpenProfile && (
         <button
@@ -173,6 +176,7 @@ export function OverviewIdentityCard({ identity, avatarUrl, onOpenProfile }: Pro
               avatarUrl={avatarUrl}
               name={displayName}
               userId={identity.id}
+              role={identity.role}
               onOpenProfile={onOpenProfile}
             />
             <div className="min-w-0 space-y-1">

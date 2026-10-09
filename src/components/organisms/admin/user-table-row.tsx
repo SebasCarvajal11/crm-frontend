@@ -124,6 +124,7 @@ export function UserTableRow({
             color={avatarColor}
             name={displayName}
             userId={row.id}
+            role={row.role}
             size="md"
             className="shrink-0"
           />

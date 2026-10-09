@@ -5,6 +5,7 @@ import { activityAge, presenceName, type PresenceUser } from '../model/presence'
 
 export type PresenceUserRowProps = {
   user: PresenceUser
+  role?: 'worker' | 'client' | 'admin'
   now: number
   stale: boolean
   avatarUrl: string | null
@@ -115,7 +116,7 @@ function UserRowMeta(props: UserRowMetaProps) {
 }
 
 export const PresenceUserRow = memo(function PresenceUserRow(props: PresenceUserRowProps) {
-  const { user, now, stale, avatarUrl, avatarColor } = props
+  const { user, role, now, stale, avatarUrl, avatarColor } = props
   const displayName = presenceName(user)
   const isOnline = user.is_online && !stale
   const activityText = activityAge(user.last_activity_at, now)
@@ -135,6 +136,7 @@ export const PresenceUserRow = memo(function PresenceUserRow(props: PresenceUser
         color={avatarColor}
         name={displayName}
         userId={user.subject}
+        role={role}
         size="md"
         presenceStatus={isOnline ? 'online' : 'offline'}
         presenceLabel={isOnline ? 'En línea' : `Sin conexión · Actividad ${activityText}`}

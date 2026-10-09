@@ -34,6 +34,7 @@ function WorkloadWorkerCard({
             color={avatarColor}
             name={worker.workerName}
             userId={worker.workerSub}
+            role="worker"
             size="sm"
             className="size-8 shrink-0"
           />

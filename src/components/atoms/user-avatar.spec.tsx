@@ -188,4 +188,69 @@ describe('UserAvatar', () => {
     expect(markup).toContain('/avatars/avatar-31-1024.webp 1024w')
     expect(markup).toContain('background-color:#003d52')
   })
+
+  it('aplica halo distintivo y animación correspondiente según el rol del usuario', () => {
+    const adminMarkup = renderToStaticMarkup(
+      <UserAvatar name="Elena" role="admin" size="md" />
+    )
+    expect(adminMarkup).toContain('role-halo')
+    expect(adminMarkup).toContain('role-halo-admin')
+    expect(adminMarkup).toContain('role-halo-animated')
+    expect(adminMarkup).toContain('data-user-role="admin"')
+    expect(adminMarkup).toContain('title="Elena (Administrador)"')
+
+    const workerMarkup = renderToStaticMarkup(
+      <UserAvatar name="Carlos" role="worker" size="md" />
+    )
+    expect(workerMarkup).toContain('role-halo-worker')
+    expect(workerMarkup).toContain('data-user-role="worker"')
+    expect(workerMarkup).toContain('title="Carlos (Colaborador)"')
+
+    const clientMarkup = renderToStaticMarkup(
+      <UserAvatar name="Inversiones SAS" role="client" size="md" />
+    )
+    expect(clientMarkup).toContain('role-halo-client')
+    expect(clientMarkup).toContain('data-user-role="client"')
+    expect(clientMarkup).toContain('title="Inversiones SAS (Cliente)"')
+  })
+
+  it('permite desactivar animación de halo o excluir el halo explícitamente', () => {
+    const staticMarkup = renderToStaticMarkup(
+      <UserAvatar name="Juan" role="admin" haloAnimation={false} />
+    )
+    expect(staticMarkup).toContain('role-halo-admin')
+    expect(staticMarkup).not.toContain('role-halo-animated')
+
+    const noHaloMarkup = renderToStaticMarkup(
+      <UserAvatar name="Juan" role="admin" showRoleHalo={false} />
+    )
+    expect(noHaloMarkup).not.toContain('role-halo')
+  })
+
+  it('aplica modificadores de escala de halo para tamaños grandes', () => {
+    const lgMarkup = renderToStaticMarkup(
+      <UserAvatar name="Admin" role="admin" size="lg" />
+    )
+    expect(lgMarkup).toContain('role-halo-lg')
+
+    const xl2Markup = renderToStaticMarkup(
+      <UserAvatar name="Admin" role="admin" size="2xl" />
+    )
+    expect(xl2Markup).toContain('role-halo-xl')
+  })
+
+  it('coexiste limpiamente el halo de rol con el indicador de presencia sin interferencias', () => {
+    const mixedMarkup = renderToStaticMarkup(
+      <UserAvatar
+        name="Diana"
+        role="worker"
+        presenceStatus="online"
+        presenceLabel="Conectada"
+      />
+    )
+    expect(mixedMarkup).toContain('role-halo-worker')
+    expect(mixedMarkup).toContain('role="status"')
+    expect(mixedMarkup).toContain('aria-label="Conectada"')
+    expect(mixedMarkup).toContain('bg-status-online')
+  })
 })

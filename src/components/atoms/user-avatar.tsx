@@ -6,9 +6,16 @@ import {
   resolveDeterministicAvatar,
 } from '@/shared/lib/avatar-catalog'
 import { cn } from '@/shared/lib/utils'
+import type { UserRole } from '@/shared/types/identity'
+import {
+  PresenceIndicator,
+  type PresenceIndicatorProps,
+  type UserPresenceStatus,
+} from './presence-indicator'
+import { getRoleHaloClasses, ROLE_LABELS } from './user-avatar-halo'
 
+export type { UserPresenceStatus, PresenceIndicatorProps, UserRole }
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
-export type UserPresenceStatus = 'online' | 'away' | 'busy' | 'offline' | 'recent'
 
 export type UserAvatarProps = {
   src?: string | null
@@ -18,6 +25,9 @@ export type UserAvatarProps = {
   name?: string | null
   userId?: string | null
   size?: AvatarSize
+  role?: UserRole | null
+  showRoleHalo?: boolean
+  haloAnimation?: boolean
   presenceStatus?: UserPresenceStatus
   presenceLabel?: string
   className?: string
@@ -36,92 +46,6 @@ const SIZE_CLASSES: Record<AvatarSize, { container: string; dot: string }> = {
   '2xl': { container: 'size-28 sm:size-32', dot: 'size-5' },
 }
 
-const PRESENCE_CONFIG: Record<
-  UserPresenceStatus,
-  { label: string; color: string; content?: React.ReactNode }
-> = {
-  online: {
-    label: 'En línea',
-    color: 'bg-status-online',
-  },
-  away: {
-    label: 'Ausente',
-    color: 'bg-status-away',
-    content: (
-      <svg
-        viewBox="0 0 10 10"
-        className="size-full p-[0.5px] text-background"
-        fill="currentColor"
-        aria-hidden="true"
-      >
-        <path d="M7.5 5A3.5 3.5 0 0 1 2 2.5a3.5 3.5 0 1 0 5.5 2.5z" />
-      </svg>
-    ),
-  },
-  busy: {
-    label: 'Ocupado',
-    color: 'bg-status-busy',
-    content: (
-      <span
-        className="block h-[1.5px] w-[60%] bg-white rounded-full mx-auto"
-        aria-hidden="true"
-      />
-    ),
-  },
-  recent: {
-    label: 'Reciente',
-    color: 'bg-status-recent ring-1 ring-status-recent/50',
-    content: (
-      <span
-        className="block size-[35%] bg-background rounded-full mx-auto"
-        aria-hidden="true"
-      />
-    ),
-  },
-  offline: {
-    label: 'Desconectado',
-    color: 'bg-status-offline/50',
-  },
-}
-
-function PresenceIndicator({
-  status,
-  sizeClass,
-  customLabel,
-  ringClass,
-}: {
-  status: UserPresenceStatus
-  sizeClass: string
-  customLabel?: string
-  ringClass?: string
-}) {
-  const config = PRESENCE_CONFIG[status]
-  const label = customLabel ?? config.label
-
-  return (
-    <span
-      role="status"
-      aria-label={label}
-      className={cn(
-        'absolute bottom-0 right-0 z-10 shrink-0 rounded-full ring-2 ring-background',
-        'flex items-center justify-center overflow-hidden',
-        sizeClass,
-        config.color,
-        ringClass
-      )}
-    >
-      {config.content}
-    </span>
-  )
-}
-
-function extractColorFromSrc(src?: string | null): string | null {
-  if (!src) return null
-  const match = src.match(/[?&]c=([0-9a-fA-F]{3,8})/)
-  if (match) return `#${match[1]}`
-  return null
-}
-
 const SIZES_MEDIA_QUERIES: Record<AvatarSize, string> = {
   xs: '24px',
   sm: '28px',
@@ -129,6 +53,12 @@ const SIZES_MEDIA_QUERIES: Record<AvatarSize, string> = {
   lg: '40px',
   xl: '56px',
   '2xl': '(min-width: 640px) 128px, 112px',
+}
+
+function extractColorFromSrc(src?: string | null): string | null {
+  if (!src) return null
+  const match = src.match(/[?&]c=([0-9a-fA-F]{3,8})/)
+  return match ? `#${match[1]}` : null
 }
 
 type AvatarMediaProps = {
@@ -224,6 +154,9 @@ export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
   const {
     name,
     size = 'md',
+    role,
+    showRoleHalo = true,
+    haloAnimation = true,
     presenceStatus,
     presenceLabel,
     className,
@@ -254,21 +187,33 @@ export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
       }
     : undefined
 
+  const haloClass = showRoleHalo
+    ? getRoleHaloClasses(role, size, haloAnimation)
+    : undefined
+  const roleLabel = role ? ROLE_LABELS[role] : undefined
+  const titleText = name
+    ? roleLabel
+      ? `${name} (${roleLabel})`
+      : name
+    : roleLabel
+
   return (
     <div
       className={cn(
-        'relative inline-flex shrink-0 select-none items-center justify-center',
+        'relative inline-flex shrink-0 select-none items-center justify-center rounded-full',
         isClickable &&
           'cursor-pointer hover:opacity-90 active:scale-[0.98] transition-transform',
         cfg.container,
+        haloClass,
         className
       )}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       role={isClickable ? 'button' : undefined}
       tabIndex={isClickable ? 0 : undefined}
-      title={name ?? undefined}
+      title={titleText ?? undefined}
       data-testid="user-avatar"
+      data-user-role={role ?? undefined}
     >
       <AvatarMedia
         src={currentSrc}

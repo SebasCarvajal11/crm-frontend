@@ -39,6 +39,7 @@ export function ProjectMemberCard({
           color={avatarColor}
           name={displayName}
           userId={member.userSub}
+          role={member.role}
           size="lg"
           className="shrink-0"
         />

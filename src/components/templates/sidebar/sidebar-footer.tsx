@@ -69,6 +69,7 @@ function UserProfileTrigger({
           color={userAvatarColor}
           name={userEmail}
           userId={userId ?? userEmail}
+          role={userRole as any}
           size="sm"
           className="size-8"
         />

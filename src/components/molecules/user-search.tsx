@@ -189,6 +189,7 @@ export function UserSearch({ accessToken, role, selected, excludedSubjects = [],
                     color={getAvatarColor(u.subject)}
                     name={u.email}
                     userId={u.subject}
+                    role={u.role}
                     size="xs"
                     className="size-5 shrink-0"
                   />

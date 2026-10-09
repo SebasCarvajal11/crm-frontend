@@ -79,6 +79,7 @@ function GroupUserList({
         <PresenceUserRow
           key={user.subject}
           user={user}
+          role={group.role}
           now={now}
           stale={stale}
           avatarUrl={getAvatarUrl(user.subject)}

@@ -122,6 +122,7 @@ export function AdminUserCard({
               color={avatarColor}
               name={displayName}
               userId={row.id}
+              role={row.role}
               size="lg"
               className="size-11 shrink-0 text-sm"
             />
