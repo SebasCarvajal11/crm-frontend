@@ -74,12 +74,12 @@ export function AdminUserActions({
   }
 
   return (
-    <div className="flex items-center justify-end gap-1.5">
+    <div className="flex items-center justify-end gap-1.5 shrink-0">
       <Button
         type="button"
         variant="outline"
         size="sm"
-        className="hidden sm:inline-flex h-8 px-2.5 text-xs font-medium"
+        className="hidden sm:inline-flex h-8 px-2.5 text-xs font-medium shrink-0 whitespace-nowrap"
         disabled={busy}
         onClick={() => {
           clearActionMessage()
@@ -96,7 +96,7 @@ export function AdminUserActions({
             variant="ghost"
             size="sm"
             className={
-              'hidden sm:inline-flex h-8 px-2 text-xs font-medium ' +
+              'hidden sm:inline-flex h-8 px-2 text-xs font-medium shrink-0 whitespace-nowrap ' +
               'text-destructive hover:bg-destructive/10 hover:text-destructive'
             }
             disabled={busy}

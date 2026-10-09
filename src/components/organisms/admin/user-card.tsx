@@ -63,7 +63,10 @@ function roleBadge(role: UserRole) {
 function statusBadge(row: AdminUserRow) {
   if (row.deleted_at) {
     return (
-      <Badge variant="destructive" className="inline-flex items-center gap-1.5 rounded-full text-[11px]">
+      <Badge
+        variant="destructive"
+        className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] whitespace-nowrap shrink-0"
+      >
         <span className="size-1.5 rounded-full bg-red-200" /> Archivado
       </Badge>
     )
@@ -73,7 +76,8 @@ function statusBadge(row: AdminUserRow) {
       <Badge
         className={[
           'inline-flex items-center gap-1.5 rounded-full border-emerald-500/20',
-          'bg-emerald-500/10 text-[11px] font-medium text-emerald-700 dark:text-emerald-400',
+          'bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400',
+          'whitespace-nowrap shrink-0',
         ].join(' ')}
       >
         <span className="size-1.5 rounded-full bg-emerald-500" /> Activo
@@ -83,7 +87,7 @@ function statusBadge(row: AdminUserRow) {
   return (
     <Badge
       variant="outline"
-      className="inline-flex items-center gap-1.5 rounded-full text-[11px] text-muted-foreground"
+      className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] text-muted-foreground whitespace-nowrap shrink-0"
     >
       <span className="size-1.5 rounded-full bg-muted-foreground/40" /> Inactivo
     </Badge>
@@ -111,12 +115,12 @@ export function AdminUserCard({
       className={[
         'relative flex h-full flex-col justify-between rounded-2xl border',
         'border-border/80 bg-card p-4 sm:p-5 shadow-xs transition-all duration-200',
-        'hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5',
+        'hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 overflow-hidden',
       ].join(' ')}
     >
-      <div className="space-y-3.5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3">
+      <div className="space-y-3.5 min-w-0">
+        <div className="flex items-start justify-between gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <UserAvatar
               src={avatarUrl}
               color={avatarColor}
@@ -124,7 +128,7 @@ export function AdminUserCard({
               userId={row.id}
               role={row.role}
               size="lg"
-              className="size-11 shrink-0 text-sm"
+              className="size-10 sm:size-11 shrink-0 text-sm"
             />
             <div className="min-w-0 flex-1">
               <h4
@@ -143,31 +147,37 @@ export function AdminUserCard({
               ) : null}
             </div>
           </div>
-          <div className="shrink-0">{statusBadge(row)}</div>
+          <div className="shrink-0 pt-0.5">{statusBadge(row)}</div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 pt-1">
+        <div className="flex flex-wrap items-center gap-1.5 pt-0.5 min-w-0">
           {roleBadge(row.role)}
           {row.company_name && row.company_name !== secondaryName ? (
-            <span className="inline-flex items-center gap-1 truncate text-xs text-muted-foreground">
-              <Building2 className="size-3 shrink-0" />
+            <span
+              className="inline-flex items-center gap-1 min-w-0 max-w-[150px] truncate text-xs text-muted-foreground"
+              title={row.company_name}
+            >
+              <Building2 className="size-3 shrink-0 text-muted-foreground/70" />
               <span className="truncate">{row.company_name}</span>
             </span>
           ) : null}
         </div>
 
-        <div className="space-y-1.5 rounded-xl border border-border/50 bg-muted/20 p-2.5 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1.5 truncate">
+        <div className="space-y-1.5 rounded-xl border border-border/50 bg-muted/20 p-2.5 text-xs text-muted-foreground min-w-0">
+          <div className="flex items-center gap-1.5 min-w-0">
             <Mail className="size-3.5 shrink-0 text-primary/80" />
-            <span className="truncate font-mono text-[11px] text-foreground/90" title={row.email}>
+            <span
+              className="truncate font-mono text-[11px] text-foreground/90 select-all"
+              title={row.email}
+            >
               {row.email}
             </span>
           </div>
 
           {row.force_password_change ? (
-            <div className="flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400">
+            <div className="flex items-center gap-1.5 min-w-0 text-[11px] font-medium text-amber-600 dark:text-amber-400">
               <ShieldAlert className="size-3.5 shrink-0" />
-              <span>Cambio de contraseña requerido</span>
+              <span className="truncate">Cambio de contraseña requerido</span>
             </div>
           ) : null}
         </div>
@@ -175,7 +185,7 @@ export function AdminUserCard({
 
       <div
         data-tour={index === 0 ? 'admin-user-actions' : undefined}
-        className="mt-4 border-t border-border/50 pt-3"
+        className="mt-4 border-t border-border/50 pt-3 min-w-0"
       >
         <AdminUserActions
           row={row}

@@ -203,7 +203,7 @@ export function UserCarousel({
           if (e.key === 'ArrowRight') scrollByDirection('right')
         }}
         className={[
-          'flex gap-4 overflow-x-auto py-2 px-1 scrollbar-thin rounded-xl select-none',
+          'flex gap-4 overflow-x-auto py-2 px-1 scrollbar-none rounded-xl select-none',
           isAutoScrolling ? 'snap-none' : 'snap-x snap-mandatory',
           'focus:outline-none focus-visible:ring-1 focus-visible:ring-primary/40',
         ].join(' ')}
@@ -215,8 +215,12 @@ export function UserCarousel({
               data-track-copy={index === 0 ? copyIndex : undefined}
               aria-hidden={copyIndex === 1}
               className={[
-                'w-[85vw] max-w-[320px] shrink-0 snap-start sm:w-[calc(50%-0.75rem)]',
-                'sm:max-w-none lg:w-[calc(33.333%-0.75rem)] 2xl:w-[calc(25%-0.75rem)]',
+                'w-[85vw] min-w-[280px] max-w-[320px] shrink-0 snap-start',
+                'sm:w-[310px] sm:min-w-[310px] sm:max-w-[340px]',
+                'md:w-[320px] md:min-w-[320px]',
+                'lg:w-[320px] lg:min-w-[320px]',
+                'xl:w-[330px] xl:min-w-[330px]',
+                '2xl:w-[340px] 2xl:min-w-[340px]',
               ].join(' ')}
             >
               <AdminUserCard
