@@ -77,6 +77,20 @@ Los componentes nunca deben utilizar colores hexadecimales fijos (*hardcoded*). 
 | `border-border` | `--border` | Bordes de inputs, divisores y tarjetas |
 | `bg-sidebar` | `--sidebar` | Barra de navegación lateral fija |
 
+### Halos Perimetrales de Usuario por Rol (`UserAvatar`)
+
+Para diferenciar visualmente a los tipos de usuario sin colisionar con los estados de presencia ni la paleta base:
+
+| Rol | Token Base | Claro | Oscuro | Semiótica |
+| :--- | :--- | :--- | :--- | :--- |
+| **Administrador** | `--role-admin` | `#86070c` (Carmesí CIMA) | `#df5a5f` | Autoridad y marca principal |
+| **Colaborador** | `--role-worker` | `#2563eb` (Cobalto Zafiro) | `#60a5fa` | Soporte y gestión de proyectos |
+| **Cliente** | `--role-client` | `#7c3aed` (Amatista Real) | `#a78bfa` | Portal y seguimiento comercial |
+
+- **Microinteracción "Ambient Breath":** Implementada con `@keyframes roleHaloBreathe` en GPU (`box-shadow`), proporcionando una respiración ambiental suave (4.5s) que no distrae la lectura.
+- **Aislamiento cromático:** Ningún halo utiliza verdes (`--status-online: #10b981`), amarillos (`--status-away: #f59e0b`) ni rojos brillantes (`--status-busy: #ef4444`).
+- **Accesibilidad:** Se desactiva la animación automáticamente bajo `@media (prefers-reduced-motion: reduce)`.
+
 ---
 
 ## 4. Accesibilidad y Escalado Visual
