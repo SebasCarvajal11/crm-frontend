@@ -42,11 +42,12 @@ test.describe('Ticker Numérico Cinemático (AnimatedCounter / MetricRibbon)', (
     await kpiSection.scrollIntoViewIfNeeded()
 
     const tabularValues = kpiSection.locator('.tabular-nums')
-    expect(await tabularValues.count()).toBeGreaterThan(0)
+    await expect(tabularValues.first()).toBeVisible()
+    await tabularValues.first().scrollIntoViewIfNeeded()
 
-    await expect.poll(async () => kpiSection.textContent(), { timeout: 4000 }).toContain('154')
+    await expect.poll(async () => kpiSection.textContent()).toContain('154')
     await tabularValues.last().scrollIntoViewIfNeeded()
-    await expect.poll(async () => kpiSection.textContent(), { timeout: 4000 }).toContain('94.5%')
+    await expect.poll(async () => kpiSection.textContent()).toContain('94.5%')
 
     const fontVariant = await tabularValues.first().evaluate((el) => window.getComputedStyle(el).fontVariantNumeric)
     expect(fontVariant).toContain('tabular-nums')
@@ -67,8 +68,8 @@ test.describe('Ticker Numérico Cinemático (AnimatedCounter / MetricRibbon)', (
     await expect(kpiSection).toBeVisible()
     await kpiSection.scrollIntoViewIfNeeded()
 
-    await expect.poll(async () => kpiSection.textContent(), { timeout: 3000 }).toContain('200')
-    await expect.poll(async () => kpiSection.textContent(), { timeout: 3000 }).toContain('88%')
+    await expect.poll(async () => kpiSection.textContent()).toContain('200')
+    await expect.poll(async () => kpiSection.textContent()).toContain('88%')
     expect(errors).toEqual([])
   })
 
@@ -83,9 +84,11 @@ test.describe('Ticker Numérico Cinemático (AnimatedCounter / MetricRibbon)', (
     await kpiSection.scrollIntoViewIfNeeded()
 
     const tabularValues = kpiSection.locator('.tabular-nums')
-    await expect.poll(async () => kpiSection.textContent(), { timeout: 4000 }).toContain('154')
+    await expect(tabularValues.first()).toBeVisible()
+    await tabularValues.first().scrollIntoViewIfNeeded()
+    await expect.poll(async () => kpiSection.textContent()).toContain('154')
     await tabularValues.last().scrollIntoViewIfNeeded()
-    await expect.poll(async () => kpiSection.textContent(), { timeout: 4000 }).toContain('94.5%')
+    await expect.poll(async () => kpiSection.textContent()).toContain('94.5%')
 
     await mockAnalyticsEndpoints(page, 280, 99.2)
 
@@ -97,9 +100,9 @@ test.describe('Ticker Numérico Cinemático (AnimatedCounter / MetricRibbon)', (
     })
 
     await tabularValues.first().scrollIntoViewIfNeeded()
-    await expect.poll(async () => kpiSection.textContent(), { timeout: 4000 }).toContain('280')
+    await expect.poll(async () => kpiSection.textContent()).toContain('280')
     await tabularValues.last().scrollIntoViewIfNeeded()
-    await expect.poll(async () => kpiSection.textContent(), { timeout: 4000 }).toContain('99.2%')
+    await expect.poll(async () => kpiSection.textContent()).toContain('99.2%')
     expect(errors).toEqual([])
   })
 })
