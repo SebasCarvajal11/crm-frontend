@@ -274,6 +274,10 @@ test.describe('Catálogo Oficial de Avatares CIMA', () => {
       })
     })
 
+    await page.addInitScript(() => {
+      localStorage.setItem('cima_welcome_v2:fallo.avatar%40cima.dev', 'true')
+    })
+
     await page.goto('/accept-invite/token-prueba-fallback')
     await page.waitForLoadState('networkidle')
 

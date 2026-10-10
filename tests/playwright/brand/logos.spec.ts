@@ -88,6 +88,7 @@ test('dashboard utiliza CIMAxis y conserva navegación expandida, compacta y mó
   await page.addInitScript(() => {
     sessionStorage.setItem('cima_access_token', 'brand-test-session')
     sessionStorage.setItem('cima_user_email', 'marca@example.com')
+    localStorage.setItem('cima_welcome_v2:marca%40example.com', 'true')
   })
   await page.route('**/api/**', async (route) => {
     const path = new URL(route.request().url()).pathname

@@ -37,6 +37,7 @@ export async function loginViaAPI(
       }
       sessionStorage.setItem('cima_access_token', token)
       sessionStorage.setItem('cima_user_email', userEmail)
+      localStorage.setItem(`cima_welcome_v2:${encodeURIComponent(userEmail.toLocaleLowerCase('es'))}`, 'true')
     },
     { token: access_token, userEmail: email }
   )
