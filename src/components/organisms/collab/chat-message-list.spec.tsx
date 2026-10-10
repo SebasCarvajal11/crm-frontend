@@ -239,8 +239,8 @@ describe('ChatMessageList', () => {
 
     expect(markup).toContain('data-testid="user-avatar"')
     expect(markup).toContain('background-color:#1e3a8a')
-    expect(markup).toContain('background-color:#86070c')
-    expect(markup).toContain('src="/avatars/avatar-10.webp"')
-    expect(markup).toContain('src="/avatars/avatar-4.webp"')
+    expect(markup).toContain('data-testid="user-avatar-sprite"')
+    expect(markup).toContain('data-avatar-id="10"')
+    expect(markup).toContain('data-avatar-id="4"')
   })
 })

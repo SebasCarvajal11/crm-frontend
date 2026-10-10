@@ -28,7 +28,7 @@ class AvatarDirectoryServiceImpl {
   private cache = new Map<string, UserAvatarEntity>()
   private listeners = new Set<() => void>()
   private pendingQueue = new Map<string, ResolverQueueItem[]>()
-  private microtaskScheduled = false
+  private batchTimer: ReturnType<typeof setTimeout> | null = null
   private currentToken: string | null = null
   private version = 0
 
@@ -169,7 +169,7 @@ class AvatarDirectoryServiceImpl {
   }
 
   private async flushPendingQueue(): Promise<void> {
-    this.microtaskScheduled = false
+    this.batchTimer = null
     const token = this.currentToken
     if (!token) return
 
@@ -213,11 +213,10 @@ class AvatarDirectoryServiceImpl {
       })
     })
 
-    if (!this.microtaskScheduled) {
-      this.microtaskScheduled = true
-      queueMicrotask(() => {
+    if (!this.batchTimer) {
+      this.batchTimer = setTimeout(() => {
         void this.flushPendingQueue()
-      })
+      }, 16)
     }
 
     const fetchedEntities = await Promise.all(promises)

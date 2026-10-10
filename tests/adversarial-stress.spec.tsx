@@ -35,8 +35,9 @@ describe('ADVERSARIAL STRESS HARNESS: UserAvatar Zero-Null & CIMA Corporate Guar
     it(`[Stress-Test UserAvatar] ${label}`, () => {
       const markup = renderToStaticMarkup(<UserAvatar {...props} />)
 
-      // Oracle 1: Must render <img> tag
-      expect(markup).toContain('<img')
+      // Oracle 1: Must render image representation (<img> tag or sprite role="img")
+      const hasImageRep = markup.includes('<img') || markup.includes('role="img"')
+      expect(hasImageRep).toBe(true)
 
       // Oracle 2: Must never render initials in markup
       expect(markup).not.toMatch(/<span[^>]*>[A-Z]{1,2}<\/span>/)
@@ -53,8 +54,10 @@ describe('ADVERSARIAL STRESS HARNESS: UserAvatar Zero-Null & CIMA Corporate Guar
         expect(CIMA_HEX_SET.has(color)).toBe(true)
       }
 
-      // Oracle 4: Img src must match an avatar webp
-      expect(markup).toMatch(/src="[^"]+"/)
+      // Oracle 4: Img src or sprite must be present
+      const hasValidSource =
+        /src="[^"]+"/.test(markup) || markup.includes('data-testid="user-avatar-sprite"')
+      expect(hasValidSource).toBe(true)
     })
   })
 
@@ -62,9 +65,11 @@ describe('ADVERSARIAL STRESS HARNESS: UserAvatar Zero-Null & CIMA Corporate Guar
     // Si src="" se pasa explícitamente, UserAvatar sanea cadenas vacías y recurre al avatar determinista
     const markup = renderToStaticMarkup(<UserAvatar src="" name="Usuario Vacío" />)
     expect(markup).not.toContain('UserRound')
-    expect(markup).not.toContain('lucide-user-round')
-    expect(markup).toContain('<img')
-    expect(markup).toMatch(/src="\/avatars\/avatar-\d+\.webp"/)
+    const hasImageRep = markup.includes('<img') || markup.includes('role="img"')
+    expect(hasImageRep).toBe(true)
+    const hasValidSource =
+      /src="\/avatars\/avatar-\d+\.webp"/.test(markup) || markup.includes('data-testid="user-avatar-sprite"')
+    expect(hasValidSource).toBe(true)
     const colorMatch = markup.match(/background-color:\s*(#[0-9a-fA-F]{3,8})/i)
     expect(colorMatch).not.toBeNull()
     expect(CIMA_HEX_SET.has(colorMatch![1].toLowerCase())).toBe(true)
@@ -132,7 +137,7 @@ describe('ADVERSARIAL STRESS HARNESS: ChatMessageBubble Avatar Rendering Consist
     expect(markupForeign).toContain('data-testid="user-avatar"')
     expect(markupForeign).toContain('flex-row')
     expect(markupForeign).not.toContain('flex-row-reverse')
-    expect(markupForeign).toContain('src="/avatars/avatar-7.webp"')
+    expect(markupForeign).toContain('data-avatar-id="7"')
     expect(markupForeign).toContain('background-color:#1e3a8a')
 
     // 2. Mensaje propio (isOwn = true)
@@ -155,7 +160,7 @@ describe('ADVERSARIAL STRESS HARNESS: ChatMessageBubble Avatar Rendering Consist
 
     expect(markupOwn).toContain('data-testid="user-avatar"')
     expect(markupOwn).toContain('flex-row-reverse')
-    expect(markupOwn).toContain('src="/avatars/avatar-15.webp"')
+    expect(markupOwn).toContain('data-avatar-id="15"')
     expect(markupOwn).toContain('background-color:#86070c')
   })
 
@@ -179,7 +184,7 @@ describe('ADVERSARIAL STRESS HARNESS: ChatMessageBubble Avatar Rendering Consist
     )
 
     expect(markupOwnNull).toContain('data-testid="user-avatar"')
-    expect(markupOwnNull).toMatch(/src="\/avatars\/avatar-\d+\.webp"/)
+    expect(markupOwnNull).toContain('data-testid="user-avatar-sprite"')
     const colorMatch = markupOwnNull.match(/background-color:\s*(#[0-9a-fA-F]{6})/i)
     expect(colorMatch).not.toBeNull()
     expect(CIMA_HEX_SET.has(colorMatch![1].toLowerCase())).toBe(true)

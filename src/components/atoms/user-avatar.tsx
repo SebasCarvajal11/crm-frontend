@@ -5,6 +5,7 @@ import {
   resolveAvatarSrcSet,
   resolveDeterministicAvatar,
 } from '@/shared/lib/avatar-catalog'
+import { getAvatarSpriteStyle } from '@/shared/lib/avatar-spritesheet'
 import { cn } from '@/shared/lib/utils'
 import type { UserRole } from '@/shared/types/identity'
 import {
@@ -33,6 +34,7 @@ export type UserAvatarProps = {
   className?: string
   alt?: string
   ringClass?: string
+  preferSprite?: boolean
   onClick?: () => void
   onOpenProfile?: () => void
 }
@@ -67,6 +69,8 @@ type AvatarMediaProps = {
   sizes?: string
   effectiveColor: string
   altText: string
+  avatarId?: number | null
+  useSprite?: boolean
   onError: () => void
 }
 
@@ -76,6 +80,8 @@ function AvatarMedia({
   sizes,
   effectiveColor,
   altText,
+  avatarId,
+  useSprite = false,
   onError,
 }: AvatarMediaProps) {
   return (
@@ -86,21 +92,40 @@ function AvatarMedia({
       )}
       style={{ backgroundColor: effectiveColor }}
     >
-      <img
-        src={src}
-        srcSet={srcSet}
-        sizes={sizes}
-        alt={altText}
-        className="size-full object-cover rounded-full"
-        onError={onError}
-        loading="lazy"
-      />
+      {useSprite && typeof avatarId === 'number' ? (
+        <div
+          role="img"
+          aria-label={altText}
+          data-testid="user-avatar-sprite"
+          data-avatar-id={avatarId}
+          className="size-full rounded-full"
+          style={getAvatarSpriteStyle(avatarId)}
+        />
+      ) : (
+        <img
+          src={src}
+          srcSet={srcSet}
+          sizes={sizes}
+          alt={altText}
+          className="size-full object-cover rounded-full"
+          onError={onError}
+          loading="lazy"
+        />
+      )}
     </div>
   )
 }
 
 function useResolvedAvatar(props: UserAvatarProps) {
-  const { src, avatarUrl, avatarId, color, name, userId } = props
+  const {
+    src,
+    avatarUrl,
+    avatarId,
+    color,
+    name,
+    userId,
+    preferSprite = true,
+  } = props
   const deterministic = resolveDeterministicAvatar(userId ?? name)
   const trimmedSrc = src?.trim()
   const trimmedAvatarUrl = avatarUrl?.trim()
@@ -142,13 +167,16 @@ function useResolvedAvatar(props: UserAvatarProps) {
   )
   const computedAvatarId = isCustomSrc
     ? null
-    : srcAvatarId ?? (isValidAvatarId ? avatarId : deterministic.avatarId)
+    : (srcAvatarId ?? (isValidAvatarId ? avatarId : deterministic.avatarId))
   const computedSrcSet = resolveAvatarSrcSet(currentSrc, computedAvatarId)
+  const useSprite = preferSprite && !isCustomSrc && typeof computedAvatarId === 'number'
 
   return {
     currentSrc,
     computedSrcSet,
     effectiveColor,
+    computedAvatarId,
+    useSprite,
     handleImageError,
   }
 }
@@ -173,6 +201,8 @@ export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
     currentSrc,
     computedSrcSet,
     effectiveColor,
+    computedAvatarId,
+    useSprite,
     handleImageError,
   } = useResolvedAvatar(props)
 
@@ -224,6 +254,8 @@ export const UserAvatar = memo(function UserAvatar(props: UserAvatarProps) {
         sizes={SIZES_MEDIA_QUERIES[size]}
         effectiveColor={effectiveColor}
         altText={altText}
+        avatarId={computedAvatarId}
+        useSprite={useSprite}
         onError={handleImageError}
       />
 
