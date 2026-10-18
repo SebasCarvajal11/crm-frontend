@@ -1,4 +1,4 @@
-﻿export const analyticsKeys = {
+export const analyticsKeys = {
   all: ['analytics'] as const,
   summary: () => [...analyticsKeys.all, 'summary'] as const,
   kpis: (period: string = '') => [...analyticsKeys.all, 'kpis', period] as const,
@@ -6,4 +6,8 @@
   lowStock: () => [...analyticsKeys.all, 'low-stock'] as const,
   planDistribution: () => [...analyticsKeys.all, 'plan-distribution'] as const,
   activity: () => [...analyticsKeys.all, 'activity'] as const,
+  snapshots: () => [...analyticsKeys.all, 'snapshots'] as const,
+  kpiDetail: (kpi: string, period: string) => [...analyticsKeys.all, 'kpi-detail', kpi, period] as const,
+  kpiCompare: (period: string) => [...analyticsKeys.all, 'kpi-compare', period] as const,
+  projects: () => [...analyticsKeys.all, 'projects'] as const,
 }

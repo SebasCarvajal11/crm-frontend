@@ -2,7 +2,7 @@ import { api } from '@/shared/lib'
 import { bearer } from '@/shared/lib/bearer'
 import { ANALYTICS_ROUTES } from '@/shared/lib/gateway-routes'
 
-import type { KpiSnapshotDto } from '../model'
+import type { KpiComparisonDto, KpiDetailDto, KpiKey, KpiSnapshotDto } from '../model'
 
 /**
  * Forma real de KpiSnapshotDto alineada con crm-marketing (ADR-011).
@@ -67,4 +67,44 @@ export function ultimosPeriodos(cantidad = 12): { value: string; label: string }
     })
   }
   return resultado
+}
+
+// ── Detalle de cada KPI y comparación con el mes anterior ───────────────────
+export async function getKpiDetailRequest(
+  accessToken: string,
+  kpi: KpiKey,
+  period: string
+): Promise<KpiDetailDto> {
+  return api
+    .get(ANALYTICS_ROUTES.kpiDetail(kpi), {
+      headers: bearer(accessToken),
+      searchParams: { period },
+    })
+    .json<KpiDetailDto>()
+}
+
+export async function compareKpisRequest(
+  accessToken: string,
+  period: string
+): Promise<KpiComparisonDto> {
+  return api
+    .get(ANALYTICS_ROUTES.kpisCompare, {
+      headers: bearer(accessToken),
+      searchParams: { period },
+    })
+    .json<KpiComparisonDto>()
+}
+
+export async function exportKpiDetailRequest(
+  accessToken: string,
+  kpi: KpiKey,
+  period: string,
+  format: 'xlsx' | 'pdf'
+): Promise<Blob> {
+  return api
+    .get(ANALYTICS_ROUTES.exportKpiDetail(kpi), {
+      headers: bearer(accessToken),
+      searchParams: { period, format },
+    })
+    .blob()
 }

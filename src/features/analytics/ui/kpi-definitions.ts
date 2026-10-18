@@ -9,6 +9,7 @@ import {
   UserPlus,
 } from 'lucide-react'
 import type { KpiSnapshot } from '../api/kpis-api'
+import type { KpiKey } from '../model'
 
 export type Formato = 'entero' | 'moneda' | 'porcentaje' | 'dias'
 
@@ -19,11 +20,16 @@ export interface KpiDefinition {
   icon: typeof UserPlus
   formato: Formato
   destacado?: boolean
+  /** Clave del KPI en crm-marketing (/analytics/kpis/{kpi}/detail y /compare). */
+  apiKey: KpiKey
+  /** true cuando bajar es una mejora (p. ej. días de cierre): invierte el color de la variación. */
+  mejorSiBaja?: boolean
 }
 
 export const KPIS: KpiDefinition[] = [
   {
     key: 'newClients',
+    apiKey: 'new_clients',
     label: 'Clientes nuevos',
     origen: 'Altas registradas en el período',
     icon: UserPlus,
@@ -31,6 +37,7 @@ export const KPIS: KpiDefinition[] = [
   },
   {
     key: 'estimatedRevenue',
+    apiKey: 'revenue',
     label: 'Ingresos estimados',
     origen: 'Propuestas aprobadas en el período',
     icon: BadgeDollarSign,
@@ -39,6 +46,7 @@ export const KPIS: KpiDefinition[] = [
   },
   {
     key: 'activeCampaigns',
+    apiKey: 'active_campaigns',
     label: 'Campañas activas',
     origen: 'Vigentes durante el período',
     icon: Megaphone,
@@ -46,6 +54,7 @@ export const KPIS: KpiDefinition[] = [
   },
   {
     key: 'clientsContacted',
+    apiKey: 'clients_contacted',
     label: 'Clientes contactados',
     origen: 'Distintos, con al menos un contacto',
     icon: Send,
@@ -53,6 +62,7 @@ export const KPIS: KpiDefinition[] = [
   },
   {
     key: 'responseRate',
+    apiKey: 'response_rate',
     label: 'Tasa de respuesta',
     origen: 'Respuestas sobre clientes contactados',
     icon: TrendingUp,
@@ -61,6 +71,7 @@ export const KPIS: KpiDefinition[] = [
   },
   {
     key: 'closedProjects',
+    apiKey: 'closed_projects',
     label: 'Proyectos cerrados',
     origen: 'Finalizados en el período',
     icon: FolderCheck,
@@ -68,6 +79,7 @@ export const KPIS: KpiDefinition[] = [
   },
   {
     key: 'projectsInProgress',
+    apiKey: 'projects_in_progress',
     label: 'Proyectos en curso',
     origen: 'Abiertos al cierre del período',
     icon: FolderKanban,
@@ -75,6 +87,8 @@ export const KPIS: KpiDefinition[] = [
   },
   {
     key: 'avgCloseDays',
+    apiKey: 'avg_close_days',
+    mejorSiBaja: true,
     label: 'Tiempo promedio de cierre',
     origen: 'Días entre alta del cliente y cierre',
     icon: Clock,
