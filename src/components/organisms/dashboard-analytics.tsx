@@ -2,12 +2,14 @@ import {
   Users,
   Megaphone,
   FolderKanban,
-  AlertTriangle,
+  FolderSync,
   MessageSquare,
   Activity,
   RefreshCw,
   ChartAreaIcon,
+  XCircle,
 } from 'lucide-react'
+import { useState } from 'react'
 import { PageHeader } from '@/components/molecules/page-header'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,32 +21,38 @@ import { KpiDashboard } from '@/features/analytics/ui/KpiDashboard'
 import { KpiCard } from './analytics-kpi-card'
 import { ACCENT_STYLES } from './analytics-kpi-styles'
 import { ExportButtons } from './analytics-export-buttons'
-import { InventoryAlertsCard } from './analytics-inventory-alerts'
+import { IconButton } from '@/components/ui/icon-button'
+import { AnalyticsProjectsView } from '@/features/analytics/ui/AnalyticsProjectsView'
+import type { ProjectStatusFilter } from '@/features/analytics/ui/analytics-projects.utils'
 import { useDashboardAnalytics } from './use-dashboard-analytics'
 
 interface Props {
   accessToken: string
+  /** Rol del usuario; "Sincronizar con el CRM" solo se muestra a admin. */
+  role?: string
 }
 
-export function DashboardAnalytics({ accessToken }: Props) {
+export function DashboardAnalytics({ accessToken, role }: Props) {
+  const isAdmin = role === 'admin'
   const {
     summaryQuery,
     campaignStatusQuery,
-    lowStockQuery,
     snapshotsQuery,
     planQuery,
+    projectsQuery,
     summary,
     isRefreshing,
     refreshAll,
     campaignsFormat,
     campaignsExport,
-    lowStockFormat,
-    lowStockExport,
+    canSync,
+    syncMutation,
+    syncNotice,
+    dismissSyncNotice,
     kpisFormat,
     kpisExport,
-  } = useDashboardAnalytics(accessToken)
-
-  const lowStockCount = summary?.lowStockAlerts ?? 0
+  } = useDashboardAnalytics(accessToken, { isAdmin })
+  const [projectFilter, setProjectFilter] = useState<ProjectStatusFilter>('all')
 
   return (
     <div className="space-y-6">
@@ -66,20 +74,52 @@ export function DashboardAnalytics({ accessToken }: Props) {
           description="Vista general de las métricas operativas y comerciales de CIMA."
           icon={ChartAreaIcon}
           actions={(
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={refreshAll}
-              disabled={isRefreshing}
-              data-tour="analytics-refresh-btn"
-            >
-              <RefreshCw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              Actualizar
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              {canSync && (
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => syncMutation.mutate()}
+                  disabled={syncMutation.isPending}
+                  data-tour="analytics-sync-btn"
+                  className="gap-1.5"
+                >
+                  <FolderSync className={`size-4 ${syncMutation.isPending ? 'animate-pulse' : ''}`} />
+                  {syncMutation.isPending ? 'Sincronizando…' : 'Sincronizar con el CRM'}
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={refreshAll}
+                disabled={isRefreshing}
+                data-tour="analytics-refresh-btn"
+              >
+                <RefreshCw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                Actualizar
+              </Button>
+            </div>
           )}
         />
       </div>
+
+      {syncNotice && (
+        <div
+          role={syncNotice.tone === 'error' ? 'alert' : 'status'}
+          className={
+            'flex items-start justify-between gap-3 rounded-lg border p-4 text-sm ' +
+            (syncNotice.tone === 'error'
+              ? 'border-destructive/40 bg-destructive/10 text-destructive'
+              : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300')
+          }
+        >
+          <span>{syncNotice.text}</span>
+          <IconButton label="Cerrar aviso" onClick={dismissSyncNotice}>
+            <XCircle className="h-4 w-4" />
+          </IconButton>
+        </div>
+      )}
 
       <div data-tour="analytics-charts">
         <KpiDashboard accessToken={accessToken} />
@@ -92,7 +132,7 @@ export function DashboardAnalytics({ accessToken }: Props) {
       )}
 
       {/* KPI Cards */}
-      <div data-tour="analytics-kpis" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div data-tour="analytics-kpis" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
         <KpiCard
           label="Clientes"
           value={summary?.totalClients ?? 0}
@@ -121,22 +161,13 @@ export function DashboardAnalytics({ accessToken }: Props) {
           className="animate-fade-up stagger-3"
         />
         <KpiCard
-          label="Alertas de stock bajo"
-          value={lowStockCount}
-          subtitle={`${summary?.totalProducts ?? 0} productos · ${summary?.totalStock ?? 0} unidades`}
-          icon={AlertTriangle}
-          accent={lowStockCount > 0 ? 'red' : 'green'}
-          loading={summaryQuery.isLoading}
-          className="animate-fade-up stagger-4"
-        />
-        <KpiCard
           label="Interacciones de marketing"
           value={summary?.totalMarketingInteractions ?? 0}
           subtitle="Contactos registrados con clientes"
           icon={MessageSquare}
           accent="cyan"
           loading={summaryQuery.isLoading}
-          className="animate-fade-up stagger-5"
+          className="animate-fade-up stagger-4"
         />
         <KpiCard
           label="Snapshots de KPI"
@@ -145,7 +176,7 @@ export function DashboardAnalytics({ accessToken }: Props) {
           icon={Activity}
           accent="indigo"
           loading={summaryQuery.isLoading}
-          className="animate-fade-up stagger-6"
+          className="animate-fade-up stagger-5"
         />
       </div>
 
@@ -229,17 +260,18 @@ export function DashboardAnalytics({ accessToken }: Props) {
         </div>
       </div>
 
-      {/* Alertas de Stock */}
-      <div data-tour="analytics-inventory-alerts">
-        <InventoryAlertsCard
-          data={lowStockQuery.data}
-          isLoading={lowStockQuery.isLoading}
-          isError={lowStockQuery.isError}
-          onExport={(format) => lowStockExport.mutate(format)}
-          isExporting={lowStockExport.isPending}
-          exportFormat={lowStockFormat}
-        />
-      </div>
+      {/* Proyectos sincronizados desde el CRM (el inventario se oculta: no se alimenta) */}
+      <AnalyticsProjectsView
+        projects={Array.isArray(projectsQuery.data) ? projectsQuery.data : []}
+        isLoading={projectsQuery.isLoading}
+        isError={projectsQuery.isError}
+        statusFilter={projectFilter}
+        onStatusFilterChange={setProjectFilter}
+        onRetry={() => void projectsQuery.refetch()}
+        isAdmin={canSync}
+        onSync={() => syncMutation.mutate()}
+        isSyncing={syncMutation.isPending}
+      />
     </div>
   )
 }

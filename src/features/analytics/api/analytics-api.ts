@@ -1,6 +1,6 @@
 import { api } from '@/shared/lib'
 import { bearer } from '@/shared/lib/bearer'
-import { ANALYTICS_ROUTES } from '@/shared/lib/gateway-routes'
+import { ANALYTICS_ROUTES, MARKETING_ROUTES } from '@/shared/lib/gateway-routes'
 import type {
   AnalyticsSummaryDto,
   ClientPlanDistributionDto,
@@ -8,6 +8,8 @@ import type {
   CampaignStatusReportDto,
   InventoryAlertDto,
   KpiSnapshotDto,
+  ProjectAnalyticsDto,
+  CrmSyncResultDto,
 } from '@/features/analytics/model'
 
 export async function getAnalyticsSummaryRequest(accessToken: string): Promise<AnalyticsSummaryDto> {
@@ -88,4 +90,18 @@ export async function exportLowStockRequest(
     .blob()
 }
 
+// ── Proyectos sincronizados desde el CRM ────────────────────────────────────
+export async function getAnalyticsProjectsRequest(
+  accessToken: string
+): Promise<ProjectAnalyticsDto[]> {
+  return api
+    .get(ANALYTICS_ROUTES.projects, { headers: bearer(accessToken) })
+    .json<ProjectAnalyticsDto[]>()
+}
 
+/** Sincroniza clientes y proyectos desde el CRM (solo admin en el backend). */
+export async function syncCrmFromAnalyticsRequest(accessToken: string): Promise<CrmSyncResultDto> {
+  return api
+    .post(MARKETING_ROUTES.integrationSync, { headers: bearer(accessToken) })
+    .json<CrmSyncResultDto>()
+}

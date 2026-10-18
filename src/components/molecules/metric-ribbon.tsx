@@ -142,7 +142,16 @@ function MetricCell({
       onClick={item.onClick}
       role={item.onClick ? 'button' : undefined}
       tabIndex={item.onClick ? 0 : undefined}
-      onKeyDown={item.onClick ? (e) => e.key === 'Enter' && item.onClick?.() : undefined}
+      onKeyDown={
+        item.onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                item.onClick?.()
+              }
+            }
+          : undefined
+      }
     >
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">

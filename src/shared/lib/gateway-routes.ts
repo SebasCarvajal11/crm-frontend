@@ -212,6 +212,11 @@ export const ANALYTICS_ROUTES = {
   kpisHistory: `${API_PREFIX}/analytics/kpis/history`,
   kpisCurrentByPeriod: (period: string) => `${API_PREFIX}/analytics/kpis/current/${period}`,
   kpisCalculateByPeriod: (period: string) => `${API_PREFIX}/analytics/kpis/calculate/${period}`,
+  // Detalle, comparación mensual y proyectos (crm-marketing, PR #9)
+  kpiDetail: (kpi: string) => `${API_PREFIX}/analytics/kpis/${kpi}/detail`,
+  kpisCompare: `${API_PREFIX}/analytics/kpis/compare`,
+  projects: `${API_PREFIX}/analytics/projects`,
+  exportKpiDetail: (kpi: string) => `${API_PREFIX}/analytics/export/kpis/${kpi}/detail`,
 } as const
 
 // ── Admin Storage (autenticado, rol admin) ──────────────────────────────────
