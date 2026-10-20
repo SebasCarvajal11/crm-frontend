@@ -1,18 +1,11 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
 import type { ClientPlanDistributionDto } from '../../model'
+import { planSliceColor } from './plan-distribution.utils'
 
 interface Props {
   data: ClientPlanDistributionDto[]
   loading?: boolean
 }
-
-// Colores por plan comercial de CIMA; el resto (p. ej. sin plan) en gris.
-const PLAN_COLORS: Record<string, string> = {
-  Platinum: '#64748b',
-  Oro: '#f59e0b',
-  Diamante: '#0ea5e9',
-}
-const COLORS = ['#3b82f6', '#10b981', '#8b5cf6', '#ef4444']
 
 export function PlanDistributionChart({ data, loading }: Props) {
   if (loading) {
@@ -37,8 +30,8 @@ export function PlanDistributionChart({ data, loading }: Props) {
           outerRadius={100}
           label
         >
-          {data.map((d, index) => (
-            <Cell key={`cell-${index}`} fill={PLAN_COLORS[d.plan] ?? (d.plan ? COLORS[index % COLORS.length] : '#cbd5e1')} />
+          {safeData.map((d, index) => (
+            <Cell key={`cell-${index}`} fill={planSliceColor(d, index)} />
           ))}
         </Pie>
         <Tooltip formatter={(value) => `${value} clientes`} />

@@ -17,6 +17,10 @@ import {
   type CreateWorkflowInput,
 } from '../api/marketing-api'
 import { listClientsRequest } from '../api/clients-api'
+import { getEmailQuotaRequest } from '../api/notifications-api'
+import { listTemplatesRequest } from '../api/templates-api'
+import { EmailQuotaCard } from './email-quota-card'
+import { TestEmailDialog } from './TestEmailDialog'
 import { clientLabel } from './client-plans.constants'
 import { WorkflowCard } from './workflow-card'
 import { WorkflowFormDialog } from './workflow-form-dialog'
@@ -25,6 +29,8 @@ import { WorkflowExecutionsDialog } from './workflow-executions-dialog'
 interface WorkflowsManagerProps {
   accessToken: string
   preselectedCampaignId?: number | null
+  /** El correo de prueba es solo para admin. */
+  isAdmin?: boolean
 }
 
 const INITIAL_FORM_DATA: CreateWorkflowInput = {
@@ -41,6 +47,7 @@ const INITIAL_FORM_DATA: CreateWorkflowInput = {
 export function WorkflowsManager({
   accessToken,
   preselectedCampaignId,
+  isAdmin = false,
 }: WorkflowsManagerProps) {
   const queryClient = useQueryClient()
   const [isCreateOpen, setIsCreateOpen] = useState(false)
@@ -69,6 +76,21 @@ export function WorkflowsManager({
     queryKey: ['marketing', 'clients', accessToken],
     queryFn: () => listClientsRequest(accessToken),
   })
+  const quotaQuery = useQuery({
+    queryKey: ['marketing', 'email-quota'],
+    queryFn: () => getEmailQuotaRequest(accessToken),
+    staleTime: 30_000,
+  })
+
+  const templatesQuery = useQuery({
+    queryKey: ['marketing', 'templates', 'all'],
+    queryFn: () => listTemplatesRequest(accessToken),
+  })
+  const templates = useMemo(
+    () => (Array.isArray(templatesQuery.data) ? templatesQuery.data : []),
+    [templatesQuery.data],
+  )
+
   const clientNames = useMemo(
     () => new Map((clientsQuery.data ?? []).map((c) => [c.clientId, clientLabel(c)])),
     [clientsQuery.data],
@@ -112,6 +134,7 @@ export function WorkflowsManager({
   const runMutation = useMutation({
     mutationFn: (id: number) => runWorkflowRequest(accessToken, id),
     onSuccess: (res) => {
+      // Invalida también el cupo de correos (['marketing', 'email-quota']).
       queryClient.invalidateQueries({ queryKey: ['marketing'] })
       setExecutionResultMsg({
         success: true,
@@ -188,6 +211,13 @@ export function WorkflowsManager({
           Nueva Automatización
         </Button>
       </div>
+
+      <EmailQuotaCard
+        quota={quotaQuery.data}
+        isLoading={quotaQuery.isLoading}
+        isError={quotaQuery.isError}
+        action={isAdmin ? <TestEmailDialog accessToken={accessToken} /> : undefined}
+      />
 
       {executionResultMsg && (
         <Alert
@@ -276,6 +306,9 @@ export function WorkflowsManager({
         open={isCreateOpen}
         formData={formData}
         campaigns={campaigns}
+        templates={templates}
+        accessToken={accessToken}
+        clients={clientsQuery.data ?? []}
         isPending={createMutation.isPending}
         onClose={() => setIsCreateOpen(false)}
         onFormDataChange={setFormData}

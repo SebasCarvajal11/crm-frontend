@@ -1,19 +1,22 @@
-import { Bot, CheckCircle2, MessageSquarePlus, User } from 'lucide-react'
+import { Bot, CheckCircle2, MessageSquare, MessageSquarePlus, User } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { MarketingInteraction } from '../api/interactions-api'
 import { typeMeta, formatDateTime } from './interaction-types.constants'
+import { DeliveryBadge } from './delivery-badge'
 
 interface InteractionsTableProps {
   filtered: MarketingInteraction[]
   clientLabel: (clientId: string) => string
   onOpenDialog: (interaction: MarketingInteraction) => void
+  onWhatsApp?: (interaction: MarketingInteraction) => void
 }
 
 export function InteractionsTable({
   filtered,
   clientLabel,
   onOpenDialog,
+  onWhatsApp,
 }: InteractionsTableProps) {
   return (
     <Card>
@@ -25,6 +28,7 @@ export function InteractionsTable({
                 <th className="px-4 py-3 font-semibold">Cliente</th>
                 <th className="px-4 py-3 font-semibold">Fecha</th>
                 <th className="px-4 py-3 font-semibold">Canal</th>
+                <th className="px-4 py-3 font-semibold">Entrega</th>
                 <th className="px-4 py-3 font-semibold">Tipo</th>
                 <th className="px-4 py-3 font-semibold">Origen</th>
                 <th className="px-4 py-3 font-semibold">Respuesta</th>
@@ -47,6 +51,16 @@ export function InteractionsTable({
                       {formatDateTime(interaction.contactDate)}
                     </td>
                     <td className="px-4 py-3 text-xs">{interaction.channel ?? '—'}</td>
+                    <td className="px-4 py-3">
+                      {interaction.deliveryStatus ? (
+                        <DeliveryBadge
+                          status={interaction.deliveryStatus}
+                          error={interaction.deliveryError}
+                        />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       <span
                         className={[
@@ -82,24 +96,39 @@ export function InteractionsTable({
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button
-                        variant={interaction.response ? 'ghost' : 'outline'}
-                        size="sm"
-                        className="h-8 gap-1.5 text-xs"
-                        onClick={() => onOpenDialog(interaction)}
-                      >
-                        {interaction.response ? (
-                          <>
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                            Editar
-                          </>
-                        ) : (
-                          <>
-                            <MessageSquarePlus className="h-3.5 w-3.5" />
-                            Registrar
-                          </>
+                      <div className="flex justify-end gap-1.5">
+                        {onWhatsApp && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 gap-1.5 whitespace-nowrap text-xs"
+                            onClick={() => onWhatsApp(interaction)}
+                            aria-label={`Abrir en WhatsApp a ${clientLabel(interaction.clientId)}`}
+                            title="Abrir en WhatsApp"
+                          >
+                            <MessageSquare className="h-3.5 w-3.5" />
+                            WhatsApp
+                          </Button>
                         )}
-                      </Button>
+                        <Button
+                          variant={interaction.response ? 'ghost' : 'outline'}
+                          size="sm"
+                          className="h-8 gap-1.5 text-xs"
+                          onClick={() => onOpenDialog(interaction)}
+                        >
+                          {interaction.response ? (
+                            <>
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                              Editar
+                            </>
+                          ) : (
+                            <>
+                              <MessageSquarePlus className="h-3.5 w-3.5" />
+                              Registrar
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 )

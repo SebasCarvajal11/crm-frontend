@@ -20,8 +20,9 @@ import { clientLabel } from './client-plans.constants'
 import { SegmentSchedulerCard } from './segment-scheduler-card'
 import { SegmentPreviewCard } from './segment-preview-card'
 import { TriEstado } from './tri-estado'
+import { usePlans } from '../hooks/use-plans'
+import { planChipStyle } from './plans.utils'
 import {
-  PLANES,
   ESTADOS_PROPUESTA,
   CRITERIOS_VACIOS,
   limpiar,
@@ -33,6 +34,7 @@ interface SegmentsManagerProps {
 
 export function SegmentsManager({ accessToken }: SegmentsManagerProps) {
   const queryClient = useQueryClient()
+  const { activePlans, isLoading: plansLoading } = usePlans(accessToken)
 
   const [criteria, setCriteria] = useState<SegmentCriteria>(CRITERIOS_VACIOS)
   const [preview, setPreview] = useState<SegmentPreview | null>(null)
@@ -141,23 +143,31 @@ export function SegmentsManager({ accessToken }: SegmentsManagerProps) {
             <div className="space-y-2">
               <Label>Plan de cliente (clasificación comercial)</Label>
               <div className="flex flex-wrap gap-2">
-                {PLANES.map((plan) => {
+                {activePlans.map(({ planId, name: plan, color }) => {
                   const sel = criteria.plans?.includes(plan)
                   return (
                     <button
-                      key={plan}
+                      key={planId}
                       type="button"
+                      aria-pressed={sel}
                       onClick={() => togglePlan(plan)}
-                      className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                      style={sel ? planChipStyle(color) : undefined}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
                         sel
-                          ? 'border-primary bg-primary text-primary-foreground'
+                          ? 'text-foreground ring-2 ring-offset-1 ring-offset-background ring-primary/30'
                           : 'border-input bg-background hover:bg-muted'
                       }`}
                     >
+                      <span className="size-2 rounded-full" style={{ backgroundColor: color }} aria-hidden="true" />
                       Plan {plan}
                     </button>
                   )
                 })}
+                {!plansLoading && activePlans.length === 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    No hay planes activos. Un administrador puede crearlos en la pestaña Planes.
+                  </p>
+                )}
               </div>
             </div>
 

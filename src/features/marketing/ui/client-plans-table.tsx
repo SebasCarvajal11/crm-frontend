@@ -1,14 +1,31 @@
+import { MessageSquare } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import type { ClientPlan, MarketingClient } from '../api/clients-api'
-import { PLANS, planMeta, clientLabel } from './client-plans.constants'
+import type { MarketingPlan } from '../api/plans-api'
+import { clientLabel } from './client-plans.constants'
+import { PlanChip } from './plan-chip'
+import { findPlanByName } from './plans.utils'
 
 interface ClientPlansTableProps {
   clients: MarketingClient[]
+  /** Catálogo completo (activos e inactivos), para pintar el chip. */
+  plans: MarketingPlan[]
+  /** Solo los planes activos: los únicos que se ofrecen al asignar. */
+  activePlans: MarketingPlan[]
   isBusy: boolean
   onAssignPlan: (clientId: string, plan: ClientPlan) => void
+  onWhatsApp?: (client: MarketingClient) => void
 }
 
-export function ClientPlansTable({ clients, isBusy, onAssignPlan }: ClientPlansTableProps) {
+export function ClientPlansTable({
+  clients,
+  plans,
+  activePlans,
+  isBusy,
+  onAssignPlan,
+  onWhatsApp,
+}: ClientPlansTableProps) {
   return (
     <Card>
       <CardContent className="p-0">
@@ -20,12 +37,13 @@ export function ClientPlansTable({ clients, isBusy, onAssignPlan }: ClientPlansT
                 <th className="px-4 py-3 font-semibold">Correo</th>
                 <th className="px-4 py-3 font-semibold">Plan actual</th>
                 <th className="px-4 py-3 text-right font-semibold">Asignar plan</th>
+                {onWhatsApp && <th className="px-4 py-3 text-right font-semibold">Contacto</th>}
               </tr>
             </thead>
             <tbody>
-              {clients.map((client) => {
-                const meta = planMeta(client.plan)
-                const Icon = meta?.icon
+              {clients.map((client, index) => {
+                const plan = findPlanByName(plans, client.plan)
+                const planAsignable = plan?.active ? plan.name : ''
                 return (
                   <tr
                     key={client.clientId}
@@ -36,47 +54,41 @@ export function ClientPlansTable({ clients, isBusy, onAssignPlan }: ClientPlansT
                       {client.contactInfo || '—'}
                     </td>
                     <td className="px-4 py-3">
-                      {meta && Icon ? (
-                        <span
-                          className={[
-                            'inline-flex items-center gap-1.5 rounded-full border',
-                            'px-2.5 py-0.5 text-xs font-semibold',
-                            meta.chip,
-                          ].join(' ')}
-                        >
-                          <Icon className="h-3 w-3" />
-                          {meta.label}
-                        </span>
-                      ) : (
-                        <span
-                          className={[
-                            'inline-flex items-center gap-1.5 rounded-full border',
-                            'border-border bg-muted px-2.5 py-0.5 text-xs text-muted-foreground',
-                          ].join(' ')}
-                        >
-                          Sin clasificar
-                        </span>
-                      )}
+                      <PlanChip name={client.plan} plan={plan} />
                     </td>
                     <td className="px-4 py-3 text-right">
                       <select
-                        value={client.plan ?? ''}
-                        disabled={isBusy}
-                        onChange={(e) =>
-                          onAssignPlan(client.clientId, e.target.value as ClientPlan)
-                        }
+                        aria-label={`Asignar plan a ${clientLabel(client)}`}
+                        value={planAsignable}
+                        disabled={isBusy || activePlans.length === 0}
+                        onChange={(e) => onAssignPlan(client.clientId, e.target.value)}
                         className="h-8 rounded-md border border-input bg-background px-2 text-xs disabled:opacity-60"
                       >
                         <option value="" disabled>
-                          Elegir…
+                          {client.plan && !planAsignable ? 'Cambiar plan…' : 'Elegir…'}
                         </option>
-                        {PLANS.map((p) => (
-                          <option key={p.value} value={p.value}>
-                            {p.label}
+                        {activePlans.map((p) => (
+                          <option key={p.planId} value={p.name}>
+                            {p.name}
                           </option>
                         ))}
                       </select>
                     </td>
+                    {onWhatsApp && (
+                      <td className="px-4 py-3 text-right">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-8 gap-1.5 whitespace-nowrap text-xs"
+                          onClick={() => onWhatsApp(client)}
+                          data-tour={index === 0 ? 'marketing-whatsapp-btn' : undefined}
+                        >
+                          <MessageSquare className="h-3.5 w-3.5" />
+                          Abrir en WhatsApp
+                        </Button>
+                      </td>
+                    )}
                   </tr>
                 )
               })}
