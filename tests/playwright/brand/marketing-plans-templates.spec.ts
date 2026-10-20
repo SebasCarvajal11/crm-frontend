@@ -202,8 +202,11 @@ test.describe('Marketing: planes configurables, plantillas, correos y WhatsApp',
     await expect.poll(() => toolbar.evaluate((el) => el.scrollLeft)).toBeGreaterThan(antes)
     await expect(barra.getByRole('button', { name: 'Ver pestañas anteriores' })).toBeVisible()
 
-    // Hasta el final: la última pestaña queda visible y la flecha derecha desaparece.
-    while (await derecha.isVisible()) await derecha.click()
+    // Al llegar al final la flecha derecha desaparece y la última pestaña queda visible.
+    // Se lleva la barra al final directamente: hacer clic en un bucle compite con el
+    // desplazamiento suave y la flecha puede desmontarse en medio del clic.
+    await toolbar.evaluate((el) => el.scrollTo({ left: el.scrollWidth, behavior: 'auto' }))
+    await expect(derecha).toHaveCount(0)
     await expect(page.locator('[data-tour="marketing-tab-plans"]')).toBeInViewport()
     expect(errors).toEqual([])
   })
