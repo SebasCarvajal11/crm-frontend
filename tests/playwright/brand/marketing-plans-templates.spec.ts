@@ -107,6 +107,14 @@ test.describe('Marketing: planes configurables, plantillas, correos y WhatsApp',
 
     await page.locator('[data-tour="marketing-tab-templates"]').click()
     await expect(page.getByText('Saludo WhatsApp')).toBeVisible()
+    // Explicación de qué es una plantilla, que se puede ocultar.
+    const ayuda = page.locator('[data-tour="marketing-templates-help"]')
+    await expect(ayuda).toContainText('¿Qué es una plantilla?')
+    await expect(ayuda).toContainText('Hola Acme SAS, gracias por confiar en el plan Oro.')
+    await ayuda.getByRole('button', { name: /Ocultar/ }).click()
+    await expect(ayuda).not.toContainText('Dónde se usa')
+    await ayuda.getByRole('button', { name: /Ver explicación/ }).click()
+    await expect(ayuda).toContainText('Dónde se usa')
     await page.getByLabel('Filtrar por canal').selectOption('EMAIL')
     await expect(page.getByText('Saludo WhatsApp')).toHaveCount(0)
     await expect(page.getByText('Bienvenida Oro')).toBeVisible()
@@ -174,6 +182,29 @@ test.describe('Marketing: planes configurables, plantillas, correos y WhatsApp',
         body: { campaignId: 7, clientId: 'c1', channel: 'whatsapp', interactionType: 'message', response: null },
       })
     )
+    expect(errors).toEqual([])
+  })
+
+  test('con pestañas que no caben aparecen flechas para recorrerlas', async ({ page }) => {
+    await page.setViewportSize({ width: 900, height: 900 })
+    const { errors } = await setupDashboard(page, 'admin')
+    await mockMarketing(page)
+    await page.goto('/dashboard?tab=marketing')
+
+    const barra = page.locator('[data-tour="marketing-tabs"]')
+    const derecha = barra.getByRole('button', { name: 'Ver más pestañas' })
+    await expect(derecha).toBeVisible()
+    await expect(barra.getByRole('button', { name: 'Ver pestañas anteriores' })).toHaveCount(0)
+
+    const toolbar = barra.locator('div[role="toolbar"]')
+    const antes = await toolbar.evaluate((el) => el.scrollLeft)
+    await derecha.click()
+    await expect.poll(() => toolbar.evaluate((el) => el.scrollLeft)).toBeGreaterThan(antes)
+    await expect(barra.getByRole('button', { name: 'Ver pestañas anteriores' })).toBeVisible()
+
+    // Hasta el final: la última pestaña queda visible y la flecha derecha desaparece.
+    while (await derecha.isVisible()) await derecha.click()
+    await expect(page.locator('[data-tour="marketing-tab-plans"]')).toBeInViewport()
     expect(errors).toEqual([])
   })
 })

@@ -82,3 +82,31 @@ export function handleTabKeyNavigation<T extends string>({
     }
   }
 }
+
+export interface ScrollEdges {
+  canScrollLeft: boolean
+  canScrollRight: boolean
+}
+
+/** Indica si quedan pestañas ocultas a la izquierda o a la derecha (tolerancia de 2px). */
+export function getScrollEdges(
+  container: Pick<HTMLElement, 'scrollLeft' | 'scrollWidth' | 'clientWidth'>,
+): ScrollEdges {
+  const maxScroll = container.scrollWidth - container.clientWidth
+  if (maxScroll <= 2) return { canScrollLeft: false, canScrollRight: false }
+  return {
+    canScrollLeft: container.scrollLeft > 2,
+    canScrollRight: container.scrollLeft < maxScroll - 2,
+  }
+}
+
+/** Posición de scroll para avanzar o retroceder unas pestañas (70 % del ancho visible). */
+export function nextScrollLeft(
+  container: Pick<HTMLElement, 'scrollLeft' | 'scrollWidth' | 'clientWidth'>,
+  direction: 'left' | 'right',
+): number {
+  const maxScroll = Math.max(0, container.scrollWidth - container.clientWidth)
+  const step = Math.max(120, Math.round(container.clientWidth * 0.7))
+  const target = container.scrollLeft + (direction === 'right' ? step : -step)
+  return Math.max(0, Math.min(target, maxScroll))
+}

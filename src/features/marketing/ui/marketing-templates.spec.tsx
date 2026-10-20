@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { MessageTemplate } from '../api/templates-api'
 import { TemplatesTable } from './templates-table'
+import { TemplatesExplainer } from './templates-explainer'
 import {
   channelForAction,
   channelLabel,
@@ -106,5 +107,18 @@ describe('TemplatesTable', () => {
     const filtrado = render({ templates: [], filtered: true })
     expect(filtrado).toContain('Ninguna plantilla coincide con el filtro')
     expect(filtrado).toContain('Ver todas')
+  })
+})
+
+describe('TemplatesExplainer', () => {
+  it('explica qué es una plantilla con un ejemplo, las variables y dónde se usa', () => {
+    const markup = renderToStaticMarkup(<TemplatesExplainer forceOpen />)
+    expect(markup).toContain('¿Qué es una plantilla?')
+    expect(markup).toContain('Hola Acme SAS, gracias por confiar en el plan Oro.')
+    for (const texto of ['{nombre}', '{plan}', '{empresa}', '{workflow}', 'En Automatizaciones', 'Abrir en WhatsApp', 'Cómo crear una']) {
+      expect(markup).toContain(texto)
+    }
+    // Abierta a la fuerza (sin plantillas) no ofrece ocultarla.
+    expect(markup).not.toContain('Ocultar')
   })
 })
