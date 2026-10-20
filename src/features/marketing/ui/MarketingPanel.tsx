@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Megaphone, Zap, FileText, Users, MessageSquare, Target } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Megaphone, Zap, FileText, Users, MessageSquare, Target, Tag, PenLine } from 'lucide-react'
 import { PageHeader } from '@/components/molecules/page-header'
 import { SectionTabs, type SectionTabItem } from '@/components/molecules/section-tabs'
 import { CampaignsManager } from './CampaignsManager'
@@ -8,9 +8,13 @@ import { ProposalsManager } from './ProposalsManager'
 import { ClientPlansManager } from './ClientPlansManager'
 import { InteractionsManager } from './InteractionsManager'
 import { SegmentsManager } from './SegmentsManager'
+import { PlansManager } from './PlansManager'
+import { TemplatesManager } from './TemplatesManager'
 
 interface Props {
   accessToken: string
+  /** Rol del usuario: la pestaña Planes y el correo de prueba son solo para admin. */
+  role?: string
 }
 
 type MarketingTab =
@@ -20,6 +24,8 @@ type MarketingTab =
   | 'workflows'
   | 'segments'
   | 'interactions'
+  | 'templates'
+  | 'plans'
 
 const TABS: SectionTabItem<MarketingTab>[] = [
   { value: 'clients', label: 'Clientes', icon: <Users className="size-4" /> },
@@ -28,10 +34,16 @@ const TABS: SectionTabItem<MarketingTab>[] = [
   { value: 'workflows', label: 'Automatizaciones', shortLabel: 'Flujos', icon: <Zap className="size-4" /> },
   { value: 'segments', label: 'Segmentos', icon: <Target className="size-4" /> },
   { value: 'interactions', label: 'Interacciones', icon: <MessageSquare className="size-4" /> },
+  { value: 'templates', label: 'Plantillas', icon: <PenLine className="size-4" /> },
+  { value: 'plans', label: 'Planes', icon: <Tag className="size-4" /> },
 ]
 
-export function MarketingPanel({ accessToken }: Props) {
-  const [activeTab, setActiveTab] = useState<MarketingTab>('clients')
+export function MarketingPanel({ accessToken, role }: Props) {
+  const isAdmin = role === 'admin'
+  const tabs = useMemo(() => TABS.filter((t) => t.value !== 'plans' || isAdmin), [isAdmin])
+  const [activeTabState, setActiveTab] = useState<MarketingTab>('clients')
+  // Si el rol cambia y la pestaña ya no está disponible, vuelve a Clientes.
+  const activeTab = tabs.some((t) => t.value === activeTabState) ? activeTabState : 'clients'
   const [preselectedCampaignId, setPreselectedCampaignId] = useState<number | null>(null)
 
   const handleTabChange = (nextTab: MarketingTab) => {
@@ -60,13 +72,13 @@ export function MarketingPanel({ accessToken }: Props) {
               </span>
             </>
           }
-          description="Clientes por plan, campañas, propuestas, automatizaciones, segmentos e interacciones."
+          description="Clientes por plan, campañas, propuestas, automatizaciones, segmentos, interacciones y plantillas."
           icon={Megaphone}
         />
       </div>
       <div data-tour="marketing-tabs">
         <SectionTabs
-          items={TABS}
+          items={tabs}
           value={activeTab}
           onValueChange={handleTabChange}
           ariaLabel="Secciones de marketing"
@@ -78,7 +90,10 @@ export function MarketingPanel({ accessToken }: Props) {
       <div>
         {activeTab === 'clients' && (
           <div className="tab-pane-transition">
-            <ClientPlansManager accessToken={accessToken} />
+            <ClientPlansManager
+              accessToken={accessToken}
+              onGoToTemplates={() => handleTabChange('templates')}
+            />
           </div>
         )}
 
@@ -102,6 +117,7 @@ export function MarketingPanel({ accessToken }: Props) {
             <WorkflowsManager
               accessToken={accessToken}
               preselectedCampaignId={preselectedCampaignId}
+              isAdmin={isAdmin}
             />
           </div>
         )}
@@ -114,7 +130,22 @@ export function MarketingPanel({ accessToken }: Props) {
 
         {activeTab === 'interactions' && (
           <div className="tab-pane-transition">
-            <InteractionsManager accessToken={accessToken} />
+            <InteractionsManager
+              accessToken={accessToken}
+              onGoToTemplates={() => handleTabChange('templates')}
+            />
+          </div>
+        )}
+
+        {activeTab === 'templates' && (
+          <div className="tab-pane-transition">
+            <TemplatesManager accessToken={accessToken} />
+          </div>
+        )}
+
+        {activeTab === 'plans' && isAdmin && (
+          <div className="tab-pane-transition">
+            <PlansManager accessToken={accessToken} />
           </div>
         )}
       </div>

@@ -11,6 +11,9 @@ export type InteractionType =
   | 'purchase'
   | 'testimonial'
 
+/** Resultado del envío del correo o mensaje asociado a la interacción. */
+export type DeliveryStatus = 'QUEUED' | 'FAILED' | 'SIMULATED' | 'SKIPPED_LIMIT'
+
 export interface MarketingInteraction {
   interactionId: number
   campaignId: number
@@ -21,6 +24,9 @@ export interface MarketingInteraction {
   interactionType: InteractionType
   channel?: string | null
   response?: string | null
+  /** null en registros anteriores a PR #10 o en contactos manuales. */
+  deliveryStatus?: DeliveryStatus | null
+  deliveryError?: string | null
 }
 
 export type CreateInteractionInput = {

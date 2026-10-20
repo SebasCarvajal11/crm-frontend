@@ -192,6 +192,16 @@ export const MARKETING_ROUTES = {
   segmentExecute: (workflowId: string | number) => `${API_PREFIX}/marketing/segments/${workflowId}/execute`,
   schedulerRun: `${API_PREFIX}/marketing/scheduler/run`,
   integrationSync: `${API_PREFIX}/integration/sync`,
+  // Planes configurables, plantillas y correos (crm-marketing, PR #10)
+  plans: `${API_PREFIX}/marketing/plans`,
+  plan: (planId: string) => `${API_PREFIX}/marketing/plans/${planId}`,
+  planActive: (planId: string) => `${API_PREFIX}/marketing/plans/${planId}/active`,
+  templates: `${API_PREFIX}/marketing/templates`,
+  template: (templateId: string) => `${API_PREFIX}/marketing/templates/${templateId}`,
+  templateActive: (templateId: string) => `${API_PREFIX}/marketing/templates/${templateId}/active`,
+  templatePreview: (templateId: string) => `${API_PREFIX}/marketing/templates/${templateId}/preview`,
+  emailQuota: `${API_PREFIX}/marketing/notifications/email-quota`,
+  testEmail: `${API_PREFIX}/marketing/notifications/test-email`,
 } as const
 
 // ── Analytics (autenticado) ──────────────────────────────────────────────────

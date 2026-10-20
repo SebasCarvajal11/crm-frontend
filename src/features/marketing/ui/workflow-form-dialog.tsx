@@ -21,12 +21,20 @@ import type {
   ActionType,
   CreateWorkflowInput,
 } from '../api/marketing-api'
+import type { MarketingClient } from '../api/clients-api'
+import type { MessageTemplate } from '../api/templates-api'
 import { TRIGGER_TYPES, ACTION_TYPES } from './workflow.constants'
+import { TemplatePreviewPanel } from './template-preview-panel'
+import { channelForAction, channelLabel, templatesForAction } from './templates.utils'
 
 interface WorkflowFormDialogProps {
   open: boolean
   formData: CreateWorkflowInput
   campaigns: Campaign[]
+  /** Biblioteca de plantillas; se ofrecen solo las activas del canal de la acción. */
+  templates?: MessageTemplate[]
+  accessToken?: string
+  clients?: MarketingClient[]
   isPending: boolean
   onClose: () => void
   onFormDataChange: (data: CreateWorkflowInput) => void
@@ -37,11 +45,18 @@ export function WorkflowFormDialog({
   open,
   formData,
   campaigns,
+  templates = [],
+  accessToken,
+  clients = [],
   isPending,
   onClose,
   onFormDataChange,
   onSubmit,
 }: WorkflowFormDialogProps) {
+  const disponibles = templatesForAction(templates, formData.actionType)
+  const canal = channelForAction(formData.actionType)
+  const seleccionada = disponibles.find((t) => t.templateId === formData.templateId) ?? null
+
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent size="lg">
@@ -128,12 +143,18 @@ export function WorkflowFormDialog({
                 <NativeSelect
                   id="actionType"
                   value={formData.actionType}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const actionType = e.target.value as ActionType
+                    // Una plantilla de otro canal deja de servir al cambiar la acción.
+                    const sigueValida = templatesForAction(templates, actionType).some(
+                      (t) => t.templateId === formData.templateId
+                    )
                     onFormDataChange({
                       ...formData,
-                      actionType: e.target.value as ActionType,
+                      actionType,
+                      templateId: sigueValida ? formData.templateId : null,
                     })
-                  }
+                  }}
                   className="rounded-xl border-border/70 text-xs"
                 >
                   {ACTION_TYPES.map((a) => (
@@ -167,9 +188,46 @@ export function WorkflowFormDialog({
               </div>
             )}
 
+            <div className="space-y-1.5" data-tour="marketing-workflow-template-select">
+              <Label htmlFor="wfTemplateId" className="text-xs font-medium text-foreground/90">
+                Plantilla de la biblioteca (opcional)
+              </Label>
+              <NativeSelect
+                id="wfTemplateId"
+                value={seleccionada?.templateId ?? ''}
+                onChange={(e) =>
+                  onFormDataChange({ ...formData, templateId: e.target.value || null })
+                }
+                className="rounded-xl border-border/70 text-xs"
+              >
+                <option value="">Sin plantilla: usar el mensaje de abajo</option>
+                {disponibles.map((t) => (
+                  <option key={t.templateId} value={t.templateId}>
+                    {t.name}
+                    {t.plan ? ` · ${t.plan}` : ''}
+                  </option>
+                ))}
+              </NativeSelect>
+              <p className="text-[10px] text-muted-foreground">
+                {disponibles.length === 0
+                  ? `No hay plantillas activas del canal ${channelLabel(canal)}. Créelas en la pestaña Plantillas.`
+                  : `Se muestran las plantillas activas del canal ${channelLabel(canal)}.`}
+              </p>
+              {seleccionada && accessToken && (
+                <TemplatePreviewPanel
+                  key={seleccionada.templateId}
+                  accessToken={accessToken}
+                  templateId={seleccionada.templateId}
+                  clients={clients}
+                  showSubject={seleccionada.channel === 'EMAIL'}
+                  idPrefix="wf-template-preview"
+                />
+              )}
+            </div>
+
             <div className="space-y-1.5">
               <Label htmlFor="msgTemplate" className="text-xs font-medium text-foreground/90">
-                Plantilla de Mensaje
+                {seleccionada ? 'Mensaje de respaldo' : 'Plantilla de Mensaje'}
               </Label>
               <Textarea
                 id="msgTemplate"
@@ -182,7 +240,12 @@ export function WorkflowFormDialog({
                 className="min-h-24 resize-y rounded-xl border-border/70 text-xs"
               />
               <p className="text-[10px] text-muted-foreground">
+                {seleccionada
+                  ? 'Se usa si la plantilla elegida se desactiva. '
+                  : ''}
                 Variables disponibles: <code className="font-semibold">{'{nombre}'}</code>,{' '}
+                <code className="font-semibold">{'{plan}'}</code>,{' '}
+                <code className="font-semibold">{'{empresa}'}</code>,{' '}
                 <code className="font-semibold">{'{workflow}'}</code>
               </p>
             </div>

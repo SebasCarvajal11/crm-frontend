@@ -20,6 +20,7 @@ import {
 } from '../api/interactions-api'
 import { listClientsRequest } from '../api/clients-api'
 import { RegisterContactDialog } from './RegisterContactDialog'
+import { WhatsAppDialog, type WhatsAppTarget } from './WhatsAppDialog'
 import { SummaryCard } from './summary-card'
 import { InteractionsTable } from './interactions-table'
 import { InteractionResponseDialog } from './interaction-response-dialog'
@@ -27,10 +28,13 @@ import { TIPOS_RESPUESTA } from './interaction-types.constants'
 
 interface InteractionsManagerProps {
   accessToken: string
+  /** Lleva a la pestaña Plantillas (desde el diálogo de WhatsApp). */
+  onGoToTemplates?: () => void
 }
 
-export function InteractionsManager({ accessToken }: InteractionsManagerProps) {
+export function InteractionsManager({ accessToken, onGoToTemplates }: InteractionsManagerProps) {
   const queryClient = useQueryClient()
+  const [whatsAppTarget, setWhatsAppTarget] = useState<WhatsAppTarget | null>(null)
 
   const [searchTerm, setSearchTerm] = useState('')
   const [originFilter, setOriginFilter] = useState<'ALL' | 'AUTO' | 'MANUAL' | 'PENDING'>('ALL')
@@ -216,8 +220,29 @@ export function InteractionsManager({ accessToken }: InteractionsManagerProps) {
           filtered={filtered}
           clientLabel={clientLabel}
           onOpenDialog={(item) => setTarget(item)}
+          onWhatsApp={(item) =>
+            setWhatsAppTarget({
+              clientId: item.clientId,
+              clientName: clientLabel(item.clientId),
+              campaignId: item.campaignId,
+            })
+          }
         />
       )}
+
+      <WhatsAppDialog
+        accessToken={accessToken}
+        target={whatsAppTarget}
+        onClose={() => setWhatsAppTarget(null)}
+        onGoToTemplates={
+          onGoToTemplates
+            ? () => {
+                setWhatsAppTarget(null)
+                onGoToTemplates()
+              }
+            : undefined
+        }
+      />
 
       <InteractionResponseDialog
         target={target}

@@ -49,18 +49,19 @@ test('buscar desde otra sección y cambiar subpestañas conservadas de Marketing
   await assertBounds(page)
   await guide.getByRole('button', { name: 'Cerrar tutorial' }).click()
   await startTour(page, 'Recorrido del Módulo de Marketing')
-  for (let index = 0; index < 10; index++) {
+  // Worker: 13 pasos (el paso de la pestaña Planes es solo para admin).
+  for (let index = 0; index < 13; index++) {
     await expect(guide).toHaveAttribute('aria-busy', 'false')
-    await expect(guide).toContainText(`Paso ${index + 1} de 10`)
+    await expect(guide).toContainText(`Paso ${index + 1} de 13`)
     await expect(guide).not.toContainText('Este elemento no está disponible')
     await assertBounds(page)
-    if (index === 5) {
+    if (index === 6) {
       await page.locator('[data-tour="marketing-tab-proposals"]').click()
       await expect(guide.getByRole('button', { name: 'Volver al paso' })).toBeVisible()
       await guide.getByRole('button', { name: 'Volver al paso' }).click()
       await expect(page.locator('[data-tour="marketing-campaigns-filters"]')).toBeVisible()
     }
-    await guide.getByRole('button', { name: index === 9 ? 'Finalizar' : 'Siguiente', exact: true }).click()
+    await guide.getByRole('button', { name: index === 12 ? 'Finalizar' : 'Siguiente', exact: true }).click()
   }
   await openHelp(page)
   await page.screenshot({ path: info.outputPath('help-center.png'), fullPage: true })

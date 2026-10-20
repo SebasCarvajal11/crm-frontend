@@ -25,6 +25,8 @@ export interface AnalyticsSummaryDto {
 export interface ClientPlanDistributionDto {
   plan: string
   clientCount: number
+  /** Color hexadecimal del plan (catálogo configurable); null para "sin plan". */
+  color?: string | null
 }
 
 // ── Actividad de Clientes ──────────────────────────────────────────────────
