@@ -69,12 +69,12 @@ test.describe('Marketing: planes configurables, plantillas, correos y WhatsApp',
     const { errors } = await setupDashboard(page, 'admin')
     await mockMarketing(page)
     await page.goto('/dashboard?tab=marketing')
+    await page.locator('[data-tour="marketing-tab-clients"]').click()
 
-    // Clientes: chip con el color del plan y plan inactivo en gris.
-    const tabla = page.locator('table').first()
-    await expect(tabla.getByText('Oro', { exact: true }).first()).toBeVisible()
-    await expect(tabla.getByText('Bronce (inactivo)')).toBeVisible()
-    const selector = page.getByLabel('Asignar plan a Acme SAS')
+    // Clientes (tabla en escritorio, tarjetas en celular): chip con color y plan inactivo en gris.
+    await expect(page.getByText('Oro', { exact: true }).filter({ visible: true }).first()).toBeVisible()
+    await expect(page.getByText('Bronce (inactivo)', { exact: true }).filter({ visible: true })).toBeVisible()
+    const selector = page.getByLabel('Asignar plan a Acme SAS').filter({ visible: true })
     await expect(selector.locator('option', { hasText: 'Bronce' })).toHaveCount(0)
 
     // Pestaña Planes (solo admin).
@@ -163,7 +163,8 @@ test.describe('Marketing: planes configurables, plantillas, correos y WhatsApp',
     await context.route('https://wa.me/**', (route) => route.fulfill({ body: 'ok' }))
     await page.goto('/dashboard?tab=marketing')
 
-    await page.locator('[data-tour="marketing-whatsapp-btn"]').click()
+    await page.locator('[data-tour="marketing-tab-clients"]').click()
+    await page.getByRole('button', { name: 'Abrir en WhatsApp a Acme SAS' }).filter({ visible: true }).click()
     const dialogo = page.getByRole('dialog', { name: 'Abrir en WhatsApp' })
     await dialogo.getByLabel('Plantilla').selectOption('t1')
     await expect(dialogo.getByLabel('Mensaje')).toHaveValue('Hola Acme SAS, ¿hablamos?')

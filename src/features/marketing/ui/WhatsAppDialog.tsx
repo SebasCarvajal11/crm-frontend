@@ -123,6 +123,9 @@ function WhatsAppDialogBody({
       }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['marketing', 'interactions'] })
+      void queryClient.invalidateQueries({ queryKey: ['marketing', 'today'] })
+      void queryClient.invalidateQueries({ queryKey: ['marketing', 'funnel'] })
+      void queryClient.invalidateQueries({ queryKey: ['marketing', 'timeline'] })
       void queryClient.invalidateQueries({ queryKey: ['analytics'] })
       onClose()
     },

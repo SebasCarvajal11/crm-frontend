@@ -1,5 +1,7 @@
+import type { ReactNode } from 'react'
 import {
   AlertTriangle,
+  FolderKanban,
   CalendarClock,
   CheckCircle2,
   Edit2,
@@ -26,6 +28,7 @@ import {
   UMBRAL_SIN_RESPUESTA_DIAS,
   PROPOSAL_STATUSES,
 } from './proposal.constants'
+import { ClientNameButton } from './client-name-button'
 
 interface ProposalCardProps {
   proposal: Proposal
@@ -34,6 +37,10 @@ interface ProposalCardProps {
   onChangeStatus: (status: ProposalStatus) => void
   onDelete: () => void
   isBusy: boolean
+  /** Acción "Crear proyecto en CIMAxios" (solo admin, aprobadas sin proyecto). */
+  projectAction?: ReactNode
+  /** Resaltada al llegar desde "Ver propuesta" del panel Hoy. */
+  highlighted?: boolean
 }
 
 function ProposalMenuActions({
@@ -110,7 +117,7 @@ function ProposalCardHeader(props: {
         {formatCurrency(props.proposal.estimatedValue)}
       </CardTitle>
       <CardDescription className="truncate font-medium text-xs text-muted-foreground" title={props.clientLabel}>
-        {props.clientLabel}
+        <ClientNameButton clientId={props.proposal.clientId} name={props.clientLabel} />
       </CardDescription>
     </CardHeader>
   )
@@ -217,7 +224,7 @@ function ProposalCardFooter({
 }
 
 export function ProposalCard(props: ProposalCardProps) {
-  const { proposal, isBusy, onChangeStatus } = props
+  const { proposal, isBusy, onChangeStatus, projectAction, highlighted } = props
   const dias = diasDesde(proposal.createdDate)
   const estaPendiente =
     ESTADOS_PENDIENTES.includes(proposal.status) && !proposal.responseDate
@@ -226,10 +233,14 @@ export function ProposalCard(props: ProposalCardProps) {
 
   return (
     <Card
+      id={`proposal-${proposal.proposalId}`}
+      data-proposal-id={proposal.proposalId}
+      data-highlighted={highlighted ? 'true' : undefined}
       className={[
-        'group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-xs',
+        'group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-xs scroll-mt-24',
         'transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:border-primary/40',
         venceSinRespuesta ? 'border-amber-500/60 bg-amber-50/10 dark:bg-amber-950/10' : 'border-border/80',
+        highlighted ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : '',
       ].join(' ')}
     >
       <ProposalCardHeader {...props} />
@@ -249,6 +260,22 @@ export function ProposalCard(props: ProposalCardProps) {
           dias={dias}
           venceSinRespuesta={venceSinRespuesta}
         />
+
+        {proposal.projectId ? (
+          <span
+            className={[
+              'inline-flex w-fit items-center gap-1.5 rounded-full border border-teal-500/40 bg-teal-500/10',
+              'px-2.5 py-0.5 text-xs font-semibold text-teal-700 dark:text-teal-300',
+            ].join(' ')}
+            title={`Proyecto de CIMAxios: ${proposal.projectId}`}
+            data-testid="proposal-project-badge"
+          >
+            <FolderKanban className="h-3 w-3" />
+            Proyecto vinculado
+          </span>
+        ) : (
+          projectAction && <div className="space-y-1">{projectAction}</div>
+        )}
 
         <ProposalCardFooter
           proposalId={proposal.proposalId}

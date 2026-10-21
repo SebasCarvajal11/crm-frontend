@@ -211,8 +211,19 @@ describe('Tour Registry Facade', () => {
   it('retorna el tour de marketing para admin y worker con selectores verificados y 0 emojis', () => {
     const tour = getActiveTourForContext({ activeTab: 'marketing', role: 'admin' })
     expect(tour?.id).toBe('tour-marketing')
-    expect(tour?.steps.length).toBe(14)
+    expect(tour?.steps.length).toBe(19)
     const elements = tour!.steps.map((s) => s.element)
+    // El recorrido empieza por Inicio y sigue el flujo comercial en orden.
+    expect(elements.slice(2, 7)).toEqual([
+      '[data-tour="marketing-home-funnel"]',
+      '[data-tour="marketing-funnel-stage"]',
+      '[data-tour="marketing-today"]',
+      '[data-tour="marketing-today"] [data-client360-link]',
+      '[data-tour="marketing-create-project-btn"]',
+    ])
+    expect(tour!.steps[2].switchMarketingTab).toBe('home')
+    const projectStep = tour!.steps.find((s) => s.element === '[data-tour="marketing-create-project-btn"]')
+    expect(projectStep?.requiredRole).toEqual(['admin'])
     expect(elements).toContain('[data-tour="marketing-clients-list"]')
     expect(elements).toContain('[data-tour="marketing-email-quota"]')
     expect(elements).toContain('[data-tour="marketing-tab-templates"]')

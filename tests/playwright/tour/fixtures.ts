@@ -59,6 +59,22 @@ export async function setupDashboard(
       disk: { totalBytes: 1_000_000, usedBytes: 0, availableBytes: 1_000_000, usedPercentage: 0 },
       assets: { totalAssetsCount: 0, totalAssetsBytes: 0, documentsCount: 0, documentsBytes: 0, avatarsCount: 0, avatarsBytes: 0 }, cachedAt: '2026-09-28T00:00:00Z',
     } }
+    // Flujo comercial (Inicio de Marketing): un cliente sin contacto y una aprobada sin proyecto.
+    else if (path.endsWith('/marketing/today')) json = {
+      clientsWithoutContact: [{ clientId: 'client-1', name: 'Cliente CIMA', plan: null, daysSinceContact: null }],
+      proposalsWithoutResponse: [],
+      approvedWithoutProject: [{ proposalId: 1, title: 'Propuesta de prueba', clientId: 'client-1', clientName: 'Cliente CIMA', value: 1000000 }],
+      counts: { clientsWithoutContact: 1, proposalsWithoutResponse: 0, approvedWithoutProject: 1 },
+    }
+    else if (path.endsWith('/marketing/funnel')) json = {
+      period: null,
+      stages: [
+        { key: 'clients', label: 'Clientes', count: 1 }, { key: 'contacted', label: 'Contactados', count: 0 },
+        { key: 'responded', label: 'Respondieron', count: 0 }, { key: 'proposal_sent', label: 'Propuesta enviada', count: 0 },
+        { key: 'approved', label: 'Aprobada', count: 1 }, { key: 'project', label: 'Con proyecto', count: 0 },
+      ],
+      conversionPercent: [0, null, null, null, 0],
+    }
     else if (path.startsWith('/api/v1/marketing/')) json = []
     else if (path.includes('/analytics/summary') || path.includes('/kpis/current')) json = {}
     else if (path.startsWith('/api/v1/analytics/')) json = []

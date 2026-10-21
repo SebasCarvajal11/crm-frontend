@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { FileText, Plus, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -26,12 +26,28 @@ import {
   EMPTY_FORM,
   mensajeDeError,
 } from './proposal.constants'
+import { CreateProjectFromProposal } from './CreateProjectFromProposal'
+import { proposalTitle } from './commercial.utils'
 
 interface ProposalsManagerProps {
   accessToken: string
+  /** Solo el admin ve "Crear proyecto en CIMAxios". */
+  isAdmin?: boolean
+  /** Propuesta a resaltar al llegar desde "Ver propuesta" del panel Hoy. */
+  highlightProposalId?: number | null
+  /** Abre "Nueva propuesta" con este cliente (desde la ficha 360°). */
+  newProposalForClientId?: string | null
+  /** Avisa que la intención de crear propuesta ya se atendió. */
+  onNewProposalHandled?: () => void
 }
 
-export function ProposalsManager({ accessToken }: ProposalsManagerProps) {
+export function ProposalsManager({
+  accessToken,
+  isAdmin = false,
+  highlightProposalId = null,
+  newProposalForClientId = null,
+  onNewProposalHandled,
+}: ProposalsManagerProps) {
   const queryClient = useQueryClient()
 
   const [searchTerm, setSearchTerm] = useState('')
@@ -54,6 +70,9 @@ export function ProposalsManager({ accessToken }: ProposalsManagerProps) {
 
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: ['marketing', 'proposals'] })
+    void queryClient.invalidateQueries({ queryKey: ['marketing', 'today'] })
+    void queryClient.invalidateQueries({ queryKey: ['marketing', 'funnel'] })
+    void queryClient.invalidateQueries({ queryKey: ['marketing', 'timeline'] })
     void queryClient.invalidateQueries({ queryKey: ['analytics'] })
   }
 
@@ -137,11 +156,33 @@ export function ProposalsManager({ accessToken }: ProposalsManagerProps) {
     }
   }, [proposals])
 
-  function openCreate() {
-    setFormData({ ...EMPTY_FORM, createdDate: todayISO() })
+  function openCreate(clientId?: string) {
+    setFormData({ ...EMPTY_FORM, clientId: clientId ?? '', createdDate: todayISO() })
     setFormError(null)
     setIsCreateOpen(true)
   }
+
+  // "Nueva propuesta" desde la ficha 360°: abre el formulario con el cliente.
+  const [handledClientId, setHandledClientId] = useState<string | null>(null)
+  if (newProposalForClientId && newProposalForClientId !== handledClientId) {
+    setHandledClientId(newProposalForClientId)
+    openCreate(newProposalForClientId)
+    onNewProposalHandled?.()
+  }
+
+  // "Ver propuesta" desde el panel Hoy: se limpia el filtro y se desplaza hasta ella.
+  const [lastHighlight, setLastHighlight] = useState<number | null>(null)
+  if (highlightProposalId && highlightProposalId !== lastHighlight) {
+    setLastHighlight(highlightProposalId)
+    setSearchTerm('')
+    setStatusFilter('ALL')
+  }
+  const highlightReady = highlightProposalId !== null && proposals.some((p) => p.proposalId === highlightProposalId)
+  useEffect(() => {
+    if (!highlightReady || highlightProposalId === null) return
+    const el = document.getElementById(`proposal-${highlightProposalId}`)
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [highlightReady, highlightProposalId])
 
   function openEdit(proposal: Proposal) {
     setEditingProposal(proposal)
@@ -200,7 +241,7 @@ export function ProposalsManager({ accessToken }: ProposalsManagerProps) {
           </div>
         </div>
         <Button
-          onClick={openCreate}
+          onClick={() => openCreate()}
           className="h-9 gap-2 rounded-lg font-semibold shadow-2xs shrink-0"
           data-tour="marketing-new-proposal-btn"
         >
@@ -246,11 +287,26 @@ export function ProposalsManager({ accessToken }: ProposalsManagerProps) {
         totalCount={proposals.length}
         clientLabel={clientLabel}
         isBusy={statusMutation.isPending || deleteMutation.isPending}
-        onOpenCreate={openCreate}
+        onOpenCreate={() => openCreate()}
         onEdit={openEdit}
         onChangeStatus={(id, status) => statusMutation.mutate({ id, status })}
         onDelete={(id) => deleteMutation.mutate(id)}
         onRetry={() => proposalsQuery.refetch()}
+        highlightedId={highlightProposalId}
+        renderProjectAction={(p) =>
+          isAdmin && p.status === 'Approved' && !p.projectId ? (
+            <CreateProjectFromProposal
+              accessToken={accessToken}
+              proposal={{
+                proposalId: p.proposalId,
+                title: proposalTitle(p),
+                description: p.description,
+                clientId: p.clientId,
+                clientName: clientLabel(p.clientId),
+              }}
+            />
+          ) : null
+        }
       />
 
       <ProposalFormDialog

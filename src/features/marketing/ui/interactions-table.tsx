@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import type { MarketingInteraction } from '../api/interactions-api'
 import { typeMeta, splitDateTime, channelDisplay } from './interaction-types.constants'
 import { DeliveryBadge } from './delivery-badge'
+import { ClientNameButton } from './client-name-button'
 
 interface InteractionsTableProps {
   filtered: MarketingInteraction[]
@@ -66,7 +67,7 @@ export function InteractionsTable({
                     className="group border-b last:border-0 hover:bg-muted/30 transition-colors duration-150"
                   >
                     <td className="min-w-40 px-4 py-3">
-                      <p className="font-medium leading-snug">{nombre}</p>
+                      <ClientNameButton clientId={interaction.clientId} name={nombre} className="block font-medium leading-snug" />
                       <p className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                         {esAutomatica ? (
                           <>
@@ -187,7 +188,7 @@ function InteractionCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="font-medium leading-snug">{nombre}</p>
+          <ClientNameButton clientId={interaction.clientId} name={nombre} className="block font-medium leading-snug" />
           <p className="text-xs text-muted-foreground tabular-nums">
             {date}
             {time ? ` · ${time}` : ''} · {esAutomatica ? 'Automática' : 'Manual'}

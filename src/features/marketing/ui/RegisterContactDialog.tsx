@@ -21,6 +21,13 @@ import { listCampaignsRequest } from '../api/marketing-api'
 
 interface RegisterContactDialogProps {
   accessToken: string
+  /** Modo controlado (ficha 360°, panel Hoy): abre el diálogo sin el botón propio. */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  /** Cliente preseleccionado al abrir. */
+  initialClientId?: string | null
+  /** Oculta el botón "Registrar contacto" (cuando lo abre otro componente). */
+  hideTrigger?: boolean
 }
 
 const CANALES = [
@@ -40,11 +47,28 @@ const TIPOS: { value: InteractionType; label: string; ayuda: string }[] = [
   { value: 'no_response', label: 'No hubo respuesta', ayuda: 'Se intentó y no contestó' },
 ]
 
-export function RegisterContactDialog({ accessToken }: RegisterContactDialogProps) {
+export function RegisterContactDialog({
+  accessToken,
+  open: openProp,
+  onOpenChange,
+  initialClientId,
+  hideTrigger = false,
+}: RegisterContactDialogProps) {
   const queryClient = useQueryClient()
 
-  const [open, setOpen] = useState(false)
-  const [clientId, setClientId] = useState('')
+  const [openState, setOpenState] = useState(false)
+  const open = openProp ?? openState
+  const setOpen = (next: boolean) => {
+    if (openProp === undefined) setOpenState(next)
+    onOpenChange?.(next)
+  }
+  const [clientId, setClientId] = useState(initialClientId ?? '')
+  // Al abrir desde otro componente con un cliente, se preselecciona.
+  const [lastOpen, setLastOpen] = useState(open)
+  if (open !== lastOpen) {
+    setLastOpen(open)
+    if (open && initialClientId) setClientId(initialClientId)
+  }
   const [campaignId, setCampaignId] = useState('')
   const [channel, setChannel] = useState('llamada')
   const [interactionType, setInteractionType] = useState<InteractionType>('message')
@@ -74,6 +98,9 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
       }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['marketing', 'interactions'] })
+      void queryClient.invalidateQueries({ queryKey: ['marketing', 'today'] })
+      void queryClient.invalidateQueries({ queryKey: ['marketing', 'funnel'] })
+      void queryClient.invalidateQueries({ queryKey: ['marketing', 'timeline'] })
       void queryClient.invalidateQueries({ queryKey: ['analytics'] })
       cerrar()
     },
@@ -110,10 +137,12 @@ export function RegisterContactDialog({ accessToken }: RegisterContactDialogProp
 
   return (
     <>
-      <Button variant="outline" className="gap-2" onClick={() => setOpen(true)}>
-        <PhoneCall className="h-4 w-4" />
-        Registrar contacto
-      </Button>
+      {!hideTrigger && (
+        <Button variant="outline" className="gap-2" onClick={() => setOpen(true)}>
+          <PhoneCall className="h-4 w-4" />
+          Registrar contacto
+        </Button>
+      )}
 
       <Dialog open={open} onOpenChange={(v) => !v && cerrar()}>
         <DialogContent size="lg">
