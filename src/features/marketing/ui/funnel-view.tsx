@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronDown, Filter, XCircle } from 'lucide-react'
+import { ArrowRight, Filter, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/shared/lib/utils'
@@ -66,7 +66,7 @@ export function FunnelView({
       </div>
 
       {isLoading ? (
-        <div className="grid gap-3 xl:grid-cols-6" role="status" aria-label="Cargando embudo">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 min-[1800px]:grid-cols-6" role="status" aria-label="Cargando embudo">
           {FUNNEL_ORDER.map((k) => (
             <Skeleton key={k} className="h-28 w-full rounded-xl" />
           ))}
@@ -80,52 +80,54 @@ export function FunnelView({
           </Button>
         </div>
       ) : (
-        <ol className="flex flex-col gap-1 xl:flex-row xl:items-stretch xl:gap-0">
+        <ol className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 min-[1800px]:grid-cols-6">
           {stages.map((stage, i) => {
             const help = FUNNEL_STAGE_HELP[stage.key]
             const width = Math.max(8, Math.round((stage.count / max) * 100))
+            const next = stages[i + 1]
             return (
-              <li key={stage.key} className="flex flex-col xl:min-w-0 xl:flex-1 xl:flex-row">
+              <li key={stage.key} className="flex min-w-0">
                 <button
                   type="button"
                   onClick={() => onStageClick(stage.key, stage.label)}
                   data-funnel-stage={stage.key}
                   data-tour={i === 0 ? 'marketing-funnel-stage' : undefined}
                   className={cn(
-                    'group flex w-full flex-col gap-2 rounded-xl border border-border/80 bg-muted/20 p-3 text-left',
+                    'group flex w-full min-w-0 flex-col gap-2 rounded-xl border border-border/80 bg-muted/20 p-4 text-left',
                     'transition-colors hover:border-primary/50 hover:bg-primary/5',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
-                    'xl:min-w-0 xl:flex-1'
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
                   )}
                   aria-label={`${stage.label}: ${stage.count} clientes. Ver la lista`}
                 >
-                  <span className="flex items-baseline justify-between gap-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                      {i + 1}. {stage.label}
+                  <span className="flex items-center gap-2">
+                    <span
+                      className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground"
+                      aria-hidden="true"
+                    >
+                      {i + 1}
                     </span>
-                    <span className="text-2xl font-extrabold tabular-nums">{stage.count}</span>
+                    <span className="min-w-0 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                      {stage.label}
+                    </span>
                   </span>
+                  <span className="text-3xl font-extrabold leading-none tabular-nums">{stage.count}</span>
                   <span className="h-1.5 w-full overflow-hidden rounded-full bg-muted" aria-hidden="true">
                     <span className="block h-full rounded-full bg-primary/70" style={{ width: `${width}%` }} />
                   </span>
-                  <span className="text-[11px] leading-snug text-muted-foreground">
-                    <span className="text-foreground/80">{help.meaning}</span> {help.next}
-                  </span>
+                  <span className="text-xs leading-snug text-foreground/80">{help.meaning}</span>
+                  <span className="text-xs leading-snug text-muted-foreground">{help.next}</span>
+                  {next && (
+                    <span
+                      className="mt-auto flex flex-wrap items-center gap-1 border-t border-border/60 pt-2 text-xs text-muted-foreground"
+                      title="Conversión a la siguiente etapa"
+                      data-funnel-conversion={i}
+                    >
+                      <ArrowRight className="size-3.5 shrink-0" aria-hidden="true" />
+                      <span className="font-bold tabular-nums text-foreground">{formatConversion(stage.toNext)}</span>
+                      <span>pasan a {next.label}</span>
+                    </span>
+                  )}
                 </button>
-                {stage.toNext !== undefined && (
-                  <span
-                    className={cn(
-                      'flex items-center justify-center gap-1 py-1 text-[11px] font-semibold tabular-nums text-muted-foreground',
-                      'xl:w-14 xl:shrink-0 xl:flex-col xl:py-0'
-                    )}
-                    title="Conversión a la siguiente etapa"
-                    data-funnel-conversion={i}
-                  >
-                    <ChevronDown className="size-3.5 xl:hidden" aria-hidden="true" />
-                    <ArrowRight className="hidden size-3.5 xl:block" aria-hidden="true" />
-                    {formatConversion(stage.toNext)}
-                  </span>
-                )}
               </li>
             )
           })}
