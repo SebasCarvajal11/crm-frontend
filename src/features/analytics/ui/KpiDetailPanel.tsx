@@ -12,7 +12,8 @@ import {
 } from '@/components/ui/table'
 import type { ExportFormat } from '@/features/analytics/api'
 import { ExportButtons } from '@/components/organisms/analytics-export-buttons'
-import type { KpiDetailDto } from '../model'
+import type { KpiDetailDto, KpiDetailItemDto } from '../model'
+import { ClientNameButton } from '@/features/marketing/ui/client-name-button'
 import type { KpiDefinition } from './kpi-definitions'
 import {
   detailValueLabel,
@@ -155,13 +156,16 @@ export function KpiDetailPanel({
               {filtered.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="max-w-[14rem] font-medium" title={item.title ?? undefined}>
-                    <span className="block truncate">{item.title || '—'}</span>
-                    <span className="block truncate text-xs font-normal text-muted-foreground sm:hidden">
-                      {subtitleLabel(item.subtitle)}
+                    <span className="block truncate">
+                      <DetailText item={item} text={item.title || '—'} />
                     </span>
+                    <span className="block truncate text-xs font-normal text-muted-foreground sm:hidden">
+                      <DetailText item={item} text={subtitleLabel(item.subtitle)} />
+                    </span>
+                    <ClientLine item={item} />
                   </TableCell>
                   <TableCell className="hidden max-w-[12rem] truncate text-muted-foreground sm:table-cell">
-                    {subtitleLabel(item.subtitle)}
+                    <DetailText item={item} text={subtitleLabel(item.subtitle)} />
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-muted-foreground">
                     {formatIsoDate(item.date)}
@@ -184,5 +188,24 @@ export function KpiDetailPanel({
         </p>
       )}
     </div>
+  )
+}
+
+/** El nombre del cliente (en el título o el subtítulo) abre su ficha 360°. */
+function DetailText({ item, text }: { item: KpiDetailItemDto; text: string }) {
+  if (item.clientId && item.clientName && text === item.clientName) {
+    return <ClientNameButton clientId={item.clientId} name={text} />
+  }
+  return <>{text}</>
+}
+
+/** Si el cliente no aparece en el título ni en el subtítulo, se muestra debajo. */
+function ClientLine({ item }: { item: KpiDetailItemDto }) {
+  if (!item.clientId || !item.clientName) return null
+  if (item.clientName === item.title || item.clientName === item.subtitle) return null
+  return (
+    <span className="block truncate text-xs font-normal text-muted-foreground">
+      Cliente: <ClientNameButton clientId={item.clientId} name={item.clientName} />
+    </span>
   )
 }

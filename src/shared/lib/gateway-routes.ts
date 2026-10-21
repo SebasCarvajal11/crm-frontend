@@ -202,6 +202,12 @@ export const MARKETING_ROUTES = {
   templatePreview: (templateId: string) => `${API_PREFIX}/marketing/templates/${templateId}/preview`,
   emailQuota: `${API_PREFIX}/marketing/notifications/email-quota`,
   testEmail: `${API_PREFIX}/marketing/notifications/test-email`,
+  // Flujo comercial: embudo, ficha 360°, panel Hoy y vínculo propuesta-proyecto (crm-marketing, PR #11)
+  funnel: `${API_PREFIX}/marketing/funnel`,
+  funnelClients: (stageKey: string) => `${API_PREFIX}/marketing/funnel/${stageKey}/clients`,
+  clientTimeline: (clientId: string) => `${API_PREFIX}/marketing/clients/${clientId}/timeline`,
+  today: `${API_PREFIX}/marketing/today`,
+  proposalProject: (id: string | number) => `${API_PREFIX}/marketing/proposals/${id}/project`,
 } as const
 
 // ── Analytics (autenticado) ──────────────────────────────────────────────────

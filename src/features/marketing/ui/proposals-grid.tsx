@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { FileText, Plus, XCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -17,6 +18,9 @@ interface ProposalsGridProps {
   onChangeStatus: (id: number, status: ProposalStatus) => void
   onDelete: (id: number) => void
   onRetry: () => void
+  /** Acción de crear proyecto para una propuesta (o null si no aplica). */
+  renderProjectAction?: (proposal: Proposal) => ReactNode
+  highlightedId?: number | null
 }
 
 export function ProposalsGrid({
@@ -31,6 +35,8 @@ export function ProposalsGrid({
   onChangeStatus,
   onDelete,
   onRetry,
+  renderProjectAction,
+  highlightedId,
 }: ProposalsGridProps) {
   if (isLoading) {
     return (
@@ -96,6 +102,8 @@ export function ProposalsGrid({
           onChangeStatus={(status) => onChangeStatus(proposal.proposalId, status)}
           onDelete={() => onDelete(proposal.proposalId)}
           isBusy={isBusy}
+          projectAction={renderProjectAction?.(proposal)}
+          highlighted={highlightedId === proposal.proposalId}
         />
       ))}
     </div>

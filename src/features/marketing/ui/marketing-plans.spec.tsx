@@ -70,7 +70,10 @@ describe('ClientPlansTable', () => {
 
   it('muestra el botón de WhatsApp por cliente (con data-tour solo en la primera fila)', () => {
     const markup = render()
-    expect(markup.match(/Abrir en WhatsApp/g)?.length).toBe(3)
+    // Tabla (escritorio) y tarjetas (celular y tablet): un botón por cliente en cada vista.
+    expect(markup.match(/data-testid="client-card"/g)?.length).toBe(3)
+    expect(markup.match(/>Abrir en WhatsApp</g)?.length).toBe(3)
+    expect(markup.match(/aria-label="Abrir en WhatsApp a /g)?.length).toBe(6)
     expect(markup.match(/data-tour="marketing-whatsapp-btn"/g)?.length).toBe(1)
     expect(render(false)).not.toContain('Abrir en WhatsApp')
   })
