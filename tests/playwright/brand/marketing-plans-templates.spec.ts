@@ -149,10 +149,10 @@ test.describe('Marketing: planes configurables, plantillas, correos y WhatsApp',
     await expect(dialogo).toBeHidden()
 
     await page.locator('[data-tour="marketing-tab-interactions"]').click()
-    await expect(page.locator('[data-delivery="FAILED"]')).toContainText('Falló')
-    await expect(page.locator('[data-delivery="SKIPPED_LIMIT"]')).toContainText('Límite diario alcanzado')
-    await expect(page.locator('[data-delivery="FAILED"]')).toHaveAttribute('title', 'Buzón lleno')
-    await expect(page.locator('[data-delivery="SKIPPED_LIMIT"]')).toHaveAttribute('title', 'Se reintentará mañana')
+    await expect(page.locator('[data-delivery="FAILED"]:visible')).toContainText('Falló')
+    await expect(page.locator('[data-delivery="SKIPPED_LIMIT"]:visible')).toContainText('Límite diario alcanzado')
+    await expect(page.locator('[data-delivery="FAILED"]:visible')).toHaveAttribute('title', 'Buzón lleno')
+    await expect(page.locator('[data-delivery="SKIPPED_LIMIT"]:visible')).toHaveAttribute('title', 'Se reintentará mañana')
     expect(errors).toEqual([])
   })
 
