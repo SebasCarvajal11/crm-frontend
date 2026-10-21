@@ -30,6 +30,7 @@ import { ConfirmActionDialog } from './confirm-action-dialog'
 import { TemplateEditorDialog } from './template-editor-dialog'
 import { TemplatePreviewPanel } from './template-preview-panel'
 import { TemplatesTable } from './templates-table'
+import { TemplatesExplainer } from './templates-explainer'
 import { TEMPLATE_CHANNELS, channelLabel, filterTemplates, type TemplateFilters } from './templates.utils'
 
 interface TemplatesManagerProps {
@@ -147,6 +148,8 @@ export function TemplatesManager({ accessToken }: TemplatesManagerProps) {
           </IconButton>
         </div>
       )}
+
+      <TemplatesExplainer forceOpen={!templatesQuery.isLoading && templates.length === 0} />
 
       <div className="flex flex-col gap-3 sm:flex-row" data-tour="marketing-templates-filters">
         <div className="relative flex-1">

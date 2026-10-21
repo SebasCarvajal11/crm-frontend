@@ -13,10 +13,10 @@ export function channelLabel(channel?: string | null): string {
 
 /** Variables que el backend reemplaza en asunto y cuerpo. */
 export const TEMPLATE_VARIABLES = [
-  { token: '{nombre}', label: 'Nombre' },
-  { token: '{plan}', label: 'Plan' },
-  { token: '{empresa}', label: 'Empresa' },
-  { token: '{workflow}', label: 'Automatización' },
+  { token: '{nombre}', label: 'Nombre', description: 'Nombre del cliente' },
+  { token: '{plan}', label: 'Plan', description: 'Plan comercial del cliente (Oro, Diamante…)' },
+  { token: '{empresa}', label: 'Empresa', description: 'Empresa del cliente según el CRM; si no hay, su nombre' },
+  { token: '{workflow}', label: 'Automatización', description: 'Nombre de la automatización que envía el mensaje' },
 ] as const
 
 /**

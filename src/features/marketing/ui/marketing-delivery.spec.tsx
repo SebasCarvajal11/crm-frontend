@@ -8,6 +8,7 @@ import { deliveryMeta, testEmailResultLabel } from './delivery.utils'
 import { EmailQuotaCard } from './email-quota-card'
 import { isValidEmail, quotaPercent } from './email-quota.utils'
 import { InteractionsTable } from './interactions-table'
+import { channelDisplay, splitDateTime } from './interaction-types.constants'
 import { buildWhatsAppUrl, campaignsForClient } from './whatsapp.utils'
 
 describe('estado de entrega', () => {
@@ -59,10 +60,17 @@ describe('InteractionsTable', () => {
         onWhatsApp={() => {}}
       />
     )
-    expect(markup).toContain('Entrega')
+    expect(markup).toContain('Canal y entrega')
+    expect(markup).toContain('Automática')
+    expect(markup).toContain('Manual')
+    // La columna de acciones queda fija a la derecha para no perder los botones.
+    expect(markup).toContain('sticky right-0')
+    expect(markup).toContain('Registrar la respuesta de Acme SAS')
+    // En móvil se muestra como tarjetas, sin desplazamiento horizontal.
+    expect(markup.match(/data-testid="interaction-card"/g)?.length).toBe(2)
     expect(markup).toContain('Límite diario alcanzado')
     expect(markup).toContain('title="Se reintentará mañana"')
-    expect(markup.match(/Abrir en WhatsApp a Acme SAS/g)?.length).toBe(2)
+    expect(markup.match(/Abrir en WhatsApp a Acme SAS/g)?.length).toBe(4)
   })
 })
 
@@ -130,3 +138,18 @@ describe('gráfica de distribución por plan', () => {
     expect(planSliceColor({ plan: '', clientCount: 4 }, 0)).toBe('#cbd5e1')
   })
 })
+
+describe('formato de interacciones', () => {
+  it('muestra el canal con nombre legible y separa fecha y hora', () => {
+    expect(channelDisplay('whatsapp')).toBe('WhatsApp')
+    expect(channelDisplay('email')).toBe('Correo')
+    expect(channelDisplay('reunion')).toBe('Reunión')
+    expect(channelDisplay('telegram')).toBe('Telegram')
+    expect(channelDisplay(null)).toBe('—')
+    const { date, time } = splitDateTime('2026-10-20T20:07:00')
+    expect(date).toContain('2026')
+    expect(time).toMatch(/8:07/)
+    expect(splitDateTime('x')).toEqual({ date: '—', time: '' })
+  })
+})
+

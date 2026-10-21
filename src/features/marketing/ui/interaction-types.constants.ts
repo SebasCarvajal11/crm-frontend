@@ -68,3 +68,32 @@ export function formatDateTime(value?: string | null): string {
     timeStyle: 'short',
   }).format(new Date(value))
 }
+
+/** Fecha y hora por separado, para mostrarlas en dos líneas cortas en la tabla. */
+export function splitDateTime(value?: string | null): { date: string; time: string } {
+  if (!value) return { date: '—', time: '' }
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return { date: '—', time: '' }
+  return {
+    date: new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium' }).format(d),
+    time: new Intl.DateTimeFormat('es-CO', { timeStyle: 'short' }).format(d),
+  }
+}
+
+const CHANNEL_LABELS: Record<string, string> = {
+  whatsapp: 'WhatsApp',
+  email: 'Correo',
+  correo: 'Correo',
+  llamada: 'Llamada',
+  reunion: 'Reunión',
+  redes: 'Redes sociales',
+  in_app: 'En la aplicación',
+  otro: 'Otro',
+}
+
+/** Nombre legible del canal guardado en la interacción ("whatsapp" → "WhatsApp"). */
+export function channelDisplay(channel?: string | null): string {
+  if (!channel?.trim()) return '—'
+  const key = channel.trim().toLowerCase()
+  return CHANNEL_LABELS[key] ?? channel.trim().charAt(0).toUpperCase() + channel.trim().slice(1)
+}
