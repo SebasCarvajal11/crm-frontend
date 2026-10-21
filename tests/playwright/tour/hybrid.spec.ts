@@ -36,6 +36,8 @@ test('escribir, abrir formularios y cerrar no completar una guía', async ({ pag
 })
 
 test('buscar desde otra sección y cambiar subpestañas conservadas de Marketing', async ({ page }, info) => {
+  // Recorre los 17 pasos del tour de Marketing: en WebKit (iOS) supera los 45 s por defecto.
+  test.slow()
   const { errors, mutations } = await setupDashboard(page, 'worker')
   await page.goto('/dashboard?tab=collab')
   await openHelp(page)
