@@ -49,15 +49,25 @@ jobs:
           key: playwright-browsers-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             playwright-browsers-${{ runner.os }}-
+      - name: Configurar reintentos de apt
+        # Los espejos de Ubuntu en Azure a veces dejan una descarga colgada: apt
+        # reintenta cada paquete con su propio límite de tiempo y, si hace falta
+        # repetir la instalación, espera el bloqueo de dpkg en lugar de fallar.
+        run: |
+          sudo tee /etc/apt/apt.conf.d/99ci-reintentos > /dev/null <<'CONF'
+          Acquire::Retries "5";
+          Acquire::http::Timeout "30";
+          Acquire::https::Timeout "30";
+          DPkg::Lock::Timeout "300";
+          CONF
       - name: Instalar motores de navegador
         timeout-minutes: 12
         run: |
-          # Reintenta si el espejo de apt falla o se queda colgado.
           retry() {
             for intento in 1 2 3; do
-              timeout 240 "$@" && return 0
-              echo "Intento $intento falló; reintentando en 10 s..."
-              sleep 10
+              "$@" && return 0
+              echo "Intento $intento falló; reintentando en 15 s..."
+              sleep 15
             done
             return 1
           }
