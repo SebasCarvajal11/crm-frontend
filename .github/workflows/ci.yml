@@ -23,7 +23,9 @@ jobs:
   ui:
     needs: validate
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # 25 min: la instalación de dependencias del sistema (apt) a veces tarda
+    # varios minutos por espejos lentos y la suite UI creció con el portal.
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -48,12 +50,22 @@ jobs:
           restore-keys: |
             playwright-browsers-${{ runner.os }}-
       - name: Instalar motores de navegador
+        timeout-minutes: 12
         run: |
+          # Reintenta si el espejo de apt falla o se queda colgado.
+          retry() {
+            for intento in 1 2 3; do
+              timeout 240 "$@" && return 0
+              echo "Intento $intento falló; reintentando en 10 s..."
+              sleep 10
+            done
+            return 1
+          }
           if [ "${{ steps.playwright-cache.outputs.cache-hit }}" = "true" ]; then
-            pnpm exec playwright install-deps webkit
-            pnpm exec playwright install chromium webkit
+            retry pnpm exec playwright install-deps webkit
+            retry pnpm exec playwright install chromium webkit
           else
-            pnpm exec playwright install --with-deps chromium webkit
+            retry pnpm exec playwright install --with-deps chromium webkit
           fi
       - name: Descargar build compilado
         uses: actions/download-artifact@v4
