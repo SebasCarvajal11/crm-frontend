@@ -76,8 +76,9 @@ export async function generateSignedContractPdfDoc(
   })
 
   const paragraphs = contract.contentSnapshot.split('\n')
-  drawContractBody(page, paragraphs, startY, { regular, bold })
+  const endY = drawContractBody(page, paragraphs, startY, { regular, bold })
 
+  const signaturesStartY = Math.max(endY - 18, 114)
   drawDualSignatures(page, {
     signature,
     client: {
@@ -89,7 +90,7 @@ export async function generateSignedContractPdfDoc(
       representative: contract.providerRepresentative,
       taxId: contract.providerTaxId,
     },
-    startY: 116,
+    startY: signaturesStartY,
     fonts: { regular, bold },
   })
 
@@ -128,8 +129,9 @@ export async function generateSignedAmendmentPdfDoc(
   })
 
   const paragraphs = amendment.contentSnapshot.split('\n')
-  drawContractBody(page, paragraphs, startY, { regular, bold })
+  const endY = drawContractBody(page, paragraphs, startY, { regular, bold })
 
+  const signaturesStartY = Math.max(endY - 18, 114)
   drawDualSignatures(page, {
     signature,
     client: {
@@ -141,7 +143,7 @@ export async function generateSignedAmendmentPdfDoc(
       representative: contract.providerRepresentative,
       taxId: contract.providerTaxId,
     },
-    startY: 116,
+    startY: signaturesStartY,
     fonts: { regular, bold },
   })
 

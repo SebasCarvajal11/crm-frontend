@@ -30,7 +30,7 @@ export function drawBackgroundTexture(page: PDFPage, texture: PDFImage | null): 
     width: PAGE_HEIGHT,
     height: PAGE_WIDTH,
     rotate: degrees(90),
-    opacity: 0.045,
+    opacity: 0.065,
   })
 }
 

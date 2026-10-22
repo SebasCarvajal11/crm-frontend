@@ -41,7 +41,7 @@ export function drawContractBody(
   for (const rawParagraph of paragraphs) {
     const paragraph = rawParagraph.trim()
     if (!paragraph) {
-      y -= 3
+      y -= 4
       continue
     }
 
@@ -49,12 +49,12 @@ export function drawContractBody(
       page.drawText(paragraph, {
         x: MARGIN_X,
         y,
-        size: 8.8,
+        size: 9.2,
         font: fonts.bold,
         color: TEXT_DARK,
         maxWidth: CONTENT_WIDTH,
       })
-      y -= 13
+      y -= 14
       continue
     }
 
@@ -62,11 +62,11 @@ export function drawContractBody(
       page.drawText(paragraph.toUpperCase(), {
         x: MARGIN_X,
         y,
-        size: 7.2,
+        size: 7.6,
         font: fonts.bold,
         color: CIMA_RED,
       })
-      y -= 10
+      y -= 11
       continue
     }
 
@@ -76,16 +76,16 @@ export function drawContractBody(
       paragraph.startsWith('Condiciones ')
 
     const font = isHeading ? fonts.bold : fonts.regular
-    const size = isHeading ? 7.2 : 6.8
+    const size = isHeading ? 7.8 : 7.3
     const color = isHeading ? CIMA_RED : TEXT_DARK
-    const lineHeight = isHeading ? 9.5 : 8.8
+    const lineHeight = isHeading ? 10.2 : 9.6
 
     const lines = wrapText(paragraph, font, size, CONTENT_WIDTH)
     for (const line of lines) {
       page.drawText(line, { x: MARGIN_X, y, size, font, color })
       y -= lineHeight
     }
-    y -= isHeading ? 1.5 : 3
+    y -= isHeading ? 2 : 4
   }
   return y
 }
@@ -95,7 +95,7 @@ export function drawDualSignatures(
   options: DualSignaturesOptions
 ): void {
   const { signature, client, provider, startY, fonts } = options
-  const boxHeight = 72
+  const boxHeight = 74
   const boxY = startY - boxHeight
 
   page.drawRectangle({
@@ -111,11 +111,12 @@ export function drawDualSignatures(
   page.drawText('FIRMAS Y CONSTANCIA DE CONSENTIMIENTO DIGITAL (LEY 527 DE 1999)', {
     x: MARGIN_X + 10,
     y: startY - 10,
-    size: 6.5,
+    size: 6.6,
     font: fonts.bold,
     color: CIMA_RED,
   })
 
+  // Firma Cliente (Izquierda)
   const clientX = MARGIN_X + 12
   page.drawImage(signature, { x: clientX, y: startY - 42, width: 100, height: 26 })
   page.drawLine({
@@ -140,6 +141,7 @@ export function drawDualSignatures(
     maxWidth: 200,
   })
 
+  // Firma Prestador (Derecha)
   const providerX = PAGE_WIDTH - MARGIN_X - 212
   page.drawText('CERTIFICACIÓN ELECTRÓNICA DE PRESTADOR', {
     x: providerX,
