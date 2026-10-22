@@ -52,7 +52,7 @@ describe('avatar-catalog', () => {
 
   it('generates correct avatar srcset with 4 tiered resolutions and boundary safety', () => {
     const srcset = getAvatarSrcSet(5)
-    expect(srcset).toContain('/avatars/avatar-5-64.webp 64w')
+    expect(srcset).not.toContain('64w')
     expect(srcset).toContain('/avatars/avatar-5-256.webp 256w')
     expect(srcset).toContain('/avatars/avatar-5-512.webp 512w')
     expect(srcset).toContain('/avatars/avatar-5-1024.webp 1024w')
@@ -99,11 +99,12 @@ describe('avatar-catalog', () => {
 
   it('prioritizes avatar id from src in resolveAvatarSrcSet', () => {
     const srcset = resolveAvatarSrcSet('/avatars/avatar-42.webp', 5)
-    expect(srcset).toContain('/avatars/avatar-42-64.webp 64w')
-    expect(srcset).not.toContain('/avatars/avatar-5-64.webp')
+    expect(srcset).not.toContain('64w')
+    expect(srcset).toContain('/avatars/avatar-42-256.webp 256w')
 
     const fallbackSrcset = resolveAvatarSrcSet(null, 7)
-    expect(fallbackSrcset).toContain('/avatars/avatar-7-64.webp 64w')
+    expect(fallbackSrcset).not.toContain('64w')
+    expect(fallbackSrcset).toContain('/avatars/avatar-7-256.webp 256w')
 
     const customSrcset = resolveAvatarSrcSet('https://example.com/photo.png', 7)
     expect(customSrcset).toBeUndefined()

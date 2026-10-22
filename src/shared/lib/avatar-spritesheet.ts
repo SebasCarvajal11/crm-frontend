@@ -4,7 +4,7 @@ export const SPRITESHEET_COLUMNS = 12
 export const SPRITESHEET_ROWS = 7
 export const TOTAL_CATALOG_AVATARS = SPRITESHEET_COLUMNS * SPRITESHEET_ROWS
 
-export const DEFAULT_SPRITESHEET_URL = '/avatars/avatars-spritesheet-64.webp'
+export const DEFAULT_SPRITESHEET_URL = '/avatars/avatars-spritesheet-thumb.webp'
 export const THUMB_SPRITESHEET_URL = '/avatars/avatars-spritesheet-thumb.webp'
 
 export interface AvatarSpriteCoordinates {

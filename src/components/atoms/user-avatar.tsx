@@ -107,7 +107,7 @@ function AvatarMedia({
           srcSet={srcSet}
           sizes={sizes}
           alt={altText}
-          className="size-full object-cover rounded-full"
+          className="size-full object-cover rounded-full [image-rendering:-webkit-optimize-contrast]"
           onError={onError}
           loading="lazy"
         />
@@ -128,7 +128,9 @@ function useResolvedAvatar(props: UserAvatarProps) {
     preferSprite,
   } = props
   const shouldPreferSprite =
-    typeof preferSprite === 'boolean' ? preferSprite : size !== '2xl'
+    typeof preferSprite === 'boolean'
+      ? preferSprite
+      : size === 'xs' || size === 'sm' || size === 'md'
   const deterministic = resolveDeterministicAvatar(userId ?? name)
   const trimmedSrc = src?.trim()
   const trimmedAvatarUrl = avatarUrl?.trim()

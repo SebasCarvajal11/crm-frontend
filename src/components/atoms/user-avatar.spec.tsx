@@ -21,7 +21,7 @@ describe('UserAvatar', () => {
     )
     expect(markup).toContain('data-testid="user-avatar-sprite"')
     expect(markup).toContain('data-avatar-id="12"')
-    expect(markup).toContain('avatars-spritesheet-64.webp')
+    expect(markup).toContain('avatars-spritesheet-thumb.webp')
     expect(markup).toContain('aria-label="Avatar oficial de Juan Pérez"')
     expect(markup).toContain('size-9')
   })
@@ -54,11 +54,11 @@ describe('UserAvatar', () => {
 
   it('cumple Garantía Cero-Nulos: renderiza avatar oficial en sprite y color corporativo sin iniciales cuando no hay src', () => {
     const markup = renderToStaticMarkup(
-      <UserAvatar name="Juan Pérez" userId="123e4567-e89b-12d3-a456-426614174000" size="lg" />
+      <UserAvatar name="Juan Pérez" userId="123e4567-e89b-12d3-a456-426614174000" size="md" />
     )
-    expect(markup).toContain('size-10')
+    expect(markup).toContain('size-9')
     expect(markup).toContain('data-testid="user-avatar-sprite"')
-    expect(markup).toContain('avatars-spritesheet-64.webp')
+    expect(markup).toContain('avatars-spritesheet-thumb.webp')
     const colorMatch = markup.match(/background-color:\s*(#[0-9a-fA-F]{6})/)
     expect(colorMatch).not.toBeNull()
     const allowedHexes = CIMA_CORPORATE_COLORS.map((c) => c.hex.toLowerCase())
@@ -71,7 +71,7 @@ describe('UserAvatar', () => {
     const markup = renderToStaticMarkup(<UserAvatar size="sm" />)
     expect(markup).toContain('size-7')
     expect(markup).toContain('data-testid="user-avatar-sprite"')
-    expect(markup).toContain('avatars-spritesheet-64.webp')
+    expect(markup).toContain('avatars-spritesheet-thumb.webp')
     const colorMatch = markup.match(/background-color:\s*(#[0-9a-fA-F]{6})/)
     expect(colorMatch).not.toBeNull()
     const allowedHexes = CIMA_CORPORATE_COLORS.map((c) => c.hex.toLowerCase())
@@ -171,7 +171,7 @@ describe('UserAvatar', () => {
     const markup = renderToStaticMarkup(
       <UserAvatar avatarId={7} name="Carlos CIMA" size="md" preferSprite={false} />
     )
-    expect(markup).toContain('srcSet="/avatars/avatar-7-64.webp 64w, /avatars/avatar-7-256.webp 256w, /avatars/avatar-7-512.webp 512w, /avatars/avatar-7-1024.webp 1024w"')
+    expect(markup).toContain('srcSet="/avatars/avatar-7-256.webp 256w, /avatars/avatar-7-512.webp 512w, /avatars/avatar-7-1024.webp 1024w"')
     expect(markup).toContain('sizes="36px"')
   })
 
@@ -193,6 +193,23 @@ describe('UserAvatar', () => {
     expect(markup).toContain('/avatars/avatar-12-1024.webp 1024w')
     expect(markup).toContain('/avatars/avatar-12-512.webp 512w')
     expect(markup).toContain('/avatars/avatar-12-256.webp 256w')
+    expect(markup).not.toContain('64w')
+  })
+
+  it('renderiza automáticamente en modo imagen HD con srcSet para tamaños lg y xl por defecto', () => {
+    const markupLg = renderToStaticMarkup(
+      <UserAvatar avatarId={12} name="Valeria Quintero" size="lg" />
+    )
+    expect(markupLg).toContain('<img')
+    expect(markupLg).not.toContain('data-testid="user-avatar-sprite"')
+    expect(markupLg).toContain('/avatars/avatar-12-256.webp 256w')
+
+    const markupXl = renderToStaticMarkup(
+      <UserAvatar avatarId={12} name="Valeria Quintero" size="xl" />
+    )
+    expect(markupXl).toContain('<img')
+    expect(markupXl).not.toContain('data-testid="user-avatar-sprite"')
+    expect(markupXl).toContain('/avatars/avatar-12-512.webp 512w')
   })
 
   it('sanea src vacío o con espacios y recurre limpiamente al avatar determinista en sprite', () => {

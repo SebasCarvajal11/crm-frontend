@@ -14,7 +14,7 @@ describe('avatar-spritesheet', () => {
       expect(SPRITESHEET_COLUMNS).toBe(12)
       expect(SPRITESHEET_ROWS).toBe(7)
       expect(SPRITESHEET_COLUMNS * SPRITESHEET_ROWS).toBe(84)
-      expect(DEFAULT_SPRITESHEET_URL).toBe('/avatars/avatars-spritesheet-64.webp')
+      expect(DEFAULT_SPRITESHEET_URL).toBe('/avatars/avatars-spritesheet-thumb.webp')
     })
   })
 
@@ -65,7 +65,7 @@ describe('avatar-spritesheet', () => {
   describe('getAvatarSpriteStyle', () => {
     it('genera estilo CSS completo para uso como background en contenedor', () => {
       const style = getAvatarSpriteStyle(0)
-      expect(style.backgroundImage).toBe("url('/avatars/avatars-spritesheet-64.webp')")
+      expect(style.backgroundImage).toBe("url('/avatars/avatars-spritesheet-thumb.webp')")
       expect(style.backgroundPosition).toBe('0.000% 0.000%')
       expect(style.backgroundSize).toBe('1200% 700%')
       expect(style.backgroundRepeat).toBe('no-repeat')

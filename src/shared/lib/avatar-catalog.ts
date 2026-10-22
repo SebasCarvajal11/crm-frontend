@@ -72,7 +72,6 @@ export const getAvatarSrcSet = (avatarId: number): string => {
       ? avatarId
       : Math.abs(Math.trunc(avatarId || 0)) % 84
   return [
-    `/avatars/avatar-${safeId}-64.webp 64w`,
     `/avatars/avatar-${safeId}-256.webp 256w`,
     `/avatars/avatar-${safeId}-512.webp 512w`,
     `/avatars/avatar-${safeId}-1024.webp 1024w`,
