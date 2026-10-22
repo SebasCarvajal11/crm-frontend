@@ -3,8 +3,14 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
   workflow_dispatch:
 
 concurrency:
@@ -24,17 +30,15 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     # Imagen oficial de Playwright: trae Chromium, WebKit y todas sus librerías
-    # del sistema, así no se instala nada con apt (los espejos de Ubuntu en Azure
-    # se quedaban colgados). La versión debe ser la misma de @playwright/test en
-    # pnpm-lock.yaml; al actualizar Playwright, actualice también esta etiqueta.
+    # del sistema preinstaladas para ejecución inmediata y reproducible.
     container:
       image: mcr.microsoft.com/playwright:v1.60.0-noble
       options: --ipc=host
-    timeout-minutes: 25
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -60,7 +64,7 @@ jobs:
           name: frontend-dist
           path: dist
       - name: Verificar marca, presencia, tutorial híbrido y navegación adaptativa
-        run: pnpm exec playwright test --config tests/playwright/ui.config.ts --shard=${{ matrix.shard }}/3
+        run: pnpm exec playwright test --config tests/playwright/ui.config.ts --shard=${{ matrix.shard }}/2
       - name: Guardar reporte y capturas
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,0 +1,76 @@
+name: CI Nightly Full Matrix
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-nightly-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    uses: SebasCarvajal11/crm-infra/.github/workflows/reusable-ci.yml@main
+    with:
+      component: frontend
+      is_frontend: true
+      test_command: pnpm test:unit
+    secrets: inherit
+
+  full-matrix-ui:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+      - name: Cache motores Playwright
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-full-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            playwright-full-${{ runner.os }}-
+      - name: Instalar motores de navegador completos (Chromium y WebKit)
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          NEEDRESTART_MODE: a
+        run: |
+          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" = "true" ]; then
+            pnpm exec playwright install-deps webkit
+            pnpm exec playwright install chromium webkit
+          else
+            pnpm exec playwright install --with-deps chromium webkit
+          fi
+      - name: Descargar build compilado
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist
+      - name: Ejecutar matriz exhaustiva (4K, 2K, Ultrawide, iPad, iPhone, Pixel)
+        env:
+          FULL_MATRIX: "true"
+        run: pnpm exec playwright test --config tests/playwright/ui.config.ts --shard=${{ matrix.shard }}/3
+      - name: Guardar reporte y capturas de matriz completa
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-nightly-report-${{ matrix.shard }}
+          path: |
+            tests/playwright/reports/ui/
+            tests/test-results/ui/
+          retention-days: 14
