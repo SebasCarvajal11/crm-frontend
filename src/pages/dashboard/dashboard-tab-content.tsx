@@ -9,6 +9,7 @@ import type { MentionPayload } from './use-dashboard-navigation'
 const CollabPanel = lazy(() => import('@/features/collab/ui').then((m) => ({ default: m.CollabPanel })))
 const NotificationsPanel = lazy(() => import('@/features/collab/ui').then((m) => ({ default: m.NotificationsPanel })))
 const MarketingPanel = lazy(() => import('@/features/marketing').then((m) => ({ default: m.MarketingPanel })))
+const ClientPortal = lazy(() => import('@/features/marketing').then((m) => ({ default: m.ClientPortal })))
 const DashboardAnalytics = lazy(() =>
   import('@/components/organisms/dashboard-analytics').then((m) => ({ default: m.DashboardAnalytics })),
 )
@@ -34,6 +35,10 @@ type DashboardTabContentProps = {
   onCloseProject: () => void
   onOpenNotification: (item: MentionPayload) => void
   onWorkspaceTabChange: (tab: 'board' | 'chat' | 'brief' | 'contract' | 'change-requests' | 'members') => void
+  /** Solo clientes: muestra "Mi espacio comercial". */
+  canUsePortal?: boolean
+  /** Lleva a Colaboración (proyectos) desde una propuesta con proyecto creado. */
+  onGoToProjects?: (projectId?: string | null) => void
 }
 
 export function DashboardTabContent({
@@ -55,6 +60,8 @@ export function DashboardTabContent({
   onCloseProject,
   onOpenNotification,
   onWorkspaceTabChange,
+  canUsePortal = false,
+  onGoToProjects,
 }: DashboardTabContentProps) {
   return (
     <>
@@ -87,6 +94,11 @@ export function DashboardTabContent({
               onCloseProject={onCloseProject}
               onTabChange={onWorkspaceTabChange}
             />
+          </div>
+        )}
+        {activeTab === 'portal' && canUsePortal && (
+          <div className="tab-pane-transition">
+            <ClientPortal accessToken={token} onGoToProjects={onGoToProjects} />
           </div>
         )}
         {activeTab === 'marketing' && canUseMarketing && (

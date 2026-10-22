@@ -1,19 +1,5 @@
 import type { ReactNode } from 'react'
-import {
-  CalendarClock,
-  CheckCircle2,
-  FileText,
-  FolderKanban,
-  Mail,
-  Megaphone,
-  MessageSquare,
-  PhoneCall,
-  Plus,
-  Send,
-  Tag,
-  UserX,
-  XCircle,
-} from 'lucide-react'
+import { CalendarClock, CheckCircle2, FileText, FolderKanban, Mail, Megaphone, MessageSquare, PhoneCall, Plus, Send, Tag, UserX, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/shared/lib/utils'
@@ -47,6 +33,8 @@ export interface Client360ViewProps {
   onWhatsApp?: () => void
   /** Solo dentro de Marketing (abre el formulario de propuesta con el cliente). */
   onNewProposal?: () => void
+  /** Solo dentro de Marketing: abre la conversación del portal con el cliente. */
+  onSendMessage?: () => void
 }
 
 /** Contenido de la ficha 360°: cabecera, estadísticas, acciones y línea de tiempo. */
@@ -60,6 +48,7 @@ export function Client360View({
   onRegisterContact,
   onWhatsApp,
   onNewProposal,
+  onSendMessage,
 }: Client360ViewProps) {
   if (isLoading) {
     return (
@@ -151,6 +140,12 @@ export function Client360View({
           <Button variant="outline" size="sm" className="h-9 flex-1 gap-1.5 text-xs" onClick={onWhatsApp}>
             <MessageSquare className="size-3.5" />
             Abrir en WhatsApp
+          </Button>
+        )}
+        {onSendMessage && (
+          <Button variant="outline" size="sm" className="h-9 flex-1 gap-1.5 text-xs" onClick={onSendMessage}>
+            <Send className="size-3.5" />
+            Enviar mensaje
           </Button>
         )}
         {onNewProposal && (

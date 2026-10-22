@@ -24,7 +24,7 @@ import { WhatsAppDialog, type WhatsAppTarget } from './WhatsAppDialog'
 import { SummaryCard } from './summary-card'
 import { InteractionsTable } from './interactions-table'
 import { InteractionResponseDialog } from './interaction-response-dialog'
-import { TIPOS_RESPUESTA } from './interaction-types.constants'
+import { TIPOS_RESPUESTA, interactionOrigin } from './interaction-types.constants'
 
 interface InteractionsManagerProps {
   accessToken: string
@@ -37,7 +37,7 @@ export function InteractionsManager({ accessToken, onGoToTemplates }: Interactio
   const [whatsAppTarget, setWhatsAppTarget] = useState<WhatsAppTarget | null>(null)
 
   const [searchTerm, setSearchTerm] = useState('')
-  const [originFilter, setOriginFilter] = useState<'ALL' | 'AUTO' | 'MANUAL' | 'PENDING'>('ALL')
+  const [originFilter, setOriginFilter] = useState<'ALL' | 'AUTO' | 'MANUAL' | 'PORTAL' | 'PENDING'>('ALL')
   const [target, setTarget] = useState<MarketingInteraction | null>(null)
 
   const interactionsQuery = useQuery({
@@ -72,7 +72,8 @@ export function InteractionsManager({ accessToken, onGoToTemplates }: Interactio
   }, [clients])
 
   const resumen = useMemo(() => {
-    const automaticas = interactions.filter((i) => i.executionId != null).length
+    const automaticas = interactions.filter((i) => interactionOrigin(i) === 'AUTO').length
+    const portal = interactions.filter((i) => interactionOrigin(i) === 'PORTAL').length
     const conRespuesta = interactions.filter(
       (i) => i.response || TIPOS_RESPUESTA.includes(i.interactionType)
     ).length
@@ -82,7 +83,8 @@ export function InteractionsManager({ accessToken, onGoToTemplates }: Interactio
     return {
       total: interactions.length,
       automaticas,
-      manuales: interactions.length - automaticas,
+      portal,
+      manuales: interactions.length - automaticas - portal,
       conRespuesta,
       pendientes: interactions.length - conRespuesta,
       tasa,
@@ -93,8 +95,9 @@ export function InteractionsManager({ accessToken, onGoToTemplates }: Interactio
     const termino = searchTerm.trim().toLowerCase()
     return interactions
       .filter((i) => {
-        if (originFilter === 'AUTO' && i.executionId == null) return false
-        if (originFilter === 'MANUAL' && i.executionId != null) return false
+        if (originFilter === 'AUTO' && interactionOrigin(i) !== 'AUTO') return false
+        if (originFilter === 'MANUAL' && interactionOrigin(i) !== 'MANUAL') return false
+        if (originFilter === 'PORTAL' && interactionOrigin(i) !== 'PORTAL') return false
         if (originFilter === 'PENDING' && i.response) return false
         if (!termino) return true
         return (
@@ -139,7 +142,9 @@ export function InteractionsManager({ accessToken, onGoToTemplates }: Interactio
         <SummaryCard
           label="Total contactos"
           value={resumen.total}
-          hint={`${resumen.automaticas} automáticas / ${resumen.manuales} manuales`}
+          hint={`${resumen.automaticas} automáticas / ${resumen.manuales} manuales${
+            resumen.portal ? ` / ${resumen.portal} del portal` : ''
+          }`}
           icon={MessageSquare}
         />
         <SummaryCard
@@ -183,6 +188,7 @@ export function InteractionsManager({ accessToken, onGoToTemplates }: Interactio
           <option value="ALL">Todas las interacciones</option>
           <option value="AUTO">Solo automáticas</option>
           <option value="MANUAL">Solo manuales</option>
+          <option value="PORTAL">Solo del portal del cliente</option>
           <option value="PENDING">Sin respuesta registrada</option>
         </select>
       </div>

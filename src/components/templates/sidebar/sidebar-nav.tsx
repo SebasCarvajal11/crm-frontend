@@ -32,7 +32,9 @@ export function SidebarNav({
             onItemClick()
           }}
           title={compact ? item.label : undefined}
-          aria-label={item.label}
+          aria-label={
+            item.badge && item.badge > 0 ? `${item.label} (${item.badgeLabel ?? `${item.badge} pendientes`})` : item.label
+          }
           aria-current={item.isActive ? 'page' : undefined}
           className={cn(
             navItemBaseClass,
@@ -52,6 +54,18 @@ export function SidebarNav({
             {item.icon}
           </span>
           {!compact && <span className="truncate">{item.label}</span>}
+          {item.badge != null && item.badge > 0 && (
+            <span
+              className={cn(
+                'inline-flex min-w-5 items-center justify-center rounded-full bg-white px-1.5 text-[11px] font-bold leading-5 text-primary tabular-nums shadow-xs',
+                compact ? 'absolute right-1 top-1 min-w-4 px-1 text-[10px] leading-4' : 'ml-auto'
+              )}
+              data-testid={`sidebar-badge-${item.key}`}
+              aria-hidden="true"
+            >
+              {item.badge > 99 ? '99+' : item.badge}
+            </span>
+          )}
           {item.isActive && (
             <span
               className={cn(
@@ -59,7 +73,7 @@ export function SidebarNav({
                 'shadow-[0_0_8px_rgba(255,255,255,0.9)] ring-2 ring-white/30',
                 compact
                   ? 'absolute right-1.5 top-1/2 -translate-y-1/2 h-1.5 w-1.5'
-                  : 'ml-auto h-2 w-2'
+                  : cn('h-2 w-2', item.badge ? 'ml-2' : 'ml-auto')
               )}
               aria-hidden="true"
             />

@@ -15,13 +15,21 @@ interface Client360ProviderProps {
   /** Abre el formulario de propuesta con el cliente preseleccionado (solo en Marketing). */
   onNewProposal?: (clientId: string) => void
   onGoToTemplates?: () => void
+  /** Abre la pestaña Mensajes con la conversación del cliente (solo en Marketing). */
+  onSendMessage?: (target: Client360Target) => void
 }
 
 /**
  * Provee la ficha 360° a cualquier nombre de cliente que esté dentro
  * (ClientNameButton) y la muestra en un panel lateral.
  */
-export function Client360Provider({ accessToken, children, onNewProposal, onGoToTemplates }: Client360ProviderProps) {
+export function Client360Provider({
+  accessToken,
+  children,
+  onNewProposal,
+  onGoToTemplates,
+  onSendMessage,
+}: Client360ProviderProps) {
   const [target, setTarget] = useState<Client360Target | null>(null)
   const [contactOpen, setContactOpen] = useState(false)
   const [whatsApp, setWhatsApp] = useState<WhatsAppTarget | null>(null)
@@ -57,6 +65,15 @@ export function Client360Provider({ accessToken, children, onNewProposal, onGoTo
                       const clientId = target.clientId
                       setTarget(null)
                       onNewProposal(clientId)
+                    }
+                  : undefined
+              }
+              onSendMessage={
+                onSendMessage
+                  ? (name) => {
+                      const next = { clientId: target.clientId, name: name || target.name }
+                      setTarget(null)
+                      onSendMessage(next)
                     }
                   : undefined
               }
@@ -96,12 +113,14 @@ function Client360Body({
   onRegisterContact,
   onWhatsApp,
   onNewProposal,
+  onSendMessage,
 }: {
   accessToken: string
   clientId: string
   onRegisterContact: () => void
   onWhatsApp: (name: string) => void
   onNewProposal?: () => void
+  onSendMessage?: (name: string) => void
 }) {
   const { plans } = usePlans(accessToken)
   const query = useQuery({
@@ -123,6 +142,7 @@ function Client360Body({
       onRegisterContact={onRegisterContact}
       onWhatsApp={() => onWhatsApp(name || 'el cliente')}
       onNewProposal={onNewProposal}
+      onSendMessage={onSendMessage && !notFound ? () => onSendMessage(name) : undefined}
     />
   )
 }

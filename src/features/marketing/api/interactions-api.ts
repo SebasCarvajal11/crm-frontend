@@ -16,7 +16,8 @@ export type DeliveryStatus = 'QUEUED' | 'FAILED' | 'SIMULATED' | 'SKIPPED_LIMIT'
 
 export interface MarketingInteraction {
   interactionId: number
-  campaignId: number
+  /** null en mensajes del portal y decisiones del cliente (channel "portal"). */
+  campaignId: number | null
   clientId: string
   executionId?: number | null
   loggedBy?: string | null

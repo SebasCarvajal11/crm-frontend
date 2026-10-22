@@ -21,6 +21,10 @@ export interface Proposal {
   responseDate?: string | null
   /** Proyecto de CIMAxios vinculado (solo propuestas aprobadas). */
   projectId?: string | null
+  /** Comentario del cliente al decidir desde el portal. */
+  clientComment?: string | null
+  /** Momento en que el cliente aceptó o rechazó desde el portal. */
+  decidedAt?: string | null
   createdAt?: string
   updatedAt?: string
 }

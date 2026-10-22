@@ -17,6 +17,7 @@ import {
   collabQuestions,
 } from './collab.tour'
 import { marketingTour, marketingQuestions } from './marketing.tour'
+import { portalTour, portalQuestions } from './portal.tour'
 import { adminTour, adminQuestions } from './admin.tour'
 import { analyticsTour, analyticsQuestions } from './analytics.tour'
 import { accountTour, accountQuestions } from './account.tour'
@@ -33,6 +34,7 @@ export const ALL_TOURS: CimaTourDefinition[] = [
   collabChangesMission,
   collabClientApprovalsMission,
   marketingTour,
+  portalTour,
   adminTour,
   analyticsTour,
   accountTour,
@@ -43,6 +45,7 @@ export const ALL_QUESTIONS: GuidedQuestion[] = [
   ...overviewQuestions,
   ...collabQuestions,
   ...marketingQuestions,
+  ...portalQuestions,
   ...adminQuestions,
   ...analyticsQuestions,
   ...accountQuestions,
@@ -75,7 +78,7 @@ export function getMissionsForContext(ctx: TourContextState): CimaTourDefinition
 
 export function getOnboardingChecklistForRole(role: TourUserRole): CimaTourDefinition[] {
   if (role === 'client') {
-    return [collabKanbanMission, collabClientApprovalsMission, accountTour]
+    return [collabKanbanMission, collabClientApprovalsMission, portalTour, accountTour]
   }
   if (role === 'worker') {
     return [collabTasksMission, collabDocsMission, accountTour]

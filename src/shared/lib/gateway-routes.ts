@@ -208,6 +208,14 @@ export const MARKETING_ROUTES = {
   clientTimeline: (clientId: string) => `${API_PREFIX}/marketing/clients/${clientId}/timeline`,
   today: `${API_PREFIX}/marketing/today`,
   proposalProject: (id: string | number) => `${API_PREFIX}/marketing/proposals/${id}/project`,
+  // Portal del cliente (rol client) y bandeja de mensajes de CIMA (crm-marketing B4, gateway 1.6.0)
+  meSummary: `${API_PREFIX}/marketing/me/summary`,
+  meProposals: `${API_PREFIX}/marketing/me/proposals`,
+  meProposalDecision: (id: string | number) => `${API_PREFIX}/marketing/me/proposals/${id}/decision`,
+  meMessages: `${API_PREFIX}/marketing/me/messages`,
+  messageThreads: `${API_PREFIX}/marketing/messages/threads`,
+  clientMessages: (clientId: string) => `${API_PREFIX}/marketing/messages/${clientId}`,
+  clientMessagesRead: (clientId: string) => `${API_PREFIX}/marketing/messages/${clientId}/read`,
 } as const
 
 // ── Analytics (autenticado) ──────────────────────────────────────────────────

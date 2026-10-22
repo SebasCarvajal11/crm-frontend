@@ -2,7 +2,7 @@ import { Bot, CheckCircle2, MessageSquare, MessageSquarePlus, User } from 'lucid
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { MarketingInteraction } from '../api/interactions-api'
-import { typeMeta, splitDateTime, channelDisplay } from './interaction-types.constants'
+import { typeMeta, splitDateTime, channelDisplay, interactionOrigin, ORIGIN_LABELS } from './interaction-types.constants'
 import { DeliveryBadge } from './delivery-badge'
 import { ClientNameButton } from './client-name-button'
 
@@ -58,7 +58,8 @@ export function InteractionsTable({
             <tbody>
               {filtered.map((interaction) => {
                 const meta = typeMeta(interaction.interactionType)
-                const esAutomatica = interaction.executionId != null
+                const origen = interactionOrigin(interaction)
+                const OrigenIcon = origen === 'AUTO' ? Bot : origen === 'PORTAL' ? MessageSquare : User
                 const { date, time } = splitDateTime(interaction.contactDate)
                 const nombre = clientLabel(interaction.clientId)
                 return (
@@ -68,18 +69,12 @@ export function InteractionsTable({
                   >
                     <td className="min-w-40 px-4 py-3">
                       <ClientNameButton clientId={interaction.clientId} name={nombre} className="block font-medium leading-snug" />
-                      <p className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                        {esAutomatica ? (
-                          <>
-                            <Bot className="h-3 w-3" aria-hidden="true" />
-                            Automática
-                          </>
-                        ) : (
-                          <>
-                            <User className="h-3 w-3" aria-hidden="true" />
-                            Manual
-                          </>
-                        )}
+                      <p
+                        className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-muted-foreground"
+                        data-origin={origen}
+                      >
+                        <OrigenIcon className="h-3 w-3" aria-hidden="true" />
+                        {ORIGIN_LABELS[origen]}
                       </p>
                     </td>
                     <td className="whitespace-nowrap px-4 py-3 text-xs tabular-nums text-muted-foreground">
@@ -180,7 +175,7 @@ function InteractionCard({
 }) {
   const meta = typeMeta(interaction.interactionType)
   const { date, time } = splitDateTime(interaction.contactDate)
-  const esAutomatica = interaction.executionId != null
+  const origen = interactionOrigin(interaction)
   return (
     <li
       className="flex flex-col gap-2.5 border-b p-4 last:border-b-0 md:odd:border-r md:[&:nth-last-child(2):nth-child(odd)]:border-b-0"
@@ -191,7 +186,7 @@ function InteractionCard({
           <ClientNameButton clientId={interaction.clientId} name={nombre} className="block font-medium leading-snug" />
           <p className="text-xs text-muted-foreground tabular-nums">
             {date}
-            {time ? ` · ${time}` : ''} · {esAutomatica ? 'Automática' : 'Manual'}
+            {time ? ` · ${time}` : ''} · <span data-origin={origen}>{ORIGIN_LABELS[origen]}</span>
           </p>
         </div>
         <span

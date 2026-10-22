@@ -29,6 +29,7 @@ import {
   PROPOSAL_STATUSES,
 } from './proposal.constants'
 import { ClientNameButton } from './client-name-button'
+import { clientDecisionNote } from './portal.utils'
 
 interface ProposalCardProps {
   proposal: Proposal
@@ -123,6 +124,35 @@ function ProposalCardHeader(props: {
   )
 }
 
+/** Decisión que tomó el cliente desde su portal (fecha y comentario). */
+function ClientDecisionNote({ proposal }: { proposal: Proposal }) {
+  const note = clientDecisionNote(proposal)
+  if (!note) return null
+  const accepted = note.tone === 'accepted'
+  return (
+    <div
+      className={[
+        'rounded-lg border px-2.5 py-1.5',
+        accepted
+          ? 'border-emerald-500/30 bg-emerald-500/5 text-emerald-800 dark:text-emerald-300'
+          : 'border-destructive/30 bg-destructive/5 text-destructive',
+      ].join(' ')}
+      data-testid="proposal-client-decision"
+      data-decision={note.tone}
+    >
+      <p className="flex items-center gap-1.5 font-semibold">
+        {accepted ? <CheckCircle2 className="h-3.5 w-3.5" /> : <XCircle className="h-3.5 w-3.5" />}
+        {note.title}
+      </p>
+      {note.comment && (
+        <p className="mt-0.5 whitespace-pre-line break-words font-normal text-foreground/80">
+          {accepted ? 'Comentario' : 'Motivo'}: “{note.comment}”
+        </p>
+      )}
+    </div>
+  )
+}
+
 function ProposalTimelineMeta({
   proposal,
   dias,
@@ -147,6 +177,8 @@ function ProposalTimelineMeta({
             <span>Respondida el {formatDate(proposal.responseDate)}</span>
           </div>
         )}
+
+        <ClientDecisionNote proposal={proposal} />
 
         {proposal.documentUrl && (
           <a

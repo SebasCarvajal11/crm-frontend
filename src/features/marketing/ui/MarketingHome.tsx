@@ -16,6 +16,7 @@ import { RegisterContactDialog } from './RegisterContactDialog'
 import { WhatsAppDialog, type WhatsAppTarget } from './WhatsAppDialog'
 import { CreateProjectFromProposal } from './CreateProjectFromProposal'
 import { FUNNEL_STAGE_HELP, funnelPeriodOptions } from './commercial.utils'
+import type { MessageThread } from '../api/messages-api'
 
 interface MarketingHomeProps {
   accessToken: string
@@ -23,10 +24,20 @@ interface MarketingHomeProps {
   /** "Ver propuesta": lleva a la pestaña Propuestas y la resalta. */
   onViewProposal: (proposalId: number) => void
   onGoToTemplates?: () => void
+  /** Conversaciones con mensajes del cliente sin leer (tarjeta "Mensajes sin responder"). */
+  unansweredThreads?: MessageThread[] | null
+  onOpenThread?: (thread: MessageThread) => void
 }
 
 /** Pestaña "Inicio" de Marketing: embudo comercial y panel Hoy. */
-export function MarketingHome({ accessToken, isAdmin, onViewProposal, onGoToTemplates }: MarketingHomeProps) {
+export function MarketingHome({
+  accessToken,
+  isAdmin,
+  onViewProposal,
+  onGoToTemplates,
+  unansweredThreads,
+  onOpenThread,
+}: MarketingHomeProps) {
   const { plans } = usePlans(accessToken)
   const [period, setPeriod] = useState('')
   const periodOptions = useMemo(() => funnelPeriodOptions(), [])
@@ -73,6 +84,8 @@ export function MarketingHome({ accessToken, isAdmin, onViewProposal, onGoToTemp
         onRegisterContact={(c) => setContactClientId(c.clientId)}
         onWhatsApp={(c) => setWhatsApp({ clientId: c.clientId, clientName: c.name })}
         onViewProposal={onViewProposal}
+        unansweredThreads={unansweredThreads}
+        onOpenThread={onOpenThread}
         renderCreateProject={
           isAdmin
             ? (item, index) => (

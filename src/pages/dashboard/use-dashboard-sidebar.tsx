@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { BarChart3, ChartAreaIcon, KanbanSquare, Megaphone, ShieldCheck } from 'lucide-react'
+import { BarChart3, Briefcase, ChartAreaIcon, KanbanSquare, Megaphone, ShieldCheck } from 'lucide-react'
 import type { DashboardTab } from '@/routes/-dashboard.search'
 import type { SidebarItem } from '@/components/templates/sidebar'
 import {
@@ -14,6 +14,10 @@ type Params = {
   goTo: (next: DashboardTab) => void
   canViewOverview: boolean
   canUseMarketing: boolean
+  /** Solo clientes: "Mi espacio comercial". */
+  canUsePortal?: boolean
+  /** Propuestas pendientes + mensajes sin leer. */
+  portalBadge?: number
   isAdmin: boolean
 }
 
@@ -22,6 +26,8 @@ export function useDashboardSidebar({
   goTo,
   canViewOverview,
   canUseMarketing,
+  canUsePortal = false,
+  portalBadge = 0,
   isAdmin,
 }: Params): SidebarItem[] {
   return useMemo(
@@ -41,6 +47,17 @@ export function useDashboardSidebar({
         onClick: () => goTo('collab'),
         onMouseEnter: preloadCollab,
         isActive: activeTab === 'collab',
+      },
+      {
+        key: 'portal',
+        label: 'Mi espacio comercial',
+        icon: <Briefcase className="size-[1.125rem] lg:size-5 shrink-0" />,
+        onClick: () => goTo('portal'),
+        onMouseEnter: preloadMarketing,
+        isActive: activeTab === 'portal',
+        hidden: !canUsePortal,
+        badge: portalBadge,
+        badgeLabel: `${portalBadge} ${portalBadge === 1 ? 'pendiente' : 'pendientes'}`,
       },
       {
         key: 'marketing',
@@ -70,6 +87,6 @@ export function useDashboardSidebar({
         hidden: !isAdmin,
       },
     ],
-    [activeTab, goTo, canViewOverview, canUseMarketing, isAdmin],
+    [activeTab, goTo, canViewOverview, canUseMarketing, canUsePortal, portalBadge, isAdmin],
   )
 }

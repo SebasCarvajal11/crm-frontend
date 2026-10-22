@@ -25,6 +25,8 @@ export type CimaTourStep = {
   sidebar?: boolean
   switchWorkspaceTab?: WorkspaceSubTab
   switchMarketingTab?: string
+  /** Subpestaña de "Mi espacio comercial" (proposals | messages). */
+  switchPortalTab?: string
   emptyStateDescription?: string
 }
 
@@ -54,6 +56,7 @@ export type GuidedQuestion = {
   tab: DashboardTab
   workspaceTab?: WorkspaceSubTab
   marketingTab?: string
+  portalTab?: string
   scope?: 'kanban' | 'workspace' | 'all'
   roles: TourUserRole[]
   category: GuidedQuestionCategory
