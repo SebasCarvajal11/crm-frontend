@@ -48,6 +48,9 @@ jobs:
           restore-keys: |
             playwright-browsers-${{ runner.os }}-
       - name: Instalar motores de navegador
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          NEEDRESTART_MODE: a
         run: |
           if [ "${{ steps.playwright-cache.outputs.cache-hit }}" = "true" ]; then
             pnpm exec playwright install-deps webkit
