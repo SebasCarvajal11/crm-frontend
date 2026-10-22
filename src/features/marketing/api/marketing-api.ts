@@ -49,6 +49,8 @@ export interface Workflow {
   noContactDays?: number | null
   actionType: ActionType
   messageTemplate?: string | null
+  /** Plantilla de la biblioteca (opcional; debe estar activa). */
+  templateId?: string | null
   active: boolean
   createdAt?: string
 }
@@ -61,6 +63,7 @@ export type CreateWorkflowInput = {
   noContactDays?: number | null
   actionType: ActionType
   messageTemplate?: string | null
+  templateId?: string | null
   active?: boolean
 }
 

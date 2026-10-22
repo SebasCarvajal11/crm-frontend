@@ -19,6 +19,8 @@ export interface Proposal {
   estimatedValue?: number | null
   createdDate?: string | null
   responseDate?: string | null
+  /** Proyecto de CIMAxios vinculado (solo propuestas aprobadas). */
+  projectId?: string | null
   createdAt?: string
   updatedAt?: string
 }
@@ -43,6 +45,8 @@ export interface MarketingClient {
   plan?: ClientPlan | null
   createdAt?: string
   updatedAt?: string
+  /** Puntaje de interés 0–100 calculado por el backend. */
+  score?: number | null
 }
 
 export async function listProposalsRequest(accessToken: string): Promise<Proposal[]> {

@@ -192,6 +192,22 @@ export const MARKETING_ROUTES = {
   segmentExecute: (workflowId: string | number) => `${API_PREFIX}/marketing/segments/${workflowId}/execute`,
   schedulerRun: `${API_PREFIX}/marketing/scheduler/run`,
   integrationSync: `${API_PREFIX}/integration/sync`,
+  // Planes configurables, plantillas y correos (crm-marketing, PR #10)
+  plans: `${API_PREFIX}/marketing/plans`,
+  plan: (planId: string) => `${API_PREFIX}/marketing/plans/${planId}`,
+  planActive: (planId: string) => `${API_PREFIX}/marketing/plans/${planId}/active`,
+  templates: `${API_PREFIX}/marketing/templates`,
+  template: (templateId: string) => `${API_PREFIX}/marketing/templates/${templateId}`,
+  templateActive: (templateId: string) => `${API_PREFIX}/marketing/templates/${templateId}/active`,
+  templatePreview: (templateId: string) => `${API_PREFIX}/marketing/templates/${templateId}/preview`,
+  emailQuota: `${API_PREFIX}/marketing/notifications/email-quota`,
+  testEmail: `${API_PREFIX}/marketing/notifications/test-email`,
+  // Flujo comercial: embudo, ficha 360°, panel Hoy y vínculo propuesta-proyecto (crm-marketing, PR #11)
+  funnel: `${API_PREFIX}/marketing/funnel`,
+  funnelClients: (stageKey: string) => `${API_PREFIX}/marketing/funnel/${stageKey}/clients`,
+  clientTimeline: (clientId: string) => `${API_PREFIX}/marketing/clients/${clientId}/timeline`,
+  today: `${API_PREFIX}/marketing/today`,
+  proposalProject: (id: string | number) => `${API_PREFIX}/marketing/proposals/${id}/project`,
 } as const
 
 // ── Analytics (autenticado) ──────────────────────────────────────────────────
@@ -212,6 +228,11 @@ export const ANALYTICS_ROUTES = {
   kpisHistory: `${API_PREFIX}/analytics/kpis/history`,
   kpisCurrentByPeriod: (period: string) => `${API_PREFIX}/analytics/kpis/current/${period}`,
   kpisCalculateByPeriod: (period: string) => `${API_PREFIX}/analytics/kpis/calculate/${period}`,
+  // Detalle, comparación mensual y proyectos (crm-marketing, PR #9)
+  kpiDetail: (kpi: string) => `${API_PREFIX}/analytics/kpis/${kpi}/detail`,
+  kpisCompare: `${API_PREFIX}/analytics/kpis/compare`,
+  projects: `${API_PREFIX}/analytics/projects`,
+  exportKpiDetail: (kpi: string) => `${API_PREFIX}/analytics/export/kpis/${kpi}/detail`,
 } as const
 
 // ── Admin Storage (autenticado, rol admin) ──────────────────────────────────

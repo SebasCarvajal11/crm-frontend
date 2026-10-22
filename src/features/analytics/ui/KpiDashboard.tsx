@@ -15,10 +15,14 @@ import {
 import {
   getCurrentKpisRequest,
   calculateKpisRequest,
+  compareKpisRequest,
   ultimosPeriodos,
 } from '../api/kpis-api'
 import { analyticsKeys } from '../model/query-keys'
-import { KPIS, formatear, formatearFechaHora } from './kpi-definitions'
+import type { KpiDeltaDto, KpiKey } from '../model'
+import { KPIS, formatear, formatearFechaHora, type KpiDefinition } from './kpi-definitions'
+import { KpiDeltaBadge } from './KpiDeltaBadge'
+import { KpiDetailSheet } from './KpiDetailSheet'
 
 interface KpiDashboardProps {
   accessToken: string
@@ -30,12 +34,28 @@ export function KpiDashboard({ accessToken }: KpiDashboardProps) {
 
   const [period, setPeriod] = useState<string>(() => ultimosPeriodos(1)[0]?.value ?? '')
   const [aviso, setAviso] = useState<string | null>(null)
+  const [detalle, setDetalle] = useState<KpiDefinition | null>(null)
 
   const kpisQuery = useQuery({
     queryKey: analyticsKeys.kpis(period),
     queryFn: () => getCurrentKpisRequest(accessToken, period),
     staleTime: 60_000,
   })
+
+  // Variación de cada KPI frente al mes anterior. Si falla, las tarjetas muestran "sin dato".
+  const compareQuery = useQuery({
+    queryKey: analyticsKeys.kpiCompare(period),
+    queryFn: () => compareKpisRequest(accessToken, period),
+    staleTime: 60_000,
+    enabled: Boolean(period),
+  })
+  const deltas = useMemo(() => {
+    const mapa = new Map<KpiKey, KpiDeltaDto>()
+    const lista = Array.isArray(compareQuery.data?.kpis) ? compareQuery.data.kpis : []
+    for (const d of lista) mapa.set(d.kpi, d)
+    return mapa
+  }, [compareQuery.data])
+  const periodoAnterior = compareQuery.data?.previousPeriod ?? null
 
   const calculateMutation = useMutation({
     mutationFn: () => calculateKpisRequest(accessToken, period),
@@ -90,6 +110,7 @@ export function KpiDashboard({ accessToken }: KpiDashboardProps) {
             }}
           >
             <SelectTrigger
+              data-tour="analytics-period-select"
               className="h-9 min-w-[150px] bg-muted/20 text-xs font-semibold capitalize rounded-xl border-border/80"
               aria-label="Seleccionar período"
             >
@@ -109,7 +130,10 @@ export function KpiDashboard({ accessToken }: KpiDashboardProps) {
             variant="outline"
             size="sm"
             className="gap-1.5 h-9 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground"
-            onClick={() => kpisQuery.refetch()}
+            onClick={() => {
+              void kpisQuery.refetch()
+              void compareQuery.refetch()
+            }}
             disabled={kpisQuery.isFetching}
           >
             <RefreshCw className={`size-3.5 ${kpisQuery.isFetching ? 'animate-spin' : ''}`} />
@@ -167,23 +191,40 @@ export function KpiDashboard({ accessToken }: KpiDashboardProps) {
             </div>
           )}
 
-          <MetricRibbon
-            items={KPIS.map((kpi) => {
-              const Icon = kpi.icon
-              const valor = Number(kpis[kpi.key] ?? 0)
-              return {
-                id: String(kpi.key),
-                label: kpi.label,
-                value: formatear(valor, kpi.formato),
-                subtext: kpi.origen,
-                icon: <Icon className="size-4" />,
-                accent: kpi.destacado ? 'primary' : 'muted',
-                highlight: kpi.destacado,
-              }
-            })}
-            columns={4}
-            ariaLabel="Indicadores de gestión"
-          />
+          <div data-tour="analytics-kpi-cards">
+            <MetricRibbon
+              items={KPIS.map((kpi) => {
+                const Icon = kpi.icon
+                const valor = Number(kpis[kpi.key] ?? 0)
+                const delta = deltas.get(kpi.apiKey)
+                return {
+                  id: String(kpi.key),
+                  label: kpi.label,
+                  value: formatear(valor, kpi.formato),
+                  hint: (
+                    <span className="flex items-center gap-1.5">
+                      <KpiDeltaBadge
+                        deltaPercent={compareQuery.isLoading ? undefined : delta?.deltaPercent}
+                        previousPeriod={periodoAnterior}
+                        mejorSiBaja={kpi.mejorSiBaja}
+                      />
+                      <span className="truncate">{kpi.origen}</span>
+                    </span>
+                  ),
+                  icon: <Icon className="size-4" />,
+                  accent: kpi.destacado ? 'primary' : 'muted',
+                  highlight: kpi.destacado,
+                  onClick: () => setDetalle(kpi),
+                  className: 'hover:ring-1 hover:ring-primary/20',
+                }
+              })}
+              columns={4}
+              ariaLabel="Indicadores de gestión. Pulse un indicador para ver su detalle."
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Pulse cualquier indicador para ver los clientes, propuestas o proyectos que lo componen.
+          </p>
 
           <div className="rounded-lg border border-border bg-muted/30 p-4 text-xs text-muted-foreground">
             <p>
@@ -198,6 +239,17 @@ export function KpiDashboard({ accessToken }: KpiDashboardProps) {
           </div>
         </>
       ) : null}
+
+      <KpiDetailSheet
+        accessToken={accessToken}
+        definition={detalle}
+        period={period}
+        onClose={() => setDetalle(null)}
+        onPeriodChange={(next) => {
+          setPeriod(next)
+          setAviso(null)
+        }}
+      />
     </div>
   )
 }

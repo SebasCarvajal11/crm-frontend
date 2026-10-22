@@ -211,8 +211,26 @@ describe('Tour Registry Facade', () => {
   it('retorna el tour de marketing para admin y worker con selectores verificados y 0 emojis', () => {
     const tour = getActiveTourForContext({ activeTab: 'marketing', role: 'admin' })
     expect(tour?.id).toBe('tour-marketing')
-    expect(tour?.steps.length).toBe(10)
+    expect(tour?.steps.length).toBe(19)
     const elements = tour!.steps.map((s) => s.element)
+    // El recorrido empieza por Inicio y sigue el flujo comercial en orden.
+    expect(elements.slice(2, 7)).toEqual([
+      '[data-tour="marketing-home-funnel"]',
+      '[data-tour="marketing-funnel-stage"]',
+      '[data-tour="marketing-today"]',
+      '[data-tour="marketing-today"] [data-client360-link]',
+      '[data-tour="marketing-create-project-btn"]',
+    ])
+    expect(tour!.steps[2].switchMarketingTab).toBe('home')
+    const projectStep = tour!.steps.find((s) => s.element === '[data-tour="marketing-create-project-btn"]')
+    expect(projectStep?.requiredRole).toEqual(['admin'])
+    expect(elements).toContain('[data-tour="marketing-clients-list"]')
+    expect(elements).toContain('[data-tour="marketing-email-quota"]')
+    expect(elements).toContain('[data-tour="marketing-tab-templates"]')
+    expect(elements).toContain('[data-tour="marketing-tab-plans"]')
+    const plansStep = tour!.steps.find((s) => s.element === '[data-tour="marketing-tab-plans"]')
+    expect(plansStep?.requiredRole).toEqual(['admin'])
+    expect(plansStep?.fallbackElement).toBe('[data-tour="marketing-tabs"]')
     expect(elements).toContain('[data-tour="marketing-header"]')
     expect(elements).toContain('[data-tour="marketing-tabs"]')
     expect(elements).toContain('[data-tour="marketing-clients-plans-grid"]')
@@ -238,14 +256,22 @@ describe('Tour Registry Facade', () => {
   it('retorna el tour de analítica para admin y worker con selectores verificados y 0 emojis', () => {
     const tour = getActiveTourForContext({ activeTab: 'analytics', role: 'admin' })
     expect(tour?.id).toBe('tour-analytics')
-    expect(tour?.steps.length).toBe(6)
+    expect(tour?.steps.length).toBe(8)
     const elements = tour!.steps.map((s) => s.element)
     expect(elements).toContain('[data-tour="analytics-header"]')
+    expect(elements).toContain('[data-tour="analytics-sync-btn"]')
     expect(elements).toContain('[data-tour="analytics-refresh-btn"]')
-    expect(elements).toContain('[data-tour="analytics-charts"]')
+    expect(elements).toContain('[data-tour="analytics-period-select"]')
+    expect(elements).toContain('[data-tour="analytics-kpi-cards"]')
     expect(elements).toContain('[data-tour="analytics-kpis"]')
     expect(elements).toContain('[data-tour="analytics-campaign-chart"]')
-    expect(elements).toContain('[data-tour="analytics-inventory-alerts"]')
+    expect(elements).toContain('[data-tour="analytics-projects"]')
+    // El inventario se ocultó porque esas tablas no se alimentan.
+    expect(elements).not.toContain('[data-tour="analytics-inventory-alerts"]')
+    // Sincronizar con el CRM es exclusivo de admin.
+    const syncStep = tour!.steps.find((s) => s.element === '[data-tour="analytics-sync-btn"]')
+    expect(syncStep?.requiredRole).toEqual(['admin'])
+    expect(syncStep?.fallbackElement).toBe('[data-tour="analytics-header"]')
 
     const emojiRegex = /\p{Extended_Pictographic}/u
     for (const step of tour!.steps) {

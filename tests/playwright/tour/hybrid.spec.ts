@@ -36,6 +36,8 @@ test('escribir, abrir formularios y cerrar no completar una guía', async ({ pag
 })
 
 test('buscar desde otra sección y cambiar subpestañas conservadas de Marketing', async ({ page }, info) => {
+  // Recorre los 17 pasos del tour de Marketing: en WebKit (iOS) supera los 45 s por defecto.
+  test.slow()
   const { errors, mutations } = await setupDashboard(page, 'worker')
   await page.goto('/dashboard?tab=collab')
   await openHelp(page)
@@ -49,18 +51,19 @@ test('buscar desde otra sección y cambiar subpestañas conservadas de Marketing
   await assertBounds(page)
   await guide.getByRole('button', { name: 'Cerrar tutorial' }).click()
   await startTour(page, 'Recorrido del Módulo de Marketing')
-  for (let index = 0; index < 10; index++) {
+  // Worker: 17 pasos (Planes y Crear proyecto son solo para admin).
+  for (let index = 0; index < 17; index++) {
     await expect(guide).toHaveAttribute('aria-busy', 'false')
-    await expect(guide).toContainText(`Paso ${index + 1} de 10`)
+    await expect(guide).toContainText(`Paso ${index + 1} de 17`)
     await expect(guide).not.toContainText('Este elemento no está disponible')
     await assertBounds(page)
-    if (index === 5) {
+    if (index === 10) {
       await page.locator('[data-tour="marketing-tab-proposals"]').click()
       await expect(guide.getByRole('button', { name: 'Volver al paso' })).toBeVisible()
       await guide.getByRole('button', { name: 'Volver al paso' }).click()
       await expect(page.locator('[data-tour="marketing-campaigns-filters"]')).toBeVisible()
     }
-    await guide.getByRole('button', { name: index === 9 ? 'Finalizar' : 'Siguiente', exact: true }).click()
+    await guide.getByRole('button', { name: index === 16 ? 'Finalizar' : 'Siguiente', exact: true }).click()
   }
   await openHelp(page)
   await page.screenshot({ path: info.outputPath('help-center.png'), fullPage: true })
@@ -269,5 +272,3 @@ test('faq acordeon con feedback binario y atajo kbd ctrl k', async ({ page }, in
   await page.screenshot({ path: info.outputPath('faq-feedback-shortcut.png'), fullPage: true })
   expect(errors).toEqual([])
 })
-
-

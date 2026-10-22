@@ -16,20 +16,31 @@ import {
   type ClientPlan,
   type MarketingClient,
 } from '../api/clients-api'
-import { PLANS, clientLabel } from './client-plans.constants'
+import { clientLabel } from './client-plans.constants'
 import { ClientPlansTable } from './client-plans-table'
+import { WhatsAppDialog, type WhatsAppTarget } from './WhatsAppDialog'
+import { usePlans } from '../hooks/use-plans'
+import { hexToRgba } from './plans.utils'
 import { ensureArray } from '@/shared/lib'
 
 interface ClientPlansManagerProps {
   accessToken: string
+  /** Lleva a la pestaña Plantillas (desde el diálogo de WhatsApp). */
+  onGoToTemplates?: () => void
 }
 
-export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
+export function ClientPlansManager({ accessToken, onGoToTemplates }: ClientPlansManagerProps) {
   const queryClient = useQueryClient()
+  const { plans, activePlans, findPlan } = usePlans(accessToken)
+  const [whatsAppTarget, setWhatsAppTarget] = useState<WhatsAppTarget | null>(null)
 
   const [searchTerm, setSearchTerm] = useState('')
   const [planFilter, setPlanFilter] = useState<string>('ALL')
-  const [bulkPlan, setBulkPlan] = useState<ClientPlan>('Oro')
+  const [bulkPlanChoice, setBulkPlan] = useState<ClientPlan>('')
+  // Si no se ha elegido, se usa el primer plan activo del catálogo.
+  const bulkPlan = activePlans.some((p) => p.name === bulkPlanChoice)
+    ? bulkPlanChoice
+    : (activePlans[0]?.name ?? '')
   const [feedback, setFeedback] = useState<string | null>(null)
 
   const clientsQuery = useQuery({
@@ -39,6 +50,7 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
 
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: ['marketing', 'clients'] })
+    void queryClient.invalidateQueries({ queryKey: ['marketing', 'plans'] })
     void queryClient.invalidateQueries({ queryKey: ['analytics'] })
   }
 
@@ -75,24 +87,34 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
   const sinPlan = useMemo(() => clients.filter((c) => !c.plan), [clients])
 
   const conteoPorPlan = useMemo(() => {
-    const mapa = Object.fromEntries(PLANS.map((p) => [p.value, 0])) as Record<string, number>
+    const mapa = Object.fromEntries(plans.map((p) => [p.name, 0])) as Record<string, number>
     clients.forEach((c) => {
-      if (c.plan && mapa[c.plan] !== undefined) mapa[c.plan] += 1
+      const plan = findPlan(c.plan)
+      if (plan) mapa[plan.name] += 1
     })
     return mapa
-  }, [clients])
+  }, [clients, plans, findPlan])
+
+  // Tarjetas: planes activos y los inactivos que todavía tienen clientes.
+  const planesVisibles = useMemo(
+    () => plans.filter((p) => p.active || (conteoPorPlan[p.name] ?? 0) > 0),
+    [plans, conteoPorPlan]
+  )
 
   const filtered = useMemo(() => {
     const termino = searchTerm.trim().toLowerCase()
     return clients.filter((c) => {
       if (planFilter === 'SIN_PLAN' && c.plan) return false
-      if (planFilter !== 'ALL' && planFilter !== 'SIN_PLAN' && c.plan !== planFilter) return false
+      if (planFilter !== 'ALL' && planFilter !== 'SIN_PLAN' && findPlan(c.plan)?.name !== planFilter) {
+        return false
+      }
       if (!termino) return true
       return clientLabel(c).toLowerCase().includes(termino)
     })
-  }, [clients, searchTerm, planFilter])
+  }, [clients, searchTerm, planFilter, findPlan])
 
   function asignarATodosSinPlan() {
+    if (!bulkPlan) return
     const asignaciones: Record<string, ClientPlan> = {}
     sinPlan.forEach((c) => {
       asignaciones[c.clientId] = bulkPlan
@@ -142,23 +164,30 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
         </Button>
       </div>
 
-      <div data-tour="marketing-clients-plans-grid" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {PLANS.map((plan) => {
-          const Icon = plan.icon
-          const total = conteoPorPlan[plan.value] ?? 0
+      <div data-tour="marketing-clients-plans-grid" className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(13rem,1fr))]">
+        {planesVisibles.map((plan) => {
+          const total = conteoPorPlan[plan.name] ?? 0
           const pct = clients.length > 0 ? Math.round((total / clients.length) * 100) : 0
           return (
-            <Card key={plan.value} className="border border-border/80 shadow-xs hover:border-primary/40 transition-all">
+            <Card key={plan.planId} className="border border-border/80 shadow-xs hover:border-primary/40 transition-all">
               <CardContent className="flex items-start justify-between gap-3 pt-6">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Plan {plan.label}
+                    Plan {plan.name}
+                    {!plan.active && ' (inactivo)'}
                   </p>
                   <p className="mt-1 text-3xl font-bold leading-none">{total}</p>
                   <p className="mt-2 text-xs text-muted-foreground">{pct}% de la cartera</p>
                 </div>
-                <div className="rounded-full bg-muted p-2">
-                  <Icon className="h-4 w-4 text-muted-foreground" />
+                <div
+                  className="flex size-8 items-center justify-center rounded-full"
+                  style={{ backgroundColor: hexToRgba(plan.active ? plan.color : null, 0.16) }}
+                  aria-hidden="true"
+                >
+                  <span
+                    className={['size-3 rounded-full', plan.active ? '' : 'bg-muted-foreground/50'].join(' ')}
+                    style={plan.active ? { backgroundColor: plan.color } : undefined}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -222,13 +251,13 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
             onChange={(e) => setBulkPlan(e.target.value as ClientPlan)}
             className="h-9 rounded-md border border-amber-300 bg-white px-3 text-sm"
           >
-            {PLANS.map((p) => (
-              <option key={p.value} value={p.value}>
-                {p.label}
+            {activePlans.map((p) => (
+              <option key={p.planId} value={p.name}>
+                {p.name}
               </option>
             ))}
           </select>
-          <Button size="sm" onClick={asignarATodosSinPlan} disabled={bulkMutation.isPending}>
+          <Button size="sm" onClick={asignarATodosSinPlan} disabled={bulkMutation.isPending || !bulkPlan}>
             {bulkMutation.isPending ? 'Asignando…' : 'Asignar a todos'}
           </Button>
         </div>
@@ -251,47 +280,69 @@ export function ClientPlansManager({ accessToken }: ClientPlansManagerProps) {
         >
           <option value="ALL">Todos los planes</option>
           <option value="SIN_PLAN">Sin clasificar</option>
-          {PLANS.map((p) => (
-            <option key={p.value} value={p.value}>
-              {p.label}
+          {plans.map((p) => (
+            <option key={p.planId} value={p.name}>
+              {p.name}
+              {p.active ? '' : ' (inactivo)'}
             </option>
           ))}
         </select>
       </div>
 
-      {clientsQuery.isLoading ? (
-        <Skeleton className="h-80 w-full rounded-lg" />
-      ) : clientsQuery.isError ? (
-        <Card className="border-destructive/40">
-          <CardContent className="py-10 text-center">
-            <XCircle className="mx-auto mb-3 h-10 w-10 text-destructive" />
-            <p className="font-medium">No se pudieron cargar los clientes</p>
-            <Button variant="outline" className="mt-4" onClick={() => clientsQuery.refetch()}>
-              Reintentar
-            </Button>
-          </CardContent>
-        </Card>
-      ) : clients.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="py-14 text-center">
-            <Users className="mx-auto mb-3 h-10 w-10 text-muted-foreground/50" />
-            <p className="font-medium">No hay clientes sincronizados</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Los clientes viven en el CRM base. Ejecute la sincronización para traerlos.
-            </p>
-            <Button className="mt-4 gap-2" onClick={() => syncMutation.mutate()}>
-              <RefreshCw className="h-4 w-4" />
-              Sincronizar con el CRM
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <ClientPlansTable
-          clients={filtered}
-          isBusy={isBusy}
-          onAssignPlan={(clientId, plan) => assignMutation.mutate({ clientId, plan })}
-        />
-      )}
+      <div data-tour="marketing-clients-list">
+        {clientsQuery.isLoading ? (
+          <Skeleton className="h-80 w-full rounded-lg" />
+        ) : clientsQuery.isError ? (
+          <Card className="border-destructive/40">
+            <CardContent className="py-10 text-center">
+              <XCircle className="mx-auto mb-3 h-10 w-10 text-destructive" />
+              <p className="font-medium">No se pudieron cargar los clientes</p>
+              <Button variant="outline" className="mt-4" onClick={() => clientsQuery.refetch()}>
+                Reintentar
+              </Button>
+            </CardContent>
+          </Card>
+        ) : clients.length === 0 ? (
+          <Card className="border-dashed">
+            <CardContent className="py-14 text-center">
+              <Users className="mx-auto mb-3 h-10 w-10 text-muted-foreground/50" />
+              <p className="font-medium">No hay clientes sincronizados</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Los clientes viven en el CRM base. Ejecute la sincronización para traerlos.
+              </p>
+              <Button className="mt-4 gap-2" onClick={() => syncMutation.mutate()}>
+                <RefreshCw className="h-4 w-4" />
+                Sincronizar con el CRM
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <ClientPlansTable
+            clients={filtered}
+            plans={plans}
+            activePlans={activePlans}
+            isBusy={isBusy}
+            onAssignPlan={(clientId, plan) => assignMutation.mutate({ clientId, plan })}
+            onWhatsApp={(client) =>
+              setWhatsAppTarget({ clientId: client.clientId, clientName: clientLabel(client) })
+            }
+          />
+        )}
+      </div>
+
+      <WhatsAppDialog
+        accessToken={accessToken}
+        target={whatsAppTarget}
+        onClose={() => setWhatsAppTarget(null)}
+        onGoToTemplates={
+          onGoToTemplates
+            ? () => {
+                setWhatsAppTarget(null)
+                onGoToTemplates()
+              }
+            : undefined
+        }
+      />
     </div>
   )
 }

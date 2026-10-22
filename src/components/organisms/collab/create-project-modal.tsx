@@ -27,15 +27,35 @@ import { createProjectRequest } from '@/features/collab/api'
 import { collabKeys } from '@/features/collab/model'
 import type { ProjectType } from '@/features/collab/model'
 
+/** Valores para precargar el formulario (p. ej. desde una propuesta aprobada de Marketing). */
+export type CreateProjectInitialValues = {
+  name?: string
+  description?: string
+  /** client_sub del cliente en CIMAxios (= clientId de marketing). */
+  clientSub?: string | null
+  clientName?: string | null
+  /**
+   * Usuario cliente de CIMAxios ya encontrado para clientSub (quien abre el modal
+   * lo busca). Si llega null con clientSub, se pide elegir el cliente a mano.
+   */
+  client?: ClientSearchResult | null
+  /** true mientras se busca el cliente. */
+  clientLoading?: boolean
+  /** Texto bajo el título, p. ej. "Desde la propuesta #12". */
+  sourceLabel?: string
+}
+
 type Props = {
   accessToken: string
   open: boolean
   onClose: () => void
   onCreated: (projectId: string) => void
+  /** Opcional: sin estos valores el modal se comporta igual que siempre. */
+  initialValues?: CreateProjectInitialValues
 }
 
 /** Organismo: modal para crear un nuevo proyecto con busqueda de cliente en tiempo real. */
-export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Props) {
+export function CreateProjectModal({ accessToken, open, onClose, onCreated, initialValues }: Props) {
   const queryClient = useQueryClient()
   const [name,           setName]           = useState('')
   const [description,    setDescription]    = useState('')
@@ -45,6 +65,31 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
   const [errorMsg,       setErrorMsg]       = useState<string | null>(null)
   const [selectedClient, setSelectedClient] = useState<ClientSearchResult | null>(null)
   const [selectedWorkers, setSelectedWorkers] = useState<ClientSearchResult[]>([])
+  const [clientTouched, setClientTouched] = useState(false)
+
+  // Al abrir con valores iniciales se precargan nombre y descripción.
+  const [wasOpen, setWasOpen] = useState(false)
+  if (open !== wasOpen) {
+    setWasOpen(open)
+    if (open && initialValues) {
+      setName(initialValues.name ?? '')
+      setDescription(initialValues.description ?? '')
+      setClientTouched(false)
+    }
+  }
+
+  // Cliente precargado (encontrado por quien abre el modal) mientras no se cambie a mano.
+  const prefillClient = initialValues?.client ?? null
+  if (open && prefillClient && !selectedClient && !clientTouched) {
+    setSelectedClient(prefillClient)
+  }
+  const prefillNotFound =
+    open &&
+    Boolean(initialValues?.clientSub) &&
+    !initialValues?.clientLoading &&
+    !prefillClient &&
+    !selectedClient &&
+    !clientTouched
 
   const createProject = useMutation({
     mutationFn: () =>
@@ -68,7 +113,7 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
 
   const handleClose = () => {
     setName(''); setDescription(''); setBrief(''); setFileRepositoryUrl(''); setType('campaign_service')
-    setSelectedClient(null); setSelectedWorkers([]); setErrorMsg(null)
+    setSelectedClient(null); setSelectedWorkers([]); setErrorMsg(null); setClientTouched(false)
     onClose()
   }
 
@@ -85,7 +130,9 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
             <div>
               <DialogTitle>Nuevo proyecto</DialogTitle>
               <DialogDescription>
-                Completa los datos y asocia un cliente para crear el espacio de trabajo colaborativo.
+                {initialValues?.sourceLabel
+                  ? `${initialValues.sourceLabel}. Revisa los datos, elige los trabajadores y crea el proyecto.`
+                  : 'Completa los datos y asocia un cliente para crear el espacio de trabajo colaborativo.'}
               </DialogDescription>
             </div>
           </div>
@@ -148,7 +195,7 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
                 </div>
                 <IconButton
                   label="Quitar cliente"
-                  onClick={() => setSelectedClient(null)}
+                  onClick={() => { setSelectedClient(null); setClientTouched(true) }}
                   className={
                     'size-6 shrink-0 text-muted-foreground hover:text-destructive ' +
                     'hover:bg-destructive/10 transition-colors'
@@ -162,12 +209,19 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
                 accessToken={accessToken}
                 role="client"
                 selected={selectedClient ? [selectedClient] : []}
-                onSelect={(u) => setSelectedClient(u)}
+                onSelect={(u) => { setSelectedClient(u); setClientTouched(true) }}
                 placeholder="Busca por email del cliente…"
                 queryKeyPrefix="client-search"
               />
             )}
-            <p className="text-[11px] text-muted-foreground">Busca un usuario cliente registrado en el sistema.</p>
+            {prefillNotFound ? (
+              <p className="text-[11px] text-amber-700 dark:text-amber-300" role="status">
+                No encontramos a {initialValues?.clientName || 'este cliente'} entre los usuarios cliente de
+                CIMAxios. Búscalo por correo y selecciónalo a mano.
+              </p>
+            ) : (
+              <p className="text-[11px] text-muted-foreground">Busca un usuario cliente registrado en el sistema.</p>
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -283,6 +337,3 @@ export function CreateProjectModal({ accessToken, open, onClose, onCreated }: Pr
     </Dialog>
   )
 }
-
-
-

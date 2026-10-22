@@ -4,7 +4,9 @@ import { SectionTabs, type SectionTabItem } from './section-tabs'
 import {
   measurePillGeometry,
   centerActiveTab,
+  getScrollEdges,
   handleTabKeyNavigation,
+  nextScrollLeft,
 } from './section-tabs-utils'
 
 type SampleTab = 'overview' | 'settings' | 'billing'
@@ -233,5 +235,43 @@ describe('handleTabKeyNavigation', () => {
     expect(event.preventDefault).toHaveBeenCalled()
     expect(onSelect).toHaveBeenCalledWith('billing')
     expect(focusMock).toHaveBeenCalled()
+  })
+})
+
+describe('flechas de desplazamiento de SectionTabs', () => {
+  it('sin desbordamiento no muestra flechas', () => {
+    expect(getScrollEdges({ scrollLeft: 0, scrollWidth: 500, clientWidth: 500 })).toEqual({
+      canScrollLeft: false,
+      canScrollRight: false,
+    })
+  })
+
+  it('indica qué lado tiene pestañas ocultas', () => {
+    expect(getScrollEdges({ scrollLeft: 0, scrollWidth: 900, clientWidth: 400 })).toEqual({
+      canScrollLeft: false,
+      canScrollRight: true,
+    })
+    expect(getScrollEdges({ scrollLeft: 250, scrollWidth: 900, clientWidth: 400 })).toEqual({
+      canScrollLeft: true,
+      canScrollRight: true,
+    })
+    expect(getScrollEdges({ scrollLeft: 500, scrollWidth: 900, clientWidth: 400 })).toEqual({
+      canScrollLeft: true,
+      canScrollRight: false,
+    })
+  })
+
+  it('avanza y retrocede el 70 % del ancho visible sin pasarse de los bordes', () => {
+    expect(nextScrollLeft({ scrollLeft: 0, scrollWidth: 900, clientWidth: 400 }, 'right')).toBe(280)
+    expect(nextScrollLeft({ scrollLeft: 400, scrollWidth: 900, clientWidth: 400 }, 'right')).toBe(500)
+    expect(nextScrollLeft({ scrollLeft: 100, scrollWidth: 900, clientWidth: 400 }, 'left')).toBe(0)
+  })
+
+  it('no monta flechas hasta medir que hay pestañas ocultas', () => {
+    const markup = renderToStaticMarkup(
+      <SectionTabs items={MOCK_TABS} value="overview" onValueChange={() => {}} ariaLabel="Pruebas" />,
+    )
+    expect(markup).not.toContain('data-scroll-arrow')
+    expect(markup).not.toContain('Ver más pestañas')
   })
 })

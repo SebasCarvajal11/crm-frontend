@@ -1,20 +1,22 @@
 import { useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getAnalyticsSummaryRequest,
   getCampaignStatusReportRequest,
-  getLowStockAlertsRequest,
   getKpiSnapshotsRequest,
   getClientPlanDistributionRequest,
+  getAnalyticsProjectsRequest,
+  syncCrmFromAnalyticsRequest,
   exportCampaignsRequest,
-  exportLowStockRequest,
   exportKpisRequest,
   type ExportFormat,
 } from '@/features/analytics/api'
 import { analyticsKeys } from '@/features/analytics/model'
-import { triggerBlobDownload } from '@/shared/lib'
+import { triggerBlobDownload, parseApiError } from '@/shared/lib'
+import { syncResultMessage } from '@/features/analytics/ui/analytics-labels'
 
-export function useDashboardAnalytics(accessToken: string) {
+export function useDashboardAnalytics(accessToken: string, options: { isAdmin?: boolean } = {}) {
+  const queryClient = useQueryClient()
   const summaryQuery = useQuery({
     queryKey: analyticsKeys.summary(),
     queryFn: () => getAnalyticsSummaryRequest(accessToken),
@@ -27,14 +29,10 @@ export function useDashboardAnalytics(accessToken: string) {
     staleTime: 60_000,
   })
 
-  const lowStockQuery = useQuery({
-    queryKey: analyticsKeys.lowStock(),
-    queryFn: () => getLowStockAlertsRequest(accessToken),
-    staleTime: 60_000,
-  })
+  // El inventario / stock bajo se oculta: esas tablas no se alimentan en crm-marketing.
 
   const snapshotsQuery = useQuery({
-    queryKey: [...analyticsKeys.all, 'snapshots'],
+    queryKey: analyticsKeys.snapshots(),
     queryFn: () => getKpiSnapshotsRequest(accessToken),
     staleTime: 60_000,
   })
@@ -45,21 +43,41 @@ export function useDashboardAnalytics(accessToken: string) {
     staleTime: 60_000,
   })
 
+  const projectsQuery = useQuery({
+    queryKey: analyticsKeys.projects(),
+    queryFn: () => getAnalyticsProjectsRequest(accessToken),
+    staleTime: 60_000,
+  })
+
   const summary = summaryQuery.data
   const isRefreshing =
     summaryQuery.isFetching ||
     campaignStatusQuery.isFetching ||
-    lowStockQuery.isFetching ||
     snapshotsQuery.isFetching ||
-    planQuery.isFetching
+    planQuery.isFetching ||
+    projectsQuery.isFetching
 
   function refreshAll() {
-    summaryQuery.refetch()
-    campaignStatusQuery.refetch()
-    lowStockQuery.refetch()
-    snapshotsQuery.refetch()
-    planQuery.refetch()
+    // Refresca también los KPI del período, su comparación y los detalles abiertos.
+    void queryClient.invalidateQueries({ queryKey: analyticsKeys.all })
   }
+
+  // Sincronización con el CRM (el backend la permite solo a admin).
+  const [syncNotice, setSyncNotice] = useState<{ tone: 'success' | 'error'; text: string } | null>(null)
+  const syncMutation = useMutation({
+    mutationFn: () => syncCrmFromAnalyticsRequest(accessToken),
+    onMutate: () => setSyncNotice(null),
+    onSuccess: (data) => {
+      setSyncNotice({ tone: 'success', text: `Sincronización completada: ${syncResultMessage(data)}.` })
+      void queryClient.invalidateQueries({ queryKey: analyticsKeys.all })
+      void queryClient.invalidateQueries({ queryKey: ['marketing'] })
+    },
+    onError: async (error) => {
+      const detalle = await parseApiError(error)
+      setSyncNotice({ tone: 'error', text: `No se pudo sincronizar con el CRM. ${detalle}` })
+    },
+  })
+  const canSync = Boolean(options.isAdmin)
 
   const [campaignsFormat, setCampaignsFormat] = useState<ExportFormat | null>(null)
   const campaignsExport = useMutation({
@@ -70,17 +88,6 @@ export function useDashboardAnalytics(accessToken: string) {
     },
     onSuccess: ({ blob, format }) => triggerBlobDownload(blob, `campanas-cimaxis.${format}`),
     onSettled: () => setCampaignsFormat(null),
-  })
-
-  const [lowStockFormat, setLowStockFormat] = useState<ExportFormat | null>(null)
-  const lowStockExport = useMutation({
-    mutationFn: async (format: ExportFormat) => {
-      setLowStockFormat(format)
-      const blob = await exportLowStockRequest(accessToken, format)
-      return { blob, format }
-    },
-    onSuccess: ({ blob, format }) => triggerBlobDownload(blob, `inventario-cimaxis.${format}`),
-    onSettled: () => setLowStockFormat(null),
   })
 
   const [kpisFormat, setKpisFormat] = useState<ExportFormat | null>(null)
@@ -97,16 +104,18 @@ export function useDashboardAnalytics(accessToken: string) {
   return {
     summaryQuery,
     campaignStatusQuery,
-    lowStockQuery,
     snapshotsQuery,
     planQuery,
+    projectsQuery,
     summary,
     isRefreshing,
     refreshAll,
     campaignsFormat,
     campaignsExport,
-    lowStockFormat,
-    lowStockExport,
+    canSync,
+    syncMutation,
+    syncNotice,
+    dismissSyncNotice: () => setSyncNotice(null),
     kpisFormat,
     kpisExport,
   }

@@ -6,12 +6,16 @@ import {
   useEffect,
   useLayoutEffect,
 } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { usePrefersReducedMotion } from '@/shared/hooks'
 import {
   type PillGeometry,
+  type ScrollEdges,
   measurePillGeometry,
   centerActiveTab,
+  getScrollEdges,
   handleTabKeyNavigation,
+  nextScrollLeft,
 } from './section-tabs-utils'
 
 export type SectionTabItem<T extends string> = {
@@ -133,6 +137,78 @@ function useSlidingPill<T extends string>({
   }
 }
 
+/** Detecta si hay pestañas ocultas a cada lado para mostrar las flechas de desplazamiento. */
+function useScrollEdges(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  items: readonly unknown[],
+): ScrollEdges {
+  const [edges, setEdges] = useState<ScrollEdges>({ canScrollLeft: false, canScrollRight: false })
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    const update = () => {
+      const next = getScrollEdges(container)
+      setEdges((prev) =>
+        prev.canScrollLeft === next.canScrollLeft && prev.canScrollRight === next.canScrollRight
+          ? prev
+          : next,
+      )
+    }
+    update()
+    container.addEventListener('scroll', update, { passive: true })
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null
+    ro?.observe(container)
+    window.addEventListener('resize', update)
+    return () => {
+      container.removeEventListener('scroll', update)
+      ro?.disconnect()
+      window.removeEventListener('resize', update)
+    }
+  }, [containerRef, items])
+
+  return edges
+}
+
+interface ScrollArrowProps {
+  direction: 'left' | 'right'
+  visible: boolean
+  onClick: () => void
+}
+
+function ScrollArrow({ direction, visible, onClick }: ScrollArrowProps) {
+  const isLeft = direction === 'left'
+  // Solo se monta cuando hay pestañas ocultas de ese lado (no hay botones fantasma).
+  if (!visible) return null
+  return (
+    <div
+      className={[
+        'pointer-events-none absolute inset-y-px z-20 flex items-center',
+        isLeft
+          ? 'left-px rounded-l-2xl bg-gradient-to-r from-card via-card/95 to-transparent pl-1 pr-5'
+          : 'right-px rounded-r-2xl bg-gradient-to-l from-card via-card/95 to-transparent pl-5 pr-1',
+      ].join(' ')}
+      data-scroll-arrow={direction}
+    >
+      <button
+        type="button"
+        tabIndex={-1}
+        onClick={onClick}
+        aria-label={isLeft ? 'Ver pestañas anteriores' : 'Ver más pestañas'}
+        title={isLeft ? 'Ver pestañas anteriores' : 'Ver más pestañas'}
+        className={[
+          'flex size-8 items-center justify-center rounded-full border border-border/80',
+          'bg-background text-foreground shadow-xs transition-colors hover:bg-muted',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
+          'pointer-events-auto cursor-pointer',
+        ].join(' ')}
+      >
+        {isLeft ? <ChevronLeft className="size-4" /> : <ChevronRight className="size-4" />}
+      </button>
+    </div>
+  )
+}
+
 interface SectionTabPillProps {
   geometry: PillGeometry | null
   isReady: boolean
@@ -187,73 +263,88 @@ export function SectionTabs<T extends string>({
       activeValue: value,
       items,
     })
+  const { canScrollLeft, canScrollRight } = useScrollEdges(containerRef, items)
+  const reducedMotion = usePrefersReducedMotion()
+
+  const scrollTabs = (direction: 'left' | 'right') => {
+    const container = containerRef.current
+    if (!container) return
+    container.scrollTo({
+      left: nextScrollLeft(container, direction),
+      behavior: reducedMotion ? 'auto' : 'smooth',
+    })
+  }
 
   return (
-    <div
-      ref={containerRef}
-      className={[
-        'relative flex items-center gap-1.5 overflow-x-auto rounded-2xl',
-        'border bg-card p-1.5 shadow-xs scrollbar-none',
-      ].join(' ')}
-      role={itemRole === 'button' ? 'toolbar' : 'tablist'}
-      aria-label={ariaLabel}
-    >
-      <SectionTabPill
-        geometry={pillRect}
-        isReady={isReady}
-        isAnimated={isAnimated}
-      />
+    <div className="relative">
+      <div
+        ref={containerRef}
+        className={[
+          'relative flex items-center gap-1.5 overflow-x-auto rounded-2xl',
+          'border bg-card p-1.5 shadow-xs scrollbar-none',
+        ].join(' ')}
+        role={itemRole === 'button' ? 'toolbar' : 'tablist'}
+        aria-label={ariaLabel}
+      >
+        <SectionTabPill
+          geometry={pillRect}
+          isReady={isReady}
+          isAnimated={isAnimated}
+        />
 
-      {items.map((tab, idx) => {
-        const isActive = value === tab.value
+        {items.map((tab, idx) => {
+          const isActive = value === tab.value
 
-        return (
-          <button
-            key={tab.value}
-            ref={registerTabRef(tab.value)}
-            type="button"
-            data-tour={`${dataTourPrefix}-${tab.value}`}
-            data-state={isActive ? 'active' : 'inactive'}
-            role={itemRole === 'button' ? undefined : 'tab'}
-            aria-selected={itemRole === 'tab' ? isActive : undefined}
-            aria-pressed={itemRole === 'button' ? isActive : undefined}
-            aria-controls={itemRole === 'tab' ? getPanelId?.(tab.value) : undefined}
-            tabIndex={itemRole === 'tab' ? (isActive ? 0 : -1) : 0}
-            onClick={() => onValueChange(tab.value)}
-            onKeyDown={(e) =>
-              handleTabKeyNavigation({
-                event: e,
-                currentIndex: idx,
-                items,
-                tabRefs: tabRefs.current,
-                onSelect: onValueChange,
-              })
-            }
-            className={[
-              'relative z-10 flex shrink-0 items-center gap-1.5 sm:gap-2 whitespace-nowrap',
-              'rounded-xl px-2.5 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-medium',
-              'transition-colors duration-200 ease-out cursor-pointer active:scale-[0.98]',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
-              isActive
-                ? 'text-primary-foreground shadow-none'
-                : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
-            ].join(' ')}
-          >
-            <span aria-hidden="true" className="shrink-0">{tab.icon}</span>
-            <span>
-              {tab.shortLabel ? (
-                <>
-                  <span className="hidden lg:inline">{tab.label}</span>
-                  <span className="lg:hidden">{tab.shortLabel}</span>
-                </>
-              ) : (
-                tab.label
-              )}
-            </span>
-            {tab.badge && <span className="ml-1 inline-flex items-center">{tab.badge}</span>}
-          </button>
-        )
-      })}
+          return (
+            <button
+              key={tab.value}
+              ref={registerTabRef(tab.value)}
+              type="button"
+              data-tour={`${dataTourPrefix}-${tab.value}`}
+              data-state={isActive ? 'active' : 'inactive'}
+              role={itemRole === 'button' ? undefined : 'tab'}
+              aria-selected={itemRole === 'tab' ? isActive : undefined}
+              aria-pressed={itemRole === 'button' ? isActive : undefined}
+              aria-controls={itemRole === 'tab' ? getPanelId?.(tab.value) : undefined}
+              tabIndex={itemRole === 'tab' ? (isActive ? 0 : -1) : 0}
+              onClick={() => onValueChange(tab.value)}
+              onKeyDown={(e) =>
+                handleTabKeyNavigation({
+                  event: e,
+                  currentIndex: idx,
+                  items,
+                  tabRefs: tabRefs.current,
+                  onSelect: onValueChange,
+                })
+              }
+              className={[
+                'relative z-10 flex shrink-0 items-center gap-1.5 sm:gap-2 whitespace-nowrap',
+                'rounded-xl px-2.5 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-medium',
+                'transition-colors duration-200 ease-out cursor-pointer active:scale-[0.98]',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
+                isActive
+                  ? 'text-primary-foreground shadow-none'
+                  : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
+              ].join(' ')}
+            >
+              <span aria-hidden="true" className="shrink-0">{tab.icon}</span>
+              <span>
+                {tab.shortLabel ? (
+                  <>
+                    <span className="hidden lg:inline">{tab.label}</span>
+                    <span className="lg:hidden">{tab.shortLabel}</span>
+                  </>
+                ) : (
+                  tab.label
+                )}
+              </span>
+              {tab.badge && <span className="ml-1 inline-flex items-center">{tab.badge}</span>}
+            </button>
+          )
+        })}
+      </div>
+      <ScrollArrow direction="left" visible={canScrollLeft} onClick={() => scrollTabs('left')} />
+      <ScrollArrow direction="right" visible={canScrollRight} onClick={() => scrollTabs('right')} />
     </div>
   )
 }

@@ -1,7 +1,5 @@
 import type { SegmentCriteria } from '../api/segments-api'
 
-export { CLIENT_PLANS as PLANES } from '../api/clients-api'
-
 export const ESTADOS_PROPUESTA = [
   { value: 'Sent', label: 'Enviada' },
   { value: 'In_negotiation', label: 'En negociación' },

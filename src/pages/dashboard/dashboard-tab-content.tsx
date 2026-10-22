@@ -91,7 +91,7 @@ export function DashboardTabContent({
         )}
         {activeTab === 'marketing' && canUseMarketing && (
           <div className="tab-pane-transition">
-            <MarketingPanel accessToken={token} />
+            <MarketingPanel accessToken={token} role={identity.role} />
           </div>
         )}
         {activeTab === 'account' && (
@@ -114,7 +114,7 @@ export function DashboardTabContent({
         )}
         {activeTab === 'analytics' && canUseMarketing && (
           <div className="tab-pane-transition">
-            <DashboardAnalytics accessToken={token} />
+            <DashboardAnalytics accessToken={token} role={identity.role} />
           </div>
         )}
       </Suspense>
