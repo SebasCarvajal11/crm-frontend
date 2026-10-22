@@ -6,10 +6,11 @@ import {
   type PDFPage,
 } from 'pdf-lib'
 
-export const PAGE_WIDTH = 612
-export const PAGE_HEIGHT = 1008
-export const MARGIN_X = 36
-export const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_X * 2 // 540
+// Estándar internacional A4 (210 x 297 mm = 595.28 x 841.89 pt)
+export const PAGE_WIDTH = 595
+export const PAGE_HEIGHT = 842
+export const MARGIN_X = 34
+export const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_X * 2 // 527 pt
 
 export const CIMA_RED = rgb(0.525, 0.027, 0.047) // #86070c
 export const CIMA_GOLD = rgb(0.83, 0.64, 0.45) // #d4a373
@@ -39,61 +40,63 @@ export function drawMembrete(
   fonts: { bold: PDFFont; regular: PDFFont },
   options: MembreteOptions = {}
 ): number {
-  const topY = PAGE_HEIGHT - 32
+  const topY = PAGE_HEIGHT - 28
   const { logo = null, subtitle = 'CONTRATO OFICIAL DE PRESTACIÓN DE SERVICIOS' } = options
 
   if (logo) {
     page.drawImage(logo, {
       x: MARGIN_X,
-      y: topY - 30,
-      width: 29,
-      height: 30,
+      y: topY - 28,
+      width: 27,
+      height: 28,
     })
   }
 
-  const textStartX = logo ? MARGIN_X + 36 : MARGIN_X
+  const textStartX = logo ? MARGIN_X + 34 : MARGIN_X
 
   page.drawText('CIMA DIGITAL WORKSPACE', {
     x: textStartX,
     y: topY - 10,
-    size: 11,
+    size: 10.5,
     font: fonts.bold,
     color: CIMA_RED,
   })
 
   page.drawText(subtitle, {
     x: textStartX,
-    y: topY - 21,
-    size: 7,
+    y: topY - 20,
+    size: 6.8,
     font: fonts.regular,
     color: TEXT_MUTED,
   })
 
+  // Sello legal superior derecho
   const badgeText = 'VALIDEZ ELECTRÓNICA · LEY 527 DE 1999'
-  const badgeWidth = fonts.regular.widthOfTextAtSize(badgeText, 6.5) + 12
+  const badgeWidth = fonts.regular.widthOfTextAtSize(badgeText, 6.2) + 10
   const badgeX = PAGE_WIDTH - MARGIN_X - badgeWidth
   page.drawRectangle({
     x: badgeX,
-    y: topY - 20,
+    y: topY - 19,
     width: badgeWidth,
-    height: 14,
+    height: 13,
     borderColor: CIMA_RED,
     borderWidth: 0.6,
     color: rgb(0.98, 0.95, 0.95),
   })
   page.drawText(badgeText, {
-    x: badgeX + 6,
-    y: topY - 15,
-    size: 6.5,
+    x: badgeX + 5,
+    y: topY - 14.5,
+    size: 6.2,
     font: fonts.bold,
     color: CIMA_RED,
   })
 
-  const lineY = topY - 36
+  // Filete divisor doble institucional
+  const lineY = topY - 33
   page.drawLine({
     start: { x: MARGIN_X, y: lineY },
     end: { x: PAGE_WIDTH - MARGIN_X, y: lineY },
-    thickness: 1.2,
+    thickness: 1.1,
     color: CIMA_RED,
   })
   page.drawLine({
@@ -103,7 +106,7 @@ export function drawMembrete(
     color: CIMA_GOLD,
   })
 
-  return lineY - 12
+  return lineY - 10
 }
 
 export function wrapText(

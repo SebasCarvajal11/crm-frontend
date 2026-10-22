@@ -124,31 +124,31 @@ const sampleAmendment: ProjectContractAmendment = {
 }
 
 describe('Contract PDF Single Page & Branding', () => {
-  it('defines page dimensions as Legal/Oficio (612 x 1008 pt)', () => {
-    expect(PAGE_WIDTH).toBe(612)
-    expect(PAGE_HEIGHT).toBe(1008)
+  it('defines page dimensions as standard A4 (595 x 842 pt)', () => {
+    expect(PAGE_WIDTH).toBe(595)
+    expect(PAGE_HEIGHT).toBe(842)
   })
 
-  it('generates a signed contract PDF with EXACTLY 1 single page', async () => {
+  it('generates a signed contract PDF with EXACTLY 1 single page in A4 format', async () => {
     const doc = await generateSignedContractPdfDoc(sampleContract, 'Alpha Brand Growth')
 
     expect(doc).toBeInstanceOf(PDFDocument)
     expect(doc.getPageCount()).toBe(1)
 
     const [page] = doc.getPages()
-    expect(page.getWidth()).toBe(612)
-    expect(page.getHeight()).toBe(1008)
+    expect(page.getWidth()).toBe(595)
+    expect(page.getHeight()).toBe(842)
   })
 
-  it('generates a signed amendment PDF with EXACTLY 1 single page in Legal size', async () => {
+  it('generates a signed amendment PDF with EXACTLY 1 single page in A4 format', async () => {
     const doc = await generateSignedAmendmentPdfDoc(sampleAmendment, sampleContract, 'Alpha Brand Growth')
 
     expect(doc).toBeInstanceOf(PDFDocument)
     expect(doc.getPageCount()).toBe(1)
 
     const [page] = doc.getPages()
-    expect(page.getWidth()).toBe(612)
-    expect(page.getHeight()).toBe(1008)
+    expect(page.getWidth()).toBe(595)
+    expect(page.getHeight()).toBe(842)
   })
 
   it('fails fast if contract is missing signature or snapshot', async () => {
@@ -180,6 +180,66 @@ describe('Contract PDF Single Page & Branding', () => {
 
     const doc = await generateSignedContractPdfDoc(juridicalContract, 'Alpha Brand Growth')
     expect(doc.getPageCount()).toBe(1)
+  })
+
+  it('handles the WORST CASE (ultra-long contract) and guarantees 1 single page without overflow', async () => {
+    const worstCaseSnapshot = [
+      'CONTRATO DE PRESTACIÓN DE SERVICIOS PROFESIONALES DE GESTIÓN INTEGRAL DE MEDIOS DIGITALES',
+      'Proyecto: Consorcio Global Multiplataforma Expansión Andina 2026',
+      '',
+      'Entre CIMA DIGITAL S.A.S., identificada con NIT 901.234.567-8, representada legalmente por Carlos Alberto Mendoza Carvajal, identificado con cédula 10.203.040, en adelante EL PRESTADOR, y Consorcio de Infraestructura y Desarrollo Tecnológico de Occidente S.A.S., con NIT 900.876.543-1, representada por María Patricia Gómez Gómez, identificada con documento 52.987.654, en adelante EL CLIENTE, celebran el contrato.',
+      '',
+      'CLÁUSULA PRIMERA. OBJETO DEL CONTRATO.',
+      'EL PRESTADOR se obliga a ejecutar servicios avanzados de marketing digital, parrillas estratégicas para 6 canales, producción de 24 piezas audiovisuales en formato vertical 4K, 8 cápsulas motion graphics, optimización de pauta digital y soporte analítico 24/7.',
+      'PARÁGRAFO PRIMERO. EL CLIENTE suministrará oportunamente las credenciales de administrador de Business Manager, insumos vectoriales, logotipos oficiales, identikit de marca y aprobaciones en menos de 24 horas.',
+      'PARÁGRAFO SEGUNDO. Los entregables no aprobados en el término contractual se entenderán aprobados tácitamente.',
+      '',
+      'CLÁUSULA SEGUNDA. CONTRAPRESTACIÓN, FACTURACIÓN Y CONDICIONES DE PAGO.',
+      'EL CLIENTE cancelará una retribución mensual neta anticipada de $ 5.500.000 COP más impuestos de ley aplicables durante la vigencia contractual.',
+      'EL PRESTADOR expedirá facturación electrónica reglamentaria ante la DIAN dentro de los cinco primeros días hábiles de cada período facturable.',
+      '',
+      'CLÁUSULA TERCERA. DURACIÓN Y PRÓRROGAS AUTOMÁTICAS.',
+      'El plazo pactado es de doce meses renovable de común acuerdo entre las partes siempre que no medie comunicación en contrario con 30 días de antelación.',
+      '',
+      'CLÁUSULA CUARTA. CANALES DE COLABORACIÓN Y RECURSOS.',
+      'Toda comunicación oficial, revisión de borradores y trazabilidad se canalizará mediante el Workspace CIMA CRM.',
+      '',
+      'CLÁUSULA QUINTA. DERECHOS DE AUTOR Y PROPIEDAD INTELECTUAL.',
+      'La titularidad patrimonial de los artes aprobados y pagados corresponderá a EL CLIENTE con alcance internacional.',
+      '',
+      'CLÁUSULA SEXTA. CONFIDENCIALIDAD ESTRICTA Y SECRETOS COMERCIALES.',
+      'Las partes mantendrán secreto profesional absoluto durante la vigencia del contrato y por cinco años adicionales tras su liquidación.',
+      '',
+      'CLÁUSULA SÉPTIMA. CAUSALES DE RESOLUCIÓN Y TERMINACIÓN.',
+      'El incumplimiento grave de cualquiera de las estipulaciones facultará a la parte cumplida para dar por terminado el contrato con indemnización.',
+      '',
+      'Condiciones adicionales',
+      '1. Auditoría trimestral de posicionamiento orgánico SEO y SEM.',
+      '2. Cobertura de eventos corporativos previa solicitud con 5 días hábiles.',
+      '3. Nivel de servicio SLA 99.9% para respuesta ante incidencias de reputación.',
+      '4. Cláusula penal pecuniaria equivalente al valor de dos mensualidades.',
+      '',
+      'En aceptación de lo anterior, firma del representante legal: María Patricia Gómez. El contrato se firma electrónicamente en Medellín.',
+      'Al firmar electrónicamente, EL CLIENTE declara que leyó, comprendió y acepta íntegramente este documento con pleno valor probatorio.',
+    ].join('\n')
+
+    const worstCaseContract: ProjectContract = {
+      ...sampleContract,
+      clientKind: 'juridical',
+      clientCompanyName: 'Consorcio de Infraestructura y Desarrollo Tecnológico de Occidente S.A.S.',
+      clientTaxId: '900.876.543-1',
+      clientRepresentative: 'María Patricia Gómez Gómez',
+      clientRepresentativeDocument: '52.987.654',
+      additionalTerms: '1. Auditoría trimestral.\n2. Cobertura de eventos.\n3. SLA 99.9%.\n4. Cláusula penal.',
+      contentSnapshot: worstCaseSnapshot,
+    }
+
+    const doc = await generateSignedContractPdfDoc(worstCaseContract, 'Consorcio Expansión Andina')
+    expect(doc.getPageCount()).toBe(1)
+
+    const [page] = doc.getPages()
+    expect(page.getWidth()).toBe(595)
+    expect(page.getHeight()).toBe(842)
   })
 
   it('downloads signed contract PDF without throwing in browser environment', async () => {
