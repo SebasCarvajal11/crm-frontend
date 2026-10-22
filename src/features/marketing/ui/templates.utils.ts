@@ -34,11 +34,16 @@ export function insertAtCursor(
   return { text: text.slice(0, start) + token + text.slice(end), cursor: start + token.length }
 }
 
-/** Canal de plantilla que corresponde a la acción de una automatización. */
-export function channelForAction(actionType: ActionType): TemplateChannel {
+/**
+ * Canal de plantilla que corresponde a la acción de una automatización:
+ * EMAIL para correo, WHATSAPP para WhatsApp e IN_APP para el portal del cliente.
+ * Registrar seguimiento y Notificar al administrador no usan plantilla (null).
+ */
+export function channelForAction(actionType: ActionType): TemplateChannel | null {
   if (actionType === 'send_email') return 'EMAIL'
   if (actionType === 'send_whatsapp') return 'WHATSAPP'
-  return 'IN_APP'
+  if (actionType === 'send_portal_message') return 'IN_APP'
+  return null
 }
 
 export type TemplateFilters = {
@@ -68,6 +73,7 @@ export function filterTemplates(templates: MessageTemplate[], filters: TemplateF
 /** Plantillas activas que puede usar una automatización según su acción. */
 export function templatesForAction(templates: MessageTemplate[], actionType: ActionType): MessageTemplate[] {
   const channel = channelForAction(actionType)
+  if (!channel) return []
   return templates.filter((t) => t.active && t.channel === channel)
 }
 

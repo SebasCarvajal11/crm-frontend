@@ -212,7 +212,7 @@ describe('Tour Registry Facade', () => {
   it('retorna el tour de marketing para admin y worker con selectores verificados y 0 emojis', () => {
     const tour = getActiveTourForContext({ activeTab: 'marketing', role: 'admin' })
     expect(tour?.id).toBe('tour-marketing')
-    expect(tour?.steps.length).toBe(20)
+    expect(tour?.steps.length).toBe(21)
     const elements = tour!.steps.map((s) => s.element)
     // El recorrido empieza por Inicio y sigue el flujo comercial en orden.
     expect(elements.slice(2, 8)).toEqual([
@@ -241,7 +241,15 @@ describe('Tour Registry Facade', () => {
     expect(elements).toContain('[data-tour="marketing-campaigns-filters"]')
     expect(elements).toContain('[data-tour="marketing-new-proposal-btn"]')
     expect(elements).toContain('[data-tour="marketing-new-workflow-btn"]')
-    expect(elements).toContain('[data-tour="marketing-tab-segments"]')
+    expect(elements).toContain('[data-tour="marketing-saved-segments"]')
+    // Orden: audiencia (campaña y segmentos) → disparador y acción → ver a quién le llegaría / ejecutar ahora.
+    const orden = [
+      '[data-tour="marketing-new-campaign-btn"]',
+      '[data-tour="marketing-saved-segments"]',
+      '[data-tour="marketing-new-workflow-btn"]',
+      '[data-tour="marketing-workflows-steps"]',
+    ].map((e) => elements.indexOf(e))
+    expect(orden.every((v, i) => v >= 0 && (i === 0 || v > orden[i - 1]))).toBe(true)
     expect(elements).toContain('[data-tour="marketing-tab-interactions"]')
 
     const emojiRegex = /\p{Extended_Pictographic}/u

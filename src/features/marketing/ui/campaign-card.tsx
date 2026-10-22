@@ -6,6 +6,7 @@ import {
   Share2,
   Tag,
   Trash2,
+  Users,
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { Campaign } from '../api/marketing-api'
 import { CAMPAIGN_STATUSES, CAMPAIGN_TYPES } from './campaign.constants'
+import { audienceLabel, audienceTypeOf } from './audience.utils'
 
 function fechaCorta(iso?: string | null): string {
   if (!iso) return ''
@@ -91,8 +93,9 @@ function CampaignCardHeader({
         </div>
         <CampaignCardMenu campaign={campaign} onEdit={onEdit} onDelete={onDelete} />
       </div>
-      <CardDescription className="text-xs">
-        Cliente: {campaign.clientId ? (clientName ?? 'Cliente del CRM') : 'General'}
+      <CardDescription className="flex items-center gap-1.5 text-xs" data-audience={audienceTypeOf(campaign)} data-testid="campaign-audience">
+        <Users className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
+        <span className="min-w-0 truncate">{audienceLabel(campaign, clientName)}</span>
       </CardDescription>
     </CardHeader>
   )

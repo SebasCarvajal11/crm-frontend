@@ -1,39 +1,52 @@
 import {
+  AlertTriangle,
   Clock,
+  Eye,
   History,
   Layers,
   MessageSquare,
   Play,
   Trash2,
+  Users,
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import type { Workflow } from '../api/marketing-api'
-import { TRIGGER_TYPES, ACTION_TYPES } from './workflow.constants'
+import type { Campaign, Workflow } from '../api/marketing-api'
+import { ACTION_TYPES } from './workflow.constants'
+import { audienceReach, campaignRunsToday } from './audience.utils'
+import { triggerSummary } from './workflow.utils'
 
 interface WorkflowCardProps {
   workflow: Workflow
   campaignName?: string
+  /** Campaña completa: muestra la audiencia y avisa si está inactiva o fuera de fechas. */
+  campaign?: Campaign | null
+  /** Nombre del cliente cuando la audiencia es un solo cliente. */
+  clientName?: string | null
   isToggling: boolean
   isRunning: boolean
   onToggle: (id: number) => void
   onDelete: (id: number, name: string) => void
   onRun: (id: number) => void
   onViewHistory: (w: Workflow) => void
+  onPreview?: (w: Workflow) => void
 }
 
 export function WorkflowCard({
   workflow: w,
   campaignName,
+  campaign,
+  clientName,
   isToggling,
   isRunning,
   onToggle,
   onDelete,
   onRun,
   onViewHistory,
+  onPreview,
 }: WorkflowCardProps) {
-  const triggerInfo = TRIGGER_TYPES.find((t) => t.value === w.triggerType)
+  const runs = campaign ? campaignRunsToday(campaign) : null
   const actionInfo = ACTION_TYPES.find((a) => a.value === w.actionType)
   const ActionIcon = actionInfo?.icon || MessageSquare
 
@@ -60,10 +73,16 @@ export function WorkflowCard({
                 {w.active ? 'Activo' : 'Pausado'}
               </Badge>
             </div>
-            {campaignName && (
+            {(campaign?.campaignName ?? campaignName) && (
               <p className="text-[11px] font-semibold text-primary flex items-center gap-1">
                 <Layers className="size-3" />
-                Campaña: {campaignName}
+                Campaña: {campaign?.campaignName ?? campaignName}
+              </p>
+            )}
+            {campaign && (
+              <p className="flex items-center gap-1 text-[11px] text-muted-foreground" data-testid="workflow-card-audience">
+                <Users className="size-3" />
+                Le llegará a: {audienceReach(campaign, clientName)}
               </p>
             )}
           </div>
@@ -86,6 +105,16 @@ export function WorkflowCard({
           </div>
         </div>
 
+        {runs && !runs.ok && (
+          <p
+            className="flex items-start gap-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-800 dark:text-amber-300"
+            data-testid="workflow-card-warning"
+          >
+            <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
+            {runs.reason}
+          </p>
+        )}
+
         {w.description && (
           <p className="text-xs text-muted-foreground leading-relaxed">{w.description}</p>
         )}
@@ -100,8 +129,7 @@ export function WorkflowCard({
             <span className="text-[10px] uppercase font-bold text-muted-foreground">Disparador</span>
             <p className="font-semibold text-foreground flex items-center gap-1.5">
               <Clock className="size-3.5 text-primary" />
-              {triggerInfo?.label || w.triggerType}
-              {w.noContactDays ? ` (${w.noContactDays}d)` : ''}
+              <span data-testid="workflow-trigger">{triggerSummary(w)}</span>
             </p>
           </div>
 
@@ -125,16 +153,30 @@ export function WorkflowCard({
           </div>
         )}
 
-        <div className="flex items-center justify-between border-t border-border/60 pt-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onViewHistory(w)}
-            className="text-xs h-8 gap-1.5 rounded-lg"
-          >
-            <History className="size-3.5" />
-            Historial
-          </Button>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {onPreview && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPreview(w)}
+                className="text-xs h-8 gap-1.5 rounded-lg"
+                data-tour="marketing-workflow-preview-btn"
+              >
+                <Eye className="size-3.5" />
+                Ver a quién le llegaría
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onViewHistory(w)}
+              className="text-xs h-8 gap-1.5 rounded-lg"
+            >
+              <History className="size-3.5" />
+              Historial
+            </Button>
+          </div>
 
           <div className="flex items-center gap-2">
             <Button
@@ -142,6 +184,7 @@ export function WorkflowCard({
               size="icon-sm"
               onClick={() => onDelete(w.workflowId, w.workflowName)}
               className="text-destructive hover:text-destructive hover:bg-destructive/10 size-8 rounded-lg"
+              aria-label={`Eliminar ${w.workflowName}`}
             >
               <Trash2 className="size-3.5" />
             </Button>
@@ -150,10 +193,12 @@ export function WorkflowCard({
               size="sm"
               onClick={() => onRun(w.workflowId)}
               disabled={!w.active || isRunning}
+              title={w.active ? undefined : 'Active la automatización para ejecutarla'}
               className="text-xs h-8 gap-1.5 font-bold shadow-xs rounded-lg"
+              data-tour="marketing-workflow-run-btn"
             >
               <Play className="size-3 fill-current" />
-              {isRunning ? 'Ejecutando…' : 'Ejecutar Ahora'}
+              {isRunning ? 'Ejecutando…' : 'Ejecutar ahora'}
             </Button>
           </div>
         </div>

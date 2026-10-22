@@ -38,7 +38,7 @@ interface ProposalCardProps {
   onChangeStatus: (status: ProposalStatus) => void
   onDelete: () => void
   isBusy: boolean
-  /** Acción "Crear proyecto en CIMAxios" (solo admin, aprobadas sin proyecto). */
+  /** Acción "Crear proyecto en Colaboración" (solo admin, aprobadas sin proyecto). */
   projectAction?: ReactNode
   /** Resaltada al llegar desde "Ver propuesta" del panel Hoy. */
   highlighted?: boolean
@@ -299,7 +299,7 @@ export function ProposalCard(props: ProposalCardProps) {
               'inline-flex w-fit items-center gap-1.5 rounded-full border border-teal-500/40 bg-teal-500/10',
               'px-2.5 py-0.5 text-xs font-semibold text-teal-700 dark:text-teal-300',
             ].join(' ')}
-            title={`Proyecto de CIMAxios: ${proposal.projectId}`}
+            title={`Proyecto en Colaboración: ${proposal.projectId}`}
             data-testid="proposal-project-badge"
           >
             <FolderKanban className="h-3 w-3" />

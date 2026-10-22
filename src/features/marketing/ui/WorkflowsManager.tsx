@@ -11,11 +11,16 @@ import {
   createWorkflowRequest,
   toggleWorkflowRequest,
   deleteWorkflowRequest,
-  runWorkflowRequest,
+  runWorkflowNowRequest,
+  previewWorkflowRequest,
   getExecutionsByWorkflowRequest,
   type Workflow,
   type CreateWorkflowInput,
+  type WorkflowRunNowResult,
 } from '../api/marketing-api'
+import { parseApiError } from '@/shared/lib/parse-api-error'
+import { workflowPayload } from './workflow.utils'
+import { RunNowConfirmDialog, RunNowResultDialog, WorkflowPreviewDialog } from './workflow-run-dialogs'
 import { listClientsRequest } from '../api/clients-api'
 import { getEmailQuotaRequest } from '../api/notifications-api'
 import { listTemplatesRequest } from '../api/templates-api'
@@ -25,6 +30,7 @@ import { clientLabel } from './client-plans.constants'
 import { WorkflowCard } from './workflow-card'
 import { WorkflowFormDialog } from './workflow-form-dialog'
 import { WorkflowExecutionsDialog } from './workflow-executions-dialog'
+import { WorkflowStepsStrip } from './workflow-steps-strip'
 
 interface WorkflowsManagerProps {
   accessToken: string
@@ -56,6 +62,10 @@ export function WorkflowsManager({
     success: boolean
     text: string
   } | null>(null)
+  const [previewWorkflow, setPreviewWorkflow] = useState<Workflow | null>(null)
+  const [confirmRun, setConfirmRun] = useState<Workflow | null>(null)
+  const [runResult, setRunResult] = useState<{ workflow: Workflow; result: WorkflowRunNowResult } | null>(null)
+  const [createError, setCreateError] = useState<string | null>(null)
 
   const [formData, setFormData] = useState<CreateWorkflowInput>({
     ...INITIAL_FORM_DATA,
@@ -105,8 +115,17 @@ export function WorkflowsManager({
     enabled: !!executionHistoryWorkflow,
   })
 
+  const previewQuery = useQuery({
+    queryKey: ['marketing', 'workflows', 'preview', previewWorkflow?.workflowId ?? 0],
+    queryFn: () => previewWorkflowRequest(accessToken, previewWorkflow!.workflowId),
+    enabled: previewWorkflow !== null,
+    staleTime: 0,
+  })
+
   const createMutation = useMutation({
-    mutationFn: (input: CreateWorkflowInput) => createWorkflowRequest(accessToken, input),
+    mutationFn: (input: CreateWorkflowInput) => createWorkflowRequest(accessToken, workflowPayload(input)),
+    onMutate: () => setCreateError(null),
+    onError: async (error) => setCreateError(await parseApiError(error)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['marketing'] })
       setIsCreateOpen(false)
@@ -132,22 +151,19 @@ export function WorkflowsManager({
   })
 
   const runMutation = useMutation({
-    mutationFn: (id: number) => runWorkflowRequest(accessToken, id),
-    onSuccess: (res) => {
-      // Invalida también el cupo de correos (['marketing', 'email-quota']).
+    mutationFn: (w: Workflow) => runWorkflowNowRequest(accessToken, w.workflowId),
+    onSuccess: (result, w) => {
+      // Invalida también el cupo de correos, el panel Hoy y las interacciones.
       queryClient.invalidateQueries({ queryKey: ['marketing'] })
-      setExecutionResultMsg({
-        success: true,
-        text: `Flujo ejecutado: ${res.length} acciones realizadas para clientes coincidentes.`,
-      })
-      setTimeout(() => setExecutionResultMsg(null), 6000)
+      queryClient.invalidateQueries({ queryKey: ['analytics'] })
+      setConfirmRun(null)
+      setPreviewWorkflow(null)
+      setRunResult({ workflow: w, result: { executed: result?.executed ?? [], skipped: result?.skipped ?? [] } })
     },
-    onError: () => {
-      setExecutionResultMsg({
-        success: false,
-        text: 'Error al ejecutar el flujo. Verifica la conectividad.',
-      })
-      setTimeout(() => setExecutionResultMsg(null), 6000)
+    onError: async (error) => {
+      setConfirmRun(null)
+      setExecutionResultMsg({ success: false, text: `No se pudo ejecutar: ${await parseApiError(error)}` })
+      setTimeout(() => setExecutionResultMsg(null), 8000)
     },
   })
 
@@ -189,7 +205,7 @@ export function WorkflowsManager({
           <div className="space-y-0.5">
             <h2 className="text-base font-bold text-foreground tracking-tight">Flujos automatizados</h2>
             <p className="text-xs text-muted-foreground">
-              Disparadores automáticos por inactividad, eventos de cliente y notificaciones
+              Actúan solo sobre la audiencia de su campaña, cuando la campaña está activa y dentro de sus fechas
             </p>
           </div>
         </div>
@@ -211,6 +227,8 @@ export function WorkflowsManager({
           Nueva Automatización
         </Button>
       </div>
+
+      <WorkflowStepsStrip />
 
       <EmailQuotaCard
         quota={quotaQuery.data}
@@ -286,15 +304,18 @@ export function WorkflowsManager({
                 key={w.workflowId}
                 workflow={w}
                 campaignName={campaign?.campaignName}
+                campaign={campaign}
+                clientName={campaign?.clientId ? clientNames.get(campaign.clientId) : null}
+                onPreview={setPreviewWorkflow}
                 isToggling={toggleMutation.isPending}
-                isRunning={runMutation.isPending}
+                isRunning={runMutation.isPending && runMutation.variables?.workflowId === w.workflowId}
                 onToggle={(id) => toggleMutation.mutate(id)}
                 onDelete={(id, name) => {
                   if (confirm(`¿Eliminar la automatización "${name}"?`)) {
                     deleteMutation.mutate(id)
                   }
                 }}
-                onRun={(id) => runMutation.mutate(id)}
+                onRun={() => setConfirmRun(w)}
                 onViewHistory={(wf) => setExecutionHistoryWorkflow(wf)}
               />
             )
@@ -310,9 +331,36 @@ export function WorkflowsManager({
         accessToken={accessToken}
         clients={clientsQuery.data ?? []}
         isPending={createMutation.isPending}
-        onClose={() => setIsCreateOpen(false)}
+        error={createError}
+        onClose={() => {
+          setIsCreateOpen(false)
+          setCreateError(null)
+        }}
         onFormDataChange={setFormData}
         onSubmit={handleCreateWorkflow}
+      />
+
+      <WorkflowPreviewDialog
+        workflow={previewWorkflow}
+        preview={previewQuery.data}
+        isLoading={previewQuery.isLoading}
+        isError={previewQuery.isError}
+        onRetry={() => void previewQuery.refetch()}
+        onClose={() => setPreviewWorkflow(null)}
+        onRunNow={previewWorkflow?.active ? () => setConfirmRun(previewWorkflow) : undefined}
+      />
+
+      <RunNowConfirmDialog
+        workflow={confirmRun}
+        isPending={runMutation.isPending}
+        onConfirm={() => confirmRun && runMutation.mutate(confirmRun)}
+        onCancel={() => setConfirmRun(null)}
+      />
+
+      <RunNowResultDialog
+        workflow={runResult?.workflow ?? null}
+        result={runResult?.result ?? null}
+        onClose={() => setRunResult(null)}
       />
 
       <WorkflowExecutionsDialog

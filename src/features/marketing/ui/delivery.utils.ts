@@ -23,6 +23,8 @@ export function deliveryMeta(
       }
     case 'SKIPPED_LIMIT':
       return { label: 'Límite diario alcanzado', tooltip: 'Se reintentará mañana' }
+    case 'SENT_MANUAL':
+      return { label: 'Enviado por WhatsApp', tooltip: 'El equipo lo envió a mano desde WhatsApp.' }
     default:
       return null
   }

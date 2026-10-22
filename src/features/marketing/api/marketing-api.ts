@@ -6,11 +6,21 @@ import { MARKETING_ROUTES } from '@/shared/lib/gateway-routes'
 export type CampaignType = 'Positioning' | 'Direct_sales' | 'Value_content' | 'Testimonial' | 'Reactivation'
 export type CampaignStatus = 'Draft' | 'Active' | 'Paused' | 'Completed' | 'Cancelled'
 
+/** CLIENT: un cliente; SEGMENT: un segmento guardado; ALL: todos los clientes. */
+export type AudienceType = 'CLIENT' | 'SEGMENT' | 'ALL'
+
 export interface Campaign {
   campaignId: number
   campaignName: string
   campaignType: CampaignType
-  clientId: string
+  /** Sin valor en campañas anteriores: equivale a CLIENT. */
+  audienceType?: AudienceType | null
+  /** Solo en audiencia CLIENT; null en SEGMENT o ALL. */
+  clientId: string | null
+  segmentId?: string | null
+  segmentName?: string | null
+  /** Clientes que hoy forman la audiencia (el backend lo recalcula en cada consulta). */
+  audienceSize?: number | null
   projectId?: string | null
   createdBy: string
   startDate: string
@@ -25,7 +35,12 @@ export interface Campaign {
 export type CreateCampaignInput = {
   campaignName: string
   campaignType: CampaignType
-  clientId: string
+  /** Sin valor = CLIENT. */
+  audienceType?: AudienceType
+  /** Obligatorio solo con audienceType CLIENT. */
+  clientId?: string | null
+  /** Obligatorio solo con audienceType SEGMENT. */
+  segmentId?: string | null
   projectId?: string | null
   startDate: string
   endDate?: string | null
@@ -38,7 +53,7 @@ export type UpdateCampaignInput = Partial<CreateCampaignInput>
 
 // ── Tipos y Enums de Workflows ──────────────────────────────────────────────
 export type TriggerType = 'scheduled_date' | 'no_contact_x_days' | 'proposal_no_response' | 'project_completed' | 'manual'
-export type ActionType = 'send_email' | 'send_whatsapp' | 'log_followup' | 'notify_admin'
+export type ActionType = 'send_email' | 'send_portal_message' | 'send_whatsapp' | 'log_followup' | 'notify_admin'
 
 export interface Workflow {
   workflowId: number
@@ -46,7 +61,10 @@ export interface Workflow {
   workflowName: string
   description?: string | null
   triggerType: TriggerType
+  /** Solo en no_contact_x_days y proposal_no_response. */
   noContactDays?: number | null
+  /** Fecha y hora (Bogotá) del disparador scheduled_date, p. ej. "2026-12-01T09:00:00". */
+  scheduledAt?: string | null
   actionType: ActionType
   messageTemplate?: string | null
   /** Plantilla de la biblioteca (opcional; debe estar activa). */
@@ -60,7 +78,10 @@ export type CreateWorkflowInput = {
   workflowName: string
   description?: string | null
   triggerType: TriggerType
+  /** Enviar SOLO en no_contact_x_days y proposal_no_response (otro disparador → 400). */
   noContactDays?: number | null
+  /** Obligatorio con scheduled_date. */
+  scheduledAt?: string | null
   actionType: ActionType
   messageTemplate?: string | null
   templateId?: string | null
@@ -169,3 +190,51 @@ export async function getExecutionsByClientRequest(accessToken: string, clientId
   return api.get(MARKETING_ROUTES.executionsByClient(clientId), { headers: bearer(accessToken) }).json<WorkflowExecution[]>()
 }
 
+
+// ── Vista previa y "Ejecutar ahora" ─────────────────────────────────────────
+export interface WorkflowAudienceClient {
+  clientId: string
+  name: string
+  plan?: string | null
+}
+
+export interface WorkflowSkippedClient {
+  clientId: string
+  name: string
+  /** Motivo en español (p. ej. "Ya lo recibió hace 3 días"). */
+  reason: string
+}
+
+export interface WorkflowPreview {
+  campaignName: string
+  campaignActive: boolean
+  audienceType: AudienceType | string
+  audienceSize: number
+  /** Próxima ejecución (scheduled_date). */
+  nextRunAt?: string | null
+  eligible: WorkflowAudienceClient[]
+  skipped: WorkflowSkippedClient[]
+}
+
+export interface WorkflowExecutedClient {
+  clientId: string
+  name: string
+  /** success | failed | pending */
+  result: string | null
+  /** QUEUED | FAILED | SIMULATED | SKIPPED_LIMIT | SENT_MANUAL, o null si la acción no envía nada. */
+  deliveryStatus: string | null
+  detail?: string | null
+}
+
+export interface WorkflowRunNowResult {
+  executed: WorkflowExecutedClient[]
+  skipped: WorkflowSkippedClient[]
+}
+
+export async function previewWorkflowRequest(accessToken: string, workflowId: number | string): Promise<WorkflowPreview> {
+  return api.get(MARKETING_ROUTES.workflowPreview(workflowId), { headers: bearer(accessToken) }).json<WorkflowPreview>()
+}
+
+export async function runWorkflowNowRequest(accessToken: string, workflowId: number | string): Promise<WorkflowRunNowResult> {
+  return api.post(MARKETING_ROUTES.workflowRunNow(workflowId), { headers: bearer(accessToken) }).json<WorkflowRunNowResult>()
+}

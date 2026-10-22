@@ -108,7 +108,7 @@ export const FUNNEL_STAGE_HELP: Record<FunnelStageKey, { meaning: string; next: 
   },
   approved: {
     meaning: 'Clientes con una propuesta aprobada.',
-    next: 'Siguiente paso: crear su proyecto en CIMAxios.',
+    next: 'Siguiente paso: crear su proyecto en Colaboración.',
   },
   project: {
     meaning: 'Clientes con un proyecto en marcha.',
