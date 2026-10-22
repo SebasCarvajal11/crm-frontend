@@ -23,8 +23,13 @@ jobs:
   ui:
     needs: validate
     runs-on: ubuntu-latest
-    # 25 min: la instalación de dependencias del sistema (apt) a veces tarda
-    # varios minutos por espejos lentos y la suite UI creció con el portal.
+    # Imagen oficial de Playwright: trae Chromium, WebKit y todas sus librerías
+    # del sistema, así no se instala nada con apt (los espejos de Ubuntu en Azure
+    # se quedaban colgados). La versión debe ser la misma de @playwright/test en
+    # pnpm-lock.yaml; al actualizar Playwright, actualice también esta etiqueta.
+    container:
+      image: mcr.microsoft.com/playwright:v1.60.0-noble
+      options: --ipc=host
     timeout-minutes: 25
     strategy:
       fail-fast: false
@@ -41,41 +46,13 @@ jobs:
           cache: pnpm
       - name: Instalar dependencias
         run: pnpm install --frozen-lockfile
-      - name: Cache motores Playwright
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            playwright-browsers-${{ runner.os }}-
-      - name: Configurar reintentos de apt
-        # Los espejos de Ubuntu en Azure a veces dejan una descarga colgada: apt
-        # reintenta cada paquete con su propio límite de tiempo y, si hace falta
-        # repetir la instalación, espera el bloqueo de dpkg en lugar de fallar.
+      - name: Verificar versión de Playwright de la imagen
         run: |
-          sudo tee /etc/apt/apt.conf.d/99ci-reintentos > /dev/null <<'CONF'
-          Acquire::Retries "5";
-          Acquire::http::Timeout "30";
-          Acquire::https::Timeout "30";
-          DPkg::Lock::Timeout "300";
-          CONF
-      - name: Instalar motores de navegador
-        timeout-minutes: 12
-        run: |
-          retry() {
-            for intento in 1 2 3; do
-              "$@" && return 0
-              echo "Intento $intento falló; reintentando en 15 s..."
-              sleep 15
-            done
-            return 1
-          }
-          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" = "true" ]; then
-            retry pnpm exec playwright install-deps webkit
-            retry pnpm exec playwright install chromium webkit
-          else
-            retry pnpm exec playwright install --with-deps chromium webkit
+          esperada="$(node -p "require('@playwright/test/package.json').version")"
+          echo "Playwright del proyecto: $esperada (imagen v1.60.0)"
+          if [ "$esperada" != "1.60.0" ]; then
+            echo "::error::La imagen de Playwright (v1.60.0) no coincide con @playwright/test $esperada. Actualice container.image en ci.yml."
+            exit 1
           fi
       - name: Descargar build compilado
         uses: actions/download-artifact@v4
