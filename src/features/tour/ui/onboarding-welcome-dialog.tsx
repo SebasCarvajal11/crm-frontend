@@ -75,19 +75,19 @@ export function OnboardingWelcomeContent({ role, onStart, onDismiss }: Onboardin
         </div>
       </DialogBody>
 
-      <DialogFooter className="flex-col sm:flex-row gap-2 pt-2">
+      <DialogFooter className="sm:justify-between sm:items-center gap-3">
         <Button
           type="button"
           variant="outline"
           onClick={onDismiss}
-          className="w-full sm:w-auto cursor-pointer"
+          className="w-full sm:w-auto rounded-xl text-xs sm:text-sm cursor-pointer"
         >
           Explorar por mi cuenta
         </Button>
         <Button
           type="button"
           onClick={onStart}
-          className="w-full sm:w-auto gap-1.5 cursor-pointer"
+          className="w-full sm:w-auto gap-1.5 rounded-xl font-medium shadow-xs text-xs sm:text-sm cursor-pointer"
         >
           <Play className="size-3.5 fill-current" />
           <span>Comenzar recorrido</span>
@@ -114,7 +114,11 @@ export function OnboardingWelcomeDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) dismissWelcome() }}>
-      <DialogContent size="lg" className="sm:max-w-md p-6">
+      <DialogContent
+        size="lg"
+        className="sm:max-w-lg"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <OnboardingWelcomeContent
           role={ctx.role}
           onStart={handleStart}

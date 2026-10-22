@@ -124,8 +124,11 @@ function useResolvedAvatar(props: UserAvatarProps) {
     color,
     name,
     userId,
-    preferSprite = true,
+    size = 'md',
+    preferSprite,
   } = props
+  const shouldPreferSprite =
+    typeof preferSprite === 'boolean' ? preferSprite : size !== '2xl'
   const deterministic = resolveDeterministicAvatar(userId ?? name)
   const trimmedSrc = src?.trim()
   const trimmedAvatarUrl = avatarUrl?.trim()
@@ -169,7 +172,7 @@ function useResolvedAvatar(props: UserAvatarProps) {
     ? null
     : (srcAvatarId ?? (isValidAvatarId ? avatarId : deterministic.avatarId))
   const computedSrcSet = resolveAvatarSrcSet(currentSrc, computedAvatarId)
-  const useSprite = preferSprite && !isCustomSrc && typeof computedAvatarId === 'number'
+  const useSprite = shouldPreferSprite && !isCustomSrc && typeof computedAvatarId === 'number'
 
   return {
     currentSrc,

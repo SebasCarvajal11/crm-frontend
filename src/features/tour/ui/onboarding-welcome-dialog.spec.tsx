@@ -60,4 +60,18 @@ describe('OnboardingWelcomeDialog: Bienvenida y Onboarding Proactivo por Rol', (
     expect(markup).toContain('Comenzar recorrido')
     expect(markup).toContain('Explorar por mi cuenta')
   })
+
+  it('estructura el footer con alineacion equilibrada sm:justify-between para separar acciones primarias y secundarias', () => {
+    const markup = renderToStaticMarkup(
+      <Dialog open>
+        <OnboardingWelcomeContent
+          role="admin"
+          onStart={() => {}}
+          onDismiss={() => {}}
+        />
+      </Dialog>
+    )
+
+    expect(markup).toContain('sm:justify-between')
+  })
 })

@@ -66,6 +66,7 @@ export function ProfileHero({
                   userId={identity.id}
                   role={identity.role}
                   size="2xl"
+                  preferSprite={false}
                   className="size-full shadow-none border-0"
                 />
                 <span

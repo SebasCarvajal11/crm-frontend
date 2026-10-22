@@ -183,6 +183,18 @@ describe('UserAvatar', () => {
     expect(markup).toContain('/avatars/avatar-12-1024.webp 1024w')
   })
 
+  it('renderiza automáticamente en modo imagen de alta definición con srcSet para tamaño 2xl por defecto', () => {
+    const markup = renderToStaticMarkup(
+      <UserAvatar avatarId={12} name="Valeria Quintero" size="2xl" />
+    )
+    expect(markup).toContain('<img')
+    expect(markup).not.toContain('data-testid="user-avatar-sprite"')
+    expect(markup).toContain('sizes="(min-width: 640px) 128px, 112px"')
+    expect(markup).toContain('/avatars/avatar-12-1024.webp 1024w')
+    expect(markup).toContain('/avatars/avatar-12-512.webp 512w')
+    expect(markup).toContain('/avatars/avatar-12-256.webp 256w')
+  })
+
   it('sanea src vacío o con espacios y recurre limpiamente al avatar determinista en sprite', () => {
     const markupEmpty = renderToStaticMarkup(
       <UserAvatar src="" name="Santiago" size="md" />
