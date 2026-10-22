@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { CalendarClock, CheckCircle2, Eye, FileText, FolderKanban, MessageSquare, PhoneCall, UserX, XCircle } from 'lucide-react'
+import { CalendarClock, CheckCircle2, Eye, FileText, FolderKanban, MessageSquare, PhoneCall, Send, UserX, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/shared/lib/utils'
@@ -10,10 +10,12 @@ import type {
   TodayPanel as TodayPanelData,
 } from '../api/commercial-api'
 import type { MarketingPlan } from '../api/plans-api'
+import type { MessageThread } from '../api/messages-api'
 import { ClientNameButton } from './client-name-button'
 import { PlanChip } from './plan-chip'
 import { findPlanByName } from './plans.utils'
 import { formatCurrency } from './proposal.constants'
+import { formatThreadTime, lastMessagePreview } from './portal.utils'
 import { TODAY_INITIAL_ROWS, daysOpenLabel, daysSinceContactLabel, remainingLabel } from './commercial.utils'
 
 export interface TodayPanelProps {
@@ -27,6 +29,10 @@ export interface TodayPanelProps {
   onViewProposal: (proposalId: number) => void
   /** Botón "Crear proyecto en CIMAxios" (solo admin); null para otros roles. */
   renderCreateProject?: (item: ApprovedWithoutProject, index: number) => ReactNode
+  /** Conversaciones del portal con mensajes del cliente sin leer (4.ª tarjeta). */
+  unansweredThreads?: MessageThread[] | null
+  /** "Responder": abre la conversación en la pestaña Mensajes. Sin él no se muestra la 4.ª tarjeta. */
+  onOpenThread?: (thread: MessageThread) => void
 }
 
 /** Panel "Hoy": lo que conviene atender hoy, con la acción directa en cada fila. */
@@ -40,7 +46,12 @@ export function TodayPanel({
   onWhatsApp,
   onViewProposal,
   renderCreateProject,
+  unansweredThreads,
+  onOpenThread,
 }: TodayPanelProps) {
+  const threads = Array.isArray(unansweredThreads) ? unansweredThreads : []
+  const showMessages = Boolean(onOpenThread)
+  const grid = showMessages ? 'grid gap-4 md:grid-cols-2 2xl:grid-cols-4' : 'grid gap-4 lg:grid-cols-3'
   const clients = Array.isArray(data?.clientsWithoutContact) ? data.clientsWithoutContact : []
   const proposals = Array.isArray(data?.proposalsWithoutResponse) ? data.proposalsWithoutResponse : []
   const approved = Array.isArray(data?.approvedWithoutProject) ? data.approvedWithoutProject : []
@@ -67,8 +78,8 @@ export function TodayPanel({
       </div>
 
       {isLoading ? (
-        <div className="grid gap-4 lg:grid-cols-3" role="status" aria-label="Cargando panel Hoy">
-          {[0, 1, 2].map((i) => (
+        <div className={grid} role="status" aria-label="Cargando panel Hoy">
+          {(showMessages ? [0, 1, 2, 3] : [0, 1, 2]).map((i) => (
             <Skeleton key={i} className="h-56 w-full rounded-2xl" />
           ))}
         </div>
@@ -81,7 +92,7 @@ export function TodayPanel({
           </Button>
         </div>
       ) : (
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className={grid}>
           <TodayCard
             icon={<UserX className="size-4" />}
             title="Clientes sin contacto"
@@ -187,6 +198,37 @@ export function TodayPanel({
             )}
             itemKey={(a) => String(a.proposalId)}
           />
+
+          {showMessages && (
+            <TodayCard
+              icon={<MessageSquare className="size-4" />}
+              title="Mensajes sin responder"
+              hint="Clientes que escribieron desde su portal y esperan respuesta."
+              count={threads.length}
+              items={threads}
+              empty="No hay mensajes de clientes pendientes."
+              testId="today-messages"
+              renderItem={(t: MessageThread) => (
+                <>
+                  <div className="flex items-start justify-between gap-2">
+                    <ClientNameButton clientId={t.clientId} name={t.clientName || t.clientId} className="min-w-0 text-sm font-medium" />
+                    <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">{formatThreadTime(t.lastAt)}</span>
+                  </div>
+                  <p className="line-clamp-2 text-xs text-muted-foreground">{lastMessagePreview(t)}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-semibold text-primary">
+                      {t.unread} {t.unread === 1 ? 'mensaje sin leer' : 'mensajes sin leer'}
+                    </span>
+                    <Button size="sm" variant="outline" className="h-8 gap-1.5 text-xs" onClick={() => onOpenThread?.(t)}>
+                      <Send className="size-3.5" />
+                      Responder
+                    </Button>
+                  </div>
+                </>
+              )}
+              itemKey={(t) => t.clientId}
+            />
+          )}
         </div>
       )}
     </section>

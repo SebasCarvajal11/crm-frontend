@@ -23,6 +23,7 @@ import { pickAvatarUrl } from '@/shared/lib/avatar-utils'
 import { getAccessTokenRole } from '@/shared/lib/access-token-role'
 import { useTourStore } from '@/features/tour'
 import { DashboardTabContent } from './dashboard-tab-content'
+import { portalBadgeCount, usePortalSummary } from '@/features/marketing/hooks/use-portal-summary'
 import type { DashboardTab } from '@/routes/-dashboard.search'
 
 type Props = {
@@ -111,7 +112,8 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     if (
       (tab === 'overview' && isClient) ||
       (tab === 'admin' && role !== 'admin') ||
-      ((tab === 'marketing' || tab === 'analytics') && role !== 'admin' && role !== 'worker')
+      ((tab === 'marketing' || tab === 'analytics') && role !== 'admin' && role !== 'worker') ||
+      (tab === 'portal' && !isClient)
     ) {
       navigate({ to: '/dashboard', search: (prev) => ({ ...prev, tab: fallbackTab }), replace: true })
     }
@@ -135,6 +137,10 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   })
   const handleOpenProfile = useCallback(() => goTo('account'), [goTo])
   const handleOpenNotifications = useCallback(() => goTo('notifications'), [goTo])
+  const handleGoToProjects = useCallback(
+    (projectId?: string | null) => (projectId ? openProject(projectId) : goTo('collab')),
+    [openProject, goTo],
+  )
   const handleOpenHelp = useCallback(() => { useTourStore.getState().openHelpCenter() }, [])
   const handleLogout = useCallback(() => { logoutMutation.mutate() }, [logoutMutation])
   const handleGoToLogin = useCallback(() => {
@@ -148,15 +154,20 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
   const isAdmin = identity?.role === 'admin'
   const canUseMarketing = !hasRoleMismatch && (identity?.role === 'admin' || identity?.role === 'worker')
   const canViewOverview = !hasRoleMismatch && (identity?.role === 'admin' || identity?.role === 'worker')
+  const canUsePortal = !hasRoleMismatch && identity?.role === 'client'
   const defaultTab: DashboardTab = canViewOverview ? 'overview' : 'collab'
+  // Contador del menú "Mi espacio comercial": propuestas por decidir + mensajes sin leer.
+  const portalSummaryQuery = usePortalSummary(token ?? '', bootstrapped && canUsePortal)
+  const portalBadge = portalBadgeCount(portalSummaryQuery.data)
 
   const activeTab: DashboardTab = useMemo(() => {
     const currentTab = tab ?? defaultTab
     if (currentTab === 'overview' && !canViewOverview) return defaultTab
     if (currentTab === 'admin' && !isAdmin) return defaultTab
     if ((currentTab === 'marketing' || currentTab === 'analytics') && !canUseMarketing) return defaultTab
+    if (currentTab === 'portal' && !canUsePortal) return defaultTab
     return currentTab
-  }, [tab, defaultTab, canViewOverview, isAdmin, canUseMarketing])
+  }, [tab, defaultTab, canViewOverview, isAdmin, canUseMarketing, canUsePortal])
 
   const isReady = Boolean(identity && !dashboardQuery.isPending)
   useScrollToTop(`${activeTab}-${isReady}`)
@@ -166,6 +177,8 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
     goTo,
     canViewOverview,
     canUseMarketing,
+    canUsePortal,
+    portalBadge,
     isAdmin,
   })
 
@@ -247,6 +260,8 @@ export function DashboardPage({ tab, project_id, workspace_tab, chat_channel, ch
         onCloseProject={closeProject}
         onOpenNotification={openNotificationTarget}
         onWorkspaceTabChange={changeWorkspaceTab}
+        canUsePortal={canUsePortal}
+        onGoToProjects={handleGoToProjects}
       />
     </AppShell>
   )

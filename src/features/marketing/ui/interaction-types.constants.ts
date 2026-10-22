@@ -88,6 +88,7 @@ const CHANNEL_LABELS: Record<string, string> = {
   reunion: 'Reunión',
   redes: 'Redes sociales',
   in_app: 'En la aplicación',
+  portal: 'Portal del cliente',
   otro: 'Otro',
 }
 
@@ -96,4 +97,27 @@ export function channelDisplay(channel?: string | null): string {
   if (!channel?.trim()) return '—'
   const key = channel.trim().toLowerCase()
   return CHANNEL_LABELS[key] ?? channel.trim().charAt(0).toUpperCase() + channel.trim().slice(1)
+}
+
+/** Origen de una interacción: flujo automático, portal del cliente o registro manual. */
+export type InteractionOrigin = 'AUTO' | 'PORTAL' | 'MANUAL'
+
+export const ORIGIN_LABELS: Record<InteractionOrigin, string> = {
+  AUTO: 'Automática',
+  PORTAL: 'Portal del cliente',
+  MANUAL: 'Manual',
+}
+
+/**
+ * Las interacciones que nacen en el portal (mensajes y decisiones del cliente)
+ * no tienen campaña: llegan con campaignId null o con channel "portal".
+ */
+export function interactionOrigin(interaction: {
+  executionId?: number | null
+  campaignId?: number | null
+  channel?: string | null
+}): InteractionOrigin {
+  if (interaction.executionId != null) return 'AUTO'
+  if (interaction.campaignId == null || interaction.channel?.trim().toLowerCase() === 'portal') return 'PORTAL'
+  return 'MANUAL'
 }

@@ -1,4 +1,13 @@
-export type DashboardTab = 'overview' | 'collab' | 'marketing' | 'account' | 'notifications' | 'admin' | 'analytics'
+export type DashboardTab =
+  | 'overview'
+  | 'collab'
+  /** "Mi espacio comercial": propuestas y mensajes con CIMA (solo rol client). */
+  | 'portal'
+  | 'marketing'
+  | 'account'
+  | 'notifications'
+  | 'admin'
+  | 'analytics'
 
 export type DashboardSearch = {
   tab?: DashboardTab
@@ -15,6 +24,7 @@ export const parseDashboardSearch = (search: Record<string, unknown>): Dashboard
     tab:
       tab === 'overview' ||
       tab === 'collab' ||
+      tab === 'portal' ||
       tab === 'marketing' ||
       tab === 'analytics' ||
       tab === 'account' ||

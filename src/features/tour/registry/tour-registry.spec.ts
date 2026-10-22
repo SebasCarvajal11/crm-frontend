@@ -21,6 +21,7 @@ describe('Tour Registry Facade', () => {
         expect(step.element).not.toBe('')
         for (const role of step.requiredRole ?? []) expect(tour.roles).toContain(role)
         if (step.switchMarketingTab) expect(step.navigateTab ?? tour.tab).toBe('marketing')
+        if (step.switchPortalTab) expect(step.navigateTab ?? tour.tab).toBe('portal')
         if (step.scope || step.switchWorkspaceTab) expect(step.navigateTab ?? tour.tab).toBe('collab')
       }
     }
@@ -211,15 +212,16 @@ describe('Tour Registry Facade', () => {
   it('retorna el tour de marketing para admin y worker con selectores verificados y 0 emojis', () => {
     const tour = getActiveTourForContext({ activeTab: 'marketing', role: 'admin' })
     expect(tour?.id).toBe('tour-marketing')
-    expect(tour?.steps.length).toBe(19)
+    expect(tour?.steps.length).toBe(20)
     const elements = tour!.steps.map((s) => s.element)
     // El recorrido empieza por Inicio y sigue el flujo comercial en orden.
-    expect(elements.slice(2, 7)).toEqual([
+    expect(elements.slice(2, 8)).toEqual([
       '[data-tour="marketing-home-funnel"]',
       '[data-tour="marketing-funnel-stage"]',
       '[data-tour="marketing-today"]',
       '[data-tour="marketing-today"] [data-client360-link]',
       '[data-tour="marketing-create-project-btn"]',
+      '[data-tour="marketing-messages"]',
     ])
     expect(tour!.steps[2].switchMarketingTab).toBe('home')
     const projectStep = tour!.steps.find((s) => s.element === '[data-tour="marketing-create-project-btn"]')
@@ -335,10 +337,11 @@ describe('Tour Registry Facade', () => {
 
   it('proporciona un checklist de onboarding estructurado por rol (Opción B)', () => {
     const clientChecklist = getOnboardingChecklistForRole('client')
-    expect(clientChecklist).toHaveLength(3)
+    expect(clientChecklist).toHaveLength(4)
     expect(clientChecklist.map((m) => m.id)).toEqual([
       'mission-collab-kanban',
       'mission-collab-client-approvals',
+      'tour-portal',
       'tour-account',
     ])
 
@@ -377,5 +380,35 @@ describe('Tour Registry Facade', () => {
     const matches = searchMissions('tareas', { activeTab: 'collab', role: 'admin' })
     expect(matches.length).toBeGreaterThan(0)
     expect(matches.some((m) => m.id === 'mission-collab-tasks')).toBe(true)
+  })
+})
+
+describe('Mi espacio comercial (portal del cliente)', () => {
+  it('ofrece al cliente su recorrido de propuestas y mensajes, y no a admin ni worker', () => {
+    const tour = getActiveTourForContext({ activeTab: 'portal', role: 'client' })
+    expect(tour?.id).toBe('tour-portal')
+    expect(tour?.steps.map((s) => s.element)).toEqual([
+      '[data-tour="portal-header"]',
+      '[data-tour="portal-proposals"]',
+      '[data-tour="portal-tab-messages"]',
+    ])
+    expect(tour?.steps[1].switchPortalTab).toBe('proposals')
+    expect(getActiveTourForContext({ activeTab: 'portal', role: 'admin' })).toBeNull()
+    expect(getActiveTourForContext({ activeTab: 'portal', role: 'worker' })).toBeNull()
+  })
+
+  it('responde "¿Cómo acepto una propuesta?" y "¿Cómo le escribo a CIMA?" solo al cliente', () => {
+    const preguntas = getQuestionsForContext({ activeTab: 'portal', role: 'client' }).map((q) => q.question)
+    expect(preguntas).toContain('¿Cómo acepto una propuesta?')
+    expect(preguntas).toContain('¿Cómo le escribo a CIMA?')
+    const admin = searchQuestions('acepto una propuesta', { activeTab: 'portal', role: 'admin' }, 'all')
+    expect(admin.some((q) => q.id.startsWith('portal-'))).toBe(false)
+  })
+
+  it('el tour de Marketing incluye la pestaña Mensajes', () => {
+    const tour = getActiveTourForContext({ activeTab: 'marketing', role: 'worker' })
+    const paso = tour?.steps.find((s) => s.element === '[data-tour="marketing-messages"]')
+    expect(paso?.switchMarketingTab).toBe('messages')
+    expect(getQuestionsForContext({ activeTab: 'marketing', role: 'worker' }).map((q) => q.id)).toContain('mkt-q18')
   })
 })

@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
-import { Megaphone, Zap, FileText, Users, MessageSquare, Target, Tag, PenLine, TrendingUp } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { Mail, Megaphone, Zap, FileText, Users, MessageSquare, Target, Tag, PenLine, TrendingUp } from 'lucide-react'
 import { PageHeader } from '@/components/molecules/page-header'
 import { SectionTabs, type SectionTabItem } from '@/components/molecules/section-tabs'
 import { CampaignsManager } from './CampaignsManager'
@@ -12,6 +13,10 @@ import { PlansManager } from './PlansManager'
 import { TemplatesManager } from './TemplatesManager'
 import { MarketingHome } from './MarketingHome'
 import { Client360Provider } from './Client360Provider'
+import { MessagesInbox } from './MessagesInbox'
+import type { Client360Target } from './client360-context'
+import { getMessageThreadsRequest, messagesKeys } from '../api/messages-api'
+import { totalUnread, unansweredThreads } from './portal.utils'
 
 interface Props {
   accessToken: string
@@ -21,6 +26,7 @@ interface Props {
 
 type MarketingTab =
   | 'home'
+  | 'messages'
   | 'clients'
   | 'campaigns'
   | 'proposals'
@@ -32,6 +38,7 @@ type MarketingTab =
 
 const TABS: SectionTabItem<MarketingTab>[] = [
   { value: 'home', label: 'Inicio', icon: <TrendingUp className="size-4" /> },
+  { value: 'messages', label: 'Mensajes', icon: <Mail className="size-4" /> },
   { value: 'clients', label: 'Clientes', icon: <Users className="size-4" /> },
   { value: 'campaigns', label: 'Campañas', icon: <Megaphone className="size-4" /> },
   { value: 'proposals', label: 'Propuestas', icon: <FileText className="size-4" /> },
@@ -44,7 +51,35 @@ const TABS: SectionTabItem<MarketingTab>[] = [
 
 export function MarketingPanel({ accessToken, role }: Props) {
   const isAdmin = role === 'admin'
-  const tabs = useMemo(() => TABS.filter((t) => t.value !== 'plans' || isAdmin), [isAdmin])
+  // Conversaciones del portal: contador de la pestaña Mensajes y tarjeta del panel Hoy.
+  const threadsQuery = useQuery({
+    queryKey: messagesKeys.threads,
+    queryFn: () => getMessageThreadsRequest(accessToken),
+    refetchInterval: 60_000,
+  })
+  const unread = totalUnread(threadsQuery.data)
+  const pendingThreads = useMemo(() => unansweredThreads(threadsQuery.data), [threadsQuery.data])
+  const tabs = useMemo(
+    () =>
+      TABS.filter((t) => t.value !== 'plans' || isAdmin).map((t) =>
+        t.value === 'messages' && unread > 0
+          ? {
+              ...t,
+              badge: (
+                <span
+                  className="inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-bold leading-5 text-primary-foreground tabular-nums"
+                  aria-label={`${unread} sin leer`}
+                  data-testid="marketing-messages-badge"
+                >
+                  {unread > 99 ? '99+' : unread}
+                </span>
+              ),
+            }
+          : t
+      ),
+    [isAdmin, unread]
+  )
+  const [messageTarget, setMessageTarget] = useState<Client360Target | null>(null)
   const [activeTabState, setActiveTab] = useState<MarketingTab>('home')
   // Si el rol cambia y la pestaña ya no está disponible, vuelve a Inicio.
   const activeTab = tabs.some((t) => t.value === activeTabState) ? activeTabState : 'home'
@@ -56,6 +91,7 @@ export function MarketingPanel({ accessToken, role }: Props) {
   const handleTabChange = (nextTab: MarketingTab) => {
     setActiveTab(nextTab)
     if (nextTab !== 'proposals') setHighlightProposalId(null)
+    if (nextTab !== 'messages') setMessageTarget(null)
   }
 
   const goToProposal = (proposalId: number) => {
@@ -68,6 +104,11 @@ export function MarketingPanel({ accessToken, role }: Props) {
     setNewProposalClientId(clientId)
   }
 
+  const openConversation = useCallback((target: Client360Target) => {
+    setActiveTab('messages')
+    setMessageTarget(target)
+  }, [])
+
   const handleSelectCampaignForWorkflows = (campaignId: number) => {
     setPreselectedCampaignId(campaignId)
     handleTabChange('workflows')
@@ -78,6 +119,7 @@ export function MarketingPanel({ accessToken, role }: Props) {
       accessToken={accessToken}
       onNewProposal={newProposalFor}
       onGoToTemplates={() => handleTabChange('templates')}
+      onSendMessage={openConversation}
     >
       <div className="space-y-6">
         <div data-tour="marketing-header">
@@ -95,7 +137,7 @@ export function MarketingPanel({ accessToken, role }: Props) {
                 </span>
               </>
             }
-            description="Embudo comercial, clientes por plan, campañas, propuestas, automatizaciones, segmentos, interacciones y plantillas."
+            description="Embudo comercial, mensajes de clientes, clientes por plan, campañas, propuestas, automatizaciones, segmentos, interacciones y plantillas."
             icon={Megaphone}
           />
         </div>
@@ -118,6 +160,17 @@ export function MarketingPanel({ accessToken, role }: Props) {
                 isAdmin={isAdmin}
                 onViewProposal={goToProposal}
                 onGoToTemplates={() => handleTabChange('templates')}
+                unansweredThreads={pendingThreads}
+                onOpenThread={(t) => openConversation({ clientId: t.clientId, name: t.clientName })}
+              />
+            </div>
+          )}
+
+          {activeTab === 'messages' && (
+            <div className="tab-pane-transition">
+              <MessagesInbox
+                accessToken={accessToken}
+                openTarget={messageTarget}
               />
             </div>
           )}

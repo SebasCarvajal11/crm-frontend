@@ -36,7 +36,7 @@ test('escribir, abrir formularios y cerrar no completar una guía', async ({ pag
 })
 
 test('buscar desde otra sección y cambiar subpestañas conservadas de Marketing', async ({ page }, info) => {
-  // Recorre los 17 pasos del tour de Marketing: en WebKit (iOS) supera los 45 s por defecto.
+  // Recorre los 18 pasos del tour de Marketing: en WebKit (iOS) supera los 45 s por defecto.
   test.slow()
   const { errors, mutations } = await setupDashboard(page, 'worker')
   await page.goto('/dashboard?tab=collab')
@@ -51,19 +51,19 @@ test('buscar desde otra sección y cambiar subpestañas conservadas de Marketing
   await assertBounds(page)
   await guide.getByRole('button', { name: 'Cerrar tutorial' }).click()
   await startTour(page, 'Recorrido del Módulo de Marketing')
-  // Worker: 17 pasos (Planes y Crear proyecto son solo para admin).
-  for (let index = 0; index < 17; index++) {
+  // Worker: 18 pasos (Planes y Crear proyecto son solo para admin).
+  for (let index = 0; index < 18; index++) {
     await expect(guide).toHaveAttribute('aria-busy', 'false')
-    await expect(guide).toContainText(`Paso ${index + 1} de 17`)
+    await expect(guide).toContainText(`Paso ${index + 1} de 18`)
     await expect(guide).not.toContainText('Este elemento no está disponible')
     await assertBounds(page)
-    if (index === 10) {
+    if (index === 11) {
       await page.locator('[data-tour="marketing-tab-proposals"]').click()
       await expect(guide.getByRole('button', { name: 'Volver al paso' })).toBeVisible()
       await guide.getByRole('button', { name: 'Volver al paso' }).click()
       await expect(page.locator('[data-tour="marketing-campaigns-filters"]')).toBeVisible()
     }
-    await guide.getByRole('button', { name: index === 16 ? 'Finalizar' : 'Siguiente', exact: true }).click()
+    await guide.getByRole('button', { name: index === 17 ? 'Finalizar' : 'Siguiente', exact: true }).click()
   }
   await openHelp(page)
   await page.screenshot({ path: info.outputPath('help-center.png'), fullPage: true })

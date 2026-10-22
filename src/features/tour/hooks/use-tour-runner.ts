@@ -16,6 +16,7 @@ export function useTourRunner() {
         title: question.question, description: question.answer,
         scope: question.scope === 'all' ? undefined : question.scope,
         switchWorkspaceTab: question.workspaceTab, switchMarketingTab: question.marketingTab,
+        switchPortalTab: question.portalTab,
         sidebar: question.targetElement?.includes('sidebar-') ?? false,
       }],
     }, ctx.role),

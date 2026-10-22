@@ -93,8 +93,13 @@ export function TourRuntime() {
         }), replace: true })
       }
       if (cancelled()) return
-      if (current.switchMarketingTab) {
-        const tab = await waitForTarget(`[data-tour="marketing-tab-${current.switchMarketingTab}"]`, signal)
+      const sectionTab = current.switchMarketingTab
+        ? `marketing-tab-${current.switchMarketingTab}`
+        : current.switchPortalTab
+          ? `portal-tab-${current.switchPortalTab}`
+          : null
+      if (sectionTab) {
+        const tab = await waitForTarget(`[data-tour="${sectionTab}"]`, signal)
         if (cancelled()) return
         if (tab?.getAttribute('aria-pressed') !== 'true' && !hasApplicationDialog()) tab?.click()
       }

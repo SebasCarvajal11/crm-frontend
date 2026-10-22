@@ -17,7 +17,7 @@ export const marketingTour: CimaTourDefinition = {
     {
       element: '[data-tour="marketing-tabs"]',
       title: 'Secciones Estratégicas',
-      description: 'Empieza en Inicio y alterna entre Clientes, Campañas, Propuestas, Automatizaciones, Segmentos, Interacciones, Plantillas y, si eres administrador, Planes.',
+      description: 'Empieza en Inicio y alterna entre Mensajes, Clientes, Campañas, Propuestas, Automatizaciones, Segmentos, Interacciones, Plantillas y, si eres administrador, Planes.',
       actionHint: 'Haz clic en cualquier pestaña para ver su detalle operativo.',
       side: 'bottom',
     },
@@ -66,6 +66,15 @@ export const marketingTour: CimaTourDefinition = {
       description: 'Cuando una propuesta se aprueba, crea su proyecto con los datos ya cargados. La propuesta queda vinculada y sale de la lista.',
       actionHint: 'Pulsa Crear proyecto en CIMAxios en una propuesta aprobada.',
       side: 'top',
+    },
+    {
+      element: '[data-tour="marketing-messages"]',
+      switchMarketingTab: 'messages',
+      fallbackElement: '[data-tour="marketing-tabs"]',
+      title: 'Mensajes de los Clientes',
+      description: 'Lo que los clientes escriben desde su portal llega aquí, con las conversaciones sin leer primero. Responde en la conversación y, si quieres, envíalo también por correo.',
+      actionHint: 'Abre una conversación para leerla y responder; el contador de la pestaña muestra los mensajes sin leer.',
+      side: 'bottom',
     },
     {
       element: '[data-tour="marketing-clients-plans-grid"]',
@@ -361,6 +370,17 @@ export const marketingQuestions: GuidedQuestion[] = [
     category: 'gestion',
     targetElement: '[data-tour="marketing-today"]',
     marketingTab: 'home',
+    fallbackTargetElement: '[data-tour="marketing-tabs"]',
+  },
+  {
+    id: 'mkt-q18',
+    question: '¿Dónde leo y respondo los mensajes de los clientes?',
+    answer: 'En la pestaña Mensajes de Marketing. Las conversaciones con mensajes sin leer aparecen primero; abre una, escribe la respuesta y marca "Enviar también por correo" si quieres que le llegue además a su correo. También puedes pulsar "Enviar mensaje" en la ficha 360° del cliente.',
+    tab: 'marketing',
+    roles: ['admin', 'worker'],
+    category: 'comunicacion',
+    targetElement: '[data-tour="marketing-messages"]',
+    marketingTab: 'messages',
     fallbackTargetElement: '[data-tour="marketing-tabs"]',
   },
 ]

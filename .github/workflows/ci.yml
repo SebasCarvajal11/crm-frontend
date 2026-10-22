@@ -23,7 +23,14 @@ jobs:
   ui:
     needs: validate
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # Imagen oficial de Playwright: trae Chromium, WebKit y todas sus librerías
+    # del sistema, así no se instala nada con apt (los espejos de Ubuntu en Azure
+    # se quedaban colgados). La versión debe ser la misma de @playwright/test en
+    # pnpm-lock.yaml; al actualizar Playwright, actualice también esta etiqueta.
+    container:
+      image: mcr.microsoft.com/playwright:v1.60.0-noble
+      options: --ipc=host
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -39,24 +46,13 @@ jobs:
           cache: pnpm
       - name: Instalar dependencias
         run: pnpm install --frozen-lockfile
-      - name: Cache motores Playwright
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            playwright-browsers-${{ runner.os }}-
-      - name: Instalar motores de navegador
-        env:
-          DEBIAN_FRONTEND: noninteractive
-          NEEDRESTART_MODE: a
+      - name: Verificar versión de Playwright de la imagen
         run: |
-          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" = "true" ]; then
-            pnpm exec playwright install-deps webkit
-            pnpm exec playwright install chromium webkit
-          else
-            pnpm exec playwright install --with-deps chromium webkit
+          esperada="$(node -p "require('@playwright/test/package.json').version")"
+          echo "Playwright del proyecto: $esperada (imagen v1.60.0)"
+          if [ "$esperada" != "1.60.0" ]; then
+            echo "::error::La imagen de Playwright (v1.60.0) no coincide con @playwright/test $esperada. Actualice container.image en ci.yml."
+            exit 1
           fi
       - name: Descargar build compilado
         uses: actions/download-artifact@v4

@@ -75,6 +75,9 @@ export async function setupDashboard(
       ],
       conversionPercent: [0, null, null, null, 0],
     }
+    else if (path.endsWith('/marketing/me/summary')) json = {
+      clientName: 'Cliente Tutorial', plan: null, planColor: null, pendingProposals: 0, unreadMessages: 0, approvedProposals: 0,
+    }
     else if (path.startsWith('/api/v1/marketing/')) json = []
     else if (path.includes('/analytics/summary') || path.includes('/kpis/current')) json = {}
     else if (path.startsWith('/api/v1/analytics/')) json = []
