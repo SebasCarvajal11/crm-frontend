@@ -31,7 +31,13 @@ export type SinglePageFooterOptions = {
   font: PDFFont
 }
 
+/**
+ * Calibra la escala tipográfica según estándares legales internacionales
+ * (Typography for Lawyers: base 9.5 - 10.5 pt con leading 1.2x - 1.25x),
+ * adaptando suavemente en contratos extensos para garantizar 1 sola página.
+ */
 function resolveScale(totalChars: number): {
+  titleSize: number
   headingSize: number
   headingLineHeight: number
   bodySize: number
@@ -39,29 +45,35 @@ function resolveScale(totalChars: number): {
   gap: number
 } {
   if (totalChars > 2600) {
+    // Caso límite ultra-extenso
     return {
-      headingSize: 7.0,
-      headingLineHeight: 8.8,
-      bodySize: 6.4,
-      bodyLineHeight: 8.0,
-      gap: 2.2,
+      titleSize: 9.5,
+      headingSize: 8.2,
+      headingLineHeight: 10.2,
+      bodySize: 7.5,
+      bodyLineHeight: 9.4,
+      gap: 2.5,
     }
   }
-  if (totalChars > 1800) {
+  if (totalChars > 1900) {
+    // Contrato medio extenso
     return {
-      headingSize: 7.3,
-      headingLineHeight: 9.2,
-      bodySize: 6.7,
-      bodyLineHeight: 8.6,
-      gap: 3.2,
+      titleSize: 10.5,
+      headingSize: 9.0,
+      headingLineHeight: 11.4,
+      bodySize: 8.5,
+      bodyLineHeight: 10.8,
+      gap: 3.5,
     }
   }
+  // Estándar óptimo de legibilidad legal (base 9.5 - 10 pt)
   return {
-    headingSize: 7.6,
-    headingLineHeight: 9.8,
-    bodySize: 7.0,
-    bodyLineHeight: 9.2,
-    gap: 4.0,
+    titleSize: 11.2,
+    headingSize: 9.8,
+    headingLineHeight: 12.6,
+    bodySize: 9.2,
+    bodyLineHeight: 11.8,
+    gap: 4.5,
   }
 }
 
@@ -86,7 +98,7 @@ export function drawContractBody(
       page.drawText(paragraph, {
         x: MARGIN_X,
         y,
-        size: scale.headingSize + 1.2,
+        size: scale.titleSize,
         font: fonts.bold,
         color: TEXT_DARK,
         maxWidth: CONTENT_WIDTH,
@@ -99,11 +111,11 @@ export function drawContractBody(
       page.drawText(paragraph.toUpperCase(), {
         x: MARGIN_X,
         y,
-        size: scale.headingSize,
+        size: scale.headingSize - 0.5,
         font: fonts.bold,
         color: CIMA_RED,
       })
-      y -= scale.headingLineHeight + 1
+      y -= scale.headingLineHeight
       continue
     }
 
@@ -148,68 +160,68 @@ export function drawDualSignatures(
   page.drawText('FIRMAS Y CONSTANCIA DE CONSENTIMIENTO DIGITAL (LEY 527 DE 1999)', {
     x: MARGIN_X + 10,
     y: startY - 9,
-    size: 6.2,
+    size: 6.5,
     font: fonts.bold,
     color: CIMA_RED,
   })
 
   // Firma Cliente (Izquierda)
   const clientX = MARGIN_X + 12
-  page.drawImage(signature, { x: clientX, y: startY - 38, width: 90, height: 24 })
+  page.drawImage(signature, { x: clientX, y: startY - 38, width: 95, height: 25 })
   page.drawLine({
     start: { x: clientX, y: startY - 41 },
-    end: { x: clientX + 190, y: startY - 41 },
+    end: { x: clientX + 195, y: startY - 41 },
     thickness: 0.6,
     color: TEXT_DARK,
   })
   page.drawText(`Firma: ${client.name}`, {
     x: clientX,
-    y: startY - 49,
-    size: 6.5,
+    y: startY - 50,
+    size: 7.2,
     font: fonts.bold,
-    maxWidth: 190,
+    maxWidth: 195,
   })
   page.drawText(`Cliente · ${client.email}`, {
     x: clientX,
-    y: startY - 58,
-    size: 5.8,
+    y: startY - 59,
+    size: 6.4,
     font: fonts.regular,
     color: TEXT_MUTED,
-    maxWidth: 190,
+    maxWidth: 195,
   })
 
   // Firma Prestador (Derecha)
-  const providerX = PAGE_WIDTH - MARGIN_X - 202
+  const providerX = PAGE_WIDTH - MARGIN_X - 208
   page.drawText('CERTIFICACIÓN ELECTRÓNICA DE PRESTADOR', {
     x: providerX,
     y: startY - 29,
-    size: 5.8,
+    size: 6.2,
     font: fonts.bold,
     color: CIMA_GOLD,
   })
   page.drawLine({
     start: { x: providerX, y: startY - 41 },
-    end: { x: providerX + 190, y: startY - 41 },
+    end: { x: providerX + 195, y: startY - 41 },
     thickness: 0.6,
     color: TEXT_DARK,
   })
   page.drawText(provider.representative || provider.name, {
     x: providerX,
-    y: startY - 49,
-    size: 6.5,
+    y: startY - 50,
+    size: 7.2,
     font: fonts.bold,
-    maxWidth: 190,
+    maxWidth: 195,
   })
   const provDetails = [provider.name, provider.taxId ? `NIT ${provider.taxId}` : null]
     .filter(Boolean)
     .join(' · ')
   page.drawText(provDetails, {
     x: providerX,
-    y: startY - 58,
-    size: 5.8,
+    y: startY - 59,
+    size: 6.4,
     font: fonts.regular,
     color: TEXT_MUTED,
-    maxWidth: 190,
+    maxWidth: 195,
   })
 }
 
@@ -233,7 +245,7 @@ export function drawSinglePageFooter(
   page.drawText(footerText, {
     x: MARGIN_X,
     y: 15,
-    size: 5.4,
+    size: 5.6,
     font,
     color: TEXT_MUTED,
     maxWidth: CONTENT_WIDTH,
