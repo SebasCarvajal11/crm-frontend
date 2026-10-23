@@ -31,7 +31,7 @@ import { proposalTitle } from './commercial.utils'
 
 interface ProposalsManagerProps {
   accessToken: string
-  /** Solo el admin ve "Crear proyecto en CIMAxios". */
+  /** Solo el admin ve "Crear proyecto en Colaboración". */
   isAdmin?: boolean
   /** Propuesta a resaltar al llegar desde "Ver propuesta" del panel Hoy. */
   highlightProposalId?: number | null

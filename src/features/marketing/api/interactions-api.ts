@@ -12,7 +12,7 @@ export type InteractionType =
   | 'testimonial'
 
 /** Resultado del envío del correo o mensaje asociado a la interacción. */
-export type DeliveryStatus = 'QUEUED' | 'FAILED' | 'SIMULATED' | 'SKIPPED_LIMIT'
+export type DeliveryStatus = 'QUEUED' | 'FAILED' | 'SIMULATED' | 'SKIPPED_LIMIT' | 'SENT_MANUAL'
 
 export interface MarketingInteraction {
   interactionId: number

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Filter, XCircle } from 'lucide-react'
+import { Filter, FolderCheck, XCircle } from 'lucide-react'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { parseApiError } from '@/shared/lib/parse-api-error'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { IconButton } from '@/components/ui/icon-button'
@@ -10,6 +12,13 @@ import {
   previewSegmentRequest,
   executeOnSegmentRequest,
   runSchedulerRequest,
+  listSavedSegmentsRequest,
+  createSavedSegmentRequest,
+  updateSavedSegmentRequest,
+  setSavedSegmentActiveRequest,
+  getSavedSegmentClientsRequest,
+  savedSegmentsKey,
+  type SavedSegment,
   type SegmentCriteria,
   type SegmentPreview,
   type SchedulerRunResult,
@@ -26,7 +35,11 @@ import {
   ESTADOS_PROPUESTA,
   CRITERIOS_VACIOS,
   limpiar,
+  toEditableCriteria,
 } from './segment-criteria.utils'
+import { SaveSegmentDialog } from './save-segment-dialog'
+import { SavedSegmentsSection, SegmentClientsList } from './saved-segments-section'
+import { clientCountLabel } from './audience.utils'
 
 interface SegmentsManagerProps {
   accessToken: string
@@ -34,13 +47,63 @@ interface SegmentsManagerProps {
 
 export function SegmentsManager({ accessToken }: SegmentsManagerProps) {
   const queryClient = useQueryClient()
-  const { activePlans, isLoading: plansLoading } = usePlans(accessToken)
+  const { plans, activePlans, isLoading: plansLoading } = usePlans(accessToken)
 
   const [criteria, setCriteria] = useState<SegmentCriteria>(CRITERIOS_VACIOS)
   const [preview, setPreview] = useState<SegmentPreview | null>(null)
   const [selectedWorkflow, setSelectedWorkflow] = useState<string>('')
   const [schedulerResult, setSchedulerResult] = useState<SchedulerRunResult | null>(null)
   const [mensaje, setMensaje] = useState<string | null>(null)
+  // Segmentos guardados
+  const [saveOpen, setSaveOpen] = useState(false)
+  const [editingSegment, setEditingSegment] = useState<SavedSegment | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [viewing, setViewing] = useState<SavedSegment | null>(null)
+  const [toggleError, setToggleError] = useState<{ segmentId: string; message: string } | null>(null)
+
+  const savedQuery = useQuery({
+    queryKey: savedSegmentsKey,
+    queryFn: () => listSavedSegmentsRequest(accessToken),
+  })
+  const segmentClientsQuery = useQuery({
+    queryKey: [...savedSegmentsKey, 'clients', viewing?.segmentId ?? 'none'],
+    queryFn: () => getSavedSegmentClientsRequest(accessToken, viewing!.segmentId),
+    enabled: viewing !== null,
+  })
+
+  const saveMutation = useMutation({
+    mutationFn: async (v: { name: string; description: string; replaceCriteria: boolean }) => {
+      if (editingSegment) {
+        return updateSavedSegmentRequest(accessToken, editingSegment.segmentId, {
+          name: v.name,
+          description: v.description || null,
+          criteria: v.replaceCriteria ? limpiar(criteria) : editingSegment.criteria,
+        })
+      }
+      return createSavedSegmentRequest(accessToken, {
+        name: v.name,
+        description: v.description || null,
+        criteria: limpiar(criteria),
+      })
+    },
+    onSuccess: (saved) => {
+      void queryClient.invalidateQueries({ queryKey: savedSegmentsKey })
+      void queryClient.invalidateQueries({ queryKey: ['marketing', 'campaigns'] })
+      setMensaje(
+        `${editingSegment ? 'Segmento actualizado' : 'Segmento guardado'}: “${saved.name}” · ${clientCountLabel(saved.clientCount)}. Ya puede usarlo como audiencia de una campaña.`
+      )
+      setSaveOpen(false)
+      setEditingSegment(null)
+    },
+    onError: async (error) => setSaveError(await parseApiError(error)),
+  })
+
+  const toggleMutation = useMutation({
+    mutationFn: (s: SavedSegment) => setSavedSegmentActiveRequest(accessToken, s.segmentId, !s.active),
+    onMutate: () => setToggleError(null),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: savedSegmentsKey }),
+    onError: async (error, s) => setToggleError({ segmentId: s.segmentId, message: await parseApiError(error) }),
+  })
 
   const clientsQuery = useQuery({
     queryKey: ['marketing', 'clients', accessToken],
@@ -224,7 +287,7 @@ export function SegmentsManager({ accessToken }: SegmentsManagerProps) {
               </div>
             </div>
 
-            <div className="flex gap-3 border-t pt-4">
+            <div className="flex flex-wrap gap-3 border-t pt-4">
               <Button
                 onClick={() => previewMutation.mutate()}
                 disabled={previewMutation.isPending}
@@ -233,7 +296,22 @@ export function SegmentsManager({ accessToken }: SegmentsManagerProps) {
                 <Filter className="h-4 w-4" />
                 {previewMutation.isPending ? 'Calculando…' : 'Calcular segmento'}
               </Button>
-              <Button variant="outline" onClick={limpiarTodo}>
+              <Button
+                variant="outline"
+                className="gap-2"
+                disabled={!preview}
+                title={preview ? undefined : 'Primero calcule el segmento'}
+                onClick={() => {
+                  setEditingSegment(null)
+                  setSaveError(null)
+                  setSaveOpen(true)
+                }}
+                data-tour="marketing-save-segment-btn"
+              >
+                <FolderCheck className="h-4 w-4" />
+                Guardar como segmento
+              </Button>
+              <Button variant="ghost" onClick={limpiarTodo}>
                 Limpiar criterios
               </Button>
             </div>
@@ -250,6 +328,65 @@ export function SegmentsManager({ accessToken }: SegmentsManagerProps) {
           onExecute={() => executeMutation.mutate()}
         />
       </div>
+
+      <SavedSegmentsSection
+        segments={savedQuery.data ?? []}
+        isLoading={savedQuery.isLoading}
+        isError={savedQuery.isError}
+        onRetry={() => void savedQuery.refetch()}
+        onViewClients={setViewing}
+        onEdit={(s) => {
+          setEditingSegment(s)
+          setSaveError(null)
+          setSaveOpen(true)
+        }}
+        onToggleActive={(s) => toggleMutation.mutate(s)}
+        onLoadCriteria={(s) => {
+          setCriteria(toEditableCriteria(s.criteria))
+          setPreview(null)
+          setMensaje(`Criterios de “${s.name}” cargados en el segmentador. Pulse “Calcular segmento” para ver el público.`)
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }}
+        togglingId={toggleMutation.isPending ? toggleMutation.variables?.segmentId : null}
+        toggleError={toggleError}
+      />
+
+      <SaveSegmentDialog
+        open={saveOpen}
+        editing={editingSegment}
+        criteria={limpiar(criteria)}
+        canReplaceCriteria={preview !== null}
+        isPending={saveMutation.isPending}
+        error={saveError}
+        onSubmit={(v) => {
+          setSaveError(null)
+          saveMutation.mutate(v)
+        }}
+        onClose={() => {
+          setSaveOpen(false)
+          setEditingSegment(null)
+        }}
+      />
+
+      <Sheet open={viewing !== null} onOpenChange={(o) => !o && setViewing(null)}>
+        <SheetContent side="right" className="w-full gap-0 sm:data-[side=right]:max-w-lg">
+          <SheetHeader className="pr-12 sm:px-5">
+            <SheetTitle className="text-lg font-bold tracking-tight">{viewing?.name ?? 'Segmento'}</SheetTitle>
+            <SheetDescription>
+              Clientes que hoy cumplen el criterio{viewing ? ` · ${clientCountLabel(viewing.clientCount)}` : ''}.
+            </SheetDescription>
+          </SheetHeader>
+          {viewing && (
+            <SegmentClientsList
+              clients={segmentClientsQuery.data}
+              isLoading={segmentClientsQuery.isLoading}
+              isError={segmentClientsQuery.isError}
+              plans={plans}
+              onRetry={() => void segmentClientsQuery.refetch()}
+            />
+          )}
+        </SheetContent>
+      </Sheet>
 
       {mensaje && (
         <div

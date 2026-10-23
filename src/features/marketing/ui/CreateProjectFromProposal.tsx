@@ -28,7 +28,7 @@ interface CreateProjectFromProposalProps {
 }
 
 /**
- * Botón "Crear proyecto en CIMAxios" para una propuesta aprobada sin proyecto
+ * Botón "Crear proyecto en Colaboración" para una propuesta aprobada sin proyecto
  * (solo admin). Abre el formulario de proyecto de Colaboración precargado y, al
  * crearlo, vincula la propuesta con PATCH /proposals/{id}/project.
  */
@@ -101,7 +101,7 @@ export function CreateProjectFromProposal({
         data-tour={dataTour}
       >
         <FolderKanban className="size-3.5" />
-        {linkMutation.isPending ? 'Vinculando…' : 'Crear proyecto en CIMAxios'}
+        {linkMutation.isPending ? 'Vinculando…' : 'Crear proyecto en Colaboración'}
       </Button>
       {error && (
         <p className="text-xs font-medium text-destructive" role="alert">

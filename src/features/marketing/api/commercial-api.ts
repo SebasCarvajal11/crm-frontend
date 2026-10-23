@@ -2,6 +2,7 @@ import { api } from '@/shared/lib'
 import { bearer } from '@/shared/lib/bearer'
 import { MARKETING_ROUTES } from '@/shared/lib/gateway-routes'
 import type { Proposal } from './proposals-api'
+import type { WhatsappPendingItem } from './whatsapp-api'
 
 // ── Embudo comercial ─────────────────────────────────────────────────────────
 export type FunnelStageKey =
@@ -107,10 +108,13 @@ export interface TodayPanel {
   clientsWithoutContact: ClientWithoutContact[]
   proposalsWithoutResponse: ProposalWithoutResponse[]
   approvedWithoutProject: ApprovedWithoutProject[]
+  /** WhatsApp preparados por automatizaciones que falta enviar (máx. 20). */
+  whatsappPending?: WhatsappPendingItem[]
   counts: {
     clientsWithoutContact: number
     proposalsWithoutResponse: number
     approvedWithoutProject: number
+    whatsappPending?: number
   }
 }
 

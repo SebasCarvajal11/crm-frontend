@@ -180,9 +180,9 @@ describe('TodayPanel', () => {
         approvedWithoutProject: [{ proposalId: 5, title: 'Plan Oro', clientId: 'c1', clientName: 'Acme', value: 1 }],
         counts: { ...today.counts, approvedWithoutProject: 1 },
       },
-      renderCreateProject: () => <button>Crear proyecto en CIMAxios</button>,
+      renderCreateProject: () => <button>Crear proyecto en Colaboración</button>,
     })
-    expect(admin).toContain('Crear proyecto en CIMAxios')
+    expect(admin).toContain('Crear proyecto en Colaboración')
   })
 })
 
@@ -256,13 +256,13 @@ describe('ProposalCard con proyecto', () => {
     )
 
   it('muestra "Proyecto vinculado" cuando tiene projectId', () => {
-    const markup = render({ ...base, projectId: 'proj-1' }, <button>Crear proyecto en CIMAxios</button>)
+    const markup = render({ ...base, projectId: 'proj-1' }, <button>Crear proyecto en Colaboración</button>)
     expect(markup).toContain('Proyecto vinculado')
-    expect(markup).not.toContain('Crear proyecto en CIMAxios')
+    expect(markup).not.toContain('Crear proyecto en Colaboración')
   })
   it('sin proyecto muestra la acción y queda resaltada', () => {
-    const markup = render(base, <button>Crear proyecto en CIMAxios</button>)
-    expect(markup).toContain('Crear proyecto en CIMAxios')
+    const markup = render(base, <button>Crear proyecto en Colaboración</button>)
+    expect(markup).toContain('Crear proyecto en Colaboración')
     expect(markup).toContain('data-highlighted="true"')
     expect(markup).toContain('id="proposal-5"')
   })

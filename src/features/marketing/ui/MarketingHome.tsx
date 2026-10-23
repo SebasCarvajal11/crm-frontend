@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { markWhatsappSentRequest } from '../api/whatsapp-api'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import {
   commercialKeys,
@@ -50,6 +51,16 @@ export function MarketingHome({
     queryKey: commercialKeys.funnel(periodValue),
     queryFn: () => getFunnelRequest(accessToken, periodValue),
   })
+  const queryClient = useQueryClient()
+  const markSent = useMutation({
+    mutationFn: (interactionId: number) => markWhatsappSentRequest(accessToken, interactionId),
+    // Desde ahí cuenta como contacto: se refrescan Hoy, el embudo y las interacciones.
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: commercialKeys.today })
+      void queryClient.invalidateQueries({ queryKey: ['marketing', 'interactions'] })
+      void queryClient.invalidateQueries({ queryKey: ['marketing', 'funnel'] })
+    },
+  })
   const todayQuery = useQuery({
     queryKey: commercialKeys.today,
     queryFn: () => getTodayPanelRequest(accessToken),
@@ -85,6 +96,8 @@ export function MarketingHome({
         onWhatsApp={(c) => setWhatsApp({ clientId: c.clientId, clientName: c.name })}
         onViewProposal={onViewProposal}
         unansweredThreads={unansweredThreads}
+        onMarkWhatsappSent={(w) => markSent.mutate(w.interactionId)}
+        markingWhatsappId={markSent.isPending ? markSent.variables : null}
         onOpenThread={onOpenThread}
         renderCreateProject={
           isAdmin

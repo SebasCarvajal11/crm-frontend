@@ -16,7 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { createInteractionRequest } from '../api/interactions-api'
-import { listCampaignsRequest } from '../api/marketing-api'
+import { getCampaignsByClientRequest, listCampaignsRequest } from '../api/marketing-api'
 import { listTemplatesRequest, previewTemplateRequest } from '../api/templates-api'
 import { buildWhatsAppUrl, campaignsForClient, WHATSAPP_CHANNEL } from './whatsapp.utils'
 
@@ -100,9 +100,20 @@ function WhatsAppDialogBody({
     queryFn: () => listCampaignsRequest(accessToken),
     enabled: !target.campaignId,
   })
+  // Campañas cuya audiencia actual incluye al cliente (también por segmento).
+  const clientCampaignsQuery = useQuery({
+    queryKey: ['marketing', 'campaigns', 'client', target.clientId],
+    queryFn: () => getCampaignsByClientRequest(accessToken, target.clientId),
+    enabled: !target.campaignId && Boolean(target.clientId),
+  })
   const { campaigns, ofClient } = useMemo(
-    () => campaignsForClient(campaignsQuery.data ?? [], target.clientId),
-    [campaignsQuery.data, target.clientId]
+    () =>
+      campaignsForClient(
+        campaignsQuery.data ?? [],
+        target.clientId,
+        new Set((clientCampaignsQuery.data ?? []).map((c) => c.campaignId))
+      ),
+    [campaignsQuery.data, clientCampaignsQuery.data, target.clientId]
   )
 
   const previewQuery = useQuery({

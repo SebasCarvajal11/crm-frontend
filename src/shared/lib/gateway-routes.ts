@@ -169,6 +169,9 @@ export const MARKETING_ROUTES = {
   workflowsByCampaign: (campaignId: string | number) => `${API_PREFIX}/marketing/workflows/campaign/${campaignId}`,
   workflowsActive: `${API_PREFIX}/marketing/workflows/active`,
   workflowToggle: (id: string | number) => `${API_PREFIX}/marketing/workflows/${id}/toggle`,
+  // Vista previa ("a quién le llegaría") y "Ejecutar ahora" (crm-marketing B6, gateway 1.7.0)
+  workflowPreview: (id: string | number) => `${API_PREFIX}/marketing/workflows/${id}/preview`,
+  workflowRunNow: (id: string | number) => `${API_PREFIX}/marketing/workflows/${id}/run-now`,
   executionsRun: (workflowId: string | number) => `${API_PREFIX}/marketing/executions/run/${workflowId}`,
   executionsRunForClient: (workflowId: string | number, clientId: string | number) => `${API_PREFIX}/marketing/executions/run/${workflowId}/client/${clientId}`,
   executionsByWorkflow: (workflowId: string | number) => `${API_PREFIX}/marketing/executions/workflow/${workflowId}`,
@@ -190,6 +193,13 @@ export const MARKETING_ROUTES = {
   interactionResponse: (id: string | number) => `${API_PREFIX}/marketing/interactions/${id}/response`,
   segmentPreview: `${API_PREFIX}/marketing/segments/preview`,
   segmentExecute: (workflowId: string | number) => `${API_PREFIX}/marketing/segments/${workflowId}/execute`,
+  savedSegments: `${API_PREFIX}/marketing/segments/saved`,
+  savedSegment: (segmentId: string) => `${API_PREFIX}/marketing/segments/saved/${segmentId}`,
+  savedSegmentActive: (segmentId: string) => `${API_PREFIX}/marketing/segments/saved/${segmentId}/active`,
+  savedSegmentClients: (segmentId: string) => `${API_PREFIX}/marketing/segments/saved/${segmentId}/clients`,
+  whatsappPending: `${API_PREFIX}/marketing/whatsapp/pending`,
+  whatsappPendingSent: (interactionId: string | number) =>
+    `${API_PREFIX}/marketing/whatsapp/pending/${interactionId}/sent`,
   schedulerRun: `${API_PREFIX}/marketing/scheduler/run`,
   integrationSync: `${API_PREFIX}/integration/sync`,
   // Planes configurables, plantillas y correos (crm-marketing, PR #10)

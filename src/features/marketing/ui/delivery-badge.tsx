@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, EyeOff, XCircle } from 'lucide-react'
+import { CheckCheck, CheckCircle2, Clock, EyeOff, XCircle } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import type { DeliveryStatus } from '../api/interactions-api'
 import { deliveryMeta } from './delivery.utils'
@@ -8,6 +8,7 @@ const ICONS = {
   FAILED: XCircle,
   SIMULATED: EyeOff,
   SKIPPED_LIMIT: Clock,
+  SENT_MANUAL: CheckCheck,
 } as const
 
 const TONES = {
@@ -15,6 +16,7 @@ const TONES = {
   FAILED: 'border-destructive/40 bg-destructive/10 text-destructive',
   SIMULATED: 'border-border bg-muted text-muted-foreground',
   SKIPPED_LIMIT: 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+  SENT_MANUAL: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
 } as const
 
 interface DeliveryBadgeProps {

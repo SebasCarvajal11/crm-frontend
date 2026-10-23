@@ -14,6 +14,8 @@ import {
   type CreateCampaignInput,
 } from '../api/marketing-api'
 import { listClientsRequest, type MarketingClient } from '../api/clients-api'
+import { listSavedSegmentsRequest, savedSegmentsKey, type SavedSegment } from '../api/segments-api'
+import { audienceTypeOf, campaignPayload } from './audience.utils'
 import { CAMPAIGN_STATUSES, CAMPAIGN_TYPES, clientLabel } from './campaign.constants'
 import { CampaignCard } from './campaign-card'
 import { CampaignFormDialog } from './campaign-form-dialog'
@@ -27,7 +29,9 @@ interface CampaignsManagerProps {
 const INITIAL_FORM_DATA: CreateCampaignInput = {
   campaignName: '',
   campaignType: 'Direct_sales',
+  audienceType: 'CLIENT',
   clientId: '',
+  segmentId: null,
   startDate: new Date().toISOString().split('T')[0],
   endDate: '',
   status: 'Active',
@@ -56,6 +60,11 @@ export function CampaignsManager({
   const clientsQuery = useQuery({
     queryKey: ['marketing', 'clients', accessToken],
     queryFn: () => listClientsRequest(accessToken),
+  })
+
+  const segmentsQuery = useQuery({
+    queryKey: savedSegmentsKey,
+    queryFn: () => listSavedSegmentsRequest(accessToken),
   })
 
   const createMutation = useMutation({
@@ -89,7 +98,9 @@ export function CampaignsManager({
     setFormData({
       campaignName: campaign.campaignName,
       campaignType: campaign.campaignType,
-      clientId: campaign.clientId,
+      audienceType: audienceTypeOf(campaign),
+      clientId: campaign.clientId ?? '',
+      segmentId: campaign.segmentId ?? null,
       startDate: campaign.startDate,
       endDate: campaign.endDate || '',
       status: campaign.status,
@@ -103,15 +114,16 @@ export function CampaignsManager({
     if (editingCampaign) {
       updateMutation.mutate({
         id: editingCampaign.campaignId,
-        input: formData,
+        input: campaignPayload(formData),
       })
     } else {
-      createMutation.mutate(formData)
+      createMutation.mutate(campaignPayload(formData))
     }
   }
 
   const campaigns = useMemo(() => ensureArray<Campaign>(campaignsQuery.data), [campaignsQuery.data])
   const clients = useMemo(() => ensureArray<MarketingClient>(clientsQuery.data), [clientsQuery.data])
+  const segments = useMemo(() => ensureArray<SavedSegment>(segmentsQuery.data), [segmentsQuery.data])
   const clientNames = useMemo(
     () => new Map(clients.map((cl) => [cl.clientId, clientLabel(cl)])),
     [clients],
@@ -253,7 +265,7 @@ export function CampaignsManager({
               <CampaignCard
                 key={c.campaignId}
                 campaign={c}
-                clientName={clientNames.get(c.clientId)}
+                clientName={c.clientId ? clientNames.get(c.clientId) : undefined}
                 onEdit={handleOpenEdit}
                 onDelete={(id) => {
                   if (confirm(`¿Eliminar la campaña "${c.campaignName}"?`)) {
@@ -273,6 +285,13 @@ export function CampaignsManager({
         formData={formData}
         clients={clients}
         clientsLoading={clientsQuery.isLoading}
+        segments={segments}
+        segmentsLoading={segmentsQuery.isLoading}
+        error={
+          createMutation.isError || updateMutation.isError
+            ? 'No se pudo guardar la campaña. Revise la audiencia: el segmento debe estar activo.'
+            : null
+        }
         isPending={createMutation.isPending || updateMutation.isPending}
         onClose={() => {
           setIsCreateOpen(false)

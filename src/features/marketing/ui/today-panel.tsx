@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { CalendarClock, CheckCircle2, Eye, FileText, FolderKanban, MessageSquare, PhoneCall, Send, UserX, XCircle } from 'lucide-react'
+import { CalendarClock, CheckCheck, CheckCircle2, ExternalLink, Eye, FileText, FolderKanban, Loader2, MessageSquare, PhoneCall, Send, UserX, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/shared/lib/utils'
@@ -11,6 +11,8 @@ import type {
 } from '../api/commercial-api'
 import type { MarketingPlan } from '../api/plans-api'
 import type { MessageThread } from '../api/messages-api'
+import type { WhatsappPendingItem } from '../api/whatsapp-api'
+import { buildWhatsAppUrl } from './whatsapp.utils'
 import { ClientNameButton } from './client-name-button'
 import { PlanChip } from './plan-chip'
 import { findPlanByName } from './plans.utils'
@@ -27,12 +29,16 @@ export interface TodayPanelProps {
   onRegisterContact: (client: ClientWithoutContact) => void
   onWhatsApp: (client: ClientWithoutContact) => void
   onViewProposal: (proposalId: number) => void
-  /** Botón "Crear proyecto en CIMAxios" (solo admin); null para otros roles. */
+  /** Botón "Crear proyecto en Colaboración" (solo admin); null para otros roles. */
   renderCreateProject?: (item: ApprovedWithoutProject, index: number) => ReactNode
   /** Conversaciones del portal con mensajes del cliente sin leer (4.ª tarjeta). */
   unansweredThreads?: MessageThread[] | null
   /** "Responder": abre la conversación en la pestaña Mensajes. Sin él no se muestra la 4.ª tarjeta. */
   onOpenThread?: (thread: MessageThread) => void
+  /** "Marcar como enviado" de un WhatsApp preparado por una automatización. Sin él no se muestra la tarjeta. */
+  onMarkWhatsappSent?: (item: WhatsappPendingItem) => void
+  /** interactionId que se está marcando. */
+  markingWhatsappId?: number | null
 }
 
 /** Panel "Hoy": lo que conviene atender hoy, con la acción directa en cada fila. */
@@ -48,10 +54,20 @@ export function TodayPanel({
   renderCreateProject,
   unansweredThreads,
   onOpenThread,
+  onMarkWhatsappSent,
+  markingWhatsappId,
 }: TodayPanelProps) {
   const threads = Array.isArray(unansweredThreads) ? unansweredThreads : []
+  const whatsapp = Array.isArray(data?.whatsappPending) ? data.whatsappPending : []
   const showMessages = Boolean(onOpenThread)
-  const grid = showMessages ? 'grid gap-4 md:grid-cols-2 2xl:grid-cols-4' : 'grid gap-4 lg:grid-cols-3'
+  const showWhatsapp = Boolean(onMarkWhatsappSent)
+  const cards = 3 + (showMessages ? 1 : 0) + (showWhatsapp ? 1 : 0)
+  const grid =
+    cards === 4
+      ? 'grid gap-4 md:grid-cols-2 2xl:grid-cols-4'
+      : cards === 5
+        ? 'grid gap-4 md:grid-cols-2 xl:grid-cols-3'
+        : 'grid gap-4 lg:grid-cols-3'
   const clients = Array.isArray(data?.clientsWithoutContact) ? data.clientsWithoutContact : []
   const proposals = Array.isArray(data?.proposalsWithoutResponse) ? data.proposalsWithoutResponse : []
   const approved = Array.isArray(data?.approvedWithoutProject) ? data.approvedWithoutProject : []
@@ -79,7 +95,7 @@ export function TodayPanel({
 
       {isLoading ? (
         <div className={grid} role="status" aria-label="Cargando panel Hoy">
-          {(showMessages ? [0, 1, 2, 3] : [0, 1, 2]).map((i) => (
+          {Array.from({ length: cards }, (_, i) => i).map((i) => (
             <Skeleton key={i} className="h-56 w-full rounded-2xl" />
           ))}
         </div>
@@ -171,7 +187,7 @@ export function TodayPanel({
           <TodayCard
             icon={<FolderKanban className="size-4" />}
             title="Aprobadas sin proyecto"
-            hint="Propuestas aprobadas que aún no tienen proyecto en CIMAxios."
+            hint="Propuestas aprobadas que aún no tienen proyecto en Colaboración."
             count={counts.approvedWithoutProject}
             items={approved}
             empty="Todas las propuestas aprobadas ya tienen proyecto."
@@ -227,6 +243,50 @@ export function TodayPanel({
                 </>
               )}
               itemKey={(t) => t.clientId}
+            />
+          )}
+
+          {showWhatsapp && (
+            <TodayCard
+              icon={<MessageSquare className="size-4" />}
+              title="WhatsApp por enviar"
+              hint="Mensajes que preparó una automatización: ábralos en WhatsApp y márquelos como enviados."
+              count={data?.counts?.whatsappPending ?? whatsapp.length}
+              items={whatsapp}
+              empty="No hay mensajes de WhatsApp por enviar."
+              testId="today-whatsapp"
+              renderItem={(w: WhatsappPendingItem) => (
+                <>
+                  <div className="flex items-start justify-between gap-2">
+                    <ClientNameButton clientId={w.clientId} name={w.clientName || w.clientId} className="min-w-0 text-sm font-medium" />
+                    <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">{formatThreadTime(w.createdAt)}</span>
+                  </div>
+                  {w.workflowName && <p className="text-[11px] text-muted-foreground">Automatización: {w.workflowName}</p>}
+                  <p className="line-clamp-3 whitespace-pre-line rounded-lg bg-muted/40 p-2 text-xs">{w.message}</p>
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    <Button asChild size="sm" variant="outline" className="h-8 gap-1.5 text-xs">
+                      <a href={buildWhatsAppUrl(w.message)} target="_blank" rel="noreferrer">
+                        <ExternalLink className="size-3.5" />
+                        Abrir en WhatsApp
+                      </a>
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="h-8 gap-1.5 text-xs"
+                      onClick={() => onMarkWhatsappSent?.(w)}
+                      disabled={markingWhatsappId === w.interactionId}
+                    >
+                      {markingWhatsappId === w.interactionId ? (
+                        <Loader2 className="size-3.5 animate-spin" />
+                      ) : (
+                        <CheckCheck className="size-3.5" />
+                      )}
+                      Marcar como enviado
+                    </Button>
+                  </div>
+                </>
+              )}
+              itemKey={(w) => String(w.interactionId)}
             />
           )}
         </div>

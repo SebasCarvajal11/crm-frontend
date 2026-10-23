@@ -50,8 +50,10 @@ describe('canales y filtros', () => {
   it('relaciona cada acción de automatización con el canal de plantilla', () => {
     expect(channelForAction('send_email')).toBe('EMAIL')
     expect(channelForAction('send_whatsapp')).toBe('WHATSAPP')
-    expect(channelForAction('notify_admin')).toBe('IN_APP')
-    expect(channelForAction('log_followup')).toBe('IN_APP')
+    expect(channelForAction('send_portal_message')).toBe('IN_APP')
+    // Seguimiento y notificar no usan plantilla.
+    expect(channelForAction('notify_admin')).toBeNull()
+    expect(channelForAction('log_followup')).toBeNull()
     expect(channelLabel('IN_APP')).toBe('En la aplicación')
   })
 
